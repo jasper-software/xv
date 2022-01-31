@@ -1,11 +1,11 @@
-/* 
+/*
  * xvdial.c - DIAL handling functions
  *
  * callable functions:
  *
  *   DCreate()   -  creates a dial
  *   DSetRange() -  sets min/max/current values of control
- *   DSetVal()   -  sets value of control 
+ *   DSetVal()   -  sets value of control
  *   DSetActive() - turns dial '.active' on and off
  *   DRedraw()   -  redraws the dial
  *   DTrack()    -  called when clicked.  Operates control 'til mouseup
@@ -41,51 +41,53 @@ static int    pixmaps_built=0;   /* true if pixmaps created already */
 
 
 /* local functions */
-static int  whereInDial     PARM((DIAL *, int, int));
-static void drawArrow       PARM((DIAL *));
-static void drawValStr      PARM((DIAL *));
-static void drawButt        PARM((DIAL *, int, int));
-static int  computeDialVal  PARM((DIAL *, int, int));
-static void dimDial         PARM((DIAL *));
+static int    whereInDial     PARM((DIAL *, int, int));
+static void   drawArrow       PARM((DIAL *));
+static void   drawValStr      PARM((DIAL *));
+static void   drawButt        PARM((DIAL *, int, int));
+static double computeDialVal  PARM((DIAL *, int, int));
+static void   dimDial         PARM((DIAL *));
 
 
 /***************************************************/
-void DCreate(dp, parent, x, y, w, h, minv, maxv, curv, page, 
+void DCreate(dp, parent, x, y, w, h, minv, maxv, curv, inc, page,
 	          fg, bg, hi, lo, title, units)
-DIAL         *dp;
-Window        parent;
-int           x,y,w,h,minv,maxv,curv,page;
-unsigned long fg,bg,hi,lo;
-char         *title, *units;
+DIAL          *dp;
+Window         parent;
+int            x, y, w, h;
+double         minv, maxv, curv, inc, page;
+unsigned long  fg, bg, hi, lo;
+const char    *title, *units;
 {
 
   if (!pixmaps_built) {
-    cw1Pix   = XCreatePixmapFromBitmapData(theDisp, parent, 
+    cw1Pix   = XCreatePixmapFromBitmapData(theDisp, parent,
 		(char *) dial_cw1_bits, PW, PH, fg, bg, dispDEEP);
-    ccw1Pix  = XCreatePixmapFromBitmapData(theDisp, parent, 
+    ccw1Pix  = XCreatePixmapFromBitmapData(theDisp, parent,
 	        (char *) dial_ccw1_bits, PW, PH, fg, bg, dispDEEP);
-    cw2Pix   = XCreatePixmapFromBitmapData(theDisp, parent, 
+    cw2Pix   = XCreatePixmapFromBitmapData(theDisp, parent,
                 (char *) dial_cw2_bits, PW, PH, fg, bg, dispDEEP);
-    ccw2Pix  = XCreatePixmapFromBitmapData(theDisp, parent, 
+    ccw2Pix  = XCreatePixmapFromBitmapData(theDisp, parent,
 	        (char *) dial_ccw2_bits, PW, PH, fg, bg, dispDEEP);
   }
 
-  dp->x     = x;
-  dp->y     = y;
-
-  dp->w     = w;
-  dp->h     = h;
-  dp->fg    = fg;
-  dp->bg    = bg;
-  dp->hi    = hi;
-  dp->lo    = lo;
-  dp->title = title;
-  dp->units = units;
-  dp->active = 1;
+  dp->x       = x;
+  dp->y       = y;
+  dp->w       = w;
+  dp->h       = h;
+  dp->fg      = fg;
+  dp->bg      = bg;
+  dp->hi      = hi;
+  dp->lo      = lo;
+  dp->title   = title;
+  dp->units   = units;
+  dp->active  = 1;
   dp->drawobj = NULL;
 
-  if (w < h-24-16) dp->rad = (w - 8) / 2;
-           else dp->rad = (h - 24 - 16 - 8) / 2;
+  if (w < h-24-16)
+    dp->rad = (w - 8) / 2;
+  else
+    dp->rad = (h - 24 - 16 - 8) / 2;
   dp->cx = w / 2;
   dp->cy = dp->rad + 4 + 16;
 
@@ -94,22 +96,22 @@ char         *title, *units;
   dp->bx[INCW1]  = w-14-4;  dp->by[INCW1]  = h - 4 - 20;
   dp->bx[INCW2]  = w-14-4;  dp->by[INCW2]  = h - 4 - 10;
 
-  dp->win = XCreateSimpleWindow(theDisp, parent,x,y,(u_int) w,(u_int) h,
-				1,fg,bg);
+  dp->win = XCreateSimpleWindow(theDisp, parent, x, y, (u_int) w, (u_int) h,
+				1, fg, bg);
   if (!dp->win) FatalError("can't create dial window");
 
-  DSetRange(dp, minv, maxv, curv, page);
+  DSetRange(dp, minv, maxv, curv, inc, page);
   XSelectInput(theDisp, dp->win, ExposureMask | ButtonPressMask);
 }
 
 
 /***************************************************/
-void DSetRange(dp, minv, maxv, curv, page)
-DIAL *dp;
-int   minv, maxv, curv, page;
+void DSetRange(dp, minv, maxv, curv, inc, page)
+DIAL   *dp;
+double  minv, maxv, curv, inc, page;
 {
   if (maxv<minv) maxv=minv;
-  dp->min = minv;    dp->max = maxv;    dp->page = page;
+  dp->min = minv; dp->max = maxv; dp->inc = inc; dp->page = page;
   dp->active =  (minv < maxv);
 
   DSetVal(dp, curv);
@@ -118,22 +120,22 @@ int   minv, maxv, curv, page;
 
 /***************************************************/
 void DSetVal(dp, curv)
-DIAL *dp;
-int   curv;
+DIAL  *dp;
+double curv;
 {
   RANGE(curv, dp->min, dp->max);   /* make sure curv is in-range */
 
   if (curv == dp->val) return;
 
   /* erase old arrow */
-  XSetForeground(theDisp, theGC, dp->bg); 
+  XSetForeground(theDisp, theGC, dp->bg);
   drawArrow(dp);
 
-  dp->val = curv;
+  dp->val = (double)((int)(curv / dp->inc + (curv > 0 ? 0.5 : -0.5))) * dp->inc;
 
   /* draw new arrow and string */
   XSetForeground(theDisp, theGC, dp->fg);
-  XSetBackground(theDisp, theGC, dp->bg); 
+  XSetBackground(theDisp, theGC, dp->bg);
   drawArrow(dp);
   drawValStr(dp);
   if (!dp->active) dimDial(dp);
@@ -202,7 +204,8 @@ DIAL *dp;
 int mx,my;
 {
   Window       rW,cW;
-  int          rx,ry, x,y, ipos, pos, lit, i, origval;
+  int          rx, ry, x, y, ipos, pos, lit;
+  double       origval;
   unsigned int mask;
 
   lit = 0;
@@ -224,35 +227,36 @@ int mx,my;
   if (ipos != INDIAL) {
     drawButt(dp, ipos, 1);
     switch (ipos) {
-    case INCW1:  if (dp->val < dp->max) DSetVal(dp, dp->val+1); break;
+    case INCW1:  if (dp->val < dp->max) DSetVal(dp, dp->val+dp->inc);  break;
     case INCW2:  if (dp->val < dp->max) DSetVal(dp, dp->val+dp->page); break;
-    case INCCW1: if (dp->val > dp->min) DSetVal(dp, dp->val-1); break;
+    case INCCW1: if (dp->val > dp->min) DSetVal(dp, dp->val-dp->inc);  break;
     case INCCW2: if (dp->val > dp->min) DSetVal(dp, dp->val-dp->page); break;
     }
-    if (dp->drawobj != NULL) (dp->drawobj)();  
+    if (dp->drawobj != NULL) (dp->drawobj)();
     Timer(INC1WAIT);
     lit = 1;
   }
 
-  else { 
-    i = computeDialVal(dp, mx, my);
-    DSetVal(dp, i);
-    if (dp->drawobj != NULL) (dp->drawobj)();  
+  else {
+    double v;
+    v = computeDialVal(dp, mx, my);
+    DSetVal(dp, v);
+    if (dp->drawobj != NULL) (dp->drawobj)();
   }
 
-  
+
   /* loop until mouse is released */
   while (XQueryPointer(theDisp,dp->win,&rW,&cW,&rx,&ry,&x,&y,&mask)) {
     if (!(mask & Button1Mask)) break;    /* button released */
 
     if (ipos == INDIAL) {
-      int j;
-      i = computeDialVal(dp, x, y);
-      j = dp->val;
-      DSetVal(dp, i);
-      if (j != dp->val) {
+      double v, w;
+      v = computeDialVal(dp, x, y);
+      w = dp->val;
+      DSetVal(dp, v);
+      if (w != dp->val) {
 	/* track whatever dial controls */
-	if (dp->drawobj != NULL) (dp->drawobj)();  
+	if (dp->drawobj != NULL) (dp->drawobj)();
       }
     }
 
@@ -266,18 +270,18 @@ int mx,my;
 
       if (lit) {
 	switch (ipos) {
-	case INCW1:  if (dp->val < dp->max) DSetVal(dp, dp->val+1); 
+	case INCW1:  if (dp->val < dp->max) DSetVal(dp, dp->val+dp->inc);
 	             break;
 	case INCW2:  if (dp->val < dp->max) DSetVal(dp, dp->val+dp->page);
                      break;
-	case INCCW1: if (dp->val > dp->min) DSetVal(dp, dp->val-1);
+	case INCCW1: if (dp->val > dp->min) DSetVal(dp, dp->val-dp->inc);
                      break;
 	case INCCW2: if (dp->val > dp->min) DSetVal(dp, dp->val-dp->page);
                      break;
 	}
 
 	/* track whatever dial controls */
-	if (dp->drawobj != NULL) (dp->drawobj)();  
+	if (dp->drawobj != NULL) (dp->drawobj)();
 
 	Timer(INC2WAIT);
       }
@@ -305,34 +309,35 @@ int x, y;
 
   /* returns region * that x,y is in.  returns -1 if none */
 
-  for (i=0; i<4; i++) 
+  for (i=0; i<4; i++)
     if (PTINRECT(x,y, dp->bx[i], dp->by[i], 14, 10)) return i;
 
-  if (PTINRECT(x,y, dp->cx - dp->rad, dp->cy - dp->rad, 
+  if (PTINRECT(x,y, dp->cx - dp->rad, dp->cy - dp->rad,
 	       2*dp->rad, 2*dp->rad))
     return INDIAL;
 
   return -1;
 }
 
-	  
+
 /***************************************************/
 static void drawArrow(dp)
 DIAL *dp;
 {
-  int i, rad, cx, cy;
+  int rad, cx, cy;
+  double v;
   XPoint arrow[4];
 
   rad = dp->rad;  cx = dp->cx;  cy = dp->cy;
 
   /* map pos (range minv..maxv) into degrees (range 240..-60) */
-  i = 240 + (-300 * (dp->val - dp->min)) / (dp->max - dp->min);
-  arrow[0].x = cx + (int) ((double) rad * .80 * cos(i * DEG2RAD));
-  arrow[0].y = cy - (int) ((double) rad * .80 * sin(i * DEG2RAD));
-  arrow[1].x = cx + (int) ((double) rad * .33 * cos((i+160) * DEG2RAD));
-  arrow[1].y = cy - (int) ((double) rad * .33 * sin((i+160) * DEG2RAD));
-  arrow[2].x = cx + (int) ((double) rad * .33 * cos((i-160) * DEG2RAD));
-  arrow[2].y = cy - (int) ((double) rad * .33 * sin((i-160) * DEG2RAD));
+  v = 240 + (-300 * (dp->val - dp->min)) / (dp->max - dp->min);
+  arrow[0].x = cx + (int) ((double) rad * .80 * cos(v * DEG2RAD));
+  arrow[0].y = cy - (int) ((double) rad * .80 * sin(v * DEG2RAD));
+  arrow[1].x = cx + (int) ((double) rad * .33 * cos((v+160) * DEG2RAD));
+  arrow[1].y = cy - (int) ((double) rad * .33 * sin((v+160) * DEG2RAD));
+  arrow[2].x = cx + (int) ((double) rad * .33 * cos((v-160) * DEG2RAD));
+  arrow[2].y = cy - (int) ((double) rad * .33 * sin((v-160) * DEG2RAD));
   arrow[3].x = arrow[0].x;
   arrow[3].y = arrow[0].y;
   XDrawLines(theDisp, dp->win, theGC, arrow, 4, CoordModeOrigin);
@@ -343,33 +348,47 @@ DIAL *dp;
 static void drawValStr(dp)
 DIAL *dp;
 {
-  int  i, x1, x2;
+  int  tot, i, x1, x2;
   char foo[60], foo1[60];
 
   /* compute longest string necessary so we can right-align this thing */
-  sprintf(foo,"%d",dp->min);    x1 = strlen(foo);
-  sprintf(foo,"%d",dp->max);    x2 = strlen(foo);
+  sprintf(foo,"%d",(int)dp->min);    x1 = strlen(foo);
+  sprintf(foo,"%d",(int)dp->max);    x2 = strlen(foo);
   if (dp->min < 0 && dp->max > 0) x2++;   /* put '+' at beginning */
   i = x1;  if (x2>x1) i = x2;
   if (dp->units) i += strlen(dp->units);
 
-  if (dp->min < 0 && dp->max > 0) sprintf(foo,"%+d", dp->val);
-  else sprintf(foo,"%d", dp->val);
+  sprintf(foo,"%g",dp->inc);   /* space for decimal values */
+  tot = i + strlen(foo) - 1;   /* Take away the 0 from the beginning */
+
+  if (dp->min < 0.0 && dp->max > 0.0) sprintf(foo,"%+g", dp->val);
+  else sprintf(foo,"%g", dp->val);
+
+  if (dp->inc < 1.0)
+  {
+    int j;
+
+    if (dp->val == (double)((int)dp->val))
+      strcat(foo,".");
+
+    for (j = strlen(foo); j < tot; j++)
+      strcat(foo,"0");
+  }
 
   if (dp->units) strcat(foo,dp->units);
   foo1[0] = '\0';
   if (strlen(foo) < (size_t) i) {
-    for (i = i - strlen(foo); i>0; i--) strcat(foo1," ");
+    for (i-=strlen(foo);i>0;i--) strcat(foo1," ");
   }
   strcat(foo1, foo);
 
   XSetForeground(theDisp, theGC, dp->fg);
   XSetBackground(theDisp, theGC, dp->bg);
   XSetFont(theDisp, theGC, monofont);
-  XDrawImageString(theDisp, dp->win, theGC, 
+  XDrawImageString(theDisp, dp->win, theGC,
 		   dp->w/2 - XTextWidth(monofinfo, foo1, (int) strlen(foo1))/2,
 		   dp->h-14 - (monofinfo->ascent + monofinfo->descent)/2
-		                                 + monofinfo->ascent, 
+		                                 + monofinfo->ascent,
 		   foo1, (int) strlen(foo1));
   XSetFont(theDisp, theGC, mfont);
 }
@@ -411,12 +430,13 @@ static void drawButt(dp, i, lit)
 
 
 /***************************************************/
-static int computeDialVal(dp, x, y)
+static double computeDialVal(dp, x, y)
 DIAL *dp;
 int x, y;
 {
-  int dx, dy, val;
-  double angle;
+  int dx, dy;
+
+  double angle, val;
 
   /* compute dx, dy (distance from cx, cy).  Note: +dy is *up* */
   dx = x - dp->cx;  dy = dp->cy - y;
@@ -431,13 +451,15 @@ int x, y;
   }
   else if (dx>0) angle = atan((double)  dy / (double)  dx) * RAD2DEG;
   else           angle = atan((double) -dy / (double) -dx) * RAD2DEG + 180.0;
-    
+
   /* map angle into range: -90..270, then into to value */
   if (angle > 270.0) angle -= 360.0;
   if (angle < -90.0) angle += 360.0;
 
-  val = (int) ((dp->max - dp->min) * (240.0 - angle) / 300.0) + dp->min;
+  val = ((dp->max - dp->min) * (240.0 - angle) / 300.0) + dp->min;
 
+  /* round value to be an even multiple of dp->inc */
+  val = (double)((int)(val / dp->inc + 0.5)) * dp->inc;
   return val;
 }
 

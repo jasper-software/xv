@@ -21,13 +21,15 @@
  *     void   LoadFishCursors()
  *     void   WaitCursor()
  *     void   SetCursors(int)
- *     char  *BaseName(char *)
+ *     const char  *BaseName(const char *)
  *     void   DrawTempGauge(win, x,y,w,h, percent, fg,bg,hi,lo, str)
  *     void   ProgressMeter(min, max, val, str);
  *     void   xvbcopy(src, dst, length)
  *     int    xvbcmp (s1,  s2,  length)
  *     void   xvbzero(s, length)
  *     char  *xv_strstr(s1, s2)
+ *     FILE  *xv_fopen(str, str)
+ *     void   xv_mktemp(str)
  *     void   Timer(milliseconds)
  */
 
@@ -35,6 +37,10 @@
 
 #define NEEDSTIME
 #include "xv.h"
+
+#ifdef __linux__	/* probably others, too, but being conservative */
+#  include <unistd.h>	/* getwd() */
+#endif
 
 #include "bits/fc_left"
 #include "bits/fc_leftm"
@@ -61,21 +67,24 @@ void StoreDeleteWindowProp (win)
 
   /* the following fakes 'XSetWMProtocols(theDisp, win, &atom_DELWIN, 1);' */
 
-  if (! atom_PROTOCOLS) 
+  if (! atom_PROTOCOLS)
     atom_PROTOCOLS = XInternAtom (theDisp, "WM_PROTOCOLS", False);
 
   if (atom_PROTOCOLS == None) return;
 
-  XChangeProperty(theDisp, win, atom_PROTOCOLS, XA_ATOM, 32, 
+  XChangeProperty(theDisp, win, atom_PROTOCOLS, XA_ATOM, 32,
 		  PropModeReplace, (unsigned char *) &atom_DELWIN, 1);
 }
 
 
 /***************************************************/
 Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
-char         *name, *clname, *geom;
-int           defw,defh,usesize;
-unsigned long fg, bg;
+     const char   *name;
+     const char   *clname;
+     const char   *geom;
+     int           defw,defh;
+     unsigned long fg, bg;
+     int           usesize;
 {
   Window               win;
   XSetWindowAttributes xswa;
@@ -91,16 +100,24 @@ unsigned long fg, bg;
   x = y = 1;
   i = XParseGeometry(geom,&x,&y, (unsigned int *) &w, (unsigned int *) &h);
 
-  if ((i&XValue || i&YValue)) hints.flags = USPosition;  
+  if ((i&XValue || i&YValue)) hints.flags = USPosition;
                          else hints.flags = PPosition;
-  
+
   if (!usesize || !(i&WidthValue))  w = defw;
   if (!usesize || !(i&HeightValue)) h = defh;
 
-  hints.flags |= USSize;
+  hints.flags |= USSize | PWinGravity;
 
-  if (i&XValue && i&XNegative) x = dispWIDE - w - abs(x);
-  if (i&YValue && i&YNegative) y = dispHIGH - h - abs(y);
+  hints.win_gravity = NorthWestGravity;
+  if (i&XValue && i&XNegative) {
+    hints.win_gravity = NorthEastGravity;
+    x = dispWIDE - (w + 2 * bwidth) - abs(x);
+  }
+  if (i&YValue && i&YNegative) {
+    hints.win_gravity = (hints.win_gravity == NorthWestGravity) ?
+      SouthWestGravity : SouthEastGravity;
+    y = dispHIGH - (h + 2 * bwidth) - abs(y);
+  }
 
 
 #define VROOT_TRANS
@@ -130,77 +147,76 @@ unsigned long fg, bg;
   xswamask = CWBackPixel | CWBorderPixel | CWColormap;
   if (!usesize) xswamask |= CWBitGravity;
 
-  win = XCreateWindow(theDisp, rootW, x, y, (u_int) w, (u_int) h, 
+  win = XCreateWindow(theDisp, rootW, x, y, (u_int) w, (u_int) h,
 		      (u_int) bwidth, (int) dispDEEP, InputOutput,
 		      theVisual, xswamask, &xswa);
   if (!win) return(win);   /* leave immediately if couldn't create */
 
 
-  XSetStandardProperties(theDisp, win, name, name, None, NULL, 0, &hints);
-
   xwmh.input = True;
   xwmh.flags = InputHint;
   if (iconPix) { xwmh.icon_pixmap = iconPix;  xwmh.flags |= IconPixmapHint; }
-  XSetWMHints(theDisp, win, &xwmh);
 
   if (clname && strlen(clname)) {
     classh.res_name = "xv";
-    classh.res_class = clname;
-    XSetClassHint(theDisp, win, &classh);
+    classh.res_class = (char *) clname;
     StoreDeleteWindowProp(win);
   }
 
+  XmbSetWMProperties(theDisp, win, name, name, NULL, 0, &hints, &xwmh,
+      clname ? &classh : NULL);
+
   return(win);
 }
-  
+
 
 
 /**************************************************/
 void DrawString(win,x,y,str)
-     Window win;
-     int x,y;
-     char *str;
+     Window      win;
+     int         x,y;
+     const char *str;
 {
   XDrawString(theDisp, win, theGC, x, y, str, (int) strlen(str));
 }
 
-  
+
 /**************************************************/
 void CenterString(win,x,y,str)
-     Window win;
-     int x,y;
-     char *str;
+     Window      win;
+     int         x,y;
+     const char *str;
 {
   DrawString(win, CENTERX(mfinfo, x, str), CENTERY(mfinfo, y), str);
 }
 
-  
+
 /**************************************************/
 void ULineString(win,x,y,str)
-     Window win;
-     int x,y;
-     char *str;
+     Window      win;
+     int         x,y;
+     const char *str;
 {
   DrawString(win, x, y, str);
-  XDrawLine(theDisp, win, theGC, x, y+DESCENT-1, 
+  XDrawLine(theDisp, win, theGC, x, y+DESCENT-1,
 	    x+StringWidth(str), y+DESCENT-1);
 }
 
-  
+
 /**************************************************/
 int StringWidth(str)
-     char *str;
+     const char *str;
 {
   return(XTextWidth(mfinfo, str, (int) strlen(str)));
 }
 
-  
+
 /**************************************************/
 int CursorKey(ks, shift, dotrans)
      KeySym ks;
      int    shift, dotrans;
 {
-  /* called by the KeyPress/KeyRelease event handler to determine if a 
+  /* called by the KeyPress/KeyRelease event handler to determine if a
      given keypress is a cursor key.  More complex than you'd think, since
      certain Sun Keyboards generate a variety of odd keycodes, and not all
      keyboards *have* all these keys.  Note that 'shifted' arrow keys
@@ -225,29 +241,29 @@ int CursorKey(ks, shift, dotrans)
 
   int  i = CK_NONE;
 
-  if      (ks==XK_Up    || ks==XK_KP_Up    || 
-	   ks==XK_KP_8  || ks==XK_F28)             i=CK_UP;
+  if      (ks==XK_Up    || ks==XK_KP_Up    ||
+			   ks==XK_F28)             i=CK_UP;
 
-  else if (ks==XK_Down  || ks==XK_KP_Down  || 
-	   ks==XK_KP_2  || ks==XK_F34)             i=CK_DOWN;
+  else if (ks==XK_Down  || ks==XK_KP_Down  ||
+			   ks==XK_F34)             i=CK_DOWN;
 
-  else if (ks==XK_Left  || ks==XK_KP_Left  || 
-	   ks==XK_KP_4  || ks==XK_F30)             i=CK_LEFT;
+  else if (ks==XK_Left  || ks==XK_KP_Left  ||
+			   ks==XK_F30)             i=CK_LEFT;
 
-  else if (ks==XK_Right || ks==XK_KP_Right || 
-	   ks==XK_KP_6  || ks==XK_F32)             i=CK_RIGHT;
+  else if (ks==XK_Right || ks==XK_KP_Right ||
+			   ks==XK_F32)             i=CK_RIGHT;
 
   else if (ks==XK_Prior || ks==XK_KP_Prior ||
-	   ks==XK_KP_9  || ks==XK_F29)             i=CK_PAGEUP;
+			   ks==XK_F29)             i=CK_PAGEUP;
 
   else if (ks==XK_Next  || ks==XK_KP_Next  ||
-	   ks==XK_KP_3  || ks==XK_F35)             i=CK_PAGEDOWN;
+			   ks==XK_F35)             i=CK_PAGEDOWN;
 
   else if (ks==XK_Home  || ks==XK_KP_Home  ||
-	   ks==XK_KP_7  || ks==XK_F27)             i=CK_HOME;
+			   ks==XK_F27)             i=CK_HOME;
 
   else if (ks==XK_End   || ks==XK_KP_End   ||
-	   ks==XK_KP_1  || ks==XK_F33)             i=CK_END;
+			   ks==XK_F33)             i=CK_END;
 
   else i = CK_NONE;
 
@@ -257,7 +273,7 @@ int CursorKey(ks, shift, dotrans)
     else if (i==CK_UP)       i=CK_PAGEUP;
     else if (i==CK_DOWN)     i=CK_PAGEDOWN;
   }
-  
+
   return i;
 }
 
@@ -334,9 +350,9 @@ void GenExpose(win, x, y, w, h)
   ev.window = win;
   ev.x = x;  ev.y = y;  ev.width = w;  ev.height = h;
   ev.count = 0;
-  
+
   XSendEvent(theDisp, win, False, NoEventMask, (XEvent *) &ev);
-}    
+}
 
 
 /***********************************/
@@ -381,7 +397,7 @@ void DimRect(win, x, y, w, h, bg)
      u_int  w, h;
      u_long bg;
 {
-  /* stipple a rectangular region by drawing 'bg' where there's 1's 
+  /* stipple a rectangular region by drawing 'bg' where there's 1's
      in the stipple pattern */
 
   XSetFillStyle (theDisp, theGC, FillStippled);
@@ -400,7 +416,7 @@ void Draw3dRect(win, x,y,w,h, inout, bwidth, hi, lo, bg)
      unsigned int  w,h;
      unsigned long hi, lo, bg;
 {
-  int i,r,x1,y1;
+  int i, x1, y1;
 
   x1 = x + (int) w;
   y1 = y + (int) h;
@@ -413,7 +429,7 @@ void Draw3dRect(win, x,y,w,h, inout, bwidth, hi, lo, bg)
       XDrawLine(theDisp, win, theGC, x+i, y1-i, x+i,  y+i);
       XDrawLine(theDisp, win, theGC, x+i, y+i,  x1-i, y+i);
     }
-    
+
     /* draw bot-right */
     XSetForeground(theDisp, theGC, (inout==R3D_OUT) ? lo : hi);
 
@@ -431,18 +447,18 @@ void Draw3dRect(win, x,y,w,h, inout, bwidth, hi, lo, bg)
     }
   }
 }
-    
+
 
 
 /**************************************************/
 void SetCropString()
 {
   /* sets the crop string in the info box to be correct.  should
-     be called whenever 'but[BCROP].active', cXOFF,cYOFF,cWIDE,cHIGH 
+     be called whenever 'but[BCROP].active', cXOFF,cYOFF,cWIDE,cHIGH
      are changed */
 
-  if (cpic != pic) 
-    SetISTR(ISTR_CROP, "%dx%d rectangle starting at %d,%d",  
+  if (cpic != pic)
+    SetISTR(ISTR_CROP, "%dx%d rectangle starting at %d,%d",
 	    cWIDE, cHIGH, cXOFF, cYOFF);
   else SetISTR(ISTR_CROP, "<none>");
 }
@@ -469,7 +485,7 @@ void Warning()
   char *st;
 
   /* give 'em time to read message */
-  if (infoUp || ctrlUp || anyBrowUp) sleep(3); 
+  if (infoUp || ctrlUp || anyBrowUp) sleep(3);
   else {
     st = GetISTR(ISTR_INFO);
     OpenAlert(st);
@@ -477,11 +493,11 @@ void Warning()
     CloseAlert();
   }
 }
-    
+
 
 /***********************************/
 void FatalError (identifier)
-      char *identifier;
+      const char *identifier;
 {
   fprintf(stderr, "%s: %s\n",cmd, identifier);
   Quit(-1);
@@ -491,11 +507,16 @@ void FatalError (identifier)
 /***********************************/
 void Quit(i)
      int i;
-{ 
+{
   /* called when the program exits.  frees everything explictly created
      EXCEPT allocated colors.  This is used when 'useroot' is in operation,
      as we have to keep the alloc'd colors around, but we don't want anything
      else to stay */
+
+#ifdef AUTO_EXPAND
+  chdir(initdir);
+  Vdsettle();
+#endif
 
   if (!theDisp) exit(i);   /* called before connection opened */
 
@@ -516,14 +537,34 @@ void Quit(i)
     if (jpegW) XDestroyWindow(theDisp, jpegW);
 #endif
 
+#ifdef HAVE_JP2K
+    if (jp2kW) XDestroyWindow(theDisp, jp2kW);
+#endif
+
 #ifdef HAVE_TIFF
     if (tiffW) XDestroyWindow(theDisp, tiffW);
 #endif
 
+#ifdef HAVE_PNG
+    if (pngW)  XDestroyWindow(theDisp, pngW);
+#endif
+
+#ifdef HAVE_PCD
+    if (pcdW)  XDestroyWindow(theDisp, pcdW);
+#endif
+
+#ifdef HAVE_PIC2
+    if (pic2W) XDestroyWindow(theDisp, pic2W);
+#endif
+
+#ifdef HAVE_MGCSFX
+    if (mgcsfxW) XDestroyWindow(theDisp, mgcsfxW);
+#endif
+
     /* if NOT using stdcmap for images, free stdcmap */
-    if (colorMapMode != CM_STDCMAP) { 
+    if (colorMapMode != CM_STDCMAP) {
       int j;
-      for (j=0; j<stdnfcols; j++) 
+      for (j=0; j<stdnfcols; j++)
 	xvFreeColors(theDisp, theCmap, &stdfreecols[j], 1, 0L);
     }
 
@@ -543,13 +584,13 @@ void Quit(i)
       if (origlist[j][0] != '/') {  /* relative path, prepend 'initdir' */
 	sprintf(str,"%s/%s", initdir, origlist[j]);
 	if (unlink(str)) {
-	  fprintf(stderr,"%s: can't delete '%s' - %s\n", 
+	  fprintf(stderr,"%s: can't delete '%s' - %s\n",
 		  cmd, str, ERRSTR(errno));
 	}
       }
       else {
 	if (unlink(origlist[j])) {
-	  fprintf(stderr,"%s: can't delete '%s' - %s\n", 
+	  fprintf(stderr,"%s: can't delete '%s' - %s\n",
 		  cmd, origlist[j], ERRSTR(errno));
 	}
       }
@@ -567,7 +608,7 @@ static Cursor flcurs, fl1curs, fmcurs, fr1curs, frcurs;
 void LoadFishCursors()
 {
 #define fc_w 16
-#define fc_h 16 
+#define fc_h 16
 
   Pixmap flpix,flmpix,fmpix,fmmpix,frpix,frmpix;
   Pixmap fl1pix, fl1mpix, fr1pix, fr1mpix;
@@ -592,7 +633,7 @@ void LoadFishCursors()
 
   fr1pix = XCreatePixmapFromBitmapData(theDisp, ctrlW, (char *) fc_right1_bits,
 	     fc_w, fc_h, 1L, 0L, 1);
-  fr1mpix = XCreatePixmapFromBitmapData(theDisp, ctrlW, 
+  fr1mpix = XCreatePixmapFromBitmapData(theDisp, ctrlW,
 					(char *) fc_right1m_bits,
 	     fc_w, fc_h, 1L, 0L, 1);
 
@@ -613,7 +654,7 @@ void LoadFishCursors()
   fr1curs= XCreatePixmapCursor(theDisp, fr1pix,fr1mpix,&fg, &bg, 8,8);
   frcurs = XCreatePixmapCursor(theDisp, frpix, frmpix, &fg, &bg, 8,8);
 
-  if (!flcurs || !fmcurs || !frcurs || !fl1curs || !fr1curs) 
+  if (!flcurs || !fmcurs || !frcurs || !fl1curs || !fr1curs)
     { flcurs = fmcurs = frcurs = (Cursor) NULL; }
 }
 
@@ -633,8 +674,8 @@ void WaitCursor()
     time(&lastwaittime);
     waiting=1;
     xwmh.input       = True;
-    xwmh.icon_pixmap = riconPix;  
-    xwmh.icon_mask   = riconmask;  
+    xwmh.icon_pixmap = riconPix;
+    xwmh.icon_mask   = riconmask;
     xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
     if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
     if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
@@ -665,8 +706,8 @@ void SetCursors(n)
     if (waiting) {
       waiting=0;
       xwmh.input       = True;
-      xwmh.icon_pixmap = iconPix;  
-      xwmh.icon_mask   = iconmask;  
+      xwmh.icon_pixmap = iconPix;
+      xwmh.icon_mask   = iconmask;
       xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
       if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
       if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
@@ -694,11 +735,11 @@ void SetCursors(n)
 
   XFlush(theDisp);
 }
-  
+
 
 static void set_cursors(mainc, otherc)
      Cursor mainc, otherc;
-{    
+{
   if (!useroot && mainW) XDefineCursor(theDisp, mainW, mainc);
   if (infoW) XDefineCursor(theDisp, infoW, otherc);
   if (ctrlW) XDefineCursor(theDisp, ctrlW, otherc);
@@ -708,42 +749,63 @@ static void set_cursors(mainc, otherc)
 
   SetBrowseCursor(otherc);
   SetTextCursor(otherc);
-  
+
 #ifdef HAVE_JPEG
   if (jpegW) XDefineCursor(theDisp, jpegW, otherc);
 #endif
-  
+
+#ifdef HAVE_JP2K
+  if (jp2kW) XDefineCursor(theDisp, jp2kW, otherc);
+#endif 
+
 #ifdef HAVE_TIFF
   if (tiffW) XDefineCursor(theDisp, tiffW, otherc);
+#endif
+
+#ifdef HAVE_PNG
+  if (pngW)  XDefineCursor(theDisp, pngW, otherc);
+#endif
+
+#ifdef HAVE_PNG
+  if (pngW)  XDefineCursor(theDisp, pngW, otherc);
+#endif
+
+#ifdef HAVE_PCD
+  if (pcdW)  XDefineCursor(theDisp, pcdW, otherc);
+#endif
+
+#ifdef HAVE_PIC2
+  if (pic2W) XDefineCursor(theDisp, pic2W, otherc);
+#endif
+
+#ifdef HAVE_MGCSFX
+  if (mgcsfxW) XDefineCursor(theDisp, mgcsfxW, otherc);
 #endif
 }
 
 
 /***************************************************/
-char *BaseName(fname)
-     char *fname;
+const char *BaseName(fname)
+     const char *fname;
 {
-  char *basname;
+  const char *basname;
 
-  /* given a complete path name ('/foo/bar/weenie.gif'), returns just the 
+  /* given a complete path name ('/foo/bar/weenie.gif'), returns just the
      'simple' name ('weenie.gif').  Note that it does not make a copy of
      the name, so don't be modifying it... */
 
-  basname = (char *) rindex(fname, '/');
-  if (!basname) basname = fname;
-  else basname++;
-
-  return basname;
+  basname = (const char *) rindex(fname, '/');
+  return basname? basname+1 : fname;
 }
 
-  
+
 /***************************************************/
 void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
-     Window win;
-     int    x,y,w,h;
-     double ratio;
-     u_long fg,bg,hi,lo;
-     char   *str;
+     Window      win;
+     int         x,y,w,h;
+     double      ratio;
+     u_long      fg,bg,hi,lo;
+     const char *str;
 {
   /* draws a 'temprature'-style horizontal progress meter in the specified
      window, at the specified location */
@@ -773,14 +835,14 @@ void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
     if (numchars) {      /* do string */
       if (barwide < maxwide) {
 	XSetForeground(theDisp, theGC, bg);
-	XFillRectangle(theDisp, win, theGC, x+3+barwide, y+3, 
+	XFillRectangle(theDisp, win, theGC, x+3+barwide, y+3,
 		       (u_int) (maxwide-barwide), (u_int) (h-5));
       }
-	
+
       XSetFunction(theDisp, theGC, GXinvert);
       XSetPlaneMask(theDisp, theGC, fg ^ bg);
 
-      XDrawString(theDisp, win, theGC, CENTERX(mfinfo, (x+w/2), str), 
+      XDrawString(theDisp, win, theGC, CENTERX(mfinfo, (x+w/2), str),
 		  CENTERY(mfinfo, (y+h/2)), str, numchars);
 
       XSetFunction(theDisp, theGC, GXcopy);
@@ -789,18 +851,18 @@ void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
 
     else if (barwide < maxwide) {
       XDrawLine(theDisp,win,theGC,x+3+barwide, y+h/2 + 0, x+w-3, y+h/2 + 0);
-      
+
       XSetForeground(theDisp, theGC, lo);
       XDrawLine(theDisp,win,theGC,x+3+barwide, y+h/2 + 1, x+w-3, y+h/2 + 1);
-      
+
       XSetForeground(theDisp, theGC, hi);
       XDrawLine(theDisp,win,theGC,x+3+barwide, y+h/2 + 2, x+w-3, y+h/2 + 2);
-      
+
       XSetForeground(theDisp, theGC, bg);
-      XFillRectangle(theDisp, win, theGC, x+3+barwide, y+3, 
+      XFillRectangle(theDisp, win, theGC, x+3+barwide, y+3,
 		     (u_int) (maxwide-barwide), (u_int) (h/2 - 3));
-      
-      XFillRectangle(theDisp, win, theGC, x+3+barwide, y+h/2 + 3, 
+
+      XFillRectangle(theDisp, win, theGC, x+3+barwide, y+h/2 + 3,
 		     (u_int) (maxwide-barwide),(u_int)((h-3) - (h/2+3)) + 1);
     }
   }
@@ -815,44 +877,44 @@ void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
     if (numchars) {
       if (barwide < maxwide) {
 	XSetForeground(theDisp, theGC, bg);
-	XFillRectangle(theDisp, win, theGC, x+1+barwide, y+1, 
+	XFillRectangle(theDisp, win, theGC, x+1+barwide, y+1,
 		       (u_int) (maxwide-barwide), (u_int) (h-1));
       }
-      
+
       XSetFunction(theDisp, theGC, GXinvert);
       XSetPlaneMask(theDisp, theGC, fg ^ bg);
 
-      XDrawString(theDisp, win, theGC, CENTERX(mfinfo, (x+w/2), str), 
+      XDrawString(theDisp, win, theGC, CENTERX(mfinfo, (x+w/2), str),
 		  CENTERY(mfinfo, (y+h/2)), str, numchars);
 
       XSetFunction(theDisp, theGC, GXcopy);
       XSetPlaneMask(theDisp, theGC, AllPlanes);
     }
-    
+
     else if (barwide < maxwide) {
       XDrawLine(theDisp, win, theGC, x+1+barwide, y+h/2, x+w-1, y+h/2);
-      
+
       XSetForeground(theDisp, theGC, bg);
-      XFillRectangle(theDisp, win, theGC, x+1+barwide, y+1, 
+      XFillRectangle(theDisp, win, theGC, x+1+barwide, y+1,
 		     (u_int) (maxwide-barwide), (u_int) (h/2 - 1));
-      
-      XFillRectangle(theDisp, win, theGC, x+1+barwide, y+h/2 + 1, 
+
+      XFillRectangle(theDisp, win, theGC, x+1+barwide, y+h/2 + 1,
 		     (u_int)(maxwide-barwide),(u_int)(((h-1) - (h/2+1))+1));
     }
   }
 
   XFlush(theDisp);
 }
-    
+
 
 
 /***************************************************/
 void ProgressMeter(min, max, val, str)
-     int min, max, val;
-     char *str;
+     int         min, max, val;
+     const char *str;
 {
   /* called during 'long' operations (algorithms, smoothing, etc.) to
-     give some indication that the program will ever finish.  Draws a 
+     give some indication that the program will ever finish.  Draws a
      temperature gauge in either mainW (if not useRoot), or ctrlW.
      Tries to be clever:  only draws gauge if it looks like the operation is
      going to take more than a few seconds.  Calling with val == max removes
@@ -887,7 +949,7 @@ void ProgressMeter(min, max, val, str)
   if (!waiting) {     /* not waiting (or not waiting any longer) */
     if (nowTime == lastTime && val<max) return;  /* max one draw per second */
     lastTime = nowTime;
-    DrawTempGauge(win, xpos, ypos, 100,19, doneness, 
+    DrawTempGauge(win, xpos, ypos, 100,19, doneness,
 		    infofg,infobg,hicol,locol,str);
 
     if (val >= max) {            /* remove temp gauge */
@@ -915,7 +977,7 @@ void XVDeletedFile(fullname)
 void XVCreatedFile(fullname)
      char *fullname;
 {
-  /* called whenever a file has been deleted.  Updates browser & dir windows,
+  /* called whenever a file has been created.  Updates browser & dir windows,
      if necessary */
 
   BRCreatedFile(fullname);
@@ -925,7 +987,8 @@ void XVCreatedFile(fullname)
 
 /***************************************************/
 void xvbcopy(src, dst, len)
-     char *src, *dst;
+     const char *src;
+     char *dst;
      size_t  len;
 {
   /* Modern OS's (Solaris, etc.) frown upon the use of bcopy(),
@@ -945,7 +1008,7 @@ void xvbcopy(src, dst, len)
    */
 
   if (src==dst || len<=0) return;    /* nothin' to do */
-  
+
   if (src<dst && src+len>dst) {  /* do a backward copy */
     src = src + len - 1;
     dst = dst + len - 1;
@@ -957,11 +1020,11 @@ void xvbcopy(src, dst, len)
     for ( ; len>0; len--, src++, dst++) *dst = *src;
   }
 }
-    
+
 
 /***************************************************/
 int xvbcmp (s1, s2, len)
-     char   *s1, *s2;
+     const char   *s1, *s2;
      size_t  len;
 {
   for ( ; len>0; len--, s1++, s2++) {
@@ -985,28 +1048,31 @@ void xv_getwd(buf, buflen)
      char   *buf;
      size_t  buflen;
 {
-  /* gets the current working directory.  No trailing '/' */
+  /* Gets the current working directory and puts it in buf.  No trailing '/'. */
 
-  char *rv; 
+  const char *rv;
 
 #ifdef USE_GETCWD
-  rv = (char *) getcwd(buf, buflen);
+  rv = (const char *) getcwd(buf, buflen);
 #else
-  rv = (char *) getwd(buf);
+  rv = (const char *) getwd(buf);
 #endif
 
   if (!rv || strlen(rv)==0) {
-    if (((rv=(char *) getenv("PWD"))==NULL) && 
-	((rv=(char *) getenv("cwd"))==NULL)) rv = "./";
+    if (((rv=(const char *) getenv("PWD"))==NULL) &&
+	((rv=(const char *) getenv("cwd"))==NULL)) rv = "./";
     strcpy(buf, rv);
   }
+#ifdef AUTO_EXPAND
+  Vdtodir(buf);
+#endif
 }
 
 
 
 /***************************************************/
 
-/* 
+/*
  *	Source code for the "strstr" library routine.
  *
  * Copyright 1988 Regents of the University of California
@@ -1020,10 +1086,11 @@ void xv_getwd(buf, buflen)
  */
 
 char *xv_strstr(string, substring)
-     char *string;	        /* String to search. */
-     char *substring;		/* Substring to try to find in string. */
+     const char *string;        /* String to search. */
+     const char *substring;	/* Substring to try to find in string. */
 {
-  register char *a, *b;
+  const char *a;
+  const char *b;
 
   /* First scan quickly through the two strings looking for a
    * single-character match.  When it's found, then compare the
@@ -1031,14 +1098,14 @@ char *xv_strstr(string, substring)
    */
 
   b = substring;
-  if (*b == 0) return string;
+  if (*b == 0) return (char *) string;
 
   for ( ; *string != 0; string += 1) {
     if (*string != *b) continue;
 
     a = string;
     while (1) {
-      if (*b == 0) return string;
+      if (*b == 0) return (char *) string;
       if (*a++ != *b++) break;
     }
     b = substring;
@@ -1052,7 +1119,8 @@ char *xv_strstr(string, substring)
 
 /***************************************************/
 FILE *xv_fopen(fname, mode)
-     char *fname, *mode;
+     const char *fname;
+     const char *mode;
 {
   FILE *fp;
 
@@ -1066,72 +1134,90 @@ FILE *xv_fopen(fname, mode)
 }
 
 
+/***************************************************/
+/* GRR 20050320:  added actual mk[s]temp() call... */
+void xv_mktemp(buf, fname)
+     char       *buf;
+     const char *fname;
+{
+#ifndef VMS
+  sprintf(buf, "%s/%s", tmpdir, fname);
+#else
+  sprintf(buf, "Sys$Disk:[]%s", fname);
+#endif
+#ifdef USE_MKSTEMP
+  close(mkstemp(buf));
+#else
+  mktemp(buf);
+#endif
+}
 
 
-/*******/
+/***************************************************/
 void Timer(msec)   /* waits for 'n' milliseconds */
- int  msec;
-/*******/
+     int  msec;
 {
   long usec;
 
   if (msec <= 0) return;
+
   usec = (long) msec * 1000;
 
 
-#ifdef VMS
+#ifdef USLEEP
+  usleep(usec);
+  /* return */
+#endif
+
+
+#if defined(VMS) && !defined(USLEEP)
   {
     float ftime;
     ftime = msec / 1000.0;
     lib$wait(&ftime);
-    return;
+    /* return */
   }
 #endif
 
 
-#ifdef sgi
+#if defined(sgi) && !defined(USLEEP)
   {
     float ticks_per_msec;
     long ticks;
     ticks_per_msec = (float) CLK_TCK / 1000.0;
     ticks = (long) ((float) msec * ticks_per_msec);
     sginap(ticks);
-    return;
+    /* return */
   }
 #endif
 
 
-#if defined(SVR4) || defined(sco)
+/* does SGI define SVR4?  not sure... */
+#if (defined(SVR4) || defined(sco)) && !defined(sgi) && !defined(USLEEP)
   {
     struct pollfd dummy;
     poll(&dummy, 0, msec);
-    return;
+    /* return */
   }
 #endif
 
 
-#ifdef USLEEP
-  usleep(usec);  return;
-#endif
-
-
-#ifdef NOTIMER
-  return;
-#endif
-
-
-#ifndef VMS
+#if !defined(USLEEP) && !defined(VMS) && !defined(sgi) && !defined(SVR4) && !defined(sco) && !defined(NOTIMER)
   {
-    /* default Timer() method now uses 'select()', which probably works
-	on all systems *anyhow* (except for VMS...) */
-    
+    /* default/fall-through Timer() method now uses 'select()', which
+     * probably works on all systems *anyhow* (except for VMS...) */
+
     struct timeval time;
 
     time.tv_sec = usec / 1000000L;
     time.tv_usec = usec % 1000000L;
     select(0, XV_FDTYPE NULL, XV_FDTYPE NULL, XV_FDTYPE NULL, &time);
+    /* return */
   }
-#endif /* VMS */
-}
+#endif
 
+
+  /* NOTIMER case, fallthroughs, etc. ... but we return void, so who cares */
+  /* return */
+}
 

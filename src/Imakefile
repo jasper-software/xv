@@ -104,6 +104,11 @@ HPUX7 = -DSYSV +Ns4000 -DHPUX7
 SGI = -Dsgi
 #endif
 
+/* install directory of xv_mgcsfx.sample. */
+MGCSFXDIR = $(LIBDIR)
+/* Directory of default configuration file. */
+MGCSFX = -DMGCSFXDIR=\"$(MGCSFXDIR)\"
+
 
 
 
@@ -137,6 +142,8 @@ PDS = -DDOPDS
 #if defined(SCOArchitecture)
 SCO= -Dsco -DPOSIX -DNO_RANDOM 
 SYS_LIBRARIES=        -lm -lc -lx 
+#elif defined(HPArchitecture)
+SYS_LIBRARIES=        -lm -lV3
 #else
 SYS_LIBRARIES=        -lm
 #endif
@@ -147,7 +154,7 @@ LOCAL_LIBRARIES = $(XLIB) $(DEPLIBS)
 
 DEFINES= $(SCO) $(UNIX) $(NODIRENT) $(VPRINTF) $(TIMERS) \
 	$(HPUX7) $(JPEG) $(TIFF) $(PDS) $(DXWM) $(RAND) \
-	$(BACKING_STORE) $(BSDTYPES) $(SGI)
+	$(BACKING_STORE) $(BSDTYPES) $(SGI) $(MGCSFX)
 
 INCLUDES = $(JPEGINCLUDE) $(TIFFINCLUDE)
 
@@ -157,7 +164,9 @@ SRCS1 =	xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c \
 	xvdial.c xvgraf.c xvsunras.c xvjpeg.c xvps.c xvpopup.c xvdflt.c \
 	xvtiff.c xvtiffwr.c xvpds.c xvrle.c xviris.c xvgrab.c vprintf.c \
 	xvbrowse.c xvtext.c xvpcx.c xviff.c xvtarga.c xvxpm.c xvcut.c \
-	xvxwd.c xvfits.c
+	xvxwd.c xvfits.c xvpng.c xvzx.c xvwbmp.c xvpcd.c \
+	xvmag.c xvpic.c xvmaki.c xvpi.c xvpic2.c xvvd.c xvmgcsfx.c \
+	xvml.c
 
 OBJS1 =	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
@@ -165,7 +174,9 @@ OBJS1 =	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
 	xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
 	xvbrowse.o xvtext.o xvpcx.o xviff.o xvtarga.o xvxpm.o xvcut.o \
-	xvxwd.o xvfits.o
+	xvxwd.o xvfits.o xvpng.o xvzx.o xvwbmp.o xvpcd.o \
+	xvmag.o xvpic.o xvmaki.o xvpi.o xvpic2.o xvvd.o xvmgcsfx.o \
+	xvml.o
 
 SRCS2=	bggen.c
 OBJS2=	bggen.o
@@ -265,6 +276,8 @@ InstallManPageLong(docs/bggen,$(MANDIR),bggen)
 InstallManPageLong(docs/xcmap,$(MANDIR),xcmap)
 InstallManPageLong(docs/xvp2p,$(MANDIR),xvpictoppm)
 InstallManPageLong(docs/vdcomp,$(MANDIR),vdcomp)
+
+InstallNonExecFile(xv_mgcsfx.sample,$(MGCSFXDIR))
 
 tar:
 	tar cf xv.tar Makefile* Imakefile *.c *.h bits docs \

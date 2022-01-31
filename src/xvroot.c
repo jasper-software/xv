@@ -22,7 +22,7 @@ static void killRootPix PARM((void));
 /***********************************/
 void MakeRootPic()
 {
-  /* called after 'epic' has been generated (if we're using root).  
+  /* called after 'epic' has been generated (if we're using root).
      creates the XImage and the pixmap, sets the root to the new
      pixmap, and refreshes the display */
 
@@ -44,6 +44,7 @@ void MakeRootPic()
   case RM_MIRROR:
   case RM_IMIRROR: rpixw = 2*eWIDE;  rpixh = 2*eHIGH;  break;
   case RM_CSOLID:
+  case RM_UPLEFT:
   case RM_CWARP:
   case RM_CBRICK:  rpixw = dispWIDE; rpixh = dispHIGH; break;
 
@@ -67,32 +68,32 @@ void MakeRootPic()
 
 
   if (rmode == RM_NORMAL || rmode == RM_TILE) {
-    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,0, 
+    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,0,
 	      (u_int) eWIDE, (u_int) eHIGH);
   }
 
   else if (rmode == RM_MIRROR || rmode == RM_IMIRROR) {
     /* quadrant 2 */
-    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,0, 
+    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,0,
 	      (u_int) eWIDE, (u_int) eHIGH);
     if (epic == NULL) FatalError("epic == NULL in RM_MIRROR code...\n");
 
     /* quadrant 1 */
     FlipPic(epic, eWIDE, eHIGH, 0);   /* flip horizontally */
     CreateXImage();
-    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, eWIDE,0, 
+    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, eWIDE,0,
 	      (u_int) eWIDE, (u_int) eHIGH);
 
     /* quadrant 4 */
     FlipPic(epic, eWIDE, eHIGH, 1);   /* flip vertically */
     CreateXImage();
-    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, eWIDE,eHIGH, 
+    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, eWIDE,eHIGH,
 	      (u_int) eWIDE, (u_int) eHIGH);
 
     /* quadrant 3 */
     FlipPic(epic, eWIDE, eHIGH, 0);   /* flip horizontally */
     CreateXImage();
-    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,eHIGH, 
+    XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,eHIGH,
 	      (u_int) eWIDE, (u_int) eHIGH);
 
     FlipPic(epic, eWIDE, eHIGH, 1);   /* flip vertically  (back to orig) */
@@ -101,7 +102,7 @@ void MakeRootPic()
 
 
   else if (rmode == RM_CENTER || rmode == RM_CENTILE || rmode == RM_CSOLID ||
-	   rmode == RM_CWARP || rmode == RM_CBRICK) {
+	   rmode == RM_CWARP || rmode == RM_CBRICK || rmode == RM_UPLEFT) {
     /* do some stuff to set up the border around the picture */
 
     if (rmode != RM_CENTILE) {
@@ -122,15 +123,15 @@ void MakeRootPic()
       for (i=ay; i < (int) eHIGH; i+=h) {
 	for (j=ax; j < (int) eWIDE; j+=w) {
 	  /* if image goes off tmpPix, only draw subimage */
-	  
+
 	  x = j;  y = i;  w1 = w;  h1 = h;  offx = offy = 0;
 	  if (x<0)           { offx = -x;  w1 -= offx;  x = 0; }
 	  if (x+w1>eWIDE) { w1 = (eWIDE-x); }
 
 	  if (y<0)           { offy = -y;  h1 -= offy;  y = 0; }
 	  if (y+h1>eHIGH)    { h1 = (eHIGH-y); }
-	  
-	  XPutImage(theDisp, tmpPix, theGC, theImage, offx, offy, 
+
+	  XPutImage(theDisp, tmpPix, theGC, theImage, offx, offy,
 		    x, y, (u_int) w1, (u_int) h1);
 	}
       }
@@ -138,9 +139,15 @@ void MakeRootPic()
 
     else if (rmode == RM_CSOLID) { }
 
+    else if (rmode == RM_UPLEFT) {
+
+      XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 0,0,
+		(u_int) eWIDE, (u_int) eHIGH);
+    }
+
     else if (rmode == RM_CWARP) {          /* warp effect */
       XSetForeground(theDisp, theGC, rootfg);
-      for (i=0; i<=dispWIDE; i+=8) 
+      for (i=0; i<=dispWIDE; i+=8)
 	XDrawLine(theDisp,tmpPix,theGC, i,0, (int) dispWIDE-i,(int) dispHIGH);
       for (i=0; i<=dispHIGH; i+=8)
 	XDrawLine(theDisp,tmpPix,theGC, 0,i, (int) dispWIDE, (int) dispHIGH-i);
@@ -150,16 +157,16 @@ void MakeRootPic()
       XSetForeground(theDisp, theGC, rootfg);
       for (i=k=0; i<dispHIGH; i+=20,k++) {
 	XDrawLine(theDisp, tmpPix, theGC, 0, i, (int) dispWIDE, i);
-	for (j=(k&1) * 20 + 10; j<dispWIDE; j+=40) 
+	for (j=(k&1) * 20 + 10; j<dispWIDE; j+=40)
 	  XDrawLine(theDisp, tmpPix, theGC, j,i,j,i+20);
       }
     }
 
 
     /* draw the image centered on top of the background */
-    if (rmode != RM_CENTILE) 
-      XPutImage(theDisp, tmpPix, theGC, theImage, 0,0, 
-		((int) dispWIDE-eWIDE)/2, ((int) dispHIGH-eHIGH)/2, 
+    if ((rmode != RM_CENTILE) && (rmode != RM_UPLEFT))
+      XPutImage(theDisp, tmpPix, theGC, theImage, 0,0,
+		((int) dispWIDE-eWIDE)/2, ((int) dispHIGH-eHIGH)/2,
 		(u_int) eWIDE, (u_int) eHIGH);
   }
 
@@ -172,7 +179,7 @@ void MakeRootPic()
     if (dispWIDE == eWIDE) {
       /* horizontal center line */
       int y, ay;
-      
+
       y = eHIGH - ((dispHIGH/2)%eHIGH); /* Starting point in picture to copy */
       ay = 0;    /* Vertical anchor point */
       while (ay < dispHIGH) {
@@ -189,7 +196,7 @@ void MakeRootPic()
     else if (dispHIGH == eHIGH) {
       /* vertical centerline */
       int x, ax;
-      
+
       x = eWIDE - ((dispWIDE/2)%eWIDE); /* Starting point in picture to copy */
       ax = 0;    /* Horizontal anchor point */
       while (ax < dispWIDE) {
@@ -206,10 +213,10 @@ void MakeRootPic()
     else {
       /* vertical and horizontal centerlines */
       int x,y, ax,ay;
-      
+
       y = eHIGH - ((dispHIGH/2)%eHIGH); /* Starting point in picture to copy */
       ay = 0;    /* Vertical anchor point */
-      
+
       while (ay < dispHIGH) {
 	x = eWIDE - ((dispWIDE/2)%eWIDE);/* Starting point in picture to cpy */
 	ax = 0;    /* Horizontal anchor point */
@@ -276,8 +283,8 @@ static void killRootPix()
     gc_init.foreground = BlackPixel(theDisp, theScreen);
     gc_init.background = WhitePixel(theDisp, theScreen);
     gc = XCreateGC(theDisp, vrootW, GCForeground|GCBackground, &gc_init);
-    pix = XCreatePixmap(theDisp, vrootW, root_weave_width, 
-			root_weave_height, 
+    pix = XCreatePixmap(theDisp, vrootW, root_weave_width,
+			root_weave_height,
 			(unsigned int) DefaultDepth(theDisp, theScreen));
 
     XCopyPlane(theDisp, bitmap, pix, gc, 0,0, root_weave_width,
@@ -333,8 +340,8 @@ void KillOldRootInfo()
   prop = XInternAtom(theDisp, "_XSETROOT_ID", True);
   if (prop == None) return;    /* no old pixmap to kill */
 
-  if (XGetWindowProperty(theDisp, vrootW, prop, 0L, 1L, True, 
-			 AnyPropertyType, &type, &format, &length, 
+  if (XGetWindowProperty(theDisp, vrootW, prop, 0L, 1L, True,
+			 AnyPropertyType, &type, &format, &length,
 			 &after, &data) == Success) {
 
     if (type==XA_PIXMAP && format==32 && length==1 && after==0 && data) {
@@ -348,4 +355,4 @@ void KillOldRootInfo()
 
 
 
-    
+

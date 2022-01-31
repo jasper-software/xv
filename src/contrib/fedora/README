@@ -1,0 +1,16 @@
+Greg,
+     After winding up in dark lonely places trying to
+get xv-3.10a to build on FC5 I suspected I was missing
+something.  Then I happened on your patch manifest
+in Slackware 10.2.
+
+I bandsawed the script a bit to use in propagating XV
+to a handful of personal FC5 machines.  Attached for
+reference.
+
+Thanks for your effort!
+
+-john
+
+-- 
+john.cooper@third-harmonic.com

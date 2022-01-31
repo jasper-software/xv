@@ -1,4 +1,4 @@
-.TH bggen l
+.TH bggen 1
 .SH NAME
 bggen \- generates colored backgrounds on X11 displays
 .SH SYNTAX

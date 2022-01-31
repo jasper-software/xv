@@ -17,8 +17,8 @@
  *   0:
  *   1: colormap type
  *   2: image type  (1=colmap RGB, 2=uncomp RGB, 3=uncomp gray)
- *   3: 
- *   4: 
+ *   3:
+ *   4:
  *   5: colormap_length, low byte
  *   6: colormap_length, high byte
  *   7: bits per cmap entry     (8, 24, 32)
@@ -28,7 +28,7 @@
  *  14: height, low byte
  *  15: height, high byte
  *  16: bits per pixel (8, 24)
- *  17: flags  
+ *  17: flags
  */
 
 
@@ -36,7 +36,7 @@
 #include "xv.h"
 
 static long filesize;
-static char *bname;
+static const char *bname;
 
 
 /*******************************************/
@@ -48,7 +48,7 @@ int LoadTarga(fname, pinfo)
   /* returns '1' on success */
 
   FILE  *fp;
-  int    i, row, c, c1, w, h, r, g, b, flags, intlace, topleft, trunc;
+  int    i, row, c, c1, w, h, npixels, bufsize, flags, intlace, topleft, trunc;
   byte *pic24, *pp;
 
   bname = BaseName(fname);
@@ -88,7 +88,9 @@ int LoadTarga(fname, pinfo)
   c=getc(fp); c1=getc(fp);
   h = c1*256 + c;
 
-  if (w<1 || h<1) {
+  npixels = w * h;
+  bufsize = 3 * npixels;
+  if (w <= 0 || h <= 0 || npixels/w != h || bufsize/3 != npixels) {
     fclose(fp);
     SetISTR(ISTR_WARNING,"%s:  error in Targa header (bad image size)", bname);
     return 0;
@@ -115,7 +117,7 @@ int LoadTarga(fname, pinfo)
 #endif
 
 
-  pic24 = (byte *) calloc((size_t) w*h*3, (size_t) 1);
+  pic24 = (byte *) calloc((size_t) bufsize, (size_t) 1);
   if (!pic24) FatalError("couldn't malloc 'pic24'");
 
 
@@ -134,7 +136,7 @@ int LoadTarga(fname, pinfo)
       if      (i < h / 2) row = 2 * i;
       else                row = 2 * (i - h/2) + 1;
     }
-    
+
     else row = i;              /* no interlace */
 
 
@@ -150,7 +152,7 @@ int LoadTarga(fname, pinfo)
 
 
   /* swap R,B values (file is in BGR, pic24 should be in RGB) */
-  for (i=0, pp=pic24; i<w*h; i++, pp+=3) {
+  for (i=0, pp=pic24; i<npixels; i++, pp+=3) {
     c = pp[0];  pp[0] = pp[2];  pp[2] = c;
   }
 
@@ -185,7 +187,7 @@ int WriteTarga(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle)
 
   /* write the header */
   for (i=0; i<12; i++) putc( (i==2) ? 2 : 0, fp);
-  
+
   putc(w&0xff,     fp);
   putc((w>>8)&0xff,fp);
   putc(h&0xff,     fp);

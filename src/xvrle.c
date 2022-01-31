@@ -28,7 +28,7 @@
 #define GETINT(fp) (c=getc(fp), c1=getc(fp), (c1<<8) + c )
 
 static void read_rle PARM((FILE *, byte *, int, int, int, int));
-static int  rleError PARM((char *, char *));
+static int  rleError PARM((const char *, const char *));
 
 
 
@@ -44,9 +44,10 @@ int LoadRLE(fname, pinfo)
   byte   maps[3][256];
   int    xpos, ypos, w, h, flags, ncolors, pixelbits, ncmap, cmaplen;
   int    cmtlen;
-  byte  *img, *pic8;
+  byte  *img;
   long filesize;
-  char  *bname, *errstr;
+  const char *bname;
+  const char *errstr;
 
   pinfo->type = PIC8;
   pinfo->pic     = (byte *) NULL;
@@ -57,7 +58,7 @@ int LoadRLE(fname, pinfo)
   /* open the stream */
   fp = xv_fopen(fname,"r");
   if (!fp) return (rleError(bname, "unable to open file"));
-  
+
 
   /* figure out the file size */
   fseek(fp, 0L, 2);
@@ -85,7 +86,7 @@ int LoadRLE(fname, pinfo)
   if (DEBUG) {
     fprintf(stderr,"RLE: %dx%d image at %d,%d\n", w, h, xpos, ypos);
     fprintf(stderr,"flags: 0x%02x  (%s%s%s%s)\n",
-	    flags, 
+	    flags,
 	    (flags & H_CLEARFIRST)    ? "CLEARFIRST " : "",
 	    (flags & H_NO_BACKGROUND) ? "NO_BG " : "",
 	    (flags & H_ALPHA)         ? "ALPHA " : "",
@@ -93,7 +94,7 @@ int LoadRLE(fname, pinfo)
 
     fprintf(stderr, "%d bands, %d pixelbits, %d cmap bands, %d cmap entries\n",
 	    ncolors, pixelbits, ncmap, cmaplen);
-  }  
+  }
 
   if (!(flags & H_NO_BACKGROUND)) {
     if (DEBUG) fprintf(stderr, "background value: ");
@@ -212,7 +213,7 @@ int LoadRLE(fname, pinfo)
       for (i=0, ip=img; i<w*h; i++, ip++) *ip = bgcol[0];
     }
     else {
-      for (i=0, ip=img; i<w*h; i++) 
+      for (i=0, ip=img; i<w*h; i++)
 	for (j=0; j<3; j++, ip++) *ip = bgcol[j];
     }
   }
@@ -250,7 +251,7 @@ int LoadRLE(fname, pinfo)
   /* finally, convert into XV internal format */
 
   pinfo->pic = img;
-  pinfo->w   = w;  
+  pinfo->w   = w;
   pinfo->h   = h;
   pinfo->normw = pinfo->w;   pinfo->normh = pinfo->h;
   pinfo->frmType = -1;    /* no default format to save in */
@@ -260,7 +261,7 @@ int LoadRLE(fname, pinfo)
     if (ncmap == 0 || ncmap == 1) {   /* grey, or grey with gamma curve */
       pinfo->colType = F_GREYSCALE;
       sprintf(pinfo->fullInfo, "Greyscale RLE.  (%ld bytes)", filesize);
-      for (i=0; i<256; i++) 
+      for (i=0; i<256; i++)
 	pinfo->r[i] = pinfo->g[i] = pinfo->b[i] = i;
     }
     else {
@@ -272,7 +273,7 @@ int LoadRLE(fname, pinfo)
 	pinfo->b[i] = maps[2][i];
       }
     }
-    
+
     sprintf(pinfo->shrtInfo, "%dx%d RLE.",w, h);
   }
 
@@ -294,7 +295,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
      int   w, h, ncolors, ncmap;
 {
   int posx, posy, plane, bperpix, i, pixval, skipcalls;
-  int opcode, operand, done, c, c1;    
+  int opcode, operand, done, c, c1;
   byte *ip;
 
   posx = posy = plane = done = skipcalls = 0;
@@ -324,7 +325,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
     case RSkipPixelsOp:
       if (opcode & LONG_OP) { getc(fp);  operand = GETINT(fp); }
       else operand = getc(fp);
-      
+
       posx += operand;
       break;
 
@@ -340,7 +341,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
 	c = getc(fp);
 	if (plane<ncolors && posy<h && (posx+i < w)) *ip = c;
       }
-      
+
       if (operand & 1) getc(fp);  /* word boundary */
       posx += operand;
       break;
@@ -358,7 +359,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
       for (i=0; i<operand; i++, ip+=bperpix) {
 	if (plane<ncolors && posy<h && (posx+i < w)) *ip = pixval;
       }
-      
+
       /*  if (operand & 1) getc(fp); */  /* word boundary */
       posx += operand;
       break;
@@ -373,7 +374,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
 
 /*******************************************/
 static int rleError(fname,st)
-     char *fname, *st;
+     const char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

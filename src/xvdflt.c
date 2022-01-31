@@ -16,12 +16,12 @@
 #include "bits/xv_rev"
 #include "bits/xv_ver"
 #include "bits/xf_left"
-#include "bits/xf_right"
+/* #include "bits/xf_right"	not used */
 #include "bits/font5x9.h"
 
 
 #ifndef USEOLDPIC
-#  include "xvdflt.h"  
+#  include "xvdflt.h"
 #endif
 
 
@@ -62,7 +62,7 @@ void LoadDfltPic(pinfo)
   for (i=0; i<XVDFLT_HIGH; i++) {
     nbytes = 0;
     while (nbytes < XVDFLT_WIDE) {
-      char *sp;
+      const char *sp;
       byte *dp;
 
       j = XVDFLT_WIDE - nbytes;
@@ -100,21 +100,21 @@ void LoadDfltPic(pinfo)
   setcolor(pinfo, 252,   0,  0,  0);   /* black background for text */
 
 
-  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height, 
+  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2+1, 203+1, 252);
-  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height, 
+  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2,   203, 250);
 
   i = xv_ver_width + xv_rev_width + 30;
 
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height, 
+  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
        dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2+1, 220+1,252);
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height, 
+  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
        dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2+1, 220+1,252);
 
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height, 
+  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2, 220, 250);
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height, 
+  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2, 220, 250);
 
   strcpy(str,"Press <right> mouse button for menu.");
@@ -136,7 +136,11 @@ void LoadDfltPic(pinfo)
   pinfo->w       = XVDFLT_WIDE;
   pinfo->h       = XVDFLT_HIGH;
   pinfo->type    = PIC8;
+#ifdef HAVE_PNG
+  pinfo->frmType = F_PNG;
+#else
   pinfo->frmType = F_GIF;
+#endif
   pinfo->colType = F_FULLCOLOR;
 
   pinfo->normw   = pinfo->w;
@@ -169,7 +173,7 @@ static void loadOldDfltPic(pinfo)
     for (i=k=0; i<DHIGH; i+=xf_left_height) {
       for (j=0; j<DWIDE; j+=xf_left_width) {
 	k++;
-	if (k&1) 
+	if (k&1)
 	  xbm2pic((byte *) xf_left_bits, xf_left_width, xf_left_height,
 		  dfltpic, DWIDE, DHIGH, j + xf_left_width/2,
 		  i + xf_left_height/2, 1);
@@ -179,29 +183,29 @@ static void loadOldDfltPic(pinfo)
 
 
 
-  xbm2pic((byte *) xvpic_logo_out_bits, xvpic_logo_out_width, 
+  xbm2pic((byte *) xvpic_logo_out_bits, xvpic_logo_out_width,
 	  xvpic_logo_out_height, dfltpic, DWIDE, DHIGH, DWIDE/2 + 10, 80, 103);
 
-  xbm2pic((byte *) xvpic_logo_top_bits, xvpic_logo_top_width, 
+  xbm2pic((byte *) xvpic_logo_top_bits, xvpic_logo_top_width,
 	  xvpic_logo_top_height, dfltpic, DWIDE, DHIGH, DWIDE/2 + 10, 80, 100);
 
-  xbm2pic((byte *) xvpic_logo_bot_bits, xvpic_logo_bot_width, 
+  xbm2pic((byte *) xvpic_logo_bot_bits, xvpic_logo_bot_width,
 	  xvpic_logo_bot_height, dfltpic, DWIDE, DHIGH, DWIDE/2 + 10, 80, 101);
 
 
 
-  xbm2pic((byte *) xv_jhb_bits, xv_jhb_width, xv_jhb_height, 
+  xbm2pic((byte *) xv_jhb_bits, xv_jhb_width, xv_jhb_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2, 160, 102);
 
-  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height, 
+  xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2, 203, 102);
 
   i = xv_ver_width + xv_rev_width + 30;
 
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height, 
+  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2, 220, 102);
 
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height, 
+  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2, 220, 102);
 
   strcpy(str,"Press <right> mouse button for menu.");
@@ -240,7 +244,11 @@ static void loadOldDfltPic(pinfo)
   pinfo->w       = DWIDE;
   pinfo->h       = DHIGH;
   pinfo->type    = PIC8;
+#ifdef HAVE_PNG
+  pinfo->frmType = F_PNG;
+#else
   pinfo->frmType = F_GIF;
+#endif
   pinfo->colType = F_FULLCOLOR;
 
   sprintf(pinfo->fullInfo, "<8-bit internal>");
@@ -272,7 +280,7 @@ void xbm2pic(bits, bwide, bhigh, pic, pwide, phigh, cx, cy, col)
       x = cx - bwide/2;
 
       k = *bptr;
-      for (j=0,bit=0; j<bwide; j++, bit = (++bit)&7, x++) {
+      for (j=0,bit=0; j<bwide; j++, bit = (bit+1)&7, x++) {
 	if (!bit) k = *bptr++;
 	if ( (k&1) && (x>=0) && (x<pwide))
 	  pptr[x] = col;
@@ -281,7 +289,7 @@ void xbm2pic(bits, bwide, bhigh, pic, pwide, phigh, cx, cy, col)
       }
     }
   }
-}  
+}
 
 
 /*******************************************/
@@ -300,7 +308,7 @@ static void gen_bg(dfltpic, pinfo)
      byte    *dfltpic;
      PICINFO *pinfo;
 {
-  int i,j,k, dr, dg, db;
+  int i,j, dr, dg, db;
   byte *pp;
 
   pp = dfltpic;
@@ -357,7 +365,7 @@ void DrawStr2Pic(str, cx, cy, pic, pw, ph, col)
 
   for ( ; *str; str++, cx+=6) {
     i = (byte) *str;
-    if (i >= 32 && i < 128) 
+    if (i >= 32 && i < 128)
       xbm2pic(font5x9[i - 32], 5, 9, pic, pw, ph, cx, cy, col);
   }
 }

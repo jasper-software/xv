@@ -1,4 +1,4 @@
-/* 
+/*
  * xvctrl.c - Control box handling functions
  *
  * callable functions:
@@ -9,7 +9,7 @@
  *   RedrawCtrl(x,y,w,h)    -  called by 'expose' events
  *   ClickCtrl(x,y)
  *   DrawCtrlStr()          -  called to redraw 'ISTR_INFO' string in ctrlW
- *   ScrollToCurrent()      -  called when list selection is changed 
+ *   ScrollToCurrent()      -  called when list selection is changed
  *
  *   LSCreate()             -  creates a listbox
  *   LSRedraw()             -  redraws 'namelist' box
@@ -49,7 +49,10 @@
 #include "bits/uicon"
 #include "bits/oicon1"
 #include "bits/oicon2"
-#include "bits/icon"
+#ifdef REGSTR
+#  define OMIT_ICON_BITS
+#  include "bits/icon"
+#endif
 
 #define CTRLWIDE 440               /* (fixed) size of control window */
 #define CTRLHIGH 348 /* 379 */
@@ -80,73 +83,74 @@ static XRectangle butrect;
    in xv.h */
 
 
-static char *dispMList[] = { "Raw\tr", 
-			     "Dithered\td",
-			     "Smooth\ts",
-			     MBSEP,
-			     "Read/Write Colors",
-			     MBSEP,
-			     "Normal Colors",
-			     "Perfect Colors",
-			     "Use Own Colormap",
-			     "Use Std. Colormap" };
+static const char *dispMList[] = { "Raw\tr",
+				   "Dithered\td",
+				   "Smooth\ts",
+				   MBSEP,
+				   "Read/Write Colors",
+				   MBSEP,
+				   "Normal Colors",
+				   "Perfect Colors",
+				   "Use Own Colormap",
+				   "Use Std. Colormap" };
 
-static char *rootMList[] = { "Window", 
-			     "Root: tiled",
-			     "Root: integer tiled",
-			     "Root: mirrored",
-			     "Root: integer mirrored",
-			     "Root: center tiled",
-			     "Root: centered",
-			     "Root: centered, warp",
-			     "Root: centered, brick",
-    		             "Root: symmetrical tiled",
-			     "Root: symmetrical mirrored" };
+static const char *rootMList[] = { "Window",
+				   "Root: tiled",
+				   "Root: integer tiled",
+				   "Root: mirrored",
+				   "Root: integer mirrored",
+				   "Root: center tiled",
+				   "Root: centered",
+				   "Root: centered, warp",
+				   "Root: centered, brick",
+				   "Root: symmetrical tiled",
+				   "Root: symmetrical mirrored",
+				   "Root: upper left corner" };
 
-static char *conv24MList[] = { "8-bit mode\t\2448",
-			       "24-bit mode\t\2448",
-			       MBSEP,
-			       "Lock current mode",
-			       MBSEP,
-                               "Quick 24->8",
-			       "Slow 24->8",
-			       "Best 24->8" };
+static const char *conv24MList[] = { "8-bit mode\t\2448",
+				     "24-bit mode\t\2448",
+				     MBSEP,
+				     "Lock current mode",
+				     MBSEP,
+				     "Quick 24->8",
+				     "Slow 24->8",
+				     "Best 24->8" };
 
-static char *algMList[]    = { "Undo All\t\244u",
-			       MBSEP,
- 			       "Blur...\t\244b",
-			       "Sharpen...\t\244s",
-			       "Edge Detect\t\244e",
-			       "Emboss\t\244m",
-			       "Oil Painting\t\244o",
-			       "Blend\t\244B",
-			       "Copy Rotate...\t\244t",
-			       "Clear Rotate...\t\244T",
-			       "Pixelize...\t\244p",
-			       "Spread...\t\244S",
-			       "DeSpeckle...\t\244k"};
+static const char *algMList[] = { "Undo All\t\244u",
+				  MBSEP,
+				  "Blur...\t\244b",
+				  "Sharpen...\t\244s",
+				  "Edge Detect\t\244e",
+				  "Emboss\t\244m",
+				  "Oil Painting\t\244o",
+				  "Blend\t\244B",
+				  "Copy Rotate...\t\244t",
+				  "Clear Rotate...\t\244T",
+				  "Pixelize...\t\244p",
+				  "Spread...\t\244S",
+				  "DeSpeckle...\t\244k"};
 
-static char *sizeMList[]   = { "Normal\tn",
-			       "Max Size\tm",
-			       "Maxpect\tM",
-			       "Double Size\t>",
-			       "Half Size\t<",
-			       "10% Larger\t.",
-			       "10% Smaller\t,",
-			       MBSEP,
-			       "Set Size\tS",
-			       "Re-Aspect\ta",
-			       "4x3\t4",
-			       "Int. Expand\tI" };
+static const char *sizeMList[] = { "Normal\tn",
+				   "Max Size\tm",
+				   "Maxpect\tM",
+				   "Double Size\t>",
+				   "Half Size\t<",
+				   "10% Larger\t.",
+				   "10% Smaller\t,",
+				   MBSEP,
+				   "Set Size\tS",
+				   "Re-Aspect\ta",
+				   "4x3\t4",
+				   "Int. Expand\tI" };
 
-static char *windowMList[] = { "Visual Schnauzer\t^v",
-			       "Color Editor\te",
-			       "Image Info\ti",
-			       "Image Comments\t^c",
-			       "Text View\t^t",
-			       MBSEP,
-			       "About XV\t^a",
-			       "XV Keyboard Help"};
+static const char *windowMList[] = { "Visual Schnauzer\t^v",
+				     "Color Editor\te",
+				     "Image Info\ti",
+				     "Image Comments\t^c",
+				     "Text View\t^t",
+				     MBSEP,
+				     "About XV\t^a",
+				     "XV Keyboard Help"};
 
 
 
@@ -157,14 +161,14 @@ static void ls3d         PARM((LIST *));
 
 /***************************************************/
 void CreateCtrl(geom)
-     char *geom;
+     const char *geom;
 {
-  int i, listh, topskip;
+  int listh, topskip;
   double skip;
   XSetWindowAttributes xswa;
   Pixmap oicon1Pix, oicon2Pix;
 
-  ctrlW = CreateWindow("xv controls", "XVcontrols", geom, 
+  ctrlW = CreateWindow("xv controls", "XVcontrols", geom,
 		       CTRLWIDE, CTRLHIGH, infofg, infobg, 0);
   if (!ctrlW) FatalError("can't create controls window!");
 
@@ -205,10 +209,10 @@ void CreateCtrl(geom)
   oicon2Pix = MakePix1(ctrlW, oicon2_bits,  oicon2_width,  oicon2_height);
 
   if (!grayTile  || !dimStip  || !fifoPix   || !chrPix    || !dirPix    ||
-      !blkPix    || !lnkPix   || !regPix    || !rotlPix   || !fliphPix  || 
+      !blkPix    || !lnkPix   || !regPix    || !rotlPix   || !fliphPix  ||
       !flipvPix  || !p10Pix   || !m10Pix    || !cutPix    || !copyPix   ||
       !pastePix  || !clearPix || !uiconPix  || !oiconPix  || !oicon1Pix ||
-      !oicon2Pix || !padPix   || !annotPix) 
+      !oicon2Pix || !padPix   || !annotPix)
     FatalError("unable to create all pixmaps in CreateCtrl()\n");
 
 
@@ -226,7 +230,7 @@ void CreateCtrl(geom)
   XFreePixmap(theDisp, oicon1Pix);
   XFreePixmap(theDisp, oicon2Pix);
 
-  
+
 
   if (ctrlColor) XSetWindowBackground(theDisp, ctrlW, locol);
             else XSetWindowBackgroundPixmap(theDisp, ctrlW, grayTile);
@@ -234,7 +238,7 @@ void CreateCtrl(geom)
   listh = LINEHIGH * NLINES;
 
   LSCreate(&nList, ctrlW, 5, 52, (CTRLWIDE-BUTTW-18),
-	   LINEHIGH*NLINES, NLINES, dispnames, numnames, 
+	   LINEHIGH*NLINES, NLINES, dispnames, numnames,
 	   infofg, infobg, hicol, locol, RedrawNList, 0, 0);
   nList.selected = 0;  /* default to first name selected */
 
@@ -245,8 +249,8 @@ void CreateCtrl(geom)
 
   topskip = nList.y;
   skip =  ((double) (nList.h - (CHIGH+5))) / 6.0;
-  if (skip > SBUTTH+8) {  
-    skip = SBUTTH + 7;  
+  if (skip > SBUTTH+8) {
+    skip = SBUTTH + 7;
     topskip = nList.y + (nList.h - (6*skip + (CHIGH+5))) / 2;
   }
 
@@ -258,7 +262,7 @@ void CreateCtrl(geom)
 #define R_BY3 (topskip + (int)(3*skip))
 #define R_BY4 (topskip + (int)(4*skip))
 #define R_BY5 (topskip + (int)(5*skip))
-  
+
   BTCreate(&but[BNEXT],    ctrlW, R_BX0, R_BY0, R_BW1, SBUTTH, "Next",   BCLS);
   BTCreate(&but[BPREV],    ctrlW, R_BX0, R_BY1, R_BW1, SBUTTH, "Prev",   BCLS);
   BTCreate(&but[BLOAD],    ctrlW, R_BX0, R_BY2, R_BW1, SBUTTH, "Load",   BCLS);
@@ -309,7 +313,7 @@ void CreateCtrl(geom)
   BTCreate(&but[BABOUT],  ctrlW,BX4,  BY1,BUTTW,BUTTH,"About XV",BCLS);
   BTCreate(&but[BQUIT],   ctrlW,BX5,  BY1,BUTTW,BUTTH,"Quit",    BCLS);
 
-  BTCreate(&but[BXV],     ctrlW,5,5, 100, (u_int) nList.y - 5 - 2 - 5, 
+  BTCreate(&but[BXV],     ctrlW,5,5, 100, (u_int) nList.y - 5 - 2 - 5,
 	   "", BCLS);
 
   SetButtPix(&but[BCOPY],  copyPix,  copy_width,   copy_height);
@@ -329,7 +333,7 @@ void CreateCtrl(geom)
   if (ctrlColor) {
     SetButtPix(&but[BXV], oiconPix, oicon1_width,  oicon1_height);
     but[BXV].colorpix = 1;
-  } 
+  }
   else SetButtPix(&but[BXV], iconPix, icon_width,  icon_height);
 #else
   SetButtPix(&but[BXV], uiconPix, uicon_width,  uicon_height);
@@ -338,21 +342,21 @@ void CreateCtrl(geom)
   XMapSubwindows(theDisp, ctrlW);
 
 
-  /* have to create menu buttons after XMapSubWindows, as we *don't* want 
+  /* have to create menu buttons after XMapSubWindows, as we *don't* want
      the popup menus mapped */
 
-  MBCreate(&dispMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5,112,19, 
+  MBCreate(&dispMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5,112,19,
 	   "Display",    dispMList,   DMB_MAX,    BCLS);
-  MBCreate(&conv24MB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5,112,19, 
+  MBCreate(&conv24MB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5,112,19,
 	   "24/8 Bit",   conv24MList, CONV24_MAX, BCLS);
-  MBCreate(&algMB,    ctrlW, CTRLWIDE - 8 - 112,             5,112,19, 
+  MBCreate(&algMB,    ctrlW, CTRLWIDE - 8 - 112,             5,112,19,
 	   "Algorithms", algMList,    ALG_MAX,    BCLS);
 
-  MBCreate(&rootMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5+21,112,19, 
+  MBCreate(&rootMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5+21,112,19,
 	   "Root",       rootMList,   RMB_MAX,    BCLS);
-  MBCreate(&windowMB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5+21,112,19, 
+  MBCreate(&windowMB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5+21,112,19,
 	   "Windows",    windowMList, WMB_MAX,    BCLS);
-  MBCreate(&sizeMB,   ctrlW, CTRLWIDE - 8 - 112,             5+21,112,19, 
+  MBCreate(&sizeMB,   ctrlW, CTRLWIDE - 8 - 112,             5+21,112,19,
 	   "Image Size", sizeMList,   SZMB_MAX,   BCLS);
 
 
@@ -395,7 +399,7 @@ Pixmap MakePix1(win, bits, w, h)
      byte *bits;
      int   w,h;
 {
-  return XCreatePixmapFromBitmapData(theDisp, win, (char *) bits, 
+  return XCreatePixmapFromBitmapData(theDisp, win, (char *) bits,
 				     (u_int) w, (u_int) h, 1L,0L,1);
 }
 
@@ -404,7 +408,7 @@ Pixmap MakePix1(win, bits, w, h)
 void CtrlBox(vis)
 int vis;
 {
-  if (vis) XMapRaised(theDisp, ctrlW);  
+  if (vis) XMapRaised(theDisp, ctrlW);
   else     XUnmapWindow(theDisp, ctrlW);
 
   ctrlUp = vis;
@@ -416,7 +420,6 @@ void RedrawCtrl(x,y,w,h)
 int x,y,w,h;
 {
   int i;
-  XRectangle xr;
 
   RANGE(w, 0, CTRLWIDE);
   RANGE(h, 0, CTRLHIGH);
@@ -452,7 +455,7 @@ int x,y,w,h;
 /***************************************************/
 void DrawCtrlNumFiles()
 {
-  int x,y,w,h;
+  int x,y,w;
   char foo[40];
 
   x  = but[BNEXT].x;
@@ -463,14 +466,14 @@ void DrawCtrlNumFiles()
   XSetBackground(theDisp, theGC, infobg);
 
   sprintf(foo, "%d file%s", numnames, (numnames==1) ? "" : "s");
-    
+
   XSetForeground(theDisp, theGC, infobg);
   XFillRectangle(theDisp,ctrlW, theGC, x+1,y+1, (u_int) w-1, (u_int) CHIGH+5);
 
   XSetForeground(theDisp,theGC,infofg);
   XDrawRectangle(theDisp,ctrlW, theGC, x,y,     (u_int) w,   (u_int) CHIGH+6);
 
-  Draw3dRect(ctrlW, x+1,y+1,                    (u_int) w-2, (u_int) CHIGH+4, 
+  Draw3dRect(ctrlW, x+1,y+1,                    (u_int) w-2, (u_int) CHIGH+4,
 	     R3D_IN, 2, hicol, locol, infobg);
 
   XSetForeground(theDisp,theGC,infofg);
@@ -489,7 +492,7 @@ void DrawCtrlStr()
   st1 = GetISTR(ISTR_WARNING);
 
   XSetForeground(theDisp, theGC, infobg);
-  XFillRectangle(theDisp, ctrlW, theGC, 0, y+1, 
+  XFillRectangle(theDisp, ctrlW, theGC, 0, y+1,
 		 CTRLWIDE, (u_int)((CHIGH+4)*2+1));
 
   XSetForeground(theDisp, theGC, infofg);
@@ -501,7 +504,7 @@ void DrawCtrlStr()
     XSetForeground(theDisp, theGC, locol);
     XDrawLine(theDisp, ctrlW, theGC, 0, y+1,   CTRLWIDE, y+1);
     XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+5, CTRLWIDE, y+CHIGH+5);
-    XDrawLine(theDisp, ctrlW, theGC, 0, y+(CHIGH+4)*2+1, 
+    XDrawLine(theDisp, ctrlW, theGC, 0, y+(CHIGH+4)*2+1,
 	      CTRLWIDE, y+(CHIGH+4)*2+1);
   }
 
@@ -542,16 +545,16 @@ int x,y;
 void ScrollToCurrent(lst)
 LIST *lst;
 {
-  /* called when selected item on list is changed.  Makes the selected 
+  /* called when selected item on list is changed.  Makes the selected
      item visible.  If it already is, nothing happens.  Otherwise, it
-     attempts to scroll so that the selection appears in the middle of 
+     attempts to scroll so that the selection appears in the middle of
      the list window */
 
   int halfway;
 
   if (lst->selected < 0) return;  /* no selection, do nothing */
 
-  if (lst->selected > lst->scrl.val && 
+  if (lst->selected > lst->scrl.val &&
       lst->selected <  lst->scrl.val + lst->nlines-1) LSRedraw(lst, 0);
   else {
     halfway = (lst->nlines)/2;   /* offset to the halfway pt. of the list */
@@ -590,7 +593,7 @@ void        (*fptr)PARM((int,SCRL *));
   lp->win = XCreateSimpleWindow(theDisp,win,x,y,(u_int) w, (u_int) h,1,fg,bg);
   if (!lp->win) FatalError("can't create list window!");
 
-  lp->x = x;    lp->y = y;   
+  lp->x = x;    lp->y = y;
   lp->w = w;    lp->h = h;
   lp->fg = fg;  lp->bg = bg;
   lp->hi = hi;  lp->lo = lo;
@@ -603,7 +606,7 @@ void        (*fptr)PARM((int,SCRL *));
 
   XSelectInput(theDisp, lp->win, ExposureMask | ButtonPressMask);
 
-  SCCreate(&lp->scrl, lp->win, w-20, -1, 1, h, 0, 
+  SCCreate(&lp->scrl, lp->win, w-20, -1, 1, h, 0,
 	   nstr-nlines, 0, nlines-1, fg, bg, hi, lo, fptr);
 
   XMapSubwindows(theDisp, lp->win);
@@ -646,7 +649,7 @@ static void ls3d(lp)
 LIST *lp;
 {
   /* redraws lists 3d-effect, which can be trounced by drawSel() */
-  Draw3dRect(lp->win, 0, 0, lp->w-1, lp->h-1, R3D_IN, 2, 
+  Draw3dRect(lp->win, 0, 0, lp->w-1, lp->h-1, R3D_IN, 2,
 	     lp->hi, lp->lo, lp->bg);
 }
 
@@ -675,43 +678,43 @@ int j;
   else { fg = lp->fg;  bg = lp->bg; }
 
   XSetForeground(theDisp, theGC, bg);
-  XFillRectangle(theDisp, lp->win, theGC, x0, y0+i*LINEHIGH, 
+  XFillRectangle(theDisp, lp->win, theGC, x0, y0+i*LINEHIGH,
 		 (u_int) wide+1, (u_int) LINEHIGH);
 
   if (j>=0 && j<lp->nstr) {   /* only draw string if valid */
     XSetForeground(theDisp, theGC, fg);
     XSetBackground(theDisp, theGC, bg);
 
-    if (!lp->filetypes) 
+    if (!lp->filetypes)
       DrawString(lp->win, x0+3, y0+i*LINEHIGH + ASCENT + 1, lp->str[j]);
     else {
       int ypos = y0 + i*LINEHIGH + (LINEHIGH - i_fifo_height)/2;
 
-      if (lp->str[j][0] == C_FIFO) 
+      if (lp->str[j][0] == C_FIFO)
 	XCopyPlane(theDisp, fifoPix, lp->win, theGC, 0, 0,
 		   i_fifo_width, i_fifo_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_CHR) 
+      else if (lp->str[j][0] == C_CHR)
 	XCopyPlane(theDisp, chrPix, lp->win, theGC, 0, 0,
 		   i_chr_width, i_chr_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_DIR) 
+      else if (lp->str[j][0] == C_DIR)
 	XCopyPlane(theDisp, dirPix, lp->win, theGC, 0, 0,
 		   i_dir_width, i_dir_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_BLK) 
+      else if (lp->str[j][0] == C_BLK)
 	XCopyPlane(theDisp, blkPix, lp->win, theGC, 0, 0,
 		   i_blk_width, i_blk_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_LNK) 
+      else if (lp->str[j][0] == C_LNK)
 	XCopyPlane(theDisp, lnkPix, lp->win, theGC, 0, 0,
 		   i_lnk_width, i_lnk_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_SOCK) 
+      else if (lp->str[j][0] == C_SOCK)
 	XCopyPlane(theDisp, sockPix, lp->win, theGC, 0, 0,
 		   i_sock_width, i_sock_height, x0+3, ypos, 1L);
 
-      else if (lp->str[j][0] == C_EXE) 
+      else if (lp->str[j][0] == C_EXE)
 	XCopyPlane(theDisp, exePix, lp->win, theGC, 0, 0,
 		   i_exe_width, i_exe_height, x0+3, ypos, 1L);
 
@@ -720,8 +723,8 @@ int j;
 		   i_reg_width, i_reg_height, x0+3, ypos, 1L);
 
 
-      DrawString(lp->win, x0+3 + i_fifo_width + 3, 
-		  y0+i*LINEHIGH + ASCENT + 1, 
+      DrawString(lp->win, x0+3 + i_fifo_width + 3,
+		  y0+i*LINEHIGH + ASCENT + 1,
 		  lp->str[j]+1);
     }
   }
@@ -735,7 +738,7 @@ int   delta;
 {
   int  i;
 
-  for (i = lp->scrl.val; i < lp->scrl.val + lp->nlines; i++) 
+  for (i = lp->scrl.val; i < lp->scrl.val + lp->nlines; i++)
     drawSel(lp,i);
   ls3d(lp);
 }
@@ -762,7 +765,7 @@ XButtonEvent *ev;
   if (sel >= lp->nstr) sel = lp->selected;
 
   /* see if it's a double click */
-  if (ev->time - lasttime < DBLCLKTIME && sel==lastsel 
+  if (ev->time - lasttime < DBLCLKTIME && sel==lastsel
       && (lp->scrl.val + (y-y0)/LINEHIGH) < lp->nstr
       && !INACTIVE(lp,sel)) {
     return (sel);
@@ -782,7 +785,7 @@ XButtonEvent *ev;
   while (XQueryPointer(theDisp,lp->win,&rW,&cW,&rx,&ry,&x,&y,&mask)) {
     if (!(mask & Button1Mask)) break;    /* button released */
 
-    if (y<y0) { /* scroll up in list */ 
+    if (y<y0) { /* scroll up in list */
       if (lp->scrl.val > lp->scrl.min) {
 	lp->selected = lp->scrl.val - 1;
 	SCSetVal(&lp->scrl, lp->scrl.val - 1);
@@ -804,7 +807,7 @@ XButtonEvent *ev;
       if (sel >= lp->nstr) sel = lp->nstr - 1;
 
       if (sel != lp->selected && sel >= lp->scrl.val &&
-	  sel < lp->scrl.val + lp->nlines) {  
+	  sel < lp->scrl.val + lp->nlines) {
 	/* dragged to another on current page */
 	oldsel = lp->selected;
 	lp->selected = sel;
@@ -829,17 +832,17 @@ void LSKey(lp, key)
   else if (key==LS_PAGEDOWN) SCSetVal(&lp->scrl,lp->scrl.val + (lp->nlines-1));
   else if (key==LS_HOME)     SCSetVal(&lp->scrl,lp->scrl.min);
   else if (key==LS_END)      SCSetVal(&lp->scrl,lp->scrl.max);
-  
+
   else if (key==LS_LINEUP)   {
     /* if the selected item visible, but not the top line */
-    if (lp->selected > lp->scrl.val && 
+    if (lp->selected > lp->scrl.val &&
 	lp->selected <= lp->scrl.val + lp->nlines - 1) {
       /* then just move it */
       lp->selected--;
       drawSel(lp, lp->selected);  drawSel(lp, lp->selected+1);
       ls3d(lp);
     }
-    
+
     /* if it's the top line... */
     else if (lp->selected == lp->scrl.val) {
       if (lp->selected > 0) {
@@ -847,7 +850,7 @@ void LSKey(lp, key)
 	SCSetVal(&lp->scrl, lp->selected);
       }
     }
-    
+
     /* if it's not visible, put it on the bottom line */
     else {
       lp->selected = lp->scrl.val + lp->nlines - 1;
@@ -856,10 +859,10 @@ void LSKey(lp, key)
       ls3d(lp);
     }
   }
-  
+
   else if (key==LS_LINEDOWN)   {
     /* if the selected item visible, but not the bottom line */
-    if (lp->selected >= lp->scrl.val && 
+    if (lp->selected >= lp->scrl.val &&
 	lp->selected < lp->scrl.val + lp->nlines - 1) {
       if (lp->selected < lp->nstr-1) {
 	/* then just move it */
@@ -868,7 +871,7 @@ void LSKey(lp, key)
 	ls3d(lp);
       }
     }
-    
+
     /* if it's the bottom line... */
     else if (lp->selected == lp->scrl.val + lp->nlines - 1) {
       if (lp->selected < lp->nstr-1) {
@@ -876,7 +879,7 @@ void LSKey(lp, key)
 	SCSetVal(&lp->scrl, lp->scrl.val+1);
       }
     }
-    
+
     /* if it's not visible, put it on the top line */
     else {
       lp->selected = lp->scrl.val;

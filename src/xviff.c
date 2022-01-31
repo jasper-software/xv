@@ -39,14 +39,14 @@
 
 static long filesize;
 
-static int           readID       PARM((FILE *, char *));
-static int           iffError     PARM((char *, char *));
+/* static int           readID       PARM((FILE *, char *));  DOES NOT EXIST */
+static int           iffError     PARM((const char *, const char *));
 static void          decomprle    PARM((byte *, byte *, long, long));
 static unsigned int  iff_getword  PARM((byte *));
 static unsigned long iff_getlong  PARM((byte *));
 
 
-static char *bname;
+static const char *bname;
 
 
 /* Define internal ILBM types */
@@ -65,16 +65,17 @@ int LoadIFF(fname, pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
-  
+
   register byte bitmsk, rval, gval, bval;
   register long col, colbit;
   FILE          *fp;
   int           rv;
-  int           BMHDok, CMAPok, CAMGok, BODYok;
+  int           BMHDok, CMAPok, CAMGok;
   int           bmhd_width, bmhd_height, bmhd_bitplanes, bmhd_transcol;
   int           i, j, k, lineskip, colors, fmt;
+  int           npixels = 0; /* needs to be initialized _outside_ while-loop */
   byte          bmhd_masking, bmhd_compression;
-  long          chunkLen, camg_viewmode, decomp_bufsize;
+  long          chunkLen, camg_viewmode;
   byte          *databuf, *dataptr, *cmapptr, *picptr, *pic, *bodyptr;
   byte          *workptr, *workptr2, *workptr3, *decomp_mem;
 
@@ -149,25 +150,30 @@ int LoadIFF(fname, pinfo)
       bmhd_transcol    = iff_getword(dataptr + 8 + 12);
       BMHDok = 1;                                       /* got BMHD */
       dataptr += 8 + chunkLen;                          /* to next chunk */
+
+      npixels = bmhd_width * bmhd_height;  /* 65535*65535 max */
+      if (bmhd_width <= 0 || bmhd_height <= 0
+          || npixels/bmhd_width != bmhd_height)
+        return (iffError(bname, "xviff: image dimensions out of range"));
     }
 
 
     else if (strncmp((char *) dataptr, "CMAP", (size_t) 4)==0) { /* CMAP ? */
       cmapptr = dataptr + 8;
       colors = chunkLen / 3;                            /* calc no of colors */
-      
+
       /* copy colors to color map */
       for (i=0; i < colors; i++) {
 	pinfo->r[i] = *cmapptr++;
 	pinfo->g[i] = *cmapptr++;
 	pinfo->b[i] = *cmapptr++;
       }
-      
+
       CMAPok = 1;                                       /* got CMAP */
       dataptr += 8 + chunkLen;                          /* to next chunk */
     }
 
-    
+
     else if (strncmp((char *) dataptr, "CAMG", (size_t) 4)==0) {  /* CAMG ? */
       camg_viewmode = iff_getlong(dataptr + 8);             /* get viewmodes */
       CAMGok = 1;                                       /* got CAMG */
@@ -176,19 +182,28 @@ int LoadIFF(fname, pinfo)
 
 
     else if (strncmp((char *) dataptr, "BODY", (size_t) 4)==0) { /* BODY ? */
+      int byte_width = (((bmhd_width + 15) >> 4) << 1);  /* 8192 max */
+
       bodyptr = dataptr + 8;                            /* -> BODY data */
-      
+
       if (BMHDok) {                                     /* BMHD found? */
 	/* if BODY is compressed, allocate buffer for decrunched BODY and
 	   decompress it (run length encoding) */
-	
+
 	if (bmhd_compression == 1) {
 	  /* calc size of decrunch buffer - (size of the actual picture
 	     decompressed in interleaved Amiga bitplane format) */
 
-	  decomp_bufsize = (((bmhd_width + 15) >> 4) << 1) 
-  	                       * bmhd_height * bmhd_bitplanes;
-	  
+	  int bytes_per_bitplane = byte_width * bmhd_height; /* 536862720 max */
+          long decomp_bufsize = bytes_per_bitplane * bmhd_bitplanes;
+
+	  if (byte_width <= 0 || bmhd_height <= 0 ||
+	      bytes_per_bitplane/byte_width != bmhd_height ||
+	      decomp_bufsize/bytes_per_bitplane != bmhd_bitplanes)
+	  {
+	    return (iffError(bname, "xviff: image dimensions out of range"));
+	  }
+
 	  if ((decomp_mem = (byte *)malloc((size_t) decomp_bufsize)) != NULL) {
 	    decomprle(dataptr + 8, decomp_mem, chunkLen, decomp_bufsize);
 	    bodyptr = decomp_mem;                 /* -> uncompressed BODY */
@@ -200,12 +215,13 @@ int LoadIFF(fname, pinfo)
 	    FatalError("xviff: cannot malloc() decrunch buffer");
 	  }
 	}
-	
+
 
 	/* the following determines the type of the ILBM file.
 	   it's either NORMAL, EHB, HAM, HAM8 or 24BIT */
-	
+
 	fmt = ILBM_NORMAL;                        /* assume normal ILBM */
+	/* FIXME:  does ILBM_NORMAL really support up to 255 bitplanes? */
 
 	if      (bmhd_bitplanes == 24) fmt = ILBM_24BIT;
 	else if (bmhd_bitplanes == 8) {
@@ -216,7 +232,7 @@ int LoadIFF(fname, pinfo)
 	  if (camg_viewmode & 0x80) fmt = ILBM_EHB;
 	  else if (camg_viewmode & 0x800) fmt = ILBM_HAM;
 	}
-	
+
 
 	if (DEBUG) {
 	  fprintf(stderr, "LoadIFF: %s %dx%d, planes=%d (%d cols), comp=%d\n",
@@ -225,9 +241,9 @@ int LoadIFF(fname, pinfo)
 		  (fmt==ILBM_HAM8)   ? "HAM8 ILBM" :
 		  (fmt==ILBM_EHB)    ? "EHB ILBM" :
 		  (fmt==ILBM_24BIT)  ? "24BIT ILBM" : "unknown ILBM",
-		  bmhd_width, bmhd_height, bmhd_bitplanes, 
+		  bmhd_width, bmhd_height, bmhd_bitplanes,
 		  1<<bmhd_bitplanes, bmhd_compression);
-	}	  
+	}
 
 
 	if ((fmt==ILBM_NORMAL) || (fmt==ILBM_EHB) || (fmt==ILBM_HAM)) {
@@ -248,8 +264,14 @@ int LoadIFF(fname, pinfo)
 
 
 	if ((fmt == ILBM_HAM) || (fmt == ILBM_HAM8) || (fmt == ILBM_24BIT)) {
-	  if ((picptr=(byte *) malloc((size_t)bmhd_width*bmhd_height*3))
-	      ==NULL) {
+	  int bufsize = 3 * npixels;
+
+	  if (bufsize/3 != npixels) {
+	    if (databuf)    free(databuf);
+	    if (decomp_mem) free(decomp_mem);
+	    return (iffError(bname, "xviff: image dimensions out of range"));
+	  }
+	  if ((picptr=(byte *) malloc((size_t) bufsize)) == NULL) {
 	    if (databuf)    free(databuf);
 	    if (decomp_mem) free(decomp_mem);
 	    return (iffError(bname, "xviff: no memory for decoded picture"));
@@ -258,8 +280,8 @@ int LoadIFF(fname, pinfo)
 	  else {
 	    pic = picptr;
 	    workptr = bodyptr;
-	    lineskip = ((bmhd_width + 15) >> 4) << 1;
-	    
+	    lineskip = byte_width;
+
 	    for (i=0; i<bmhd_height; i++) {
 	      bitmsk = 0x80;
 	      workptr2 = workptr;
@@ -338,28 +360,28 @@ int LoadIFF(fname, pinfo)
 
 
 	else if ((fmt == ILBM_NORMAL) || (fmt == ILBM_EHB)) {
-	  if ((picptr = (byte *) malloc((size_t) bmhd_width * bmhd_height))
-	      == NULL) {
+	  /* if bmhd_width and bmhd_height are OK (checked in BMHD block
+	   * above; guaranteed by BMHDok), then npixels is OK, too */
+	  if ((picptr = (byte *) malloc((size_t) npixels)) == NULL) {
 	    if (databuf) free(databuf);
 	    if (decomp_mem) free(decomp_mem);
 	    return (iffError(bname, "xviff: no memory for decoded picture"));
 	  }
-	  
+
 	  else if (fmt == ILBM_EHB) {
 	    if (DEBUG) fprintf(stderr,"Doubling CMAP for EHB mode\n");
-	    
+
 	    for (i=0; i<32; i++) {
 	      pinfo->r[i + colors] = pinfo->r[i] >> 1;
 	      pinfo->g[i + colors] = pinfo->g[i] >> 1;
 	      pinfo->b[i + colors] = pinfo->b[i] >> 1;
 	    }
 	  }
-	  
+
 	  pic = picptr;             /* ptr to chunky buffer */
 	  workptr = bodyptr;        /* ptr to uncmp'd pic, planar format */
-	  
-	  lineskip = ((bmhd_width + 15) >> 4) << 1;  /* # of bytes/line */
-	  
+	  lineskip = byte_width;
+
 	  for (i=0; i<bmhd_height; i++) {
 	    bitmsk = 0x80;                      /* left most bit (mask) */
 	    workptr2 = workptr;                 /* work ptr to source */
@@ -367,14 +389,14 @@ int LoadIFF(fname, pinfo)
 	      col = 0;
 	      colbit = 1;
 	      workptr3 = workptr2;              /* ptr to byte in 1st pln */
-	      
+
 	      for (k=0; k<bmhd_bitplanes; k++) {
 		if (*workptr3 & bitmsk)          /* if bit set in this pln */
 		  col = col + colbit;           /* add bit to chunky byte */
 		workptr3 += lineskip;           /* go to next line */
 		colbit <<= 1;                   /* shift color bit */
 	      }
-	      
+
 	      *pic++ = col;                     /* write to chunky buffer */
 	      bitmsk = bitmsk >> 1;             /* shift mask to next bit */
 	      if (bitmsk == 0) {                /* if mask is zero */
@@ -382,7 +404,7 @@ int LoadIFF(fname, pinfo)
 		workptr2++;                     /* mv ptr to next byte */
 	      }
 	    }  /* for j ... */
-	    
+
 	    workptr += lineskip * bmhd_bitplanes;  /* to next line */
 	  }  /* for i ... */
 
@@ -399,7 +421,7 @@ int LoadIFF(fname, pinfo)
 	pinfo->colType = F_FULLCOLOR;
 	pinfo->frmType = -1;
 
-	sprintf(pinfo->fullInfo, "%s (%ld bytes)", 
+	sprintf(pinfo->fullInfo, "%s (%ld bytes)",
 		(fmt==ILBM_NORMAL) ? "IFF ILBM" :
 		(fmt==ILBM_HAM)    ? "HAM ILBM" :
 		(fmt==ILBM_HAM8)   ? "HAM8 ILBM" :
@@ -414,7 +436,8 @@ int LoadIFF(fname, pinfo)
       }  /* if BMHDok */
 
       else rv = 0;                   /* didn't get BMHD header */
-    }
+
+    }  /* "BODY" chunk */
 
     else {
       if (DEBUG)
@@ -440,10 +463,10 @@ int LoadIFF(fname, pinfo)
 
 /**************************************************************************
   void decomprle(source, destination, source length, buffer size)
-  
+
   Decompress run-length encoded data from source to destination. Terminates
   when source is decoded completely or destination buffer is full.
-  
+
   The decruncher is as optimized as I could make it, without risking
   safety in case of corrupt BODY chunks.
 ***************************************************************************/
@@ -455,12 +478,12 @@ static void decomprle(sptr, dptr, slen, dlen)
      register long slen, dlen;
 {
   register byte codeByte, dataByte;
-  
+
   while ((slen > 0) && (dlen > 0)) {
-    
+
     /* read control byte */
     codeByte = *sptr++;
-    
+
     if (codeByte < 0x80) {
       codeByte++;
       if ((slen > (long) codeByte) && (dlen >= (long) codeByte)) {
@@ -522,7 +545,7 @@ static unsigned long iff_getlong(ptr)
 
 /*******************************************/
 static int iffError(fname, st)
-     char *fname, *st;
+     const char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

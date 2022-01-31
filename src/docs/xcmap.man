@@ -1,4 +1,4 @@
-.TH xcmap 1X
+.TH xcmap 1
 .SH NAME
 xcmap \- displays the default colormap on X11 displays
 .SH SYNTAX

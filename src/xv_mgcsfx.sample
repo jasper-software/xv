@@ -1,0 +1,125 @@
+#/*
+# Configuration file for XV with recognition of 'Magic and Suffix'
+#
+#
+# $Id: xv_mgcsfx.sample,v 1.11 95/10/03 17:00:05 tin329 Exp Locker: tin329 $
+#
+# Author: Tetsuya INOUE  <tin329@chino.it.okayama-u.ac.jp>
+#
+#
+# MgcSfx definition should write in one line.
+#  Format:
+#      <desc>:<ms type>:<ofs>:<magic>:<suffix>:<in it>:<in c>:<out it>:<out c>
+#  If you decide to not use preprocessor, comment style is allowed.
+#      # <comment>
+#
+#   <desc>            Description of your recognized image format.
+#   <ms type>         Type ID for recognition. (You should use 'magic'.)
+#                        * magic        Data of string style.
+#                                        `\' escape for special characters:
+#                                           \b \f \n \r \t \v \\ \' \" \a \?
+#                                           \0  ...\377   octal value
+#                                           \x0 ...\xff   hexadecimal value
+#                        * suffix       Suffix of file name.
+#                                         This type check <suffix> instead
+#                                         of <magic>.
+#                        * [b|l]eint16  2 byte integer of [big|little] endian.
+#                        * [b|l]eint32  4 byte integer of [big|little] endian.
+#   <ofs>             Offset of magic number in the target image file.
+#   <magic>           Data(magic number) of <ms type> to match at <ofs>.
+#   <suffix>          Suffix of filename with '.'start.
+#
+#   <in it>           Input image format type (output from <in c>).
+#                        * PNM       (PPM, PGM, PBM)
+#                        * AUTO      Recognized by xv management, and load.
+#                                    This is different from others, because
+#                                    this write file to temporary.
+#   <out it>          Output image format type (input to <out c>).
+#                        * PNM_RAW   (PPM_RAW, PGM_RAW, PBM_RAW)
+#                        * PNM_ASCII (PPM_ASCII, PGM_ASCII, PBM_ASCII)
+#
+#   <in c>            Command to get the input image.
+#                        * Command mast read stdin or file(specified by
+#                          argument), and write to stdout.
+#                        * Use %s to represent the file name. Without %s,
+#                          get file on stdin.
+#   <out c>           Command to put the output image.
+#                        * Command mast read stdin and write to stdout.
+#
+#   <comment>         Any message.
+#*/
+
+#/*############################################################################
+#
+# definition of the rule with Magic and Suffix
+#
+#*/
+
+# /* Canon View Station Image Format */
+ViewStation(std):magic:0:VsStdImf V0.2:.vs:PNM:VStopnm %s:PNM_RAW:pnmtoVS
+ViewStation(obj):magic:0:VsObjFormat V1.0:.vs:PNM:VSobjtopnm -:PNM_RAW:pnmtoVSobj
+
+# /* CERN httpd cache */
+# /* unchc skip header of CERN httpd cache file, and write data to stdout. */
+CERN httpd cache:magic:0:HTTP/1.0::AUTO:unchc %s::
+
+# /* XLD4(Q4) image format */
+XLD(Q4):magic:11:MAJYO:.q4:PNM:q4toppm::
+
+# /* ML1 image format */
+ML1:magic:0:\1\0\0\x1a:.ml1:PNM:ml1toppm %s::
+
+# /* Pict image format, 256 color only */
+PICT:suffix:::.pict:PNM:picttoppm:PNM_RAW:ppmquant 256 | ppmtopict 
+PICT(gzip):suffix:::.pict.gz:PNM:gzip -dc | picttoppm:PNM_RAW:ppmquant 256 | ppmtopict | gzip
+PICT(compress):suffix:::.pict.Z:PNM:compress -dc | picttoppm:PNM_RAW:ppmquant 256 | ppmtopict | compress
+
+# /* Tim image format(used by SONY PlayStation) */
+TIM:magic:0:\x10\x00\x00\x00:.tim:PNM:timtoppm::
+
+# /* Cam image format(used by CASIO QV-10) */
+# /* CAM:magic:0:\x07\x20\x4d\x4d:.cam:AUTO:camtoppm -j:PNM_RAW */
+CAM:magic:0:\x07\x20\x4d\x4d:.cam:PNM:camtoppm::
+
+# /* Portable Network Graphics (PNG) format : magic is "0x89 PNG" */
+PNG:magic:0:\x89\x50\x4e\x47:.png:PNM:pngtopnm %s:PNM_RAW:pnmtopng
+# /* PNG(interlace):magic:0:\x89\x50\x4e\x47:.png:PNM:pngtopnm %s:PNM_RAW:pnmtopng -interlace */
+
+# /* DB-Z, SAURUS Freehand Memo, PV-F1 Action Board, Wiz Quick Memo format */
+# /* Use xbm2free-1.10 or later. Old version is NOT a filter. */
+# /* To show version of xbm2free, type "xbm2free" (with no argument). */
+ZAURUS:magic:19:IMG1:.zau:PBM_ASCII:free2pbm:PBM:pbmtoxbm|xbm2free -s -
+DBZ:magic:19:IMG1:.dbz:::PBM:pbmtoxbm|xbm2free -d -
+PVF1:magic:12:IMG1:.pvf1:PBM_ASCII:free2pbm:PBM:pbmtoxbm|xbm2free -v -
+# /* WIZ:magic:19:IMG1:.wiz:::PBM:pbmtoxbm|xbm2free -w - */
+
+
+
+# /* Compress:magic:0:\037\235:.Z:AUTO:uncompress %s:: */
+# /* Gzip:magic:0:\037\213:.gz:AUTO:gunzip %s:: */
+# /* Gzip(old):magic:0:\037\236:.z:AUTO:gunzip %s:: */
+
+# /* MAKI:magic:0:MAKI01A\040:.mki:::: */
+# /* MAKI:magic:0:MAKI01B\040:.mki:::: */
+# /* MAG:magic:0:MAKI02\040\040:.mag:::: */
+# /* Pi:magic:0:Pi:.pi:::: */
+# /* PIC:magic:0:PIC:.pic:::: */
+# /* PIC2:magic:0:P2DT:.p2:::: */
+# /* PhotoCD:magic:0:\xff\xff\xff\xff:.pcd:::: */
+
+# /* PBM(ascii):magic:0:P1:.pbm:::: */
+# /* PGM(ascii):magic:0:P2:.pgm:::: */
+# /* PPM(ascii):magic:0:P3:.ppm:::: */
+# /* PBM(raw):magic:0:P4:.pbm:::: */
+# /* PGM(raw):magic:0:P5:.pgm:::: */
+# /* PPM(raw):magic:0:P6:.ppm:::: */
+
+# /* Sun raster:magic:0:\131\246\152\225:.sun:::: */
+# /* JFIF(JPEG):magic:0:\xff\xd8\xff:.jpg:::: */
+# /* TIFF big-endian:magic:0:\115\115:.tif:::: */
+# /* TIFF little-endian:magic:0:\111\111:.tif:::: */
+# /* GIF(87):magic:0:GIF87a:.gif:::: */
+# /* GIF(89):magic:0:GIF89a:.gif:::: */
+# /* SGI(1):magic:0:\x01\xda:.rgb:::: */
+# /* SGI(2):magic:0:\xda\x01:.rgb:::: */
+# /* XWD:magic:0:\0\0\0\7: :::: */

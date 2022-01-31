@@ -1,9 +1,13 @@
-#!/bin/csh -f
+#!/bin/sh -f
 # cleandir: if called with an argument, cd's there and does a 'make clean'
 #
 
-if ( x$1 != x ) then
-  echo "cleaning $1 subdirectory"
-  cd $1
-  make clean
-endif
+if [ x"$1" != x ]; then
+  if [ -f "$1"/makefile -o -f "$1"/Makefile ]; then
+    echo "cleaning '$1' subdirectory"
+    cd "$1"
+    make clean
+# else
+#   echo "no makefile found; NOT cleaning '$1' subdirectory"
+  fi
+fi

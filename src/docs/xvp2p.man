@@ -1,4 +1,4 @@
-.TH xvpictoppm 1X
+.TH xvpictoppm 1
 .SH NAME
 xvpictoppm \- converts XV 'thumbnail' files to standard PPM format
 .SH SYNTAX

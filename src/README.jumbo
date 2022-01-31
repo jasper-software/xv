@@ -1,0 +1,559 @@
+This is the latest version of the XV jumbo patches I originally created in
+February 2000 (but never distributed) and eventually updated and released in
+May 2004, prompted by a discussion on LWN (http://lwn.net/Articles/76391/).
+Information about the patches, updates to the patches, and the patches
+themselves can all be found here:
+
+	http://pobox.com/~newt/greg_xv.html
+	http://freshmeat.net/projects/xvjumbopatches/
+
+(Use the "Subscribe to new releases" link on the latter page if you want to
+be notified of new versions automatically; trivial registration required.)
+
+These patches incorporate all of the fix- and enhancement-patches available
+from John's XV site (http://www.trilon.com/xv/downloads.html and
+ftp://ftp.trilon.com/pub/xv/patches/), plus a number of my own fixes and
+additions (security-related and otherwise), plus quite a few from other
+people.  They're still not fully complete, and it's probable they never
+will be, but I do plan to continue tinkering with them whenever the mood
+strikes--and I may even release them publicly on rare occasions.  (At the
+current rate, once every few years may be the best we can hope for....)
+
+Also be aware that several other people have had the same idea over the
+years.  Ones I've found, more or less by accident, include:
+
+ - Landon Curt "chongo" Noll (http://www.isthe.com/chongo/)
+   http://www.isthe.com/chongo/src/xv-patch/
+ - Mark Ashley <mark ibiblio.org>
+   http://www.ibiblio.org/pub/packages/solaris/sparc/html/xv.3.10a.p19.html
+ - Peter Jordan <pete dc.seflin.org>
+   http://www.ibiblio.org/pub/Linux/apps/graphics/viewers/X/xv-3.10a.patch.*
+ - Uwe F. Mayer (http://www.tux.org/~mayer/)
+   http://www.tux.org/~mayer/linux/book/node311.html
+ - Kurt Wall <kwall kurtwerks.com>
+   http://www.kurtwerks.com/software/xv.html
+ - Chisato Yamauchi (http://phe.phyas.aichi-edu.ac.jp/~cyamauch/index_en.html)
+   http://phe.phyas.aichi-edu.ac.jp/~cyamauch/xv.html
+ - Daisuke Yabuki <dxy optix.org>
+   http://www.optix.org/~dxy/solaris/xv/
+ - Pekoe (http://pekoe.lair.net/)
+   http://pekoe.lair.net/diary/xv.html
+ - FreeBSD FreshPorts
+   http://www.freshports.org/graphics/xv/
+ - Kyoichiro Suda <sudakyo fat.coara.or.jp>
+   http://www.coara.or.jp/~sudakyo/XV_jp.html
+
+This is not an exhaustive list (e.g., Jörgen Grahn also had one).  So far,
+most of the other patch-sets appear not to be as extensive or as up-to-date
+as my own, particularly now that the (very large) "Japanese extension" patches
+are incorporated--big thanks to Werner Fink of SuSE for that!
+
+Below I summarize the component patches that are encompassed by my jumbo
+bugfixes and jumbo enhancements patches, circa 2005.  (As of 2007, they're
+distributed as a single monster-patch, and the "component patches" are now
+listed in the changelog section at the bottom of this file.)  Unfortunately,
+some of my own additions never saw the light of day as standalone patches,
+but considering the number of overlaps (collisions) already implicit in the
+list, that would have been difficult to accomplish even if I'd had the time.
+
+Here's a quick guide to the "third-party" credits in the lists and changelog
+below:
+
+  AAC = Andrey A. Chernov [ache]
+        (http://cvsweb.freebsd.org/ports/graphics/xv/files/patch-ab)
+  AD  = Andreas Dilger (adilger clusterfs.com)
+  AL  = Alexander Lehmann (lehmann usa.net)
+  AS  = Alexey Spiridonov (http://www-math.mit.edu/~lesha/)
+  AT  = Anthony Thyssen (http://www.cit.gu.edu.au/~anthony/)
+  BR  = Bruno Rohee (http://bruno.rohee.com/)
+  DAC = David A. Clunie (http://www.dclunie.com/xv-pcd.html)
+  EAJ = Erling A. Jacobsen (linuxcub email.dk)
+  EK  = Egmont Koblinger (egmont users.sourceforge.net)
+  FG  = Fabian Greffrath (fabian debian-unofficial.org)
+  GRR = Greg Roelofs (http://pobox.com/~newt/greg_contact.html)
+  GV  = Guido Vollbeding (http://sylvana.net/guido/)
+  IM  = IKEMOTO Masahiro (ikeyan airlab.cs.ritsumei.ac.jp)
+  JC  = John Cooper (john.cooper third-harmonic.com)
+  JCE = John C. Elliott (http://www.seasip.demon.co.uk/ZX/zxdload.html)
+  JDB = John D. Baker (http://mylinuxisp.com/~jdbaker/)
+  JG  = Jörgen Grahn (jgrahn algonet.se)
+  JHB = John H. Bradley, of course (http://www.trilon.com/xv/)
+  JPD = Jean-Pierre Demailly (http://www-fourier.ujf-grenoble.fr/~demailly/)
+  JR  = John Rochester (http://www.freebsd.org/cgi/query-pr.cgi?pr=2920)
+        (also http://cvsweb.freebsd.org/ports/graphics/xv/files/patch-af, -ag)
+  JRK = James Roberts Kirkpatrick (uwyo.edu)
+  JZ  = Joe Zbiciak (http://spatula-city.org/~im14u2c/)
+  KS  = Kyoichiro Suda (http://www.coara.or.jp/~sudakyo/XV_jp.html)
+  LCN = Landon Curt "chongo" Noll (http://www.isthe.com/chongo/)
+  LJ  = Larry Jones (lawrence.jones ugs.com)
+  PBJ = Peter Jordan (http://www.ibiblio.org/pub/Linux/apps/graphics/viewers/X/)
+  PSV = Pawel S. Veselov (http://manticore.2y.net/wbmp.html)
+  RAC = Ross Combs (rocombs cs.nmsu.edu)
+  RJH = Robin Humble (http://www.cita.utoronto.ca/~rjh/)
+  SB  = Sean Borman (http://www.nd.edu/~sborman/software/xvwheelmouse.html)
+  SJT = TenThumbs (tenthumbs cybernex.net)
+  SBM = Scott B. Marovich (formerly marovich hpl.hp.com)
+  TA  = Tim Adye (http://hepwww.rl.ac.uk/Adye/xv-psnewstyle.html)
+  TAR = Tim Ramsey (tar pobox.com)
+  TI  = Tetsuya INOUE (tin329 chino.it.okayama-u.ac.jp)
+  TO  = Tavis Ormandy (taviso gentoo.org)
+  WF  = Werner Fink (http://www.suse.de/~werner/)
+
+Other credits are as listed on the XV Downloads page or in the respective
+patches (e.g., the jp-extension patches or within the PNG patch).
+
+Finally, please note that these patches have not been blessed by John Bradley
+in any way (although I copied him on the May 2004 announcement and wrote to
+him again in May 2005), unless you count Debian's redistribution permission
+(Daniel Kirchheimer, 5 Dec 2005).  Nor have I personally tested every change
+and feature!  (See the BIG SCARY WARNING below for further caveats.)  In other
+words, they're both completely unofficial and completely unguaranteed.  But
+they seem to work for me.  (And when they don't, I try to fix 'em--eventually,
+anyway... ;-) )
+
+Greg Roelofs, 20070520
+http://pobox.com/~newt/greg_contact.html
+
+
+How to build
+------------
+
+The following assumes you, the user, already have the libtiff,[1] libjpeg,[2]
+libpng,[3] zlib,[4] and JasPer[5] libraries downloaded, patched (if necessary),
+compiled, and installed, not to mention a C compiler and the bzip2,[6] tar,[7]
+patch,[8] and make[9] utilities.  You should also have downloaded the original
+XV 3.10a source distribution from the XV Downloads page[10] and be able to edit
+its Makefile and config.h files as indicated in the INSTALL file.  (Editing
+the Makefile will also allow you to disable some of the third-party libraries
+if you wish.)  Finally, you should know what a Unix(-style) command line is,
+where to find one, and how to wield it with abandon (or at least with adult
+supervision)--and preferably not as the root user until the "make install"
+step.  (A filesystem is a terrible thing to waste.)
+
+   [1] http://www.remotesensing.org/libtiff/
+   [2] http://www.ijg.org/
+   [3] http://www.libpng.org/pub/png/libpng.html
+   [4] http://www.zlib.net/
+   [5] http://www.ece.uvic.ca/~mdadams/jasper/
+   [6] http://sources.redhat.com/bzip2/
+   [7] http://www.gnu.org/directory/devel/specific/tar.html
+   [8] http://www.gnu.org/directory/devel/specific/patch.html
+   [9] http://www.gnu.org/directory/devel/specific/make.html
+  [10] http://www.trilon.com/xv/downloads.html#src-distrib
+
++-------------------------------------------------------------------------+
+|                                                                         |
+|                            BIG SCARY WARNING                            |
+|                                                                         |
+|  These patches work for Greg (and parts of them reportedly work for     |
+|  various other people), and so far Greg's CPU still computes and his    |
+|  hard disks haven't been wiped.  But there's no guarantee that this     |
+|  will be the case for you! In particular, not every incorporated patch  |
+|  has been explicitly tested, nor has every possible subcase of the      |
+|  explicitly tested subset. (Read that again; it's grammatical.)  Nor    |
+|  are these patches officially blessed by John Bradley in any way. In    |
+|  other words, if you use these patches, you do so at your own risk.     |
+|  (Greg doesn't believe there are any serious problems remaining, but    |
+|  then, what programmer ever does? Bugs happen.)                         |
+|                                                                         |
++-------------------------------------------------------------------------+
+
+Assuming you have the prerequisites out of the way and aren't scared
+off by the Big Scary Warning, here's the build procedure:
+
+      tar xvzf xv-3.10a-jumbo-patches-20070520.tar.gz
+      (or:  gzip -dc xv-3.10a-jumbo-patches-20070520.tar.gz | tar xvf - )
+
+      tar xvzf xv-3.10a.tar.gz 
+
+      cd xv-3.10a 
+
+      patch -p1 < ../xv-3.10a-jumbo-fix-enh-patch-20070520.txt 
+
+      edit Makefile and config.h as directed in INSTALL file (in particular,
+      ensure paths to external libraries and header files are correct)
+
+      make 
+
+      ./xv  your_favorite_image  your_other_favorite_image  etc.
+
+If everything seems to be working to your satisfaction, go ahead and install: 
+
+      make -n install (and double-check that things will be installed
+      where you want them to be)
+
+      become root if necessary (e.g., type su)
+
+      make install 
+      (or:  sudo make install)
+
+That wasn't so hard, was it? 
+
+
+Summary of incorporated and unincorporated patches (through 20050501)
+---------------------------------------------------------------------
+(See the ChangeLog at the bottom for more recent incorporated patches.)
+
+fixes ((*) = listed on XV Downloads page, (f) = on ftp site only):
+
+20040516:
+ - grabpatch (*)		[obsoleted by new-xvgrab.c below]
+ - vispatch (*)
+ - mp-tiff-patch (*)		[technically an enhancement, but JHB says...]
+ - longname.patch (*)		[*SECURITY*]
+ - xpm.patch (*)
+ - deepcolor.patch (*)		[slightly modified for language conformance]
+ - gifpatch (*)
+ - exceed_grab.patch (*)
+ - xv-redhat6-readme.txt (*)	[slightly modified for portability]
+ - beos.patch (*)		[modified for portability]
+ - croppad.patch (f)
+ - epsfpatch (f)
+ - tiff1200.patch (*)
+ - gssafer.patch (*)		[*SECURITY*]
+ - new-xvgrab.c (f)		[includes grabpatch but not exceed_grab.patch]
+ - xcmap.diff (AD)		[part of xv-3.10a-png-1.2d.tar.gz]
+ - fixes for huge number gcc -Wall warnings--including two bugs (GRR)
+ - fix for cleandir script when no makefile exists (GRR)
+ - *SECURITY* fix for gets() in vdcomp.c (GRR, LCN vdcomp-security.patch)
+ - *SECURITY* fix for getwd() on Linux (GRR, LCN Linux-compile.patch)
+ - fix for "no fuss" Linux compiles (LCN Linux-compile.patch)
+ - partial *SECURITY* fix for mktemp() in xv.c and xvdir.c (GRR)
+   (remaining instances in xv.c (2), xvimage.c, xvfits.c, xvpds.c, xvps.c, and
+   possibly xvtiff.c--most involve system())
+ - freebsd-vdcomp-newline.patch (AAC)
+ - xv-3.10a.patch.linux (PBJ)	[/bin/sh versions of cleandir, RANLIB.sh only]
+ - removed trailing white space (GRR)  [purely cosmetic]
+20040523:
+ - fixed compilation error in registered versions (GRR)
+20050410:
+ - fix for YCbCr oversaturated-green bug(s) in TIFF decoder (GRR)
+ - provisional fix for contiguous tiled TIFFs with bottom-* orientation (GRR)
+ - fixes for gcc 3.3 -Wall warnings (GRR)
+ - fix for incorrect 16/24-bit display of xwd dumps (SJT)
+ - *SECURITY* fix for multiple input-validation bugs (OpenBSD/SuSE, Gentoo, GRR)
+   (this also completes the partial mktemp() security fix listed above)
+ - fix for (probable) 24-bit endianness bug in fixpix code (GRR)
+
+
+enhancements ((*) = listed on XV Downloads page, (<who>) = third-party):
+
+20040516:
+ - xv-3.10a.JPEG-patch (*)
+   (xv-3.10a.JPEG-patch.old differs only in ftp site listed in comments at top)
+ - xv-3.10a.TIFF-patch (*)
+ - xv-3.10a-png-1.2d.tar.gz (AL, AD) (*)
+   (xvjpeg.diff and xvtiff.diff ignored; xcmap.diff included in fixes)
+ - xvpng-1.2d-fix3.patch (GRR, SJT) (*)
+ - pdf.patch (*)
+ - windowid.patch + windowid.patch.readme (*)
+ - bmp32.patch (*)
+ - fixpix-20000610.tar.gz (GV)
+   (identical to 19961127 version except for README updates and new Win32 file)
+   [modified to be runtime-selectable via -/+fixpix option]
+ - browse-remember.patch (JZ)
+ - faster-smooth.patch (JZ)
+ - PAM support (GRR)
+ - PNG/GIF -ibg ("image background") transparency option (GRR)
+   (does not yet support TIFF, XPM or TGA)
+ - VersionInfo* in help screen (GRR)
+ - minor grammar/spelling fixes (GRR)
+ - floating-point support for -wait when USE_TICKS enabled (GRR)
+ - wheelmouse.patch (SB)
+ - freebsd-gravity-hints-patch (JR)
+ - xv-zx.patch (JCE)
+ - xv3.10a.wapbmp.patch (PSV)
+ - xv-3.10a-pcd.patch.20010708 (DAC)
+ - jp-ext-bzip2-1.1.patch
+   (from ftp://ftp.freebsd.org/pub/FreeBSD/ports/local-distfiles/shige/xv/)
+20050410:
+ - boosted maximum number of files from 4096 to 32768 (GRR)
+   (note that OS kernel limits may also apply; for example, in Linux see
+   MAX_ARG_PAGES in linux-<version>/include/linux/binfmts.h)
+ - xv-3.10a-bmp16.patch (KS)
+ - final-image delay (e.g., "-wait 0.2,3" : pause 3 secs on final image) (GRR)
+ - xv-numpad.patch (EK)
+ - xv-delete-is-not-backspace.patch (EK)
+ - made browser window (schnauzer) and icons configurable (AT, GRR)
+20050501:
+ - xv-3.10a-bmpfix.patch (WF)		[*SECURITY*]
+ - xv310a-jp-extension-rev5.3.3.tar.gz (TI, IM, ..., WF)
+   (adds support for MAG, MAKI, Pi, PIC, and PIC2 formats[!]; "magic suffix"
+   detection/conversion; MacBinary prefixes; archives as virtual filesystems;
+   multilingual text viewer [though not Unicode]; etc.)
+ - xv-3.10a-yaos.dif (WF, TO)		[*SECURITY*]
+   (fixes a number of format-string issues and system() calls)
+ - xv-3.10a.dif (WF)			[*SECURITY*]
+   (fixes more format-string issues, mktemp() and open() calls, and compilation
+   warnings [mostly from jp-extension patch])
+ - xv-3.10a-jumbo-jpd_startgrab-patch-20050420.txt (JPD)
+ - PATCH.alwaysnever (LJ)
+ - PATCH.bsd (LJ)
+ - PATCH.linedraw (LJ)
+ - PATCH.multipage (LJ)
+ - PATCH.multipageGIF (LJ)
+ - PATCH.random (LJ)
+ - PATCH.stat (LJ)
+ - PATCH.thumbs (LJ)
+ - xv-startgrab-imake-hips.patch (JPD)
+   ("hips" portion only; adds support for HIPS image format[!])
+ - xv-3.10a-formatstr.patch (KS)
+ - xv-3.10a-shortsleep.patch (KS)
+ - xv-3.10a-locale-linux.patch (KS)
+ - xv-3.10a-printkey.patch (KS)
+ - xv-3.10a-sysconfdir.patch (KS)
+ - added PREFIX and DESTDIR support to Makefile (KS, GRR)
+ - xv-3.10a-xvexecpath.patch (but disabled pending fixes) (KS)
+ - xv-3.10a-zeroquit.patch (KS, GRR)
+
+[!] Note that all six of these formats may still suffer from exploitable heap
+    overflows [*SECURITY*] when decoding images with large (possibly invalid)
+    dimensions; as a result, they are DISABLED by default.  (Search for "GRR
+    POSSIBLE OVERFLOW / FIXME" comments in xvmag.c, xvmaki.c, xvpi.c, xvpic.c,
+    xvpic2.c, and xvhips.c, but keep in mind that these may not be exhaustive.)
+    Users who choose to overlook these security issues can enable any or all
+    of them by editing config.h.
+
+
+not (yet?) included:
+
+ - others from http://www.coara.or.jp/~sudakyo/XV_jp.html (some are duplicates):
+	-rw-r--r--      4644 Mar 11  2004 xv-3.10a-directory.patch
+	-rw-r--r--       462 Mar 11  2004 xv-3.10a-dirwkey.patch
+	-rw-r--r--       688 Mar 11  2004 xv-3.10a-docdir.patch
+	-rw-r--r--     11952 Mar 11  2004 xv-3.10a-download-test0.patch
+	-rw-r--r--     41786 Mar 11  2004 xv-3.10a-download-test1.patch
+	-rw-r--r--     42397 Mar 11  2004 xv-3.10a-download-test2.patch
+	-rw-r--r--     47679 Mar 11  2004 xv-3.10a-download-test3.patch
+	-rw-r--r--     52745 Mar 11  2004 xv-3.10a-download-test4.patch
+	-rw-r--r--      3423 Apr 24  2004 xv-3.10a-keyzoom.patch
+	-rw-r--r--     12387 Mar 15  2004 xv-3.10a-menubutton.patch
+	-rw-r--r--      1178 Apr 24  2004 xv-3.10a-noblink.patch
+	-rw-r--r--     57092 Jul  9  2004 xv-3.10a-resolution.patch
+	-rw-r--r--      4645 Apr 24  2004 xv-3.10a-selall.patch
+	-rw-r--r--       702 Apr 24  2004 xv-3.10a-showlongname.patch
+	-rw-r--r--      1205 Apr 24  2004 xv-3.10a-staytoppdir.patch
+	-rw-r--r--      4228 Apr 24  2004 xv-3.10a-wheelmouse.patch
+	-rw-r--r--       744 Apr 24  2004 xv-3.10a-xvbutt_wait.patch
+	-rw-r--r--      3757 Jul  9  2004 xv-3.10a-xvscrl_button2.patch
+	-rw-r--r--      1494 Jul  9  2004 xv-3.10a-xvscrl_wait.patch
+	-rw-r--r--     19352 Jul  9  2004 xv-3.10a-xvzoom.patch
+
+ - xv-3.10a+jp-extension-rev5.3.3+FLmask.v2.1+png+misc.patch	["mask" support]
+
+ - xv-psnewstyle.patch (TA)			[coming "soon"?]
+ - xv-3.10a.patch.linux (PBJ)			[maybe use vdcomp.c changes?]
+ - xvxpm-anthony-thyssen.c (AT)			["slate grey" bug already gone?]
+ - xv-geoff-kuenning-iconsize-slideshow.patch	[var. icons; full-screen slides]
+ - xv-scott-marovich-20070214-xvtiff.c.patch6.unified	[TIFF CMYK support]
+
+ - stuff in xv/unsupt:
+	-rw-r--r--     30527 Dec 22  1994 FITS.rite
+	-rw-r--r--     49152 Dec 22  1994 FITS.tar
+	-rw-r--r--      3753 Dec 22  1994 G3.patch1
+	-rw-r--r--     24576 Dec 22  1994 G3.tar
+	-rw-r--r--      1098 Dec 22  1994 INFO.cgm
+	-rw-r--r--      1941 Dec 22  1994 README
+	-rwxr-xr-x      1059 Dec 22  1994 getweather
+	-rwxr-xr-x      2186 Dec 22  1994 getweather.ksh
+	-rw-r--r--       856 Dec 22  1994 twm.fix
+	-rw-r--r--       844 Dec 22  1994 vargs.c
+	-rw-r--r--     47626 Dec 22  1994 vis
+	-rw-r--r--     21097 Dec 22  1994 xscm
+
+
+
+not finished (and/or even started ;-) ):
+
+ - fix xvpng.c not to use direct struct access
+ - (better) fix for never-ending pile of SLOW popups when viewing TIFFs with
+   unknown tags (or truncated/corrupted images)
+ - fix for minor .Z inefficiency in xv.c ("FIXME")
+ - fix for filename entry-field mouse/cursor deficiencies
+   (positioning fixed 20070104 by Ross Combs; would like select/cut/paste, too)
+ - fix for .ppm.gz "disk leak" [can't reproduce...already fixed?]
+   (maybe occurs only if filesystem is already nearly full?  bad .gz?)
+
+ - transparency support for TIFF, XPM and TGA images
+ - support for tiled background image (with transparent foreground image)
+ - MNG/JNG support
+ - SVG support
+
+
+ChangeLog
+---------
+
+  20000220
+    original pair of jumbo patches, comprising perhaps 16 fix-patches and a
+    dozen enhancement-patches; never publicly released 
+
+  20040516
+    first public release, incorporating 25 fix-patches and 21 enhancement-
+    patches
+
+  20040523
+    minor fix to xvctrl.c to support registered versions (GRR warnings-patch
+    was slightly overzealous); switched to tarball packaging
+
+  20040531
+    fixed undefined CLK_TCK with gcc -ansi (enh/USE_TICKS option); made
+    libjpeg, libtiff, libpng and zlib sections of makefile more consistent
+    (enh)
+
+  20040606
+    added freshmeat link, build instructions, and changelog to jumbo README
+    (this file)
+
+  20050213
+    increased max number of files from 4096 to 32768 (enh)
+
+  20050320-20050410
+    fixed two very long-standing YCbCr bugs in TIFF decoder (fix);
+    provisionally fixed bug in TIFF decoder for contiguous tiled TIFFs with
+    bottom-* orientation (fix/USE_TILED_TIFF_BOTLEFT_FIX option); fixed new
+    gcc 3.3 warnings (fix); fixed incorrect 16/24-bit display of xwd dumps
+    (fix); fixed multiple input-validation bugs (potential heap overflows)
+    and mktemp() dependencies (*SECURITY* fixes:  CAN-2004-1725, CAN-2004-
+    1726, CAN-2005-0665, CERT VU#622622, and others); added support for 16-
+    and 32-bit BMPs using bitfields "compression" (enh); fixed probable byte-
+    sex bug in 24-bit FixPix display code (enh/USE_24BIT_ENDIAN_FIX option);
+    fixed numerical-keypad NumLock behavior and delete-key behavior in file-
+    load/save window (enh); made schnauzer window and icons configurable (enh)
+
+  20050417
+    incorporated "Japanese extension" patches, revision 5.3.3 (enh); fixed
+    additional *SECURITY* issues (format-string vulnerabilities, system()
+    and mktemp() calls, etc., but NOT heap overflows in new decoders) both
+    in existing code and in jp-extension additions (enh)
+
+  20050425
+    added support for -startgrab option (enh); added support for a "Never"
+    button to file-overwrite popups (enh); added NetBSD and BSDI to list of
+    mkstemp()-supporting systems (enh); improved line-drawing code to set the
+    correct pixels for lines of all slopes (enh); added "Page n of m" to Info
+    window for multipage images (enh); added support for multipage (animated)
+    GIFs (enh); fixed -random support so randomized file list can be traversed
+    normally in forward or backward direction (enh); added typecasts to stat()
+    printfs for portability (enh); fixed erroneous use of "creation" time and
+    forced unlink prior to overwrite in schnauzer thumbnail code (enh); added
+    HIPS support (enh/HAVE_HIPS option)
+
+  20050501
+    extended multipage keyboard support (PgUp/PgDn) to all windows except
+    control ("console") and directory (enh); fixed minor (non-security)
+    format-string issue in xv.c (enh); shortened delay on popup error windows
+    from 3 seconds to 1 second (enh); tweaked text-viewer localization support
+    (TV_L10N) for Linux (enh); added keyboard short cuts for Color and
+    Grayscale buttons in print dialog (enh); added support for separate "magic
+    suffix" (xv_mgcsfx) config dir (enh); added PREFIX and DESTDIR support to
+    Makefile (enh); fixed handling of zero-length files and other text-viewer
+    failures (enh)
+
+  20050528
+    conditionally added missing alloca.h to xvpcd.c (required if alloca() is
+    a macro and alloca.h not included in stdlib.h, for example); fixed bogus
+    __S_IWRITE introduced in 20050501 release; fixed Makefile "install" target
+    (mkdir, chmod); fixed bug in MUST macro in xvwbmp.c; fixed prototype
+    warnings in xvevent.c, xvpcd.c (JRK, GRR)
+	- xv-3.10a-jimkirk-fixes.patch
+
+  20050630
+    fixed broken mkdir(.xvpics) introduced in 20050501 release (RJH, GRR);
+    tweaked GUNZIP config for OpenBSD (GRR)
+	- xv-3.10a-xvpics-mkdir-fix.patch
+
+  20051014
+    fixed longstanding xvevent.c typo (wasJpegUp -> wasPngUp) that caused build
+    failure if no JPEG support (TAR)
+
+  20051019
+    fixed Darwin (Mac OS X) build error in xv.h and vdcomp.c due to lack of
+    malloc.h (JDB)
+
+  20070210
+    fixed minor grammos (GRR); promoted PNG to first position, demoted GIF to
+    third (GRR); changed internal type of default image to PNG (GRR); increased
+    max files again, to 65536 (GRR)
+
+  20070310
+    incorporated JPEG-2000 patch (SBM, GRR); added manual fax options for
+    unrecognized G3 images (SBM); relaxed 30-byte minimum file size (SBM)
+	- http://www.ece.uvic.ca/~mdadams/jasper/software/xv-patches
+
+  20070318
+    incorporated 16bps raw (binary) PPM patch (define ASSUME_RAW_PPM_LSB_FIRST
+    for old behavior) (RAC, GRR); updated format list, web sites in xv man page
+    (GRR); fixed Makefile "install" target to create any necessary directories
+    (RAC, GRR); fixed GIF decoder bug (sizes of global, local color tables
+    different) (GRR)
+	- xv-ross-combs-ppm-16bps-rawbits.patch
+
+  20070325
+    fixed invalid gamma assumption in PNG decoder (=> progressive color changes
+    over load/save cycles) (GRR)
+
+  20070328
+    fixed animated-GIF /tmp/xvpgXXXXXX droppings (GRR)
+
+  20070331
+    fixed PNG duplicate-palette-entries bug (GRR)
+
+  20070415
+    incorporated EXIF-preserve patch (GHK); added missing JP2/JPC VS bits code
+    (GRR); added extended-warning options to CCOPTS (RAC); added "const" to
+    huge number of function args (RAC, GRR); made more effectively static
+    functions officially static (RAC); added mouse-clickability (but not
+    selectability) to text-entry fields (RAC); fixed window positioning (race
+    conditions?) under some virtual window managers (e.g., tvtwm) (RAC);
+    removed explicit paths for external (de)compressors (GRR, RAC)
+	- xv-geoff-kuenning-jpeg-exif-preserve.patch
+	- xv-ross-combs-20070104.diff
+
+  20070422
+    incorporated function-key-scripts patch (see contrib/fnkey-scripts) (AS);
+    fixed man-page-section extensions ("1", not "l" or "1X") (FG); switched to
+    more sensible install paths for docs (FG); added Fedora Core build script
+    (see contrib/fedora) (JC); fixed VS to switch from move-mode to copy-mode
+    if source dir is read-only (EAJ); extended VS incremental-search mode (EAJ)
+	- xv-alexey-spiridonov-20070116-fnkey-scripts.tar.bz2
+	- xv-fabian-greffrath-20070215-debian-04-manpages.dpatch
+	- xv-fabian-greffrath-20070215-debian-03-makefiles.dpatch
+	- xv-john-cooper-Build-FC5-script.sh
+	- xv-erling-jacobsen-20060617-incr-search.patch
+
+  20070428
+    modified install to include README.jumbo in docs (GRR); incorporated PNG
+    no-stdio patch (SBM); fixed XWD endianness support, improved performance
+    (replaces SJT 16/24-bit fix) (SBM)
+	- xv-scott-marovich-20070214-xvpng.diff
+	- xv-scott-marovich-20070214-xvxwd.c.patch
+
+  20070506
+    added JPEG CMYK support (SBM); fixed TIFF (and others?) /tmp/xvpgXXXXXX
+    droppings (GRR); added VS clipboard support (JG)
+	- xv-scott-marovich-20070214-xvjpeg.c.patch
+	- xv-jurgen-grahn-20051127-schnauzer-clip.patch
+
+  20070512
+    inverted handling of malloc.h header file to require NEED_MALLOC_H macro
+    for those few systems that actually need it (GRR)
+
+  20070513
+    fixed GCC 4.1.x warnings (GRR); next round of const cleanup (GRR); fixed
+    minor TIFF memleak (GRR)
+
+  20070514
+    fixed TIFF YCbCr reference black/white levels (SBM); added option to use
+    libjpeg YCbCr-to-RGB conversion for TIFF images (SBM, GRR)
+	- xv-scott-marovich-20070214-xvtiff.c.patch2.unified
+	- xv-scott-marovich-20070214-xvtiff.c.patch3.unified
+
+  20070519
+    fixed handling of multi-page JPEG-compressed TIFFs (old or new) (SBM);
+    added TIFF YCbCr separated-color-plane support (may require libtiff
+    patch(es) to tif_ojpeg.c and/or tif_jpeg.c) (SBM)
+	- xv-scott-marovich-20070214-xvtiff.c.patch4.unified
+	- xv-scott-marovich-20070214-xvtiff.c.patch5.unified
+
+  20070520
+    updated README.jumbo

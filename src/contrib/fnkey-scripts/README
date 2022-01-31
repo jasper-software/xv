@@ -1,0 +1,111 @@
+-- License and Disclaimer --
+
+This patch & script package was written by Alexey Spiridonov, and is
+licensed under the GNU GPLv2. There is NO WARRANTY.
+
+XV is copyrighted by John Bradley.
+
+-- What is this? --
+
+This is a small patch for XV that allows you to run scripts by pressing 
+a key from F1 through F12 (or more, just change 12 to your number in the
+patch file). 
+
+The patch enables a number of useful features. Here is a my set-up:
+
+F1: Losslessly rotate JPEG 90 degrees to the right.
+F2: Losslessly rotate JPEG 90 degrees to the left.
+
+F3: Print the current selection rectangle (on the terminal where xv was 
+    launched). This is useful for quickly recording a bunch of positions in
+    an image. Use case: 
+      I'm annotating face positions.
+        1) Select Joe in picture, hit F3, type "Joe" in the terminal.
+        2) Select Jane in the picture, ... 
+        ...
+        n) Copy the text visible in the terminal, and paste it into the
+           JPEG comment.
+    Of course, i would write a more convenient script if I annotated faces 
+    with any any frequency.
+
+F4: Edit JPEG comment (I use it for annotations/tags).
+
+F5: Log a 'losslessly rotate right' command for batch processing.  This
+    writes the rotation command for the current file into a shell script
+    somewhere ("~/photos/bin/rotscript" by default). This is great for 
+    slower computers because you don't have to wait for each image to 
+    rotate; instead, you just rotate them all at once by running the 
+    resulting script.
+F6: Log a 'losslessly rotate left' batch command.
+
+F8: Crop image on disk, but back-up the uncropped version. You can make 
+    a succession of crops this way, with a backup made at every step.
+    This wastes disk space, so be sure to clean up once you get a crop you
+    like.
+F7: Undo the last crop done on this image. This can be repeated until you're
+    back at the original.
+
+-- Installation --
+
+I'll tell you how to get the set-up I described above. Of course, you can
+customize it to your heart's content.
+
+(( 1 ))
+
+Go to:
+
+  http://www.sonic.net/~roelofs/greg_xv.html
+
+and follow the XV install instructions there. If you are okay with
+reading shell scripts, you might also give this a shot:
+
+  http://sources.gentoo.org/viewcvs.py/*checkout*/gentoo-x86/media-gfx/xv/xv-3.10a-r12.ebuild
+
+When you're ready to type "make install", do the following to apply my patch:
+
+  $ cd WHEREVER_YOU_COMPILED_XV
+  $ patch -p1 --dry-run < PATH/TO/xv-3.10a-fkey-command-patch.greg-xv
+
+Hopefully, the above command won't complain; if it does, Greg Roelofs
+probably changed his patchset, and my patch has become out of date -- let me
+know. If that went well, run:
+
+  $ patch -p1 < PATH/TO/xv-3.10a-fkey-command-patch.greg-xv
+  
+Now, simply recompile and install as described in the other instructions.
+  
+(( 2 ))
+
+Copy 'jpegcrop.sh', 'jpegeditcom.sh', 'jpegundocrop.sh', 'jpegrot.sh',
+'jpeglogrot.sh' to some convenient directory.
+
+Suggestions: ~/photos/bin, /usr/local/bin, etc...
+
+Edit 'jpeglogrot.sh' and 'jpegeditcom.sh'. In the former, you need to
+customize the path to 'jpegrot.sh'. In the latter, you should make set 
+your favorite editor. The spots to customize are marked as such.
+
+(( 3 ))
+
+Open .Xdefaults in your favorite text editor, and paste the following lines
+there:
+
+xv.F1command: ~/photos/bin/jpegrot.sh 90 %s
+xv.F2command: ~/photos/bin/jpegrot.sh 270 %s
+xv.F3command: @echo "The selection rect for '%s' is at (%d, %d) of size %dx%d."
+xv.F4command: @~/photos/bin/jpegeditcom.sh %s &
+xv.F5command: @~/photos/bin/jpeglogrot.sh 90 %s
+xv.F6command: @~/photos/bin/jpeglogrot.sh 270 %s
+xv.F7command: ~/photos/bin/jpegundocrop.sh %s
+xv.F8command: ~/photos/bin/jpegcrop.sh %s %d %d %d %d
+
+Change '~/photos/bin/' to the directory you chose in (( 2 )). In case you're
+wondering what the '@' symbol means, it tells XV not to reload the file
+after running this command. The default is to reload the file.
+
+-- Apologies --
+
+I didn't get a chance to run through the above instructions and check
+that they work. I know they're right in spirit, but I might've made a typo
+or two. Even if it's obvious to you, would you please let me know by writing
+to lesha at mit dot edu?

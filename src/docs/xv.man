@@ -1,4 +1,4 @@
-.TH XV l "2 December 1994" "Rev. 3.10"
+.TH XV 1 "22 April 2007" "Rev. 3.10a-jumboFix+Enh"
 .SH NAME
 \fBxv\fP \- interactive image display for the X Window System
 .SH SYNTAX
@@ -8,14 +8,17 @@
 .SH DESCRIPTION
 The
 .I xv
-program displays images in the GIF, JPEG, TIFF,
-PBM, PGM, PPM, X11 bitmap, Utah Raster Toolkit RLE, PDS/VICAR, Sun Rasterfile, 
-BMP, PCX, IRIS RGB, XPM, Targa, XWD, possibly PostScript, and PM formats on 
-workstations and terminals running the X Window System, Version 11.
+program displays images on workstations and terminals running the X Window
+System, Version 11.  Supported image formats include
+PBM, PGM, PPM, X11 bitmap, XWD, XPM, Utah Raster Toolkit RLE, PDS/VICAR,
+FITS, Sun Rasterfile, GIF, PCX, Targa/TGA, BMP, WBMP, IRIS RGB, Spectrum
+SCREEN$, PM, and optionally PNG, JPEG, JPEG 2000, JP2, TIFF, PostScript,
+PDF, G3 fax, MAG, PIC, MAKI (640x400), PI, and PIC2.
 .LP
-The documentation for XV is now distributed
+Aside from the usage screen (available by typing 'xv -help' at the command
+line), documentation for XV is now distributed
 .I only
-as a PostScript file, as it has gotten enormous, 
+as a PostScript (or PDF) file, as it has gotten enormous
 and is no longer very well suited to the 'man' page format.
 Print a copy of the (100-ish page) manual found in
 .IR docs/xvdocs.ps .
@@ -26,9 +29,14 @@ the program to get further information.
 If you don't 
 .I have
 the PostScript file, it is part of the standard XV distribution, the
-latest version of which can be obtained via anonymous ftp from 
+latest version of which can be obtained from
+.IR http://www.trilon.com/xv/
+or via anonymous ftp from 
 .IR ftp.cis.upenn.edu
-in the directory pub/xv
+in the directory pub/xv .
+.PP
+This version has been patched with the XV Jumbo Patches, available from
+.IR http://pobox.com/~newt/greg_xv.html .
 .PP
 .SH AUTHOR
-John Bradley
+John Bradley (and many contributors)

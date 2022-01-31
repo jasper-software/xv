@@ -77,7 +77,7 @@ static byte *loadThumbFile(wptr, hptr)
   FILE *fp;
   byte  *icon8, *pic24, *ip, *pp;
   char  buf[256];
-  int   i, builtin, w, h, mv;
+  int   i, builtin, w, h, maxval, npixels, p24sz;
 
   fp = stdin;
   builtin = 0;
@@ -88,42 +88,45 @@ static byte *loadThumbFile(wptr, hptr)
   /* read comments until we see '#END_OF_COMMENTS', or hit EOF */
   while (1) {
     if (!fgets(buf, 256, fp)) errexit();
-    
+
     if (!strncmp(buf, "#END_OF_COMMENTS", (size_t) 16)) break;
 
     else if (!strncmp(buf, "#BUILTIN:",   (size_t)  9)) {
       builtin = 1;
-      fprintf(stderr,"Built-In icon:  no image to convert!\n");
+      fprintf(stderr, "Built-in icon:  no image to convert\n");
       exit(1);
     }
   }
 
 
   /* read width, height, maxval */
-  if (!fgets(buf, 256, fp) || sscanf(buf, "%d %d %d", &w, &h, &mv) != 3) 
+  if (!fgets(buf, 256, fp) || sscanf(buf, "%d %d %d", &w, &h, &maxval) != 3)
     errexit();
 
+  npixels = w * h;
+  p24sz = 3 * npixels;
 
-  if (w<1 || h<1 || mv != 255) {
-    fprintf(stderr,"Bogus thumbnail file!\n");
+  if (w <= 0 || h <= 0 || maxval != 255 || npixels/w != h || p24sz/3 != npixels)
+  {
+    fprintf(stderr, "Thumbnail dimensions out of range\n");
     exit(1);
   }
 
 
   /* read binary data */
-  icon8 = (byte *) malloc((size_t) w * h);
+  icon8 = (byte *) malloc((size_t) npixels);
   if (!icon8) errexit();
 
-  i = fread(icon8, (size_t) 1, (size_t) w*h, fp);
-  if (i != w*h) errexit();
+  i = fread(icon8, (size_t) 1, (size_t) npixels, fp);
+  if (i != npixels) errexit();
 
-  
+
   /* make 24-bit version of icon */
-  pic24 = (byte *) malloc((size_t) w * h * 3);
+  pic24 = (byte *) malloc((size_t) p24sz);
   if (!pic24) errexit();
 
   /* convert icon from 332 to 24-bit image */
-  for (i=0, ip=icon8, pp=pic24;  i<w*h;  i++, ip++, pp+=3) {
+  for (i=0, ip=icon8, pp=pic24;  i<npixels;  i++, ip++, pp+=3) {
     pp[0] = ( ((int) ((*ip >> 5) & 0x07)) * 255) / 7;
     pp[1] = ( ((int) ((*ip >> 2) & 0x07)) * 255) / 7;
     pp[2] = ( ((int) ((*ip >> 0) & 0x03)) * 255) / 3;
@@ -160,10 +163,3 @@ static void writePPM(pic, w, h)
 
   if (ferror(fp)) errexit();
 }
-
-
-	  
-	  
-
-
-

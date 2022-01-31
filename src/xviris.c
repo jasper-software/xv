@@ -14,7 +14,7 @@
  *
  *      This code should work on machines with any byte order.
  *
- *	Could someone make this run real fast using multiple processors 
+ *	Could someone make this run real fast using multiple processors
  *	or how about using memory mapped files to speed it up?
  *
  *				Paul Haeberli - 1991
@@ -44,7 +44,7 @@ typedef struct {
     u_short 	zsize;
     u_long 	min;
     u_long 	max;
-    u_long	wastebytes;	
+    u_long	wastebytes;
     char 	name[80];
     u_long	colormap;
 
@@ -80,7 +80,7 @@ typedef struct {
 #define CHANOFFSET(z)	(3-(z))	/* this is byte order dependent */
 
 
-static int      irisError     PARM((char *, char *));
+static int      irisError     PARM((const char *, const char *));
 static byte    *getimagedata  PARM((FILE *, IMAGE *));
 static void     interleaverow PARM((byte *, byte *, int, int));
 static void     expandrow     PARM((byte *, byte *, int));
@@ -97,8 +97,8 @@ static void     putshort      PARM((FILE *, int));
 static void     putlong       PARM((FILE *, u_long));
 
 
-static char *loaderr;
-static char *bname;
+static const char *loaderr;
+static const char *bname;
 
 /*****************************************************/
 int LoadIRIS(fname, pinfo)
@@ -112,7 +112,8 @@ int LoadIRIS(fname, pinfo)
   IMAGE   img;
   byte   *rawdata, *rptr;
   byte   *pic824,  *bptr;
-  int     trunc, i, j;
+  int     trunc, i, npixels, bufsize;
+  u_short ii, jj;
   long    filesize;
 
   trunc = 0;
@@ -133,11 +134,11 @@ int LoadIRIS(fname, pinfo)
   img.imagic = getshort(fp);
   img.type   = getshort(fp);
   img.dim    = getshort(fp);
-  img.xsize  = getshort(fp);
+  img.xsize  = getshort(fp);  /* u_short */
   img.ysize  = getshort(fp);
   img.zsize  = getshort(fp);
 
-  if (FERROR(fp)) {
+  if (FERROR(fp) || img.xsize == 0 || img.ysize == 0 || img.zsize == 0) {
     fclose(fp);
     return irisError(bname, "error in header info");
   }
@@ -148,7 +149,7 @@ int LoadIRIS(fname, pinfo)
   }
 
   rawdata = getimagedata(fp, &img);
-  if (!rawdata) {   
+  if (!rawdata) {
     fclose(fp);
     if (loaderr) irisError(bname, loaderr);
     return 0;
@@ -162,18 +163,22 @@ int LoadIRIS(fname, pinfo)
   /* got the raw image data.  Convert to an XV image (1,3 bytes / pix) */
 
 
+  npixels = img.xsize * img.ysize;  /* 65535*65535 = (2^32 - 131071) max */
+  if (npixels/img.xsize != img.ysize)
+    return irisError(bname, "IRIS image dimensions out of range");
+
   if (img.zsize < 3) {  /* grayscale */
-    pic824 = (byte *) malloc((size_t) img.xsize * img.ysize);
+    pic824 = (byte *) malloc((size_t) npixels);
     if (!pic824) FatalError("couldn't malloc pic824 in LoadIRIS()");
 
     /* copy plane 3 from rawdata into pic824, inverting pic vertically */
-    for (i=0, bptr=pic824; i<(int) img.ysize; i++) {
-      rptr = rawdata + 3 + ((img.ysize - 1) - i) * (img.xsize * 4);
-      for (j=0; j<(int) img.xsize; j++, bptr++, rptr+=4) *bptr = *rptr;
+    for (ii=0, bptr=pic824; ii<img.ysize; ii++) {
+      rptr = rawdata + 3 + ((img.ysize - 1) - ii) * (img.xsize * 4);
+      for (jj=0; jj<img.xsize; jj++, bptr++, rptr+=4) *bptr = *rptr;
     }
 
 
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       pinfo->r[i] = pinfo->g[i] = pinfo->b[i] = i;
 
     pinfo->pic  = pic824;
@@ -188,13 +193,17 @@ int LoadIRIS(fname, pinfo)
   }
 
   else {  /* truecolor */
-    pic824 = (byte *) malloc((size_t) img.xsize * img.ysize * 3);
+    bufsize = 3 * npixels;
+    if (npixels/img.xsize != img.ysize || bufsize/3 != npixels) {
+      return irisError(bname, "IRIS image dimensions out of range");
+    }
+    pic824 = (byte *) malloc((size_t) bufsize);
     if (!pic824) FatalError("couldn't malloc pic824 in LoadIRIS()");
-    
+
     /* copy plane 3 from rawdata into pic824, inverting pic vertically */
-    for (i=0, bptr=pic824; i<(int) img.ysize; i++) {
-      rptr = rawdata + ((img.ysize - 1) - i) * (img.xsize * 4);
-      for (j=0; j<(int) img.xsize; j++, rptr+=4) {
+    for (ii=0, bptr=pic824; ii<img.ysize; ii++) {
+      rptr = rawdata + ((img.ysize - 1) - ii) * (img.xsize * 4);
+      for (jj=0; jj<img.xsize; jj++, rptr+=4) {
 	*bptr++ = rptr[3];
 	*bptr++ = rptr[2];
 	*bptr++ = rptr[1];
@@ -220,12 +229,12 @@ int LoadIRIS(fname, pinfo)
   pinfo->comment = (char *) NULL;
 
   return 1;
-}     
+}
 
 
 /*******************************************/
 static int irisError(name, st)
-  char *name, *st;
+  const char *name, *st;
 {
   SetISTR(ISTR_WARNING,"%s: %s", name, st);
   return 0;
@@ -237,41 +246,53 @@ static byte *getimagedata(fp, img)
      FILE  *fp;
      IMAGE *img;
 {
-  /* read in a B/W RGB or RGBA iris image file and return a 
+  /* read in a B/W RGB or RGBA iris image file and return a
      pointer to an array of 4-byte pixels, arranged ABGR, NULL on error */
 
   byte   *base, *lptr;
   byte   *verdat;
-  int     y, z, pos, len, tablen;
+  int     y, z, tablen;
   int     xsize, ysize, zsize;
   int     bpp, rle, cur, badorder;
-  int     rlebuflen;
+  int     rlebuflen, npixels, bufsize;
 
 
   rle     = ISRLE(img->type);
   bpp     = BPP(img->type);
-  loaderr = (char *) NULL;
+  loaderr = (const char *) NULL;
 
   if (bpp != 1) {
     loaderr = "image must have 1 byte per pix chan";
     return (byte *) NULL;
   }
 
-  xsize = img->xsize;
+  xsize = img->xsize;   /* all three are > 0 (checked by caller), <= 65535 */
   ysize = img->ysize;
   zsize = img->zsize;
+  npixels = xsize * ysize;  /* 65535*65535 = (2^32 - 131071) max */
+  if (npixels/xsize != ysize) {
+    loaderr = "IRIS image dimensions out of range";
+    return (byte *) NULL;
+  }
 
   if (rle) {
     byte *rledat;
     u_long *starttab, *lengthtab;
 
-    rlebuflen = 2 * xsize + 10;
+    rlebuflen = 2 * xsize + 10;  /* 10 <= rlebuflen <= 131080 */
     tablen    = ysize * zsize;
-    starttab  = (u_long *) malloc((size_t) tablen * sizeof(long));
-    lengthtab = (u_long *) malloc((size_t) tablen * sizeof(long));
+    bufsize   = tablen * sizeof(long);
+
+    if (tablen/ysize != zsize || bufsize/tablen != sizeof(long)) {
+      loaderr = "IRIS image dimensions out of range";
+      return (byte *)NULL;
+    }
+
+    starttab  = (u_long *) malloc((size_t) bufsize);
+    lengthtab = (u_long *) malloc((size_t) bufsize);
     rledat    = (byte *)   malloc((size_t) rlebuflen);
 
-    if (!starttab || !lengthtab || !rledat) 
+    if (!starttab || !lengthtab || !rledat)
       FatalError("out of memory in LoadIRIS()");
 
     fseek(fp, 512L, 0);
@@ -298,7 +319,13 @@ static byte *getimagedata(fp, img)
     fseek(fp, (long) (512 + 2*tablen*4), 0);
     cur = 512 + 2*tablen*4;
 
-    base = (byte *) malloc((size_t) (xsize*ysize+TAGLEN) * 4);
+    bufsize = 4 * (npixels+TAGLEN);
+    if (bufsize/4 != (npixels+TAGLEN)) {
+      loaderr = "Bogus IRIS File!";
+      free(starttab);  free(lengthtab);  free(rledat);
+      return (byte *)NULL;
+    }
+    base = (byte *) malloc((size_t) bufsize);
     if (!base) FatalError("out of memory in LoadIRIS()");
 
     addimgtag(base,xsize,ysize);
@@ -349,12 +376,17 @@ static byte *getimagedata(fp, img)
   }      /* end of RLE case */
 
   else {  /* not RLE */
+    bufsize = 4 * (npixels+TAGLEN);
+    if (bufsize/4 != (npixels+TAGLEN)) {
+      loaderr = "Bogus IRIS File!";
+      return (byte *)NULL;
+    }
+    base   = (byte *) malloc((size_t) bufsize);
     verdat = (byte *) malloc((size_t) xsize);
-    base   = (byte *) malloc((size_t) (xsize*ysize+TAGLEN) * 4);
     if (!base || !verdat) FatalError("out of memory in LoadIRIS()");
 
     addimgtag(base,xsize,ysize);
-    
+
     fseek(fp,512L,0);
 
     for (z=0; z<zsize; z++) {
@@ -457,7 +489,7 @@ static void addimgtag(dptr,xsize,ysize)
      byte *dptr;
      int   xsize, ysize;
 {
-  /* this is used to extract image data from core dumps. 
+  /* this is used to extract image data from core dumps.
      I doubt this is necessary...  --jhb */
 
   dptr    = dptr + (xsize * ysize * 4);
@@ -499,26 +531,31 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
      int   ptype, w, h, numcols, colorstyle;
 {
   /* writes a greyscale or 24-bit RGB IRIS file to the already open
-     stream, rle compressed */
+     stream, RLE-compressed; returns 0 on success, -1 on minor error */
 
   IMAGE img;
-  int     i, j, pos, len, tablen, rlebuflen, zsize;
+  int     i, j, pos, len, tablen, rlebuflen, zsize, npixels, bufsize;
   u_long *starttab, *lengthtab;
   byte   *rlebuf, *pptr;
   byte   *lumbuf, *lptr, *longpic;
 
   xvbzero((char *) &img, sizeof(IMAGE));
-  
+
   /* write header information */
   fwrite(&img, sizeof(IMAGE), (size_t) 1, fp);
   fseek(fp, 0L, 0);
+
+  if (w <= 0 || h <= 0 || w > 65535 || h > 65535) {
+    SetISTR(ISTR_WARNING, "image dimensions too large for IRIS format");
+    return -1;
+  }
 
   /* load up header */
   img.imagic = IMAGIC;
   img.type   = ITYPE_RLE | (1 & BPPMASK);   /* RLE, 1 byteperpix */
   img.dim    = (colorstyle == F_FULLCOLOR) ? 3 : 2;
-  img.xsize  = w;
-  img.ysize  = h;
+  img.xsize  = (u_short)w;
+  img.ysize  = (u_short)h;
   img.zsize  = zsize = (colorstyle == F_FULLCOLOR) ? 3 : 1;
   img.min    = 0;
   img.max    = 255;
@@ -537,22 +574,33 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   if (ferror(fp)) { fclose(fp);  return -1; }
 
   /* allocate RLE compression tables & stuff */
-  rlebuflen = 2*w + 10;
-  tablen    = h * zsize;
+  rlebuflen = 2*w + 10;   /* 10 <= rlebuflen <= 131080 */
+  tablen    = h * zsize;  /*  1 <= tablen    <= 196605 */
 
+  /* no overflow is possible with any of these (given check on w,h above): */
   starttab  = (u_long *) malloc((size_t) tablen * sizeof(long));
   lengthtab = (u_long *) malloc((size_t) tablen * sizeof(long));
   rlebuf    = (byte *)   malloc((size_t) rlebuflen);
-  lumbuf    = (byte *)   malloc((size_t) w * 4);
+  lumbuf    = (byte *)   malloc((size_t) w * 4);   /* 262140 max */
 
-  if (!starttab || !lengthtab || !rlebuf || !lumbuf) 
+  if (!starttab || !lengthtab || !rlebuf || !lumbuf)
     FatalError("out of memory in WriteIRIS()");
 
   pos = 512 + 2 * (tablen * 4);
   fseek(fp, (long) pos, 0);
 
   /* convert image into 4-byte per pix image that the compress routines want */
-  longpic = (byte *) malloc((size_t) w * h * 4);
+  npixels = w * h;
+  bufsize = 4 * npixels;
+  if (npixels/w != h || bufsize/4 != npixels) {
+    SetISTR(ISTR_WARNING, "can't malloc longpic in WriteIRIS()");
+    free(starttab);
+    free(lengthtab);
+    free(rlebuf);
+    free(lumbuf);
+    return -1;
+  }
+  longpic = (byte *) malloc((size_t) bufsize);
   if (!longpic) FatalError("couldn't malloc longpic in WriteIRIS()");
 
   for (i=0, pptr=pic; i<h; i++) {
@@ -574,7 +622,7 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
       }
     }
   }
-      
+
 
 
   /* compress and write the data */
@@ -584,12 +632,13 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
       if (zsize == 1) {
 	lumrow(lptr, lumbuf, w);
 	len = compressrow(lumbuf, rlebuf, CHANOFFSET(j), w);
-      } 
+      }
       else {
 	len = compressrow(lptr, rlebuf, CHANOFFSET(j), w);
       }
 
       if (len > rlebuflen) {
+	/* this condition shouldn't kill XV, just abort writing the image */
 	FatalError("WriteIRIS: rlebuf is too small");
 	exit(1);
       }
@@ -618,10 +667,10 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
 
   return 0;
 }
-  
+
 
 /*************************************/
-static void lumrow(rgbptr, lumptr, n) 
+static void lumrow(rgbptr, lumptr, n)
      byte *rgbptr, *lumptr;
      int n;
 {
@@ -640,7 +689,7 @@ static int compressrow(lbuf, rlebuf, z, cnt)
      int   z, cnt;
 {
   byte *iptr, *ibufend, *sptr, *optr;
-  short todo, cc;							
+  short todo, cc;
   long  count;
 
   lbuf    += z;
@@ -685,7 +734,7 @@ static int compressrow(lbuf, rlebuf, z, cnt)
     cc = *iptr;
     iptr += 4;
     while ((iptr<ibufend) && (*iptr == cc))  iptr += 4;
-    
+
     count = (iptr-sptr)/4;
     while (count) {
       todo = count>126 ? 126:count;
@@ -694,7 +743,7 @@ static int compressrow(lbuf, rlebuf, z, cnt)
       *optr++ = cc;
     }
   }
-  
+
   *optr++ = 0;
   return (optr - rlebuf);
 }

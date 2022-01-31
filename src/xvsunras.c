@@ -39,7 +39,7 @@ struct rasterfile {
 #define RAS_RLE 0x80
 
 
-static int  sunRasError    PARM((char *, char *));
+static int  sunRasError    PARM((const char *, const char *));
 static int  rle_read       PARM((byte *, int, int, FILE *, int));
 static void sunRas1to8     PARM((byte *, byte *, int));
 static void sunRas8to1     PARM((byte *, byte *, int, int));
@@ -54,10 +54,10 @@ int LoadSunRas(fname, pinfo)
      PICINFO *pinfo;
 {
   FILE	*fp;
-  int	 linesize,lsize,csize,isize,i,w,h,d;
-  byte	 *image, *line, *pic8;
+  int	 linesize,lsize,csize,isize,i,w,h,d,npixels,nbytes;
+  byte	 *image, *line;
   struct rasterfile sunheader;
-  char   *bname;
+  const char *bname;
 
   bname = BaseName(fname);
 
@@ -85,7 +85,7 @@ int LoadSunRas(fname, pinfo)
       sunheader.ras_depth != 8 &&
       sunheader.ras_depth != 24 &&
       sunheader.ras_depth != 32) {
-    fprintf (stderr, "Sun rasterfile image has depth %d\n", 
+    fprintf (stderr, "Sun rasterfile image has depth %d\n",
 	     sunheader.ras_depth);
     fprintf (stderr, "Depths supported are 1, 8, 24, and 32\n");
     fclose(fp);
@@ -115,26 +115,59 @@ int LoadSunRas(fname, pinfo)
 
   w = sunheader.ras_width;
   h = sunheader.ras_height;
-  d = sunheader.ras_depth;
-  isize = sunheader.ras_length ?
-	  sunheader.ras_length :
-	  (w * h * d) / 8;
+  d = sunheader.ras_depth;  /* 1, 8, 24, or 32 (above) */
+  npixels = w * h;
+  if (w <= 0 || h <= 0 || npixels/w != h) {
+    fprintf (stderr, "Sun rasterfile image has invalid dimensions (%dx%d)\n",
+	     w, h);
+    fclose(fp);
+    return 0;
+  }
+  if (d == 1)
+    nbytes = npixels/8;     /* should round up here, but used only for printf */
+  else {
+    nbytes = npixels * (d/8);
+/*
+    [nbytes (isize) used only in printfs; don't really care about overflows]
+    if (nbytes/npixels != (d/8)) {
+      fprintf (stderr, "Sun rasterfile has invalid dimensions (%dx%dx%d)\n",
+	       w, h, d);
+      fclose(fp);
+      return 0;
+    }
+ */
+  }
+  isize = sunheader.ras_length ? sunheader.ras_length : nbytes;
   csize = (sunheader.ras_maptype == RMT_NONE) ? 0 : sunheader.ras_maplength;
 
 
-  /* compute length of the output (xv-format) image */
-  lsize = w * h;     
-  if (d == 24 || d == 32) lsize = lsize * 3;
+  /* length of the output (xv-format) image */
+  lsize = npixels;
+  if (d == 24 || d == 32) {
+    lsize *= 3;
+    if (lsize/3 != npixels) {
+      fprintf (stderr, "Sun rasterfile has invalid dimensions (%dx%dx%d)\n",
+	       w, h, d);
+      fclose(fp);
+      return 0;
+    }
+  }
 
 
   linesize = w * d;
+  if (linesize/w != d || linesize + 15 < linesize) {
+    fprintf (stderr, "Sun rasterfile has invalid dimensions (%dx%dx%d)\n",
+	     w, h, d);
+    fclose(fp);
+    return 0;
+  }
   if (linesize % 16) linesize += (16 - (linesize % 16));
   linesize /= 8;
 
   if (DEBUG) {
     fprintf(stderr,"%s: LoadSunRas() - loading a %dx%d pic, %d planes\n",
 	    cmd, w, h, d);
-    fprintf (stderr, 
+    fprintf (stderr,
 	  "type %d, maptype %d, isize %d, csize %d, lsize %d, linesize %d\n",
 	     sunheader.ras_type, sunheader.ras_maptype,
 	     isize, csize, lsize, linesize);
@@ -188,13 +221,13 @@ int LoadSunRas(fname, pinfo)
     }
 
     switch (d) {
-    case 1:  sunRas1to8 (image + w * i, line, w);	                
+    case 1:  sunRas1to8 (image + w * i, line, w);
              break;
     case 8:  xvbcopy((char *) line, (char *) image + w * i, (size_t) w);
              break;
     case 24: xvbcopy((char *) line, (char *) image + w * i * 3, (size_t) w*3);
              break;
-      
+
     case 32:
       {
 	int k;
@@ -202,7 +235,7 @@ int LoadSunRas(fname, pinfo)
 	ip = line;
 	op = (byte *) (image + w * i * 3);
 	for (k = 0; k<w; k++) {
-	  *ip++;           /* skip 'alpha' */
+	  ip++;            /* skip 'alpha' */
 	  *op++ = *ip++;   /* red   */
 	  *op++ = *ip++;   /* green */
 	  *op++ = *ip++;   /* blue  */
@@ -210,9 +243,9 @@ int LoadSunRas(fname, pinfo)
       }
     }
   }
-  
+
   free(line);
-  
+
   if (DEBUG) fprintf(stderr,"Sun ras: image loaded!\n");
 
 
@@ -224,7 +257,7 @@ int LoadSunRas(fname, pinfo)
   else pinfo->type = PIC8;
 
   pinfo->pic = image;
-  pinfo->w = w;  
+  pinfo->w = w;
   pinfo->h = h;
   pinfo->normw = pinfo->w;   pinfo->normh = pinfo->h;
   pinfo->frmType = F_SUNRAS;
@@ -285,7 +318,7 @@ FILE *fp;
 
 /*****************************/
 static int sunRasError(fname, st)
-     char *fname, *st;
+     const char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -364,10 +397,15 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
 
   /* special case: if PIC24 and writing GREYSCALE, write 8-bit file */
   if (ptype == PIC24  && colorstyle == F_GREYSCALE) {
-    graypic = (byte *) malloc((size_t) w*h);
+    int npixels = w * h;
+    if (w <= 0 || h <= 0 || npixels/w != h) {
+      SetISTR(ISTR_WARNING, "Image is too large (%dx%d)", w, h);
+      return (2);
+    }
+    graypic = (byte *) malloc((size_t) npixels);
     if (!graypic) FatalError("unable to malloc in WriteSunRas()");
-    
-    for (i=0,sp=pic,dp=graypic; i<w*h; i++,sp+=3,dp++) {
+
+    for (i=0,sp=pic,dp=graypic; i<npixels; i++,sp+=3,dp++) {
       *dp = MONO(sp[0],sp[1],sp[2]);
     }
 
@@ -379,9 +417,18 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
   }
 
 
-  if      (ptype==PIC24)    { d = 24;  linesize = w * 3; }
-  else if (colorstyle != F_BWDITHER) { d = 8;   linesize = w;     }
-  else { 
+  if (ptype==PIC24) {
+    d = 24;
+    linesize = w * 3;
+    if (linesize/w != 3) {
+      SetISTR(ISTR_WARNING, "Image is too wide (%d)", w);
+      if (graypic) free(graypic);
+      return (2);
+    }
+  } else if (colorstyle != F_BWDITHER) {
+    d = 8;
+    linesize = w;
+  } else {
     d = 1;
     linesize = w;
     if (linesize % 8) linesize += (8 - linesize % 8);
@@ -391,6 +438,11 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
 
 
   if (linesize % 2) linesize++;
+  if (linesize == 0) {
+    SetISTR(ISTR_WARNING, "Image is too wide (%d)", w);
+    if (graypic) free(graypic);
+    return (2);
+  }
   line = (byte *) malloc((size_t) linesize);
   if (!line) {
     SetISTR(ISTR_WARNING, "Can't allocate memory for save!\n");
@@ -428,7 +480,7 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
   write_sun_long (sunheader.ras_maplength, fp);
 
   /* write the colormap */
-  if (d == 8)
+  if (d == 8) {
     if (colorstyle == 1)  /* grayscale */
       for (color=0; color<3; color++)
 	for (i=0; i<numcols; i++)
@@ -438,6 +490,7 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
       fwrite (gmap, sizeof(byte), (size_t) numcols, fp);
       fwrite (bmap, sizeof(byte), (size_t) numcols, fp);
     }
+  }
 
 
   /* write the image */

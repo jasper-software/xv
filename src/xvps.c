@@ -1,4 +1,4 @@
-/* 
+/*
  * xvps.c - Postscript dialog box, file output functions
  *
  * callable functions:
@@ -71,10 +71,13 @@ static int  rle_encode     PARM((byte *, byte *, int));
 static void psColorImage   PARM((FILE *));
 static void psColorMap     PARM((FILE *fp, int, int, byte *, byte *, byte *));
 static void psRleCmapImage PARM((FILE *, int));
-static void epsPreview     PARM((FILE *, byte *, int, int, int, int, 
+static void epsPreview     PARM((FILE *, byte *, int, int, int, int,
 				 byte *, byte *, byte *, int));
-static int  writeBWStip    PARM((FILE *, byte *, char *, int, int, int));
+static int  writeBWStip    PARM((FILE *, byte *, const char *, int, int, int));
 
+#ifdef GS_PATH
+static void buildCmdStr    PARM((char *, char *, char *, int, int));
+#endif
 
 
 /* local variables */
@@ -123,7 +126,7 @@ static int   firsttime=1;       /* first time PSDialog being opened ? */
 void CreatePSD(geom)
 char *geom;
 {
-  psW = CreateWindow("xv postscript", "XVps", geom, 
+  psW = CreateWindow("xv postscript", "XVps", geom,
 		     PSWIDE, PSHIGH, infofg, infobg, 0);
   if (!psW) FatalError("can't create postscript window!");
 
@@ -139,9 +142,9 @@ char *geom;
   CBCreate(&encapsCB, psW, 240, 7, "preview", infofg, infobg, hicol, locol);
   CBCreate(&pscompCB, psW, 331, 7, "compress", infofg, infobg, hicol, locol);
 
-  DCreate(&xsDial, psW, 240, 30, 80, 100, 10, 800, 100, 5, 
+  DCreate(&xsDial, psW, 240, 30, 80, 100, 10.0, 800.0, 100.0, 0.5, 5.0,
 	  infofg, infobg, hicol, locol, "Width", "%");
-  DCreate(&ysDial, psW, 331, 30, 80, 100, 10, 800, 100, 5, 
+  DCreate(&ysDial, psW, 331, 30, 80, 100, 10.0, 800.0, 100.0, 0.5, 5.0,
 	  infofg, infobg, hicol, locol, "Height", "%");
   xsDial.drawobj = changedScale;
   ysDial.drawobj = changedScale;
@@ -154,38 +157,38 @@ char *geom;
   RBCreate(orientRB, psW, 36+80, 240+18, "Landscape", infofg, infobg,
 	   hicol, locol);
 
-  paperRB = RBCreate(NULL, psW,36, 240+18+36, "8.5\"x11\"", 
+  paperRB = RBCreate(NULL, psW,36, 240+18+36, "8.5\"x11\"",
 		     infofg, infobg, hicol, locol);
   RBCreate(paperRB, psW, 36+80,    240+18+36, "A4",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+122,   240+18+36, "B5",         
+  RBCreate(paperRB, psW, 36+122,   240+18+36, "B5",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+164,   240+18+36, "A3",         
+  RBCreate(paperRB, psW, 36+164,   240+18+36, "A3",
 	   infofg, infobg, hicol, locol);
   RBCreate(paperRB, psW, 36,       240+36+36, "8.5\"x14\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+80,    240+36+36, "11\"x17\"",  
+  RBCreate(paperRB, psW, 36+80,    240+36+36, "11\"x17\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36,       240+54+36, "4\"x5\"",    
+  RBCreate(paperRB, psW, 36,       240+54+36, "4\"x5\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+80,    240+54+36, "35mm slide", 
+  RBCreate(paperRB, psW, 36+80,    240+54+36, "35mm slide",
 	   infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BOK], psW, PSWIDE-180, PSHIGH-10-BUTTH, 80, BUTTH, 
+  BTCreate(&psbut[PS_BOK], psW, PSWIDE-180, PSHIGH-10-BUTTH, 80, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BCANC], psW, PSWIDE-90, PSHIGH-10-BUTTH, 80, BUTTH, 
+  BTCreate(&psbut[PS_BCANC], psW, PSWIDE-90, PSHIGH-10-BUTTH, 80, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BCENT], psW, 240, 154, 55, BUTTH-2, 
+  BTCreate(&psbut[PS_BCENT], psW, 240, 154, 55, BUTTH-2,
 	   "Center", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BORG], psW,  298, 154, 55, BUTTH-2, 
+  BTCreate(&psbut[PS_BORG], psW,  298, 154, 55, BUTTH-2,
 	   "Origin", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BMAX], psW,  356, 154, 55, BUTTH-2, 
+  BTCreate(&psbut[PS_BMAX], psW,  356, 154, 55, BUTTH-2,
 	   "Max",    infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BPOSX], psW, 256-14, 190+13-8, 8,8, "", 
+  BTCreate(&psbut[PS_BPOSX], psW, 256-14, 190+13-8, 8,8, "",
 	   infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BPOSY], psW, 256-14, 190+26-8, 8,8, "", 
+  BTCreate(&psbut[PS_BPOSY], psW, 256-14, 190+26-8, 8,8, "",
 	   infofg, infobg, hicol, locol);
 
   posxType = posyType = 0;
@@ -236,17 +239,17 @@ char *geom;
 
   if (rd_int("psres")) {             /* xv.psres:  default paper resolution */
     if (def_int >= 10 && def_int <= 720) {
-      int i = (int) ((PIX2INCH * 100) / def_int);
+      double v = (PIX2INCH * 100) / def_int;
 
-      DSetVal(&xsDial, i);
-      DSetVal(&ysDial, i);
+      DSetVal(&xsDial, v);
+      DSetVal(&ysDial, v);
     }
   }
 
 
   XMapSubwindows(theDisp, psW);
 }
-  
+
 
 /***************************************************/
 void PSDialog(vis)
@@ -289,7 +292,7 @@ XEvent *xev;
     x = e->x;  y = e->y;  w = e->width;  h = e->height;
 
     /* throw away excess expose events for 'dumb' windows */
-    if (e->count > 0 && 
+    if (e->count > 0 &&
 	(e->window == xsDial.win || e->window == ysDial.win ||
 	 e->window == pageF)) {}
 
@@ -332,7 +335,7 @@ XEvent *xev;
     XKeyEvent *e = (XKeyEvent *) xev;
     char buf[128];  KeySym ks;
     int  stlen, shift, ck;
-	
+
     stlen = XLookupString(e,buf,128,&ks,(XComposeStatus *) NULL);
     shift = e->state & ShiftMask;
     ck    = CursorKey(ks, shift, 0);
@@ -403,7 +406,7 @@ void PSResize()
 static void drawPSD(x,y,w,h)
 int x,y,w,h;
 {
-  char *title = "Save PostScript File...";
+  const char *title = "Save PostScript File...";
   int  i,cx;
   XRectangle xr;
 
@@ -463,12 +466,14 @@ int x,y,w,h;
 /***************************************************/
 static void drawPosStr()
 {
-  int x,y;
-  double cmx, cmy, inx, iny;
-  char   str[64], str1[64], *xst, *yst;
+  int         x,y;
+  double      cmx, cmy, inx, iny;
+  char        str[64], str1[64];
+  const char *xst, *yst;
 
   x = 256;  y = 190 + 13;
-  inx = iny = 0;  xst = yst = (char *) NULL;
+  inx = iny = 0;
+  xst = yst = (const char *) NULL;
 
   switch (posxType) {
   case 0:  xst = "Left: ";  inx = pos_inx;                      break;
@@ -497,7 +502,7 @@ static void drawPosStr()
   XSetFont(theDisp, theGC, mfont);
 }
 
-  
+
 /***************************************************/
 static void drawSizeStr()
 {
@@ -522,7 +527,7 @@ static void drawSizeStr()
   XSetFont(theDisp, theGC, mfont);
 }
 
-  
+
 /***************************************************/
 static void drawResStr()
 {
@@ -540,9 +545,9 @@ static void drawResStr()
   XSetFont(theDisp, theGC, mfont);
 }
 
-  
-  
-  
+
+
+
 /***************************************************/
 static void drawPage()
 {
@@ -554,7 +559,7 @@ static void drawPage()
   XSetForeground(theDisp, theGC, infofg);
   XDrawRectangle(theDisp, pageF, theGC, pageRect.x, pageRect.y,
 		 (u_int) pageRect.width, (u_int) pageRect.height);
-  
+
   drawIRect(1);
 }
 
@@ -611,7 +616,7 @@ int mx,my;
   unsigned int mask;
   double       offx, offy, newx, newy;
 
-  /* compute offset (in inches) between 'drag point' and 
+  /* compute offset (in inches) between 'drag point' and
      the top-left corner of the image */
 
   offx = ((mx - pageRect.x) / in2pix) - pos_inx;
@@ -642,7 +647,7 @@ static void doCmd(cmd)
   char *fullname;
 
   switch (cmd) {
-  case PS_BOK:    writePS();    
+  case PS_BOK:    writePS();
                   PSDialog(0);
                   fullname = GetDirFullName();
                   if (!ISPIPE(fullname[0])) {
@@ -721,15 +726,15 @@ static void setScale()
 
   GetSaveSize(&w, &h);
 
-  sz_inx = (double) w / PIX2INCH * (xsDial.val / 100.0);  
-  sz_iny = (double) h / PIX2INCH * (ysDial.val / 100.0);  
+  sz_inx = (double) w / PIX2INCH * (xsDial.val / 100.0);
+  sz_iny = (double) h / PIX2INCH * (ysDial.val / 100.0);
 
   /* round to integer .001ths of an inch */
   sz_inx = floor(sz_inx * 1000.0 + 0.5) / 1000.0;
   sz_iny = floor(sz_iny * 1000.0 + 0.5) / 1000.0;
 
-  dpix = (int) (PIX2INCH / (xsDial.val / 100.0));  
-  dpiy = (int) (PIX2INCH / (ysDial.val / 100.0));  
+  dpix = (int) (PIX2INCH / (xsDial.val / 100.0));
+  dpiy = (int) (PIX2INCH / (ysDial.val / 100.0));
 
   /* make sure 'center' of image is still on page */
   hsx = sz_inx/2;  hsy = sz_iny/2;
@@ -783,20 +788,20 @@ static void drawIRect(draw)
 {
   int x,y,w,h;
   XRectangle xr;
-  
+
   x = pageRect.x + (int) (pos_inx * in2pix);
   y = pageRect.y + (int) (pos_iny * in2pix);
   w = sz_inx * in2pix;
   h = sz_iny * in2pix;
-  
+
   xr.x = pageRect.x + 1;
   xr.y = pageRect.y + 1;
   xr.width  = pageRect.width - 1;
   xr.height = pageRect.height - 1;
-  
+
   if (draw) XSetForeground(theDisp, theGC, infofg);
        else XSetForeground(theDisp, theGC, infobg);
-  
+
   XSetClipRectangles(theDisp, theGC, 0,0, &xr, 1, Unsorted);
   XDrawRectangle(theDisp, pageF, theGC, x, y, (u_int) w, (u_int) h);
   XDrawLine(theDisp, pageF, theGC, x, y, x+w, y+h);
@@ -836,18 +841,18 @@ static void maxImage()
   if (scx < scy) { sz_iny = h * scx; }
             else { sz_inx = w * scy; }
 
-  DSetVal(&xsDial, (int) ((100 * (sz_inx * PIX2INCH) / w) + .5));
+  DSetVal(&xsDial, 100 * (sz_inx * PIX2INCH) / w);
   DSetVal(&ysDial, xsDial.val);
 
-  sz_inx = (double) w / PIX2INCH * (xsDial.val / 100.0);  
-  sz_iny = (double) h / PIX2INCH * (ysDial.val / 100.0);  
+  sz_inx = (double) w / PIX2INCH * (xsDial.val / 100.0);
+  sz_iny = (double) h / PIX2INCH * (ysDial.val / 100.0);
 
   /* round to integer .001ths of an inch */
   sz_inx = floor(sz_inx * 1000.0 + 0.5) / 1000.0;
   sz_iny = floor(sz_iny * 1000.0 + 0.5) / 1000.0;
 
-  dpix = (int) (PIX2INCH / (xsDial.val / 100.0));  
-  dpiy = (int) (PIX2INCH / (ysDial.val / 100.0));  
+  dpix = (int) (PIX2INCH / (xsDial.val / 100.0));
+  dpiy = (int) (PIX2INCH / (ysDial.val / 100.0));
 
   pos_inx = psizex/2 - sz_inx/2;
   pos_iny = psizey/2 - sz_iny/2;
@@ -888,7 +893,7 @@ double newx, newy;
 static void writePS()
 {
   FILE *fp;
-  int   i, j, q, err, rpix, gpix, bpix, nc, ptype;
+  int   i, j, err, rpix, gpix, bpix, nc, ptype;
   int   iw, ih, ox, oy, slen, lwidth, bits, colorps, w, h, pfree;
   double iwf, ihf;
   byte *inpix, *rmap, *gmap, *bmap;
@@ -900,13 +905,19 @@ static void writePS()
   if (!fp) return;
 
   WaitCursor();
-  
+
   inpix = GenSavePic(&ptype, &w, &h, &pfree, &nc, &rmap, &gmap, &bmap);
 
-    
+  if (w <= 0 || h <= 0 || w*2 < w) {
+    SetISTR(ISTR_WARNING,"%s:  Image dimensions out of range", filename);
+    CloseOutFile(fp, filename, 1);
+    return;
+  }
+
+
   /* printed image will have size iw,ih (in picas) */
   iw = (int) (sz_inx * 72.0 + 0.5);
-  ih = (int) (sz_iny * 72.0 + 0.5);   
+  ih = (int) (sz_iny * 72.0 + 0.5);
   iwf = sz_inx * 72.0;
   ihf = sz_iny * 72.0;
 
@@ -923,12 +934,12 @@ static void writePS()
   fprintf(fp,"%%%%Creator: XV %s  -  by John Bradley\n",REVDATE);
 
   if (RBWhich(orientRB)==ORNT_LAND)   /* Landscape mode */
-    fprintf(fp,"%%%%BoundingBox: %d %d %d %d\n", 
+    fprintf(fp,"%%%%BoundingBox: %d %d %d %d\n",
 	    (int) (pos_iny * 72.0 + 0.5),
 	    (int) (pos_inx * 72.0 + 0.5),
 	    (int) (pos_iny * 72.0 + 0.5) + ih,
 	    (int) (pos_inx * 72.0 + 0.5) + iw);
-  else 
+  else
     fprintf(fp,"%%%%BoundingBox: %d %d %d %d\n", ox, oy, ox+iw, oy+ih);
 
   fprintf(fp,"%%%%Pages: 1\n");
@@ -943,9 +954,9 @@ static void writePS()
   case F_BWDITHER:  slen = (w+7)/8;  bits = 1;  colorps = 0;  break;
   default:  FatalError("unknown colorType in writePS()");   break;
   }
-  
+
   if (encapsCB.val) epsPreview(fp, inpix, ptype, colorType, w, h,
-			       rmap,gmap,bmap, 
+			       rmap,gmap,bmap,
 			       (RBWhich(orientRB)==ORNT_LAND) );
 
   fprintf(fp,"%%%%EndProlog\n\n");
@@ -978,7 +989,7 @@ static void writePS()
     fprintf(fp,"%% print in landscape mode\n");
     fprintf(fp,"90 rotate 0 %d translate\n\n",(int) (-psizey*72.0));
   }
-    
+
   if (RBWhich(paperRB) == PSZ_4BY5 ||
       RBWhich(paperRB) == PSZ_35MM) {
     fprintf(fp,"%% we're going to a 4x5 or a 35mm film recorder.\n");
@@ -1083,12 +1094,12 @@ static void writePS()
 	    gpix = inpix[1];
 	    bpix = inpix[2];
 	  }
-	  
-	  if (colorps) { 
+
+	  if (colorps) {
 	    err = fprintf(fp,"%02x%02x%02x",rpix,gpix,bpix);
 	    lwidth+=6;
 	  }
-      
+
 	  else {  /* greyscale */
 	    err = fprintf(fp,"%02x", MONO(rpix,gpix,bpix));
 	    lwidth+=2;
@@ -1106,7 +1117,7 @@ static void writePS()
       fprintf(fp,"\n\n");
       fprintf(fp,"%%\n");
       fprintf(fp,"%% Compression made this file %.2f%% %s\n",
-	      100.0 * ((double) outbytes) / 
+	      100.0 * ((double) outbytes) /
 	      ((double) eWIDE * eHIGH * ((colorps) ? 3 : 1)),
 	      "of the uncompressed size.");
       fprintf(fp,"%%\n");
@@ -1147,10 +1158,10 @@ static int rle_encode(scanline, rleline, wide)
    *
    * returns length of the rleline vector
    */
-  
+
   int  i, j, blocklen, isrun, rlen;
   byte block[256], pix;
-  
+
   blocklen = isrun = rlen = 0;
 
   for (i=0; i<wide; i++) {
@@ -1186,7 +1197,7 @@ static int rle_encode(scanline, rleline, wide)
 	}
       }
     }
-	
+
     else {   /* not a run */
       if (pix == block[blocklen-1]) {   /* case 3:  non-run, prev==cur */
 	if (blocklen>1) {               /*  have a non-run block to flush */
@@ -1215,7 +1226,7 @@ static int rle_encode(scanline, rleline, wide)
 
       else {
 	rleline[rlen++] = (blocklen-1) | 0x80;
-	for (j=0; j<blocklen; j++) 
+	for (j=0; j<blocklen; j++)
 	  rleline[rlen++] = block[j];
       }
 
@@ -1231,15 +1242,15 @@ static int rle_encode(scanline, rleline, wide)
 
     else {
       rleline[rlen++] = (blocklen-1) | 0x80;
-      for (j=0; j<blocklen; j++) 
+      for (j=0; j<blocklen; j++)
 	rleline[rlen++] = block[j];
     }
   }
 
   return rlen;
 }
-	  
-	    
+
+
 /**********************************************/
 static void psColorImage(fp)
 FILE *fp;
@@ -1276,7 +1287,7 @@ FILE *fp;
   fprintf(fp,"    %% Utility procedure for colorimage operator.\n");
   fprintf(fp,"    %% This procedure takes two procedures off the\n");
   fprintf(fp,"    %% stack and merges them into a single procedure.\n\n");
-  
+
   fprintf(fp,"    /mergeprocs { %% def\n");
   fprintf(fp,"      dup length\n");
   fprintf(fp,"      3 -1 roll\n");
@@ -1326,12 +1337,12 @@ static void psColorMap(fp, color, nc, rmap, gmap, bmap)
   for (i=0; i<nc; i++) {
     if (color) fprintf(fp,"%02x%02x%02x ", rmap[i],gmap[i],bmap[i]);
     else fprintf(fp,"%02x ", MONO(rmap[i],gmap[i],bmap[i]));
-    
+
     if ((i%10) == 9) fprintf(fp,"\n");
   }
   if (i%10) fprintf(fp,"\n");
   fprintf(fp,"pop pop   %% lose return values from readhexstring\n\n\n");
-		 
+
 }
 
 
@@ -1407,7 +1418,7 @@ int   color;
 
 
 /**********************************************/
-static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap, 
+static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
 		       landscape)
      FILE *fp;
      byte *pic;
@@ -1420,21 +1431,37 @@ static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
 
 
   if (landscape) {  /* generate a rotated version of the pic */
-    int bperpix;
+    int npixels, bufsize;
     byte *lpic;
 
-    bperpix = (ptype == PIC8) ? 1 : 3;
-    lpic = (byte *) malloc((size_t) w * h * bperpix);
+    npixels = w * h;
+    if (w <= 0 || h <= 0 || npixels/w != h) {
+      SetISTR(ISTR_WARNING,"%s:  Image dimensions out of range", filename);
+/*    CloseOutFile(fp, filename, 1);  can't do since caller still writing */
+      return;
+    }
+    if (ptype == PIC8)
+      bufsize = npixels;
+    else {
+      bufsize = 3*npixels;
+      if (bufsize/3 != npixels) {
+        SetISTR(ISTR_WARNING,"%s:  Image dimensions out of range", filename);
+/*      CloseOutFile(fp, filename, 1);  can't do since caller still writing */
+        return;
+      }
+    }
+
+    lpic = (byte *) malloc((size_t) bufsize);
     if (!lpic) FatalError("can't alloc mem to rotate image in epsPreview");
 
-    xvbcopy((char *) pic, (char *) lpic, (size_t) w * h * bperpix);
+    xvbcopy((char *) pic, (char *) lpic, (size_t) bufsize);
     RotatePic(lpic, ptype, &w, &h, 0);
     pic = lpic;
   }
-    
+
 
   /* put in an EPSI preview */
-  
+
   if (colorType != F_BWDITHER) { /* have to generate a preview */
     prev = FSDither(pic, ptype, w, h, rmap,gmap,bmap, 0, 1);
 
@@ -1451,8 +1478,8 @@ static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
     flipbw = (MONO(rmap[0],gmap[0],bmap[0]) > MONO(rmap[1],gmap[1],bmap[1]));
   }
 
- 
-  fprintf(fp,"%%%%BeginPreview: %d %d %d %d\n", w, h, 1, 
+
+  fprintf(fp,"%%%%BeginPreview: %d %d %d %d\n", w, h, 1,
 	  (w/(72*4) + 1) * h);
 
   writeBWStip(fp, prev, "% ", w, h, !flipbw);
@@ -1468,10 +1495,10 @@ static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
 static int writeBWStip(fp, pic, prompt, w, h, flipbw)
      FILE *fp;
      byte *pic;
-     char *prompt;
+     const char *prompt;
      int  w, h, flipbw;
 {
-  /* write the given 'pic' (B/W stippled, 1 byte per pixel, 0=blk,1=wht) 
+  /* write the given 'pic' (B/W stippled, 1 byte per pixel, 0=blk,1=wht)
      out as hexadecimal, max of 72 hex chars per line.
 
      if 'flipbw', then 0=white, 1=black
@@ -1535,16 +1562,19 @@ int LoadPS(fname, pinfo, quick)
      document is multiple pages, a series of PNM files are created, and
      the first one is loaded (but not deleted) */
 
-
-  char tmp[512], tmp1[512], tmpname[64];
-  int  gsresult, nump, i, filetype;
-  char *rld;
+#ifdef GS_PATH
+  #define CMDSIZE	1024
+  char tmp[512], gscmd[512], cmdstr[CMDSIZE], tmpname[64];
+  int  gsresult, nump, i, filetype, doalert, epsf;
+#endif
 
   pinfo->pic     = (byte *) NULL;
   pinfo->comment = (char *) NULL;
 
-
 #ifdef GS_PATH
+
+  doalert = (!quick && !ctrlUp && !infoUp);  /* open alert if no info wins */
+  epsf    = 0;
 
 #ifndef VMS
   sprintf(tmpname, "%s/xvpgXXXXXX", tmpdir);
@@ -1552,22 +1582,26 @@ int LoadPS(fname, pinfo, quick)
   sprintf(tmpname, "Sys$Scratch:xvpgXXXXXX");
 #endif
 
+#ifdef USE_MKSTEMP
+  close(mkstemp(tmpname));
+#else
   mktemp(tmpname);
-  if (tmpname[0] == '\0') {   /* mktemp() blew up */
-    sprintf(str,"LoadPS: Unable to create temporary filename???");
-    ErrPopUp(str, "\nHow unlikely!");
+#endif
+  if (tmpname[0] == '\0') {   /* mktemp() or mkstemp() blew up */
+    sprintf(dummystr,"LoadPS: Unable to create temporary filename???");
+    ErrPopUp(dummystr, "\nHow unlikely!");
     return 0;
   }
   strcat(tmpname,".");
 
 
-  /* build command string */
+  /* build 'gscmd' string */
 
 #ifndef VMS  /* VMS needs quotes around mixed case command lines */
-  sprintf(tmp, "%s -sDEVICE=%s -r%d -q -dNOPAUSE -sOutputFile=%s%%d ",
+  sprintf(gscmd, "%s -sDEVICE=%s -r%d -q -dSAFER -dNOPAUSE -sOutputFile=%s%%d ",
 	  GS_PATH, gsDev, gsRes, tmpname);
 #else
-  sprintf(tmp, 
+  sprintf(gscmd,
 	  "%s \"-sDEVICE=%s\" -r%d -q \"-dNOPAUSE\" \"-sOutputFile=%s%%d\" ",
 	  GS_PATH, gsDev, gsRes, tmpname);
 #endif
@@ -1575,74 +1609,60 @@ int LoadPS(fname, pinfo, quick)
 
 #ifdef GS_LIB
 #  ifndef VMS
-     sprintf(tmp1, "-I%s ", GS_LIB);
+     sprintf(tmp, "-I%s ", GS_LIB);
 #  else
-     sprintf(tmp1, "\"-I%s\"", GS_LIB);
+     sprintf(tmp, "\"-I%s\" ", GS_LIB);
 #  endif
-   strcat(tmp, tmp1);
+   strcat(gscmd, tmp);
 #endif
+
+
+   /* prevent some potential naughtiness... */
+#ifndef VMS
+   strcat(gscmd, "-dSAFER ");
+#else
+   strcat(gscmd, "\"-dSAFER\" ");
+#endif
+
 
   if (gsGeomStr) {
-    sprintf(tmp1, "-g%s ", gsGeomStr);
-    strcat(tmp, tmp1);
+    sprintf(tmp, "-g%s ", gsGeomStr);
+    strcat(gscmd, tmp);
   }
 
-  /* if 'quick' is set, stop processing after first page by tacking
-     some PostScript commands that break the 'showpage' operator onto
-     the front of the stream passed to the ghostscript interpreter */
 
-#ifndef VMS
-  if (quick) {
-    sprintf(tmp1, "echo '%s' | cat - %s | %s -",
-	    "/showpage { showpage quit } bind def",   /* mk showpage exit */
-	    fname,  tmp);
-    strcpy(tmp, tmp1);
-  }
-  else {
-    strcat(tmp, " -- ");
-    strcat(tmp, fname);
-  }
-#else /* VMS */
-  /* VMS doesn't have pipes or an 'echo' command and GS doesn't like
-     Unix-style file names as input files in the VMS version */
-  strcat(tmp, " -- ");
-  rld = strrchr(fname, '/');     /* Pointer to last '/' */
-  if (rld) rld++;                /* Pointer to filename */
-      else rld = fname;          /* No path - use original string */
-  strcat(tmp, rld);
+  do {
+    buildCmdStr(cmdstr, gscmd, fname, quick, epsf);
+
+    if (DEBUG) fprintf(stderr,"LoadPS:  executing command '%s'\n", cmdstr);
+    SetISTR(ISTR_INFO, "Running '%s'...", GS_PATH);
+    sprintf(tmp, "Running %s", cmdstr);
+    if (doalert && epsf==0) OpenAlert(tmp);  /* open alert first time only */
+
+    WaitCursor();
+    gsresult = system(cmdstr);
+    WaitCursor();
+#ifdef VMS
+    gsresult = !gsresult;   /* VMS returns non-zero if OK */
 #endif
 
+    /* count # of files produced... */
+    for (i=1; i<1000; i++) {
+      struct stat st;
+      sprintf(tmp, "%s%d", tmpname, i);
+      if (stat(tmp, &st)!=0) break;
+    }
+    nump = i-1;
+    WaitCursor();
 
+    /* EPSF hack:  if gsresult==0 (OK) and 0 pages produced,
+       try tacking a 'showpage' onto the end of the file, do it again... */
 
+    if (!gsresult && !nump && !epsf) epsf++;
+  } while (!gsresult && !nump && epsf<2);
 
-  WaitCursor();
+  if (doalert) CloseAlert();
 
-  if (DEBUG) fprintf(stderr,"LoadPS:  executing command '%s'\n", tmp);
-  SetISTR(ISTR_INFO, "Running '%s'...", GS_PATH);
-
-  sprintf(tmp1, "Running %s", tmp);
-  if (!quick && !ctrlUp && !infoUp) OpenAlert(tmp1);
-
-#ifndef VMS
-  gsresult = system(tmp);
-#else
-  gsresult = !system(tmp);
-#endif
-
-  WaitCursor();
-
-  if (!quick && !ctrlUp && !infoUp) CloseAlert();
-
-  /* figure out how many page files were created, by stating files. 
-     breaks out on first failure, assuming there won't be any more after
-     that, and it would complicate matters too much anyhow... */
-
-  for (i=1; i<1000; i++) {
-    struct stat st;
-    sprintf(tmp, "%s%d", tmpname, i);
-    if (stat(tmp, &st)!=0) break;
-  }
-  nump = i-1;
 
   WaitCursor();
 
@@ -1664,7 +1684,7 @@ int LoadPS(fname, pinfo, quick)
       return 0;
     }
 
-    SetISTR(ISTR_INFO, "Running '%s'...  Done.  (%d page%s)", 
+    SetISTR(ISTR_INFO, "Running '%s'...  Done.  (%d page%s)",
 	    GS_PATH, nump, (nump==1) ? "" : "s");
   }
 
@@ -1677,8 +1697,8 @@ int LoadPS(fname, pinfo, quick)
 
   sprintf(tmp, "%s%d", tmpname, 1);
   filetype = ReadFileType(tmp);
-  
-  if (filetype == RFT_ERROR || filetype == RFT_UNKNOWN || 
+
+  if (filetype == RFT_ERROR || filetype == RFT_UNKNOWN ||
       filetype == RFT_COMPRESS) {  /* shouldn't happen */
     SetISTR(ISTR_WARNING, "Couldn't load first page '%s'", tmp);
     KillPageFiles(tmpname, nump);
@@ -1695,7 +1715,7 @@ int LoadPS(fname, pinfo, quick)
     KillPageFiles(tmpname, nump);
     SetCursors(-1);
     return 0;
-  }    
+  }
 
 
   /* SUCCESS! */
@@ -1711,4 +1731,55 @@ int LoadPS(fname, pinfo, quick)
   return 1;   /* can safely return '1' as this should never be called if
 		 we don't have 'gs' package */
 }
+
+
+
+/******************************************************************/
+#ifdef GS_PATH
+void buildCmdStr(str, gscmd, xname, quick, epsf)
+     char *str, *gscmd, *xname;
+     int   quick, epsf;
+{
+  /* note 'epsf' set only on files that don't have a showpage cmd */
+  char *x, *y, *fname;
+
+  x = (char *) malloc((5 * strlen(xname))+3);
+  if (!x)
+	FatalError("malloc failure in xvps.c buildCmdStr");
+  fname = x;
+  *x++ = 0x27;
+
+  for (y = xname; *y; ++y) {
+     if (0x27 == *y) {
+       strcpy(x, "'\"'\"'");
+       x += strlen(x);
+     } else *x++ = *y;
+  }
+  strcpy (x, "'");
+
+#ifndef VMS
+
+  if      (epsf)  snprintf(str, CMDSIZE, "echo '\n showpage ' | cat %s - | %s -",
+			  fname, gscmd);
+
+  else if (quick) snprintf(str, CMDSIZE, "echo %s | cat - %s | %s -",
+			  "/showpage { showpage quit } bind def",
+			  fname,  gscmd);
+
+  else            snprintf(str, CMDSIZE, "%s -- %s", gscmd, fname);
+
+#else /* VMS */
+  /* VMS doesn't have pipes or an 'echo' command and GS doesn't like
+     Unix-style filenames as input files in the VMS version */
+  strcat(tmp, " -- ");
+  rld = strrchr(fname, '/');     /* Pointer to last '/' */
+  if (rld) rld++;                /* Pointer to filename */
+  else rld = fname;              /* No path - use original string */
+  strcat(tmp, rld);
+#endif  /* VMS */
+  free(fname);
+}
+#endif  /* GS_PATH */
+
+
 

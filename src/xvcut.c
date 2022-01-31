@@ -15,7 +15,7 @@
  *      static void  clearSelectedArea();
  *      static void  makeClipFName    ();
  *      static int   countcols24      (byte *, int,int, int,int,int,int));
- *      static int   countNewCols     (byte*, int, int, byte*, int, 
+ *      static int   countNewCols     (byte*, int, int, byte*, int,
  *                                     int, int, int, int);
  *
  *             void  InitSelection  ();
@@ -72,7 +72,7 @@ static byte *getFromClip       PARM((void));
 static void clearSelectedArea  PARM((void));
 static void makeClipFName      PARM((void));
 static int  countcols24        PARM((byte *, int, int, int, int, int, int));
-static int  countNewCols       PARM((byte *, int, int, byte *, int, 
+static int  countNewCols       PARM((byte *, int, int, byte *, int,
 				     int, int, int, int));
 static int  dragHandle         PARM((XButtonEvent *));
 static void dragSelection      PARM((XButtonEvent *, u_int, int));
@@ -210,7 +210,7 @@ void DoImgPaste()
   if (!PasteAllowed()) { XBell(theDisp, 0);  return; }
 
   cimg = getFromClip();
-  if (!cimg) return;  
+  if (!cimg) return;
 
   /* if there's no selection, make one! */
   if (!HaveSelection()) makePasteSel(cimg);
@@ -231,7 +231,7 @@ static void doPaste(cimg)
 
   byte *dp, *dpic, *clippic, *clipcmap;
   int   clipw, cliph, clipis24, len, istran, trval;
-  int   i, j, sx,sy,sw,sh, cx,cy,cw,ch, dx,dy,dw,dh,dx2,dy2;
+  int   i, j, sx,sy,sw,sh, cx,cy,cw,ch, dx,dy,dw,dh;
 
 
   /*
@@ -245,7 +245,7 @@ static void doPaste(cimg)
 	((int) (cimg[CIMG_LEN + 2]<<16)) |
 	((int) (cimg[CIMG_LEN + 3]<<24));
 
-  if (len < CIMG_PIC24) return;        
+  if (len < CIMG_PIC24) return;
 
   istran    = cimg[CIMG_TRANS];
   trval     = cimg[CIMG_TRVAL];
@@ -268,7 +268,7 @@ static void doPaste(cimg)
    * already, because if we *are*, we'd prefer to do any clipboard rescaling
    * in 24-bit space for the obvious reasons.
    *
-   * possibilities:  
+   * possibilities:
    *   PIC24  -  easy, do clipboard rescale in 24-bit space
    *   PIC8, and clipboard is 8 bits, (or 24-bits, but with <=256 colors)
    *      and total unique colors < 256:
@@ -283,7 +283,7 @@ static void doPaste(cimg)
 
   /* dx,dy,dw,dh is the rectangle (in PIC coords) where the paste will occur
      (cropped to be entirely within PIC */
-  
+
   dx = sx;  dy = sy;  dw = sw;  dh = sh;
   CropRect2Rect(&dx, &dy, &dw, &dh, 0, 0, pWIDE, pHIGH);
 
@@ -291,7 +291,7 @@ static void doPaste(cimg)
   /* cx,cy,cw,ch is the rectangle of the clipboard data (in clipboard coords)
      that will actually be used in the paste operation */
 
-  cx = (sx>=0) ? 0 : ((-sx) * clipw) / sw;  
+  cx = (sx>=0) ? 0 : ((-sx) * clipw) / sw;
   cy = (sy>=0) ? 0 : ((-sy) * cliph) / sh;
   cw = (dw * clipw) / sw;
   ch = (dh * cliph) / sh;
@@ -302,27 +302,29 @@ static void doPaste(cimg)
   if (picType == PIC8) {
     int ncc, keep8;
     char buf[512];
-    
+
     if (clipis24) { /* pasting in a 24-bit image that *requires* promotion */
-      static char *bnames[] = { "\nOkay", "\033Cancel" };
+      static const char *labels[] = { "\nOkay", "\033Cancel" };
+
       strcpy(buf, "Warning:  Pasting this 24-bit image will require ");
       strcat(buf, "promoting the current image to 24 bits.");
-      
-      if (PopUp(buf, bnames, 2)) goto exit;   /* Cancelled */
+
+      if (PopUp(buf, labels, 2)) goto exit;   /* Cancelled */
       else Change824Mode(PIC24);              /* promote pic to 24 bits */
     }
 
     else {   /* clip is 8 bits */
       ncc = countNewCols(clippic,clipw,cliph,clipcmap,clipis24,cx,cy,cw,ch);
-      
+
       if (ncc + numcols > 256) {
-	static char *bnames[] = { "\nPromote", "8Keep 8-bit", "\033Cancel" };
+	static const char *labels[] = { "\nPromote", "8Keep 8-bit", "\033Cancel" };
+
 	strcpy(buf,"Warning:  The image and the clipboard combine to have ");
 	strcat(buf,"more than 256 unique colors.  Promoting the ");
 	strcat(buf,"image to 24 bits is recommended, otherwise the contents ");
 	strcat(buf,"of the clipboard will probably lose some colors.");
-	
-	keep8 = PopUp(buf, bnames, 3);
+
+	keep8 = PopUp(buf, labels, 3);
 	if      (keep8==2) goto exit;              /* Cancel */
 	else if (keep8==0) Change824Mode(PIC24);   /* promote pic to 24 bits */
       }
@@ -331,8 +333,8 @@ static void doPaste(cimg)
 
 
 
-  
-  
+
+
   /* legal possibilities at this point:
    *   pic is PIC24:  clip is 8 or 24
    *   pic is PIC8:   clip is 8, or clip is 24 but has 256 or fewer colors
@@ -342,18 +344,18 @@ static void doPaste(cimg)
 
   if (picType == PIC8) {
     int   clx, cly, r,g,b,k,mind,close,newcols;
-    byte *cp, *clp, *pp, *ccp, newr[256], newg[256], newb[256], remap[256];
+    byte *cp, *clp, *pp, newr[256], newg[256], newb[256], remap[256];
     byte  order[256], trans[256];
     int   bperpix, dpncols;
-    
+
     dpic = (byte *) malloc((size_t) dw * dh);
     if (!dpic) FatalError("Out of memory in DoImgPaste()\n");
-    
+
     bperpix = (clipis24) ? 3 : 1;
     newcols = 0;
-    
+
     /* dpic = a scaled, 8-bit representation of clippic[cx,cy,cw,ch] */
-    
+
     if (!clipis24) {   /* copy colormap from clip data into newr,g,b[] */
       for (i=0; i<256; i++) {
 	newr[i] = clipcmap[i*3];
@@ -366,22 +368,22 @@ static void doPaste(cimg)
       dp = dpic + i*dw;
       cly = cy + (i * ch) / dh;
       clp = clippic + (cly*clipw * bperpix);
-      
+
       for (j=0; j<dw; j++, dp++) {
 	/* get appropriate pixel from clippic */
 	clx = cx + (j * cw) / dw;
 	cp = clp + (clx * bperpix);
-	
+
 	if (!clipis24) *dp = *cp;
 	else {                            /* build colormap as we go... */
 	  r = *cp++;  g = *cp++;  b = *cp++;
-	  
+
 	  /* look it up in new colormap, add if not there */
 	  for (k=0; k<newcols && (r!=newr[k] || g!=newg[k] ||b!=newb[k]); k++);
 	  if (k==newcols && k<256) {
 	    newr[k]=r;  newg[k]=g;  newb[k]=b;  newcols++;
 	  }
-	  
+
 	  *dp = (byte) (k & 0xff);
 	}
       }
@@ -401,23 +403,23 @@ static void doPaste(cimg)
 	}
       }
     }
-    
-    
-    
+
+
+
     /* COLORMAP MERGING */
-    
+
     newcols = 0;
-    
+
     for (i=0; i<dpncols; i++) {
       if (istran && i==trval) continue;
-      
+
       for (j=0; j<numcols; j++) {              /* look for an exact match */
 	if (rMap[j]==newr[i] && gMap[j]==newg[i] && bMap[j]==newb[i]) break;
       }
       if (j<numcols) remap[i] = j;
       else {                                   /* no exact match */
 	newcols++;
-	
+
 	if (numcols < 256) {
 	  rMap[numcols] = newr[i];
 	  gMap[numcols] = newg[i];
@@ -429,7 +431,7 @@ static void doPaste(cimg)
 	  r = newr[i];  g=newg[i];  b=newb[i];
 	  mind = 256*256 + 256*256 + 256*256;
 	  for (j=close=0; j<numcols; j++) {
-	    k = ((rMap[j]-r) * (rMap[j]-r)) + 
+	    k = ((rMap[j]-r) * (rMap[j]-r)) +
 	      ((gMap[j]-g) * (gMap[j]-g)) +
 		((bMap[j]-b) * (bMap[j]-b));
 	    if (k<mind) { mind = k;  close = j; }
@@ -438,10 +440,10 @@ static void doPaste(cimg)
 	}
       }
     }
-    
-    
+
+
     /* copy the data into PIC */
-    
+
     dp = dpic;
     for (i=dy; i<dy+dh; i++) {
       pp = pic + (i*pWIDE) + dx;
@@ -451,7 +453,7 @@ static void doPaste(cimg)
       }
     }
     free(dpic);
-    
+
     if (newcols) InstallNewPic();      /* does color reallocation, etc. */
     else {
       GenerateCpic();
@@ -459,16 +461,16 @@ static void doPaste(cimg)
       DrawEpic();
     }
   }
-  
+
 
   /******************** PIC24 handling **********************/
-  
-  
+
+
   else {
     byte *tmppic, *cp, *pp, *clp;
     int   bperpix;
     int   trr, trg, trb, clx, cly;
-    
+
     trr = trg = trb = 0;
     if (istran) {
       if (clipis24) {
@@ -482,24 +484,24 @@ static void doPaste(cimg)
 	trb = clipcmap[trval*3+2];
       }
     }
-    
+
     bperpix = (clipis24) ? 3 : 1;
 
     if (!istran && (cw != dw || ch != dh)) {  /* need to resize, can smooth */
       byte rmap[256], gmap[256], bmap[256];
-      
+
       tmppic = (byte *) malloc((size_t) cw * ch * bperpix);
       if (!tmppic) FatalError("Out of memory in DoImgPaste()\n");
-      
-      /* copy relevant hunk of clippic into tmppic (Smooth24 only works on 
+
+      /* copy relevant hunk of clippic into tmppic (Smooth24 only works on
 	 complete images */
-      
+
       for (i=0; i<ch; i++) {
 	dp = tmppic + i*cw*bperpix;
 	cp = clippic + ((i+cy)*clipw + cx) * bperpix;
 	for (j=0; j<cw*bperpix; j++) *dp++ = *cp++;
       }
-      
+
       if (!clipis24) {
 	for (i=0; i<256; i++) {
 	  rmap[i] = clipcmap[i*3];
@@ -507,15 +509,15 @@ static void doPaste(cimg)
 	  bmap[i] = clipcmap[i*3+2];
 	}
       }
-      
+
       dpic = Smooth24(tmppic, clipis24, cw,ch, dw,dh, rmap,gmap,bmap);
       if (!dpic) FatalError("Out of memory (2) in DoImgPaste()\n");
       free(tmppic);
-      
+
       /* copy the resized, smoothed, 24-bit data into 'pic' */
-      
+
       /* XXX: (deal with smooth-resized transparent imgs) */
-      
+
       dp = dpic;
       for (i=dy; i<dy+dh; i++) {
 	pp = pic + (i*pWIDE + dx) * 3;
@@ -536,11 +538,11 @@ static void doPaste(cimg)
 	pp = pic + ((i+dy)*pWIDE + dx) * 3;
 	cly = cy + (i * ch) / dh;
 	clp = clippic + (cly*clipw * bperpix);
-	
+
 	for (j=0; j<dw; j++, pp+=3) {
 	  clx = cx + (j * cw) / dw;
 	  cp = clp + (clx * bperpix);
-	  
+
 	  if (clipis24) {
 	    if (!istran || cp[0]!=trr || cp[1]!=trg || cp[2]==trb) {
 	      pp[0] = *cp++;  pp[1] = *cp++;  pp[2] = *cp++;
@@ -557,14 +559,14 @@ static void doPaste(cimg)
       }
     }
 
-    
+
     GenerateCpic();
     GenerateEpic(eWIDE, eHIGH);
     DrawEpic();
   }
-  
-    
- exit:  
+
+
+ exit:
   SetCursors(-1);
 }
 
@@ -577,20 +579,20 @@ static void buildCursors()
   XColor cfg, cbg;
 
   dragcurs = XCreateFontCursor(theDisp, XC_fleur);
-  p1 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) cut_bits, 
+  p1 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) cut_bits,
 				   cut_width,  cut_height, 1L, 0L, 1);
-  p2 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) cutm_bits, 
+  p2 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) cutm_bits,
 				   cutm_width, cutm_height, 1L, 0L, 1);
-  p3 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) copy_bits, 
+  p3 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) copy_bits,
 				   copy_width,  copy_height, 1L, 0L, 1);
-  p4 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) copym_bits, 
+  p4 = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) copym_bits,
 				   copym_width, copym_height, 1L, 0L, 1);
   if (p1 && p2 && p3 && p4) {
     cfg.red = cfg.green = cfg.blue = 0;
     cbg.red = cbg.green = cbg.blue = 0xffff;
-    cutcurs = XCreatePixmapCursor(theDisp, p1,p2, &cfg, &cbg, 
+    cutcurs = XCreatePixmapCursor(theDisp, p1,p2, &cfg, &cbg,
 				  cut_x_hot, cut_y_hot);
-    copycurs = XCreatePixmapCursor(theDisp, p3,p4, &cfg, &cbg, 
+    copycurs = XCreatePixmapCursor(theDisp, p3,p4, &cfg, &cbg,
 				  copy_x_hot, copy_y_hot);
     if (!cutcurs || !copycurs) FatalError("can't create cut/copy cursors...");
   }
@@ -619,7 +621,7 @@ static byte *getSelection()
 
   if (!CutAllowed()) {  XBell(theDisp, 0);  return (byte *) NULL; }
   if (!HaveSelection()) return (byte *) NULL;
-  
+
   GetSelRCoords(&x,&y,&w,&h);
   CropRect2Rect(&x,&y,&w,&h, 0,0,pWIDE,pHIGH);
 
@@ -663,15 +665,15 @@ static byte *getSelection()
   if (picType == PIC24 && !do24) {                  /* 24-bit data as 8-bit */
     int nc,pr,pg,pb;
     byte *cm;
-    
+
     nc = 0;
     dp = cimg + CIMG_PIC8;
-    
+
     for (i=y; i<y+h; i++) {
       pp = pic + i*pWIDE*3 + x*3;
       for (j=x; j<x+w; j++, pp+=3) {
 	pr = pp[0];  pg = pp[1];  pb = pp[2];
-	
+
 	cm = cimg + CIMG_CMAP;
 	for (k=0; k<nc; k++,cm+=3) {
 	  if (pr==cm[0] && pg==cm[1] && pb==cm[2]) break;
@@ -682,12 +684,12 @@ static byte *getSelection()
 	  cimg[CIMG_CMAP + nc*3 + 1] = pg;
 	  cimg[CIMG_CMAP + nc*3 + 2] = pb;
 	}
-	
+
 	*dp++ = (byte) k;
       }
     }
   }
-  
+
 
   else if (picType == PIC24) {                     /* 24-bit data as 24-bit */
     dp = cimg + CIMG_PIC24;
@@ -705,26 +707,26 @@ static byte *getSelection()
   else if (picType == PIC8) {                       /* 8-bit selection */
     byte *cm = cimg + CIMG_CMAP;
     for (i=0; i<256; i++) {                         /* copy colormap */
-      if (i<numcols) { 
+      if (i<numcols) {
 	*cm++ = rMap[i];
 	*cm++ = gMap[i];
 	*cm++ = bMap[i];
       }
     }
-    
+
     dp = cimg + CIMG_PIC8;
     for (i=y; i<y+h; i++) {                         /* copy image */
       pp = pic + i*pWIDE + x;
       for (j=x; j<x+w; j++) *dp++ = *pp++;
     }
   }
-    
+
   return cimg;
 }
 
 
 
-  
+
 /********************************************/
 static byte *getFromClip()
 {
@@ -743,14 +745,14 @@ static byte *getFromClip()
     clipAtom = XInternAtom(theDisp, CLIPPROP, True);
     if (clipAtom != None) XDeleteProperty(theDisp, rootW, clipAtom);
   }
-  
-  
+
+
   clipAtom = XInternAtom(theDisp, CLIPPROP, True);             /* find prop */
   if (clipAtom != None) {
 
     /* try to retrieve the length of the data in the property */
-    i = XGetWindowProperty(theDisp, rootW, clipAtom, 0L, 1L, False, XA_STRING, 
-		       &actType, &actFormat, &nitems, &nleft, 
+    i = XGetWindowProperty(theDisp, rootW, clipAtom, 0L, 1L, False, XA_STRING,
+		       &actType, &actFormat, &nitems, &nleft,
 		       (unsigned char **) &data);
 
     if (i==Success && actType==XA_STRING && actFormat==8 && nleft>0) {
@@ -763,9 +765,9 @@ static byte *getFromClip()
       XFree((void *) data);
 
       /* read the rest of the data (len bytes) */
-      i = XGetWindowProperty(theDisp, rootW, clipAtom, 1L, 
-			     (long) ((len-4)+3)/4, 
-			     False, XA_STRING, &actType, &actFormat, &nitems, 
+      i = XGetWindowProperty(theDisp, rootW, clipAtom, 1L,
+			     (long) ((len-4)+3)/4,
+			     False, XA_STRING, &actType, &actFormat, &nitems,
 			     &nleft, (unsigned char **) &data);
 
       if (i==Success) {
@@ -791,8 +793,8 @@ static byte *getFromClip()
     }
   }
 
-  
-  /* if we're still here, then the prop method was less than successful. 
+
+  /* if we're still here, then the prop method was less than successful.
      use the file method, instead */
 
   if (!clipfname) makeClipFName();
@@ -800,7 +802,7 @@ static byte *getFromClip()
   fp = fopen(clipfname, "r");
   if (!fp) {
     unlink(clipfname);
-    sprintf(str, "Can't read clipboard file '%s'\n\n  %s.", 
+    sprintf(str, "Can't read clipboard file '%s'\n\n  %s.",
 	    clipfname, ERRSTR(errno));
     ErrPopUp(str,"\nBletch!");
     return (byte *) NULL;
@@ -877,19 +879,19 @@ void SaveToClip(cimg)
     clipAtom = XInternAtom(theDisp, CLIPPROP, True);
     if (clipAtom != None) XDeleteProperty(theDisp, rootW, clipAtom);
   }
-  
-  
+
+
   if (!forceClipFile) {
     clipAtom = XInternAtom(theDisp, CLIPPROP, False);  /* find or make prop */
     if (clipAtom != None) {
       /* try to store the data in the property */
-      
+
       xerrcode = 0;
       XChangeProperty(theDisp, rootW, clipAtom, XA_STRING, 8, PropModeReplace,
 		      cimg, len);
       XSync(theDisp, False);                         /* make it happen *now* */
       if (!xerrcode) return;                         /* success! */
-      
+
       /* failed, use file method */
       XDeleteProperty(theDisp, rootW, clipAtom);
     }
@@ -903,7 +905,7 @@ void SaveToClip(cimg)
   fp = fopen(clipfname, "w");
   if (!fp) {
     unlink(clipfname);
-    sprintf(str, "Can't write clipboard file '%s'\n\n  %s.", 
+    sprintf(str, "Can't write clipboard file '%s'\n\n  %s.",
 	    clipfname, ERRSTR(errno));
     ErrPopUp(str,"\nBletch!");
     return;
@@ -964,7 +966,7 @@ static void clearSelectedArea()
 /********************************************/
 static void makeClipFName()
 {
-  char *homedir;
+  const char *homedir;
 
   if (clipfname) return;
 
@@ -996,7 +998,7 @@ static int countcols24(pic, pwide, phigh, x, y, w, h)
   byte *pp;
 
   nc = 0;
-  
+
   for (i=y; nc<257 && i<y+h; i++) {
     pp = pic + i*pwide*3 + x*3;
     for (j=x; nc<257 && j<x+w; j++, pp+=3) {
@@ -1022,7 +1024,7 @@ static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
    */
 
   int   i, j, k, nc, r,g,b;
-  byte *pp, *cp;
+  byte *pp;
   byte  newr[257], newg[257], newb[257];
 
   if (picType != PIC8) return 0;           /* shouldn't happen */
@@ -1034,7 +1036,7 @@ static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
       pp = newpic + i*w*3 + cx*3;
       for (j=cx; j<cx+cw; j++) {
 	r = *pp++;  g = *pp++;  b = *pp++;
-	
+
 	/* lookup r,g,b in 'pic's colormap and the newcolors colormap */
 	for (k=0; k<nc && (r!=newr[k] || g!=newg[k] || b!=newb[k]); k++);
 	if (k==nc) {
@@ -1062,11 +1064,11 @@ static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
     /* now see which of the used colors are new */
     for (i=0, nc=0; i<256; i++) {
       if (!coluse[i]) continue;
-      
-      r = newcmap[i*3];  
-      g = newcmap[i*3+1];  
+
+      r = newcmap[i*3];
+      g = newcmap[i*3+1];
       b = newcmap[i*3+2];
-      
+
       /* lookup r,g,b in pic's colormap */
       for (k=0; k<numcols && (r!=rMap[k] || g!=gMap[k] || b!=bMap[k]);k++);
       if (k==numcols) {  /* it's a new color, alright */
@@ -1075,7 +1077,7 @@ static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
       }
     }
   }
-  
+
   return nc;
 }
 
@@ -1143,7 +1145,7 @@ void GetSelRCoords(xp, yp, wp, hp)
   /* NOTE:  SELECTION IS *NOT* GUARANTEED to be within the bounds of 'pic'.
      It is only guaranteed to *intersect* pic. */
 
-  *xp = selrx;  *yp = selry;  
+  *xp = selrx;  *yp = selry;
   *wp = selrw;  *hp = selrh;
 }
 
@@ -1200,7 +1202,7 @@ int DoSelection(ev)
     if (lastClickButton==Button1 && (ev->time - lastClickTime) < DBLCLKTIME) {
       lastClickButton=Button3;
       if (HaveSelection() && PTINRECT(px, py, selrx, selry, selrw, selrh)) {
-	EnableSelection(0); 
+	EnableSelection(0);
 	rv = 1;
       }
       else {
@@ -1225,7 +1227,7 @@ int DoSelection(ev)
   else if (ev->button == Button2) {      /* do a drag & drop operation */
     if (HaveSelection() && PTINRECT(px,py,selrx,selry,selrw,selrh)) {
       /* clip selection rect to pic */
-      EnableSelection(0);  
+      EnableSelection(0);
       CropRect2Rect(&selrx, &selry, &selrw, &selrh, 0, 0, pWIDE, pHIGH);
 
       if (selrw<1 || selrh<1) rv = 0;
@@ -1253,8 +1255,8 @@ static int dragHandle(ev)
    * holding SHIFT constrains selection to be square,
    * holding CTRL  constrains selection to keep original aspect ratio
    */
-  
-  int          i, mex, mey, mpx, mpy, offx,offy;
+
+  int          mex, mey, mpx, mpy, offx,offy;
   int          sex, sey, sex2, sey2, sew, seh, sew2, seh2, hs, h2;
   int          istp, isbt, islf, isrt, isvm, ishm;
   int          cnstsq, cnstasp;
@@ -1272,7 +1274,7 @@ static int dragHandle(ev)
   sew2 = sew/2;
   seh2 = seh/2;
   sex2--;  sey2--;
-  
+
   if      (sew>=35 && seh>=35) hs=7;
   else if (sew>=20 && seh>=20) hs=5;
   else if (sew>= 9 && seh>= 9) hs=3;
@@ -1307,7 +1309,7 @@ static int dragHandle(ev)
 
 
   /* it's definitely in a handle...  track 'til released */
-  
+
   DrawSelection(0);
   selFilled   = 1;
   selTracking = 1;
@@ -1366,12 +1368,12 @@ static int dragHandle(ev)
                        else { chwide=1;  newwide = (int) (seh*orgaspect); }
 	}
       }
-      
+
       if (chwide) {
 	if (islf) { sex = (sex+sew) - newwide; }
 	sew = newwide;
       }
-      
+
       if (chhigh) {
 	if (istp) { sey = (sey+seh) - newhigh; }
 	seh = newhigh;
@@ -1380,7 +1382,7 @@ static int dragHandle(ev)
 
     if (sew<1) sew=1;
     if (seh<1) seh=1;
-    
+
     if (sex!=selrx || sey!=selry || sew!=selrw || seh!=selrh) {
       DrawSelection(0);
       selrx = sex;  selry = sey;  selrw = sew;  selrh = seh;
@@ -1395,14 +1397,14 @@ static int dragHandle(ev)
       Timer(100);
     }
   }
-  
+
   EnableSelection(0);
 
   selFilled   = 0;
   selTracking = 0;
 
   /* only 'enable' the selection if it intersects CPIC */
-  if (selrx < cXOFF+cWIDE && selrx+selrw > cXOFF && 
+  if (selrx < cXOFF+cWIDE && selrx+selrw > cXOFF &&
       selry < cYOFF+cHIGH && selry+selrh > cYOFF) EnableSelection(1);
 
   return 1;
@@ -1422,7 +1424,7 @@ static void dragSelection(ev, bmask, dragndrop)
    *
    * if 'dragndrop', changes cursor, monitors CTRL status
    */
-  
+
   int          mpx, mpy, offx, offy;
   int          newsx, newsy, orgsx, orgsy, cnstrain, docopy, lastdocopy;
   Window       rW, cW;
@@ -1436,9 +1438,9 @@ static void dragSelection(ev, bmask, dragndrop)
 
   CoordE2P(ev->x, ev->y, &mpx, &mpy);
   offx = mpx - selrx;  offy = mpy - selry;
-  
+
   /* track rectangle until we get a release */
-  
+
   DrawSelection(0);
   selFilled   = 1;
   selTracking = 1;
@@ -1467,7 +1469,7 @@ static void dragSelection(ev, bmask, dragndrop)
       dx = newsx - orgsx;  dy = newsy - orgsy;
       if      (abs(dx) > abs(dy)) dy = 0;
       else if (abs(dy) > abs(dx)) dx = 0;
-      
+
       newsx = orgsx + dx;  newsy = orgsy + dy;
     }
 
@@ -1485,7 +1487,7 @@ static void dragSelection(ev, bmask, dragndrop)
       Timer(100);
     }
   }
-  
+
   EnableSelection(0);
 
   selFilled   = 0;
@@ -1495,7 +1497,7 @@ static void dragSelection(ev, bmask, dragndrop)
 
   /* only do <whatever> if the selection intersects CPIC */
 
- if (selrx < cXOFF+cWIDE && selrx+selrw > cXOFF && 
+ if (selrx < cXOFF+cWIDE && selrx+selrw > cXOFF &&
       selry < cYOFF+cHIGH && selry+selrh > cYOFF) {
 
     EnableSelection(1);
@@ -1503,10 +1505,10 @@ static void dragSelection(ev, bmask, dragndrop)
     if (dragndrop) {
       int   tmpsx, tmpsy;
       byte *data;
-      
+
       tmpsx = selrx;  tmpsy = selry;
       selrx = orgsx;  selry = orgsy;
-      
+
       data = getSelection();         /* copy old data */
       if (data) {
 	if (!docopy) clearSelectedArea();
@@ -1531,29 +1533,29 @@ static void rectSelection(ev)
   int          rx,ry,ox,oy,x,y,active, x1, y1, x2, y2, cnstrain;
   int          i, px,py,px2,py2,pw,ph;
   unsigned int mask;
-  
+
   /* called on a B1 press in mainW to draw a new rectangular selection.
    * any former selection has already been removed.  holding shift down
-   * while tracking constrains selection to a square 
+   * while tracking constrains selection to a square
    */
-  
+
   active = 0;
-  
+
   x1 = ox = ev->x;  y1 = oy = ev->y;               /* nail down one corner */
   selrx = selry = selrw = selrh = 0;
   selTracking = 1;
-  
+
   while (1) {
     if (!XQueryPointer(theDisp,mainW,&rW,&cW,&rx,&ry,&x,&y,&mask)) continue;
     if (!(mask & Button1Mask)) break;      /* button released */
     cnstrain = (mask & ShiftMask);
-    
+
     if (x!=ox || y!=oy) {                  /* moved.  erase and redraw (?) */
       x2 = x;  y2 = y;
-      
+
       /* x1,y1,x2,y2 are in epic coords.  sort, convert to pic coords,
 	 and if changed, erase+redraw */
-      
+
       CoordE2P(x1, y1, &px,  &py);
       CoordE2P(x2, y2, &px2, &py2);
       if (px>px2) { i=px; px=px2; px2=i; }
@@ -1561,17 +1563,17 @@ static void rectSelection(ev)
       pw = px2-px+1;  ph=py2-py+1;
 
       /* keep px,py,pw,ph inside 'pic' */
-      
+
       if (px<0) { pw+=px;  px=0; }
       if (py<0) { ph+=py;  py=0; }
       if (px>pWIDE-1) px = pWIDE-1;
       if (py>pHIGH-1) py = pHIGH-1;
-      
+
       if (pw<0) pw=0;
       if (ph<0) ph=0;
       if (px+pw>pWIDE) pw = pWIDE - px;
       if (py+ph>pHIGH) ph = pHIGH - py;
-      
+
       if (cnstrain) {          /* make a square at smaller of w,h */
 	if      (ph>pw) { if (y2<y1) py += (ph-pw);  ph=pw; }
 	else if (pw>ph) { if (x2<x1) px += (pw-ph);  pw=ph; }
@@ -1579,12 +1581,12 @@ static void rectSelection(ev)
 
       /* put x,y,w,h -> selr{x,y,w,h}
 	 if the rectangle has changed, erase old and draw new */
-      
+
       if (px!=selrx || py!=selry || pw!=selrw || ph!=selrh) {
 	DrawSelection(0);
 	selrx = px;  selry = py;  selrw = pw;  selrh = ph;
 	DrawSelection(1);
-	
+
 	haveSel = active = (pw>0 && ph>0);
 	if (infoUp) SetSelectionString();
 	XFlush(theDisp);
@@ -1615,7 +1617,7 @@ void DrawSelection(newcol)
      set, pick a new 'color' to invert the selection with */
 
   int   x,y,x1,y1,w,h;
-  
+
   if (newcol) selColor = (selColor+1) & 0x7;
 
   /* convert selr{x,y,w,h} into epic coords */
@@ -1650,7 +1652,7 @@ void DrawSelection(newcol)
   if (y<0 && y+h>eHIGH && selFilled!=1)
     XDrawLine(theDisp, mainW, theGC, x, eHIGH/2, x+w, eHIGH/2);
 
-  
+
   if (selFilled==0 || selFilled == 1) {
     /* one little kludge:  if w or h == eWIDE or eHIGH, make it one smaller */
     if (x+w == eWIDE) w--;
@@ -1664,17 +1666,17 @@ void DrawSelection(newcol)
       else if (w>=20 && h>=20) { hs=5;  h1=4; h2=2; }
       else if (w>= 9 && h>= 9) { hs=3;  h1=2; h2=1; }
       else hs=h1=h2=0;
-      
+
       if (hs) {
 	XFillRectangle(theDisp,mainW,theGC,x+1,     y+1,  (u_int)h1,(u_int)h1);
 	XFillRectangle(theDisp,mainW,theGC,x+w/2-h2,y+1,  (u_int)hs,(u_int)h1);
 	XFillRectangle(theDisp,mainW,theGC,x+w-h1,  y+1,  (u_int)h1,(u_int)h1);
-	
+
 	XFillRectangle(theDisp,mainW,theGC,x+1,   y+h/2-h2,
 		       (u_int)h1, (u_int)hs);
 	XFillRectangle(theDisp,mainW,theGC,x+w-h1,y+h/2-h2,
 		       (u_int)h1, (u_int)hs);
-	
+
 	XFillRectangle(theDisp,mainW,theGC,x+1,     y+h-h1,
 		       (u_int)h1,(u_int)h1);
 	XFillRectangle(theDisp,mainW,theGC,x+w/2-h2,y+h-h1,
@@ -1683,7 +1685,7 @@ void DrawSelection(newcol)
 		       (u_int)h1,(u_int)h1);
       }
     }
-	
+
     if (selFilled==1) {
       XDrawLine(theDisp, mainW, theGC, x+1, y+1,   x+w-1, y+h-1);
       XDrawLine(theDisp, mainW, theGC, x+1, y+h-1, x+w-1, y+1);
@@ -1692,8 +1694,8 @@ void DrawSelection(newcol)
   else if (selFilled==2) {
     XFillRectangle(theDisp, mainW, theGC, x,y,(u_int) w, (u_int) h);
   }
-  
-  
+
+
   XSetFunction(theDisp,theGC,GXcopy);
   XSetPlaneMask(theDisp, theGC, AllPlanes);
 }
@@ -1703,7 +1705,7 @@ void DrawSelection(newcol)
 void MoveGrowSelection(dx,dy,dw,dh)
      int dx,dy,dw,dh;
 {
-  /* moves and/or grows the selection by the specified amount 
+  /* moves and/or grows the selection by the specified amount
      (in pic coords).  keeps the selection entirely within 'pic'.
      (called by 'CropKey()') */
 
@@ -1729,7 +1731,7 @@ void MoveGrowSelection(dx,dy,dw,dh)
   }
 }
 
-  
+
 /***********************************/
 void BlinkSelection(cnt)
      int cnt;

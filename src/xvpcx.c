@@ -29,17 +29,17 @@
 #define PCX_YMAXH   11
                           /* hres (12,13) and vres (14,15) not used */
 #define PCX_CMAP    16    /* start of 16*3 colormap data */
-#define PCX_PLANES  65 
+#define PCX_PLANES  65
 #define PCX_BPRL    66
 #define PCX_BPRH    67
 
 #define PCX_MAPSTART 0x0c	/* Start of appended colormap	*/
 
 
-static int  pcxLoadImage8  PARM((char *, FILE *, PICINFO *, byte *));
-static int  pcxLoadImage24 PARM((char *, FILE *, PICINFO *, byte *));
+static int  pcxLoadImage8  PARM((const char *, FILE *, PICINFO *, byte *));
+static int  pcxLoadImage24 PARM((const char *, FILE *, PICINFO *, byte *));
 static void pcxLoadRaster  PARM((FILE *, byte *, int, byte *, int, int));
-static int  pcxError       PARM((char *, char *));
+static int  pcxError       PARM((const char *, const char *));
 
 
 
@@ -51,9 +51,9 @@ int LoadPCX(fname, pinfo)
 {
   FILE  *fp;
   long   filesize;
-  char  *bname, *errstr;
-  byte   hdr[128], *image;
+  byte   hdr[128];
   int    i, colors, gray, fullcolor;
+  const char  *bname;
 
   pinfo->type = PIC8;
   pinfo->pic     = (byte *) NULL;
@@ -64,7 +64,7 @@ int LoadPCX(fname, pinfo)
   /* open the stream */
   fp = xv_fopen(fname,"r");
   if (!fp) return (pcxError(bname, "unable to open file"));
-  
+
 
   /* figure out the file size */
   fseek(fp, 0L, 2);
@@ -84,10 +84,10 @@ int LoadPCX(fname, pinfo)
     return pcxError(bname,"unrecognized magic number");
   }
 
-  pinfo->w = (hdr[PCX_XMAXL] + ((int) hdr[PCX_XMAXH]<<8)) 
+  pinfo->w = (hdr[PCX_XMAXL] + ((int) hdr[PCX_XMAXH]<<8))
            - (hdr[PCX_XMINL] + ((int) hdr[PCX_XMINH]<<8));
 
-  pinfo->h = (hdr[PCX_YMAXL] + ((int) hdr[PCX_YMAXH]<<8)) 
+  pinfo->h = (hdr[PCX_YMAXL] + ((int) hdr[PCX_YMAXH]<<8))
            - (hdr[PCX_YMINL] + ((int) hdr[PCX_YMINH]<<8));
 
   pinfo->w++;  pinfo->h++;
@@ -96,10 +96,10 @@ int LoadPCX(fname, pinfo)
   fullcolor = (hdr[PCX_BPP] == 8 && hdr[PCX_PLANES] == 3);
 
   if (DEBUG) {
-    fprintf(stderr,"PCX: %dx%d image, version=%d, encoding=%d\n", 
+    fprintf(stderr,"PCX: %dx%d image, version=%d, encoding=%d\n",
 	    pinfo->w, pinfo->h, hdr[PCX_VER], hdr[PCX_ENC]);
     fprintf(stderr,"   BitsPerPixel=%d, planes=%d, BytePerRow=%d, colors=%d\n",
-	    hdr[PCX_BPP], hdr[PCX_PLANES], 
+	    hdr[PCX_BPP], hdr[PCX_PLANES],
 	    hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8),
 	    colors);
   }
@@ -190,9 +190,9 @@ int LoadPCX(fname, pinfo)
 
   if (colors > 2 || (colors==2 && !gray)) {  /* grayscale or PseudoColor */
     pinfo->colType = (gray) ? F_GREYSCALE : F_FULLCOLOR;
-    sprintf(pinfo->fullInfo, 
-	    "%s PCX, %d plane%s, %d bit%s per pixel.  (%ld bytes)", 
-	    (gray) ? "Greyscale" : "Color", 
+    sprintf(pinfo->fullInfo,
+	    "%s PCX, %d plane%s, %d bit%s per pixel.  (%ld bytes)",
+	    (gray) ? "Greyscale" : "Color",
 	    hdr[PCX_PLANES], (hdr[PCX_PLANES]==1) ? "" : "s",
 	    hdr[PCX_BPP],    (hdr[PCX_BPP]==1) ? "" : "s",
 	    filesize);
@@ -212,21 +212,27 @@ int LoadPCX(fname, pinfo)
 
 /*****************************/
 static int pcxLoadImage8(fname, fp, pinfo, hdr)
-     char    *fname;
+     const char *fname;
      FILE    *fp;
      PICINFO *pinfo;
      byte    *hdr;
 {
   /* load an image with at most 8 bits per pixel */
-  
+
   byte *image;
-  
+  int count;
+
   /* note:  overallocation to make life easier... */
-  image = (byte *) malloc((size_t) (pinfo->h + 1) * pinfo->w + 16);
+  count = (pinfo->h + 1) * pinfo->w + 16;  /* up to 65537*65536+16 (~ 65552) */
+  if (pinfo->w <= 0 || pinfo->h <= 0 || count/pinfo->w < pinfo->h) {
+    pcxError(fname, "Bogus 8-bit PCX file!!");
+    return (0);
+  }
+  image = (byte *) malloc((size_t) count);
   if (!image) FatalError("Can't alloc 'image' in pcxLoadImage8()");
-  
-  xvbzero((char *) image, (size_t) ((pinfo->h+1) * pinfo->w + 16));
-  
+
+  xvbzero((char *) image, (size_t) count);
+
   switch (hdr[PCX_BPP]) {
   case 1:   pcxLoadRaster(fp, image, 1, hdr, pinfo->w, pinfo->h);   break;
   case 8:   pcxLoadRaster(fp, image, 8, hdr, pinfo->w, pinfo->h);   break;
@@ -243,31 +249,39 @@ static int pcxLoadImage8(fname, fp, pinfo, hdr)
 
 /*****************************/
 static int pcxLoadImage24(fname, fp, pinfo, hdr)
-     char *fname;
+     const char *fname;
      FILE *fp;
      PICINFO *pinfo;
      byte *hdr;
 {
   byte *pix, *pic24, scale[256];
-  int   c, i, j, w, h, maxv, cnt, planes, bperlin, nbytes;
-  
+  int   c, i, j, w, h, maxv, cnt, planes, bperlin, nbytes, count;
+
   w = pinfo->w;  h = pinfo->h;
-  
-  planes = (int) hdr[PCX_PLANES];
-  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);
-  
+
+  planes = (int) hdr[PCX_PLANES];  /* 255 max, but can't get here unless = 3 */
+  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);  /* 65535 max */
+
+  j = h*planes;          /* w and h are limited to 65536, planes to 3 */
+  count = w*j;           /* ...so this could wrap up to 3 times */
+  nbytes = bperlin*j;    /* ...and this almost 3 times */
+  if (w <= 0 || h <= 0 || planes <= 0 || bperlin <= 0 ||
+      j/h < planes || count/w < j || nbytes/bperlin < j) {
+    pcxError(fname, "Bogus 24-bit PCX file!!");
+    return (0);
+  }
+
   /* allocate 24-bit image */
-  pic24 = (byte *) malloc((size_t) w*h*planes);
-  if (!pic24) FatalError("couldn't malloc 'pic24'");
-  
-  xvbzero((char *) pic24, (size_t) w*h*planes);
-  
+  pic24 = (byte *) malloc((size_t) count);
+  if (!pic24) FatalError("Can't malloc 'pic24' in pcxLoadImage24()");
+
+  xvbzero((char *) pic24, (size_t) count);
+
   maxv = 0;
   pix = pinfo->pic = pic24;
   i = 0;      /* planes, in this while loop */
   j = 0;      /* bytes per line, in this while loop */
-  nbytes = bperlin*h*planes;
- 
+
   while (nbytes > 0 && (c = getc(fp)) != EOF) {
     if ((c & 0xC0) == 0xC0) {   /* have a rep. count */
       cnt = c & 0x3F;
@@ -275,9 +289,9 @@ static int pcxLoadImage24(fname, fp, pinfo, hdr)
       if (c == EOF) { getc(fp); break; }
     }
     else cnt = 1;
-    
+
     if (c > maxv)  maxv = c;
-    
+
     while (cnt-- > 0) {
       if (j < w) {
 	*pix = c;
@@ -297,19 +311,19 @@ static int pcxLoadImage24(fname, fp, pinfo, hdr)
       }
     }
   }
-  
-  
+
+
   /* scale all RGB to range 0-255, if they aren't */
 
-  if (maxv<255) { 
+  if (maxv<255) {
     for (i=0; i<=maxv; i++) scale[i] = (i * 255) / maxv;
-    
+
     for (i=0, pix=pic24; i<h; i++) {
       if ((i&0x3f)==0) WaitCursor();
       for (j=0; j<w*planes; j++, pix++) *pix = scale[*pix];
     }
   }
-  
+
   return 1;
 }
 
@@ -321,13 +335,13 @@ static void pcxLoadRaster(fp, image, depth, hdr, w,h)
      byte    *image, *hdr;
      int      depth,w,h;
 {
-  /* supported:  8 bits per pixel, 1 plane, or 1 bit per pixel, 1-8 planes */
+  /* supported:  8 bits per pixel, 1 plane; or 1 bit per pixel, 1-8 planes */
 
   int row, bcnt, bperlin, pad;
   int i, j, b, cnt, mask, plane, pmask;
   byte *oldimage;
 
-  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);
+  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);  /* 65535 max */
   if (depth == 1) pad = (bperlin * 8) - w;
              else pad = bperlin - w;
 
@@ -342,7 +356,7 @@ static void pcxLoadRaster(fp, image, depth, hdr, w,h)
       if (b == EOF) { getc(fp); return; }
     }
     else cnt = 1;
-    
+
     for (i=0; i<cnt; i++) {
       if (depth == 1) {
 	for (j=0, mask=0x80; j<8; j++) {
@@ -351,12 +365,12 @@ static void pcxLoadRaster(fp, image, depth, hdr, w,h)
 	}
       }
       else *image++ = (byte) b;
-      
+
       bcnt++;
-	
+
       if (bcnt == bperlin) {     /* end of a line reached */
 	bcnt = 0;
-	plane++;  
+	plane++;
 
 	if (plane >= (int) hdr[PCX_PLANES]) {   /* moved to next row */
 	  plane = 0;
@@ -367,19 +381,19 @@ static void pcxLoadRaster(fp, image, depth, hdr, w,h)
 	}
 	else {   /* next plane, same row */
 	  image = oldimage;
-	}	
+	}
 
 	pmask = 1 << plane;
       }
     }
   }
-}    
+}
 
 
 
 /*******************************************/
 static int pcxError(fname,st)
-     char *fname, *st;
+     const char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

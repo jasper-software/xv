@@ -33,9 +33,9 @@
 
 /* a mono-spaced font needed for the 'pixel value tracking' feature */
 #define MFONT1 "-misc-fixed-medium-r-normal-*-13-*"
-#define MFONT2 "6x13"   
+#define MFONT2 "6x13"
 #define MFONT3 "-*-courier-medium-r-*-*-12-*"
-#define MFONT4 "fixed"   
+#define MFONT4 "fixed"
 
 
 /* default positions for various windows */
@@ -54,13 +54,34 @@ static int    clearonload;      /* clear window/root (on colormap visuals) */
 static int    randomShow = 0;   /* do a 'random' slideshow */
 static int    startIconic = 0;  /* '-iconic' option */
 static int    defaultVis  = 0;  /* true if using DefaultVisual */
+#ifdef HAVE_G3
+static int    fax = 0;          /* temporary(?) kludge */
+int           highresfax = 0;
+#endif
 static double hexpand = 1.0;    /* '-expand' argument */
 static double vexpand = 1.0;    /* '-expand' argument */
-static char  *maingeom = NULL;
-static char  *icongeom = NULL;
+static const char *maingeom = NULL;
+static const char *icongeom = NULL;
 static Atom   __SWM_VROOT = None;
 
 static char   basefname[128];   /* just the current fname, no path */
+
+#ifdef TV_L10N
+#  ifndef TV_FONTSET
+#    define TV_FONTSET "-*-fixed-medium-r-normal--%d-*"
+#  endif
+#  ifndef TV_FONTSIZE
+#    define TV_FONTSIZE 14,16
+#  endif
+static int    mfontsize[] = { TV_FONTSIZE, 0 };
+static char   mfontset[256];
+#endif
+
+#ifdef HAVE_JP2K
+static byte jp2k_magic[12] =
+  { 0, 0, 0, 0x0c, 'j', 'P', ' ', ' ', 0x0d, 0x0a, 0x87, 0x0a };
+#endif
+
 
 /* things to do upon successfully loading an image */
 static int    autoraw    = 0;   /* force raw if using stdcmap */
@@ -78,6 +99,12 @@ static int    autohisteq = 0;   /* Histogram equalization */
 
 static int    force8     = 0;   /* force 8-bit mode */
 static int    force24    = 0;   /* force 24-bit mode */
+#ifdef HAVE_PCD
+static int    PcdSize    = -1;  /* force dialog to ask */
+#endif
+
+static float  waitsec_nonfinal = -1;  /* "normal" waitsec value */
+static float  waitsec_final = -1;     /* final-image waitsec value */
 
 /* used in DeleteCmd() and Quit() */
 static char  **mainargv;
@@ -92,7 +119,7 @@ static void useOtherVisual           PARM((XVisualInfo *, int));
 static void parseResources           PARM((int, char **));
 static void parseCmdLine             PARM((int, char **));
 static void verifyArgs               PARM((void));
-static void printoption              PARM((char *));
+static void printoption              PARM((const char *));
 static void cmdSyntax                PARM((void));
 static void rmodeSyntax              PARM((void));
 static int  openPic                  PARM((int));
@@ -103,32 +130,34 @@ static void openNextQuit             PARM((void));
 static void openNextLoop             PARM((void));
 static void openPrevPic              PARM((void));
 static void openNamedPic             PARM((void));
-static int  findRandomPic            PARM((void));
 static void mainLoop                 PARM((void));
-static void createMainWindow         PARM((char *, char *));
-static void setWinIconNames          PARM((char *));
+static void createMainWindow         PARM((const char *, const char *));
+static void setWinIconNames          PARM((const char *));
 static void makeDispNames            PARM((void));
 static void fixDispNames             PARM((void));
 static void deleteFromList           PARM((int));
-static int  argcmp                   PARM((char *, char *, int, int, int *));
+static int  argcmp                   PARM((const char *, const char *,
+                                           int, int, int *));
 static void add_filelist_to_namelist PARM((char *, char **, int *, int));
 
 
 /* formerly local vars in main, made local to this module when
    parseResources() and parseCmdLine() were split out of main() */
-   
-int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, nopos, limit2x;
-char *display, *whitestr, *blackstr, *histr, *lostr,
-     *infogeom, *fgstr, *bgstr, *ctrlgeom, *gamgeom, *browgeom, *tmpstr;
-char *rootfgstr, *rootbgstr, *visualstr, *textgeom, *cmtgeom;
-char *monofontname, *flistName;
-int  curstype, stdinflag, browseMode, savenorm, preview, pscomp, preset, 
-     rmodeset, gamset, cgamset, perfect, owncmap, rwcolor, stdcmap;
-int  nodecor;
-double gamval, rgamval, ggamval, bgamval;
 
-
-
+static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, nopos, limit2x;
+static const char *histr, *lostr, *fgstr, *bgstr, *tmpstr;
+static const char *infogeom, *ctrlgeom, *gamgeom, *browgeom, *textgeom, *cmtgeom;
+static char *display, *whitestr, *blackstr;
+static char *rootfgstr, *rootbgstr, *imagebgstr, *visualstr;
+static char *monofontname, *flistName;
+#ifdef TV_L10N
+static char **misscharset, *defstr;
+static int nmisscharset;
+#endif
+static int  curstype, stdinflag, browseMode, savenorm, preview, pscomp, preset,
+            rmodeset, gamset, cgamset, perfect, owncmap, rwcolor, stdcmap;
+static int  nodecor;
+static double gamval, rgamval, ggamval, bgamval;
 
 /*******************************************/
 int main(argc, argv)
@@ -137,6 +166,9 @@ int main(argc, argv)
 /*******************************************/
 {
   int    i;
+#ifdef TV_L10N
+  int    j;
+#endif
   XColor ecdef;
   Window rootReturn, parentReturn, *children;
   unsigned int numChildren, rootDEEP;
@@ -153,6 +185,13 @@ int main(argc, argv)
   /*** variable Initialization                       ***/
   /*****************************************************/
 
+#ifdef TV_L10N
+  /* setlocale(LC_ALL, localeList[LOCALE_EUCJ]); */
+  setlocale(LC_ALL, "");
+  xlocale = (int)XSupportsLocale();	/* assume that (Bool) is (int) */
+	/* if X doesn't support ja_JP.ujis text viewer l10n doesn't work. */
+#endif
+
   xv_getwd(initdir, sizeof(initdir));
   searchdir[0] = '\0';
   fullfname[0] = '\0';
@@ -162,7 +201,7 @@ int main(argc, argv)
 
   /* init internal variables */
   display = NULL;
-  fgstr = bgstr = rootfgstr = rootbgstr = NULL;
+  fgstr = bgstr = rootfgstr = rootbgstr = imagebgstr = NULL;
   histr = lostr = whitestr = blackstr = NULL;
   visualstr = monofontname = flistName = NULL;
   winTitle = NULL;
@@ -172,21 +211,26 @@ int main(argc, argv)
 
   picComments = (char *) NULL;
 
+  if (picExifInfo) free(picExifInfo);
+  picExifInfo = (byte *) NULL;
+  picExifInfoSize = 0;
+
   numPages = 1;  curPage = 0;
   pageBaseName[0] = '\0';
 
   LocalCmap = browCmap = 0;
   stdinflag = 0;
-  autoclose = autoDelete = 0; 
+  autoclose = autoDelete = 0;
   cmapInGam = 0;
   grabDelay = 0;
+  startGrab = 0;
   showzoomcursor = 0;
   perfect = owncmap = stdcmap = rwcolor = 0;
 
   ignoreConfigs = 0;
-  browPerfect = 1;  
+  browPerfect = 1;
   gamval = rgamval = ggamval = bgamval = 1.0;
-  
+
   picType = -1;              /* gets set once file is loaded */
   colorMapMode = CM_NORMAL;
   haveStdCmap  = STD_NONE;
@@ -221,24 +265,27 @@ int main(argc, argv)
   cmd = (char *) rindex(argv[0],'/');
   if (!cmd) cmd = argv[0]; else cmd++;
 
-  tmpstr = (char *) getenv("TMPDIR");
-  if (!tmpstr) tmpdir = "/tmp";
-  else {
-    tmpdir = (char *) malloc(strlen(tmpstr) + 1);
-    if (!tmpdir) FatalError("can't malloc 'tmpdir'\n");
-    strcpy(tmpdir, tmpstr);
-  }
+  tmpstr = (const char *) getenv("TMPDIR");
+  if (!tmpstr) tmpstr = "/tmp";
+  tmpdir = (char *) malloc(strlen(tmpstr) + 1);
+  if (!tmpdir) FatalError("can't malloc 'tmpdir'\n");
+  strcpy(tmpdir, tmpstr);
+
+#ifdef AUTO_EXPAND
+  Vdinit();
+  vd_handler_setup();
+#endif
 
   /* init command-line options flags */
-  infogeom = DEFINFOGEOM;  ctrlgeom = DEFCTRLGEOM;  
+  infogeom = DEFINFOGEOM;  ctrlgeom = DEFCTRLGEOM;
   gamgeom  = DEFGAMGEOM;   browgeom = DEFBROWGEOM;
   textgeom = DEFTEXTGEOM;  cmtgeom  = DEFCMTGEOM;
 
-  ncols = -1;  mono = 0;  
+  ncols = -1;  mono = 0;
   ninstall = 0;  fixedaspect = 0;  noFreeCols = nodecor = 0;
   DEBUG = 0;  bwidth = 2;
   nolimits = useroot = clrroot = noqcheck = 0;
-  waitsec = -1;  waitloop = 0;  automax = 0;
+  waitsec = waitsec_final = -1.0;  waitloop = 0;  automax = 0;
   rootMode = 0;  hsvmode = 0;
   rmodeset = gamset = cgamset = 0;
   nopos = limit2x = 0;
@@ -250,6 +297,10 @@ int main(argc, argv)
   pscomp = 0;
   preset = 0;
   viewonly = 0;
+
+#ifdef ENABLE_FIXPIX_SMOOTH
+  do_fixpix_smooth = 0;
+#endif
 
   /* init 'xormasks' array */
   xorMasks[0] = 0x01010101;
@@ -268,13 +319,36 @@ int main(argc, argv)
   defaspect = normaspect = 1.0;
   mainW = dirW = infoW = ctrlW = gamW = psW = (Window) NULL;
   anyBrowUp = 0;
+  incrementalSearchTimeout = 30;
 
 #ifdef HAVE_JPEG
   jpegW = (Window) NULL;  jpegUp = 0;
 #endif
 
+#ifdef HAVE_JP2K
+  jp2kW = (Window) NULL;  jp2kUp = 0; 
+#endif
+
 #ifdef HAVE_TIFF
   tiffW = (Window) NULL;  tiffUp = 0;
+#endif
+
+#ifdef HAVE_PNG
+  pngW = (Window) NULL;  pngUp = 0;
+#endif
+
+  pcdW = (Window) NULL;  pcdUp = 0;
+
+#ifdef HAVE_PIC2
+  pic2W = (Window) NULL;  pic2Up = 0;
+#endif
+
+#ifdef HAVE_PCD
+  pcdW = (Window) NULL;  pcdUp = 0;
+#endif
+
+#ifdef HAVE_MGCSFX
+  mgcsfxW = (Window) NULL;  mgcsfxUp = 0;
 #endif
 
   imap = ctrlmap = gmap = browmap = cmtmap = 0;
@@ -303,13 +377,35 @@ int main(argc, argv)
   verifyArgs();
 
 
+#if 0
+#ifdef XVEXECPATH
+  /* set up path to search for external executables */
+  {
+    char *systempath = getenv("PATH");
+    char *xvexecpath = getenv("XVPATH");
+    if (xvexecpath == NULL) xvexecpath = XVEXECPATH;
+    /* FIXME: can systempath == NULL? */
+    strcat(systempath, ":");		/* FIXME: writing to mem we don't own */
+    strcat(systempath, xvexecpath);	/* FIXME: writing to mem we don't own */
+    /* FIXME:  was there supposed to be a setenv() call in here? */
+    if (DEBUG)
+      fprintf(stderr, "DEBUG: executable search path: %s\n", systempath);
+  }
+#endif
+#endif
+
+
   /*****************************************************/
   /*** X Setup                                       ***/
   /*****************************************************/
-  
+
   theScreen = DefaultScreen(theDisp);
   theCmap   = DefaultColormap(theDisp, theScreen);
-  rootW     = RootWindow(theDisp,theScreen);
+  if (spec_window) {
+	rootW = spec_window;
+  } else {
+	rootW = RootWindow(theDisp,theScreen);
+  }
   theGC     = DefaultGC(theDisp,theScreen);
   theVisual = DefaultVisual(theDisp,theScreen);
   ncells    = DisplayCells(theDisp, theScreen);
@@ -320,53 +416,67 @@ int main(argc, argv)
 
   rootDEEP = dispDEEP;
 
-  /* things dependant on theVisual:
-   *    dispDEEP, theScreen, rootW, ncells, theCmap, theGC, 
+  /* things dependent on theVisual:
+   *    dispDEEP, theScreen, rootW, ncells, theCmap, theGC,
    *    vrWIDE, dispWIDE, vrHIGH, dispHIGH, maxWIDE, maxHIGH
    */
 
 
-
   /* if we *haven't* had a non-default visual specified,
-     see if we have a TrueColor or DirectColor visual of 24 or 32 bits, 
+     see if we have a TrueColor or DirectColor visual of 24 or 32 bits,
      and if so, use that as the default visual (prefer TrueColor) */
 
   if (!visualstr && !useroot) {
+    VisualID     defvid;
     XVisualInfo *vinfo, rvinfo;
     int          best,  numvis;
     long         flags;
 
-    best = -1;
+    best          = -1;
     rvinfo.class  = TrueColor;
     rvinfo.screen = theScreen;
-    flags = VisualClassMask | VisualScreenMask;
-    
+    flags         = VisualClassMask | VisualScreenMask;
+    defvid        = XVisualIDFromVisual(DefaultVisual(theDisp,
+						      DefaultScreen(theDisp)));
+
     vinfo = XGetVisualInfo(theDisp, flags, &rvinfo, &numvis);
-    if (vinfo) {     /* look for a TrueColor, 24-bit or more (pref 24) */
-      for (i=0, best = -1; i<numvis; i++) {
+    if (vinfo) {
+      /* Check list, use 'default', first 24-bit, or first >24-bit */
+      for (i=0; i<numvis && best==-1; i++) {   /* default? */
+	if ((vinfo[i].visualid == defvid) && (vinfo[i].depth >= 24)) best=i;
+      }
+      for (i=0; i<numvis && best==-1; i++) {   /* 24-bit ? */
 	if (vinfo[i].depth == 24) best = i;
-	else if (vinfo[i].depth>24 && best<0) best = i;
+      }
+      for (i=0; i<numvis && best==-1; i++) {   /* >24-bit ? */
+	if (vinfo[i].depth >= 24) best = i;
       }
     }
 
     if (best == -1) {   /* look for a DirectColor, 24-bit or more (pref 24) */
       rvinfo.class = DirectColor;
       if (vinfo) XFree((char *) vinfo);
+
       vinfo = XGetVisualInfo(theDisp, flags, &rvinfo, &numvis);
       if (vinfo) {
-	for (i=0, best = -1; i<numvis; i++) {
+	for (i=0; i<numvis && best==-1; i++) {   /* default? */
+	  if ((vinfo[i].visualid == defvid) && (vinfo[i].depth >= 24)) best=i;
+	}
+	for (i=0; i<numvis && best==-1; i++) {   /* 24-bit ? */
 	  if (vinfo[i].depth == 24) best = i;
-	  else if (vinfo[i].depth>24 && best<0) best = i;
+	}
+	for (i=0; i<numvis && best==-1; i++) {   /* >24-bit ? */
+	  if (vinfo[i].depth >= 24) best = i;
 	}
       }
     }
-    
+
     if (best>=0 && best<numvis) useOtherVisual(vinfo, best);
     if (vinfo) XFree((char *) vinfo);
   }
 
 
-			   
+
   if (visualstr && useroot) {
     fprintf(stderr, "%s: %sUsing default visual.\n",
 	    cmd, "Warning:  Can't use specified visual on root.  ");
@@ -401,11 +511,11 @@ int main(argc, argv)
       long vinfomask;
       int numvis, best;
 
-      if (vclass >= 0) { 
+      if (vclass >= 0) {
 	rvinfo.class = vclass;   vinfomask = VisualClassMask;
       }
       else { rvinfo.visualid = vid;  vinfomask = VisualIDMask; }
-      
+
       rvinfo.screen = theScreen;
       vinfomask |= VisualScreenMask;
 
@@ -429,9 +539,9 @@ int main(argc, argv)
   /* make linear colormap for DirectColor visual */
   if (theVisual->class == DirectColor) makeDirectCmap();
 
-  defaultVis = (XVisualIDFromVisual(theVisual) == 
+  defaultVis = (XVisualIDFromVisual(theVisual) ==
        XVisualIDFromVisual(DefaultVisual(theDisp, DefaultScreen(theDisp))));
-    
+
 
   /* turn GraphicsExposures OFF in the default GC */
   {
@@ -440,9 +550,6 @@ int main(argc, argv)
     XChangeGC(theDisp, theGC, GCGraphicsExposures, &xgcv);
   }
 
-
-  if (!useroot && limit2x) { maxWIDE *= 2;  maxHIGH *= 2; }
-  if (nolimits) { maxWIDE = 65000; maxHIGH = 65000; }
 
   XSetErrorHandler(xvErrorHandler);
 
@@ -456,14 +563,14 @@ int main(argc, argv)
     Atom actual_type;
     int actual_format;
     unsigned long nitems, bytesafter;
-    Window *newRoot = NULL;
+    byte *newRoot = NULL;   /* byte instead of Window avoids type-pun warning */
     XWindowAttributes xwa;
     if (XGetWindowProperty (theDisp, children[i], __SWM_VROOT, 0L, 1L,
 	  False, XA_WINDOW, &actual_type, &actual_format, &nitems,
 	  &bytesafter, (unsigned char **) &newRoot) == Success && newRoot) {
-      vrootW = *newRoot;
+      vrootW = *(Window *)newRoot;
       XGetWindowAttributes(theDisp, vrootW, &xwa);
-      vrWIDE = xwa.width;  vrHIGH = xwa.height;
+      maxWIDE = vrWIDE = xwa.width;  maxHIGH = vrHIGH = xwa.height;
       dispDEEP = xwa.depth;
       break;
     }
@@ -472,7 +579,8 @@ int main(argc, argv)
   vrootW = pseudo_root(theDisp, theScreen);
 #endif
 
-
+  if (!useroot && limit2x) { maxWIDE *= 2;  maxHIGH *= 2; }
+  if (nolimits) { maxWIDE = 65000; maxHIGH = 65000; }
 
 
   if (clrroot || useroot) {
@@ -486,13 +594,14 @@ int main(argc, argv)
   arrow     = XCreateFontCursor(theDisp,(u_int) curstype);
   cross     = XCreateFontCursor(theDisp,XC_crosshair);
   tcross    = XCreateFontCursor(theDisp,XC_tcross);
+  tlcorner  = XCreateFontCursor(theDisp,XC_top_left_corner);
   zoom      = XCreateFontCursor(theDisp,XC_sizing);
 
   {
     XColor fc, bc;
     fc.red = fc.green = fc.blue = 0xffff;
     bc.red = bc.green = bc.blue = 0x0000;
-    
+
     XRecolorCursor(theDisp, zoom, &fc, &bc);
   }
 
@@ -541,7 +650,7 @@ int main(argc, argv)
 
 
   /* set up fg,bg colors */
-  fg = black;   bg = white;  
+  fg = black;   bg = white;
   if (fgstr && XParseColor(theDisp, theCmap, fgstr, &ecdef) &&
       xvAllocColor(theDisp, theCmap, &ecdef)) {
     fg = ecdef.pixel;
@@ -559,6 +668,18 @@ int main(argc, argv)
       xvAllocColor(theDisp, theCmap, &ecdef))  rootfg = ecdef.pixel;
   if (rootbgstr && XParseColor(theDisp, theCmap, rootbgstr, &ecdef) &&
       xvAllocColor(theDisp, theCmap, &ecdef))  rootbg = ecdef.pixel;
+
+
+  /* GRR 19980308:  set up image bg color (for transparent images) */
+  have_imagebg = 0;
+  if (imagebgstr && XParseColor(theDisp, theCmap, imagebgstr, &ecdef) &&
+      xvAllocColor(theDisp, theCmap, &ecdef)) {
+    /* imagebg = ecdef.pixel; */
+    have_imagebg = 1;
+    imagebgR = ecdef.red;
+    imagebgG = ecdef.green;
+    imagebgB = ecdef.blue;
+  }
 
 
   /* set up hi/lo colors */
@@ -590,7 +711,7 @@ int main(argc, argv)
     if (theVisual->class == StaticGray || theVisual->class == GrayScale)
       mono = 1;
   }
-  
+
 
 
   iconPix  = MakePix1(rootW, icon_bits,     icon_width,    icon_height);
@@ -598,32 +719,32 @@ int main(argc, argv)
   riconPix = MakePix1(rootW, runicon_bits,  runicon_width, runicon_height);
   riconmask= MakePix1(rootW, runiconm_bits, runiconm_width,runiconm_height);
 
-  if (!iconPix || !iconmask || !riconPix || !riconmask) 
+  if (!iconPix || !iconmask || !riconPix || !riconmask)
     FatalError("Unable to create icon pixmaps\n");
 
-  gray50Tile = XCreatePixmapFromBitmapData(theDisp, rootW, 
+  gray50Tile = XCreatePixmapFromBitmapData(theDisp, rootW,
 				(char *) cboard50_bits,
-				cboard50_width, cboard50_height, 
+				cboard50_width, cboard50_height,
 				infofg, infobg, dispDEEP);
   if (!gray50Tile) FatalError("Unable to create gray50Tile bitmap\n");
 
-  gray25Tile = XCreatePixmapFromBitmapData(theDisp, rootW, 
+  gray25Tile = XCreatePixmapFromBitmapData(theDisp, rootW,
 				(char *) gray25_bits,
-				gray25_width, gray25_height, 
+				gray25_width, gray25_height,
 				infofg, infobg, dispDEEP);
   if (!gray25Tile) FatalError("Unable to create gray25Tile bitmap\n");
 
 
   /* try to load fonts */
-  if ( (mfinfo = XLoadQueryFont(theDisp,FONT1))==NULL && 
-       (mfinfo = XLoadQueryFont(theDisp,FONT2))==NULL && 
-       (mfinfo = XLoadQueryFont(theDisp,FONT3))==NULL && 
-       (mfinfo = XLoadQueryFont(theDisp,FONT4))==NULL && 
+  if ( (mfinfo = XLoadQueryFont(theDisp,FONT1))==NULL &&
+       (mfinfo = XLoadQueryFont(theDisp,FONT2))==NULL &&
+       (mfinfo = XLoadQueryFont(theDisp,FONT3))==NULL &&
+       (mfinfo = XLoadQueryFont(theDisp,FONT4))==NULL &&
        (mfinfo = XLoadQueryFont(theDisp,FONT5))==NULL) {
-    sprintf(str,
+    sprintf(dummystr,
 	    "couldn't open the following fonts:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s",
 	    FONT1, FONT2, FONT3, FONT4, FONT5);
-    FatalError(str);
+    FatalError(dummystr);
   }
   mfont=mfinfo->fid;
   XSetFont(theDisp,theGC,mfont);
@@ -632,45 +753,100 @@ int main(argc, argv)
 
   if (monofontname) {
     monofinfo = XLoadQueryFont(theDisp, monofontname);
-    if (!monofinfo) fprintf(stderr,"xv: unable to load font '%s'\n", 
+    if (!monofinfo) fprintf(stderr,"xv: unable to load font '%s'\n",
 			    monofontname);
-  }    
+  }
 
   if (!monofinfo) {
-    if ((monofinfo = XLoadQueryFont(theDisp,MFONT1))==NULL && 
-	(monofinfo = XLoadQueryFont(theDisp,MFONT2))==NULL && 
-	(monofinfo = XLoadQueryFont(theDisp,MFONT3))==NULL && 
+    if ((monofinfo = XLoadQueryFont(theDisp,MFONT1))==NULL &&
+	(monofinfo = XLoadQueryFont(theDisp,MFONT2))==NULL &&
+	(monofinfo = XLoadQueryFont(theDisp,MFONT3))==NULL &&
 	(monofinfo = XLoadQueryFont(theDisp,MFONT4))==NULL) {
-      sprintf(str,"couldn't open %s fonts:\n\t%s\n\t%s\n\t%s\n\t%s",
+      sprintf(dummystr,"couldn't open %s fonts:\n\t%s\n\t%s\n\t%s\n\t%s",
 	      "any of the following",
 	      MFONT1, MFONT2, MFONT3, MFONT4);
-      FatalError(str);
+      FatalError(dummystr);
     }
   }
 
   monofont=monofinfo->fid;
-  
 
-  
-  
+#ifdef TV_L10N
+  if (xlocale) {
+    i = 0;
+    while (mfontsize[i]) {
+      xlocale = 1;	/* True */
+
+      sprintf(mfontset, TV_FONTSET, mfontsize[i]);
+/*fprintf(stderr, "FontSet: %s\n", mfontset);*/
+
+      monofset = XCreateFontSet(theDisp, mfontset,
+				&misscharset, &nmisscharset, &defstr);
+#  if 0	/* not useful */
+      if (!monofset) {
+	/* the current locale is not supported */
+/*fprintf(stderr, "Current locale `%s' is not supported.\n", localeList[i]);*/
+	xlocale = 0;
+	break;
+      }
+#  endif
+/*fprintf(stderr, "# of misscharset in mfontsize[%d]: %d\n", i,nmisscharset);*/
+
+      for (j = 0; j < nmisscharset; j++) {
+	if (!strncmp(misscharset[j], "jisx0208", 8)) {
+	  /* font for JIS X 0208 is not found */
+	  xlocale = 0;
+	  break;
+	}
+      }
+
+      if (xlocale) {
+	monofsetinfo = XExtentsOfFontSet(monofset);
+	monofsetinfo->max_logical_extent.width = mfontsize[i];
+		/* correct size of TextViewer
+		   in case that JIS X 0208 is not found */
+	break;
+      }
+
+      i++;
+    } /* while (mfontsize[i]) */
+
+#  if 0
+    if (nmisscharset > 0) {
+      sprintf(dummystr,"missing %d charset:\n", nmisscharset);
+      for (i = 0; i < nmisscharset; i++) {
+	sprintf(dummystr, "%s\t%s\n", dummystr, misscharset[i]);
+      }
+#    if 0
+      FatalError(dummystr);
+#    else
+      fprintf(stderr, "%s", dummystr);
+#    endif
+    }
+#  endif
+  }
+#endif	/* TV_L10N */
+
+
+
   /* if ncols wasn't set, set it to 2^dispDEEP, unless dispDEEP=1, in which
      case ncols = 0;  (ncols = max number of colors allocated.  on 1-bit
      displays, no colors are allocated */
-  
+
   if (ncols == -1) {
     if (dispDEEP>1) ncols = 1 << ((dispDEEP>8) ? 8 : dispDEEP);
     else ncols = 0;
   }
   else if (ncols>256) ncols = 256;       /* so program doesn't blow up */
-  
-  
+
+
   GenerateFSGamma();  /* has to be done before 'OpenBrowse()' is called */
-  
-  
-  
+
+
+
   /* no filenames.  build one-name (stdio) list (if stdinflag) */
   if (numnames==0) {
-    if (stdinflag) {  
+    if (stdinflag) {
       /* have to malloc namelist[0] so we can free it in deleteFromList() */
       namelist[0] = (char *) malloc(strlen(STDINSTR) + 1);
       if (!namelist[0]) FatalError("unable to to build namelist[0]");
@@ -679,16 +855,28 @@ int main(argc, argv)
     }
     else namelist[0] = NULL;
   }
-  
+  else if (randomShow) {
+    int i, j;
+    char *tmp;
+
+    srandom((int)time((time_t *)0));
+    for (i = numnames; i > 1; i--) {
+      j = random() % i;
+      tmp = namelist[i-1];
+      namelist[i-1] = namelist[j];
+      namelist[j] = tmp;
+    }
+  }
+
   if (numnames) makeDispNames();
-  
-  
-  if (viewonly || autoquit) { 
-    imap = ctrlmap = gmap = browmap = cmtmap = 0; 
+
+
+  if (viewonly || autoquit) {
+    imap = ctrlmap = gmap = browmap = cmtmap = 0;
     novbrowse = 1;
   }
-  
-  
+
+
   /* create the info box window */
   CreateInfo(infogeom);
   XSelectInput(theDisp, infoW, ExposureMask | ButtonPressMask | KeyPressMask
@@ -698,12 +886,12 @@ int main(argc, argv)
     RedrawInfo(0,0,1000,1000);  /* explicit draw if mapped */
     XFlush(theDisp);
   }
-  
-  
+
+
   /* create the control box window */
   CreateCtrl(ctrlgeom);
   epicMode = EM_RAW;   SetEpicMode();
-  
+
   XSelectInput(theDisp, ctrlW, ExposureMask | ButtonPressMask | KeyPressMask
 	       | StructureNotifyMask);
   if (ctrlmap < 0) {    /* map iconified */
@@ -719,22 +907,22 @@ int main(argc, argv)
     RedrawCtrl(0,0,1000,1000);   /* explicit draw if mapped */
     XFlush(theDisp);
   }
-  
+
   fixDispNames();
   ChangedCtrlList();
-  
+
   /* disable root modes if using non-default visual */
   if (!defaultVis) {
     for (i=RMB_ROOT; i<RMB_MAX; i++) rootMB.dim[i] = 1;
   }
-  
-  
+
+
   /* create the directory window */
   CreateDirW(NULL);
   XSelectInput(theDisp, dirW, ExposureMask | ButtonPressMask | KeyPressMask);
   browseCB.val = browseMode;
   savenormCB.val = savenorm;
-  
+
   /* create the gamma window */
   CreateGam(gamgeom, (gamset) ? gamval : -1.0,
 	    (cgamset) ? rgamval : -1.0,
@@ -744,60 +932,84 @@ int main(argc, argv)
   XSelectInput(theDisp, gamW, ExposureMask | ButtonPressMask | KeyPressMask
 	       | StructureNotifyMask
 	       | (cmapInGam ? ColormapChangeMask : 0));
-  
+
   GamBox(gmap);     /* map it (or not) */
-  
-  
-  
+
+
+
   stdnfcols = 0;   /* so we don't try to free any if we don't create any */
-  
+
   if (!novbrowse) {
     MakeBrowCmap();
     /* create the visual browser window */
     CreateBrowse(browgeom, fgstr, bgstr, histr, lostr);
-    
+
     if (browmap) OpenBrowse();
   }
   else windowMB.dim[WMB_BROWSE] = 1;    /* disable visual schnauzer */
-  
-  
+
+
   CreateTextWins(textgeom, cmtgeom);
   if (cmtmap) OpenCommentText();
-  
-  
+
+
   /* create the ps window */
   CreatePSD(NULL);
   XSetTransientForHint(theDisp, psW, dirW);
   encapsCB.val = preview;
   pscompCB.val = pscomp;
-  
-  
+
+
 #ifdef HAVE_JPEG
   CreateJPEGW();
   XSetTransientForHint(theDisp, jpegW, dirW);
 #endif
-  
+
+#ifdef HAVE_JP2K
+  CreateJP2KW();
+  XSetTransientForHint(theDisp, jp2kW, dirW);
+#endif
+
 #ifdef HAVE_TIFF
   CreateTIFFW();
   XSetTransientForHint(theDisp, tiffW, dirW);
 #endif
-  
-  
+
+#ifdef HAVE_PNG
+  CreatePNGW();
+  XSetTransientForHint(theDisp, pngW, dirW);
+#endif
+
+#ifdef HAVE_PCD
+  CreatePCDW();
+  XSetTransientForHint(theDisp, pcdW, dirW);
+#endif
+
+#ifdef HAVE_PIC2
+  CreatePIC2W();
+  XSetTransientForHint(theDisp, pic2W, dirW);
+#endif
+
+#ifdef HAVE_MGCSFX
+  CreateMGCSFXW();
+  XSetTransientForHint(theDisp, mgcsfxW, dirW);
+#endif
+
   LoadFishCursors();
   SetCursors(-1);
-  
-  
+
+
   /* if we're not on a colormapped display, turn off rwcolor */
   if (!CMAPVIS(theVisual)) {
     if (rwcolor) fprintf(stderr, "xv: not a colormapped display.  %s\n",
 			 "'rwcolor' turned off.");
-    
+
     allocMode = AM_READONLY;
     dispMB.flags[DMB_COLRW] = 0;  /* de-'check' */
     dispMB.dim[DMB_COLRW] = 1;    /* and dim it */
   }
-  
-  
+
+
   if (force24) {
     Set824Menus(PIC24);
     conv24MB.flags[CONV24_LOCK]  = 1;
@@ -812,15 +1024,15 @@ int main(argc, argv)
     Set824Menus(PIC8);     /* default mode */
     picType = PIC8;
   }
-  
-  
-  
+
+
+
   /* make std colormap, maybe */
   ChangeCmapMode(colorMapMode, 0, 0);
 
 
-  
-  
+
+
   /* Do The Thing... */
   mainLoop();
   Quit(0);
@@ -832,12 +1044,12 @@ int main(argc, argv)
 /*****************************************************/
 static void makeDirectCmap()
 {
-  int    i, j, cmaplen, numgot;
+  int    i, cmaplen, numgot;
   byte   origgot[256];
   XColor c;
   u_long rmask, gmask, bmask;
   int    rshift, gshift, bshift;
-  
+
 
   rmask = theVisual->red_mask;
   gmask = theVisual->green_mask;
@@ -849,22 +1061,22 @@ static void makeDirectCmap()
 
   if (rshift<0) rmask = rmask << (-rshift);
            else rmask = rmask >> rshift;
-  
+
   if (gshift<0) gmask = gmask << (-gshift);
            else gmask = gmask >> gshift;
-  
+
   if (bshift<0) bmask = bmask << (-bshift);
            else bmask = bmask >> bshift;
 
 
   cmaplen = theVisual->map_entries;
   if (cmaplen>256) cmaplen=256;
-  
+
 
   /* try to alloc a 'cmaplen' long grayscale colormap.  May not get all
      entries for whatever reason.  Build table 'directConv[]' that
      maps range [0..(cmaplen-1)] into set of colors we did get */
-  
+
   for (i=0; i<256; i++) {  origgot[i] = 0;  directConv[i] = 0; }
 
   for (i=numgot=0; i<cmaplen; i++) {
@@ -882,9 +1094,9 @@ static void makeDirectCmap()
     }
   }
 
-  
+
   if (numgot == 0) FatalError("Got no entries in DirectColor cmap!\n");
-  
+
   /* directConv may or may not have holes in it. */
   for (i=0; i<cmaplen; i++) {
     if (!origgot[i]) {
@@ -892,10 +1104,10 @@ static void makeDirectCmap()
       numbak = numfwd = 0;
       while ((i - numbak) >= 0       && !origgot[i-numbak]) numbak++;
       while ((i + numfwd) <  cmaplen && !origgot[i+numfwd]) numfwd++;
-      
+
       if (i-numbak<0        || !origgot[i-numbak]) numbak = 999;
       if (i+numfwd>=cmaplen || !origgot[i+numfwd]) numfwd = 999;
-      
+
       if      (numbak<numfwd) directConv[i] = directConv[i-numbak];
       else if (numfwd<999)    directConv[i] = directConv[i+numfwd];
       else FatalError("DirectColor cmap:  can't happen!");
@@ -926,14 +1138,14 @@ static void useOtherVisual(vinfo, best)
 {
   if (!vinfo || best<0) return;
 
-  if (vinfo[best].visualid == 
+  if (vinfo[best].visualid ==
       XVisualIDFromVisual(DefaultVisual(theDisp, theScreen))) return;
 
   theVisual = vinfo[best].visual;
 
   if (DEBUG) {
     fprintf(stderr,"%s: using %s visual (0x%0x), depth = %d, screen = %d\n",
-	    cmd, 
+	    cmd,
 	    (vinfo[best].class==StaticGray)  ? "StaticGray" :
 	    (vinfo[best].class==StaticColor) ? "StaticColor" :
 	    (vinfo[best].class==TrueColor)   ? "TrueColor" :
@@ -947,41 +1159,45 @@ static void useOtherVisual(vinfo, best)
 	    (int) vinfo[best].red_mask, (int) vinfo[best].green_mask,
 	    (int) vinfo[best].blue_mask, vinfo[best].bits_per_rgb);
   }
-  
+
   dispDEEP  = vinfo[best].depth;
   theScreen = vinfo[best].screen;
-  rootW     = RootWindow(theDisp, theScreen);
+  if (spec_window) {
+	rootW = spec_window;
+  } else {
+	rootW = RootWindow(theDisp,theScreen);
+  }
   ncells    = vinfo[best].colormap_size;
   theCmap   = XCreateColormap(theDisp, rootW, theVisual, AllocNone);
-  
+
   {
     /* create a temporary window using this visual so we can
        create a GC for this visual */
-    
-    Window win;  
+
+    Window win;
     XSetWindowAttributes xswa;
     XGCValues xgcv;
     unsigned long xswamask;
-    
+
     XFlush(theDisp);
     XSync(theDisp, False);
-    
+
     xswa.background_pixel = 0;
     xswa.border_pixel     = 1;
     xswa.colormap         = theCmap;
     xswamask = CWBackPixel | CWBorderPixel | CWColormap;
-    
+
     win = XCreateWindow(theDisp, rootW, 0, 0, 100, 100, 2, (int) dispDEEP,
 			InputOutput, theVisual, xswamask, &xswa);
-    
+
     XFlush(theDisp);
     XSync(theDisp, False);
-    
+
     theGC = XCreateGC(theDisp, win, 0L, &xgcv);
-    
+
     XDestroyWindow(theDisp, win);
   }
-  
+
   vrWIDE = dispWIDE  = DisplayWidth(theDisp,theScreen);
   vrHIGH = dispHIGH  = DisplayHeight(theDisp,theScreen);
   maxWIDE = dispWIDE;  maxHIGH = dispHIGH;
@@ -1000,25 +1216,25 @@ static void parseResources(argc, argv)
   /* once through the argument list to find the display name
      and DEBUG level, if any */
 
-  for (i=1; i<argc; i++) {
+  for (i=1; i<argc; ++i) {
     if (!strncmp(argv[i],"-help", (size_t) 5)) {  /* help */
       cmdSyntax();
       exit(0);
     }
 
     else if (!argcmp(argv[i],"-display",4,0,&pm)) {
-      i++;
+      ++i;
       if (i<argc) display = argv[i];
       break;
     }
 
-#ifdef VMS    /* in VMS, cmd-line-opts are in lower case */
+#ifdef VMS    /* in VMS, cmd-line opts are in lower case */
     else if (!argcmp(argv[i],"-debug",3,0,&pm)) {
-      { if (++i<argc) DEBUG = atoi(argv[i]); }
+      if (++i<argc) DEBUG = atoi(argv[i]);
     }
 #else
     else if (!argcmp(argv[i],"-DEBUG",2,0,&pm)) {
-      { if (++i<argc) DEBUG = atoi(argv[i]); }
+      if (++i<argc) DEBUG = atoi(argv[i]);
     }
 #endif
   }
@@ -1037,8 +1253,8 @@ static void parseResources(argc, argv)
       fprintf(stderr,"%s: unable to parse 'aspect' resource\n",cmd);
     else defaspect = (float) n / (float) d;
   }
-      
-  if (rd_flag("2xlimit"))        limit2x     = def_int;      
+
+  if (rd_flag("2xlimit"))        limit2x     = def_int;
   if (rd_flag("auto4x3"))        auto4x3     = def_int;
   if (rd_flag("autoClose"))      autoclose   = def_int;
   if (rd_flag("autoCrop"))       autocrop    = def_int;
@@ -1064,6 +1280,7 @@ static void parseResources(argc, argv)
   if (rd_flag("ctrlMap"))        ctrlmap     = def_int;
   if (rd_int ("cursor"))         curstype    = def_int;
   if (rd_int ("defaultPreset"))  preset      = def_int;
+  if (rd_int ("incrementalSearchTimeout"))  incrementalSearchTimeout = def_int;
 
   if (rd_str ("driftKludge")) {
     if (sscanf(def_str,"%d %d", &kludge_offx, &kludge_offy) != 2) {
@@ -1073,7 +1290,7 @@ static void parseResources(argc, argv)
 
   if (rd_str ("expand")) {
     if (index(def_str, ':')) {
-      if (sscanf(def_str, "%lf:%lf", &hexpand, &vexpand)!=2) 
+      if (sscanf(def_str, "%lf:%lf", &hexpand, &vexpand)!=2)
 	{ hexpand = vexpand = 1.0; }
     }
     else hexpand = vexpand = atof(def_str);
@@ -1081,6 +1298,9 @@ static void parseResources(argc, argv)
 
   if (rd_str ("fileList"))       flistName   = def_str;
   if (rd_flag("fixed"))          fixedaspect = def_int;
+#ifdef ENABLE_FIXPIX_SMOOTH
+  if (rd_flag("fixpix"))         do_fixpix_smooth = def_int;
+#endif
   if (rd_flag("force8"))         force8      = def_int;
   if (rd_flag("force24"))        force24     = def_int;
   if (rd_str ("foreground"))     fgstr       = def_str;
@@ -1092,23 +1312,39 @@ static void parseResources(argc, argv)
   if (rd_str ("highlight"))      histr       = def_str;
   if (rd_str ("iconGeometry"))   icongeom    = def_str;
   if (rd_flag("iconic"))         startIconic = def_int;
+  if (rd_str ("imageBackground")) imagebgstr = def_str;
   if (rd_str ("infoGeometry"))   infogeom    = def_str;
   if (rd_flag("infoMap"))        imap        = def_int;
   if (rd_flag("loadBrowse"))     browseMode  = def_int;
   if (rd_str ("lowlight"))       lostr       = def_str;
+#ifdef MACBINARY
+  if (rd_flag("macbinary"))      handlemacb  = def_int;
+#endif
+#ifdef HAVE_MGCSFX
+  if (rd_flag("mgcsfx"))         mgcsfx      = def_int;
+#endif
   if (rd_flag("mono"))           mono        = def_int;
   if (rd_str ("monofont"))       monofontname = def_str;
   if (rd_int ("ncols"))          ncols       = def_int;
   if (rd_flag("ninstall"))       ninstall    = def_int;
   if (rd_flag("nodecor"))        nodecor     = def_int;
   if (rd_flag("nolimits"))       nolimits    = def_int;
+#ifdef HAVE_MGCSFX
+  if (rd_flag("nomgcsfx"))       nomgcsfx    = def_int;
+#endif
+#if defined(HAVE_PIC) || defined(HAVE_PIC2)
+  if (rd_flag("nopicadjust"))    nopicadjust = def_int;
+#endif
   if (rd_flag("nopos"))          nopos       = def_int;
   if (rd_flag("noqcheck"))       noqcheck    = def_int;
   if (rd_flag("nostat"))         nostat      = def_int;
   if (rd_flag("ownCmap"))        owncmap     = def_int;
   if (rd_flag("perfect"))        perfect     = def_int;
+#ifdef HAVE_PIC2
+  if (rd_flag("pic2split"))      pic2split   = def_int;
+#endif
   if (rd_flag("popupKludge"))    winCtrPosKludge = def_int;
-  if (rd_str ("print"))          strncpy(printCmd, def_str, 
+  if (rd_str ("print"))          strncpy(printCmd, def_str,
 					 (size_t) PRINTCMDLEN);
   if (rd_flag("pscompress"))     pscomp      = def_int;
   if (rd_flag("pspreview"))      preview     = def_int;
@@ -1117,18 +1353,34 @@ static void parseResources(argc, argv)
   if (rd_flag("reverse"))        revvideo    = def_int;
   if (rd_str ("rootBackground")) rootbgstr   = def_str;
   if (rd_str ("rootForeground")) rootfgstr   = def_str;
-  if (rd_int ("rootMode"))       { rootMode    = def_int;  rmodeset++; }
+  if (rd_int ("rootMode"))       { rootMode    = def_int;  ++rmodeset; }
   if (rd_flag("rwColor"))        rwcolor     = def_int;
   if (rd_flag("saveNormal"))     savenorm    = def_int;
   if (rd_str ("searchDirectory"))  strcpy(searchdir, def_str);
   if (rd_str ("textviewGeometry")) textgeom  = def_str;
   if (rd_flag("useStdCmap"))     stdcmap     = def_int;
   if (rd_str ("visual"))         visualstr   = def_str;
+#ifdef VS_ADJUST
+  if (rd_flag("vsadjust"))       vsadjust    = def_int;
+#endif
   if (rd_flag("vsDisable"))      novbrowse   = def_int;
   if (rd_str ("vsGeometry"))     browgeom    = def_str;
   if (rd_flag("vsMap"))          browmap     = def_int;
   if (rd_flag("vsPerfect"))      browPerfect = def_int;
   if (rd_str ("white"))          whitestr    = def_str;
+  
+  /* Check for any command-bindings to the supported function keys */
+#define TMPLEN 80
+  for (i=0; i<FSTRMAX; ++i) {
+    char tmp[TMPLEN];
+
+    snprintf(tmp, TMPLEN, "F%dcommand", i+1);
+    if (rd_str(tmp))
+      fkeycmds[i] = def_str;
+    else
+      fkeycmds[i] = NULL;
+  }  
+#undef TMPLEN
 }
 
 
@@ -1146,7 +1398,7 @@ static void parseCmdLine(argc, argv)
 
     not_in_first_half = 0;
 
-    if (argv[i][0] != '-' && argv[i][0] != '+') { 
+    if (argv[i][0] != '-' && argv[i][0] != '+') {
       /* a file name.  put it in list */
 
       if (!nostat) {
@@ -1158,24 +1410,30 @@ static void parseCmdLine(argc, argv)
       }
 
       if (numnames<MAXNAMES) {
+#ifdef AUTO_EXPAND
+	if(Isarchive(argv[i]) == 0){ /* Not archive file */
+	  namelist[numnames++] = argv[i];
+	}
+#else
 	namelist[numnames++] = argv[i];
+#endif
 	if (numnames==MAXNAMES) {
-	  fprintf(stderr,"%s: too many filenames.  Only using first %d.\n",
+	  fprintf(stderr,"%s: too many filenames.  Using only first %d.\n",
 		  cmd, MAXNAMES);
 	}
       }
     }
 
-    else if (!strcmp(argv[i],  "-"))                    /* stdin flag */
+    else if (!strcmp(argv[i],  "-"))                       /* stdin flag */
       stdinflag++;
 
-    else if (!argcmp(argv[i],"-24",     3,1,&force24 ));  /* force24 */
-    else if (!argcmp(argv[i],"-2xlimit",3,1,&limit2x ));  /* 2xlimit */
-    else if (!argcmp(argv[i],"-4x3",    2,1,&auto4x3 ));  /* 4x3 */
-    else if (!argcmp(argv[i],"-8",      2,1,&force8  ));  /* force8 */
-    else if (!argcmp(argv[i],"-acrop",  3,1,&autocrop));  /* autocrop */
-
-    else if (!argcmp(argv[i],"-aspect",3,0,&pm)) {        /* def. aspect */
+    else if (!argcmp(argv[i],"-24",     3,1,&force24 ));   /* force24 */
+    else if (!argcmp(argv[i],"-2xlimit",3,1,&limit2x ));   /* 2xlimit */
+    else if (!argcmp(argv[i],"-4x3",    2,1,&auto4x3 ));   /* 4x3 */
+    else if (!argcmp(argv[i],"-8",      2,1,&force8  ));   /* force8 */
+    else if (!argcmp(argv[i],"-acrop",  3,1,&autocrop));   /* autocrop */
+                                                          
+    else if (!argcmp(argv[i],"-aspect",3,0,&pm)) {         /* def. aspect */
       int n,d;
       if (++i<argc) {
 	if (sscanf(argv[i],"%d:%d",&n,&d)!=2 || n<1 || d<1)
@@ -1184,57 +1442,65 @@ static void parseCmdLine(argc, argv)
       }
     }
 
-    else if (!argcmp(argv[i],"-best24",3,0,&pm))          /* -best */
+    else if (!argcmp(argv[i],"-windowid",3,0,&pm)) {
+      if (++i<argc) {
+	if (sscanf(argv[i], "%ld", &spec_window) != 1) {
+		fprintf(stderr,"%s: bad argument to -windowid '%s'\n",cmd,argv[i]);
+        }
+      }
+    }
+
+    else if (!argcmp(argv[i],"-best24",3,0,&pm))           /* -best */
       conv24 = CONV24_BEST;
-    
-    else if (!argcmp(argv[i],"-bg",3,0,&pm))              /* bg color */
+
+    else if (!argcmp(argv[i],"-bg",3,0,&pm))               /* bg color */
       { if (++i<argc) bgstr = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-black",3,0,&pm))           /* black color */
+
+    else if (!argcmp(argv[i],"-black",3,0,&pm))            /* black color */
       { if (++i<argc) blackstr = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-bw",3,0,&pm))              /* border width */
+
+    else if (!argcmp(argv[i],"-bw",3,0,&pm))               /* border width */
       { if (++i<argc) bwidth=atoi(argv[i]); }
-    
-    else if (!argcmp(argv[i],"-cecmap",4,1,&cmapInGam));  /* cmapInGam */
-    
-    else if (!argcmp(argv[i],"-cegeometry",4,0,&pm))      /* gammageom */
+
+    else if (!argcmp(argv[i],"-cecmap",4,1,&cmapInGam));   /* cmapInGam */
+
+    else if (!argcmp(argv[i],"-cegeometry",4,0,&pm))       /* gammageom */
       { if (++i<argc) gamgeom = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-cemap",4,1,&gmap));        /* gmap */
-    
-    else if (!argcmp(argv[i],"-cgamma",4,0,&pm)) {        /* color gamma */
+
+    else if (!argcmp(argv[i],"-cemap",4,1,&gmap));         /* gmap */
+
+    else if (!argcmp(argv[i],"-cgamma",4,0,&pm)) {         /* color gamma */
       if (i+3<argc) {
-	rgamval = atof(argv[++i]); 
-	ggamval = atof(argv[++i]); 
-	bgamval = atof(argv[++i]); 
+	rgamval = atof(argv[++i]);
+	ggamval = atof(argv[++i]);
+	bgamval = atof(argv[++i]);
       }
       cgamset++;
     }
-    
-    else if (!argcmp(argv[i],"-cgeometry",4,0,&pm))	  /* ctrlgeom */
-      { if (++i<argc) ctrlgeom = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-clear",4,1,&clrroot));	  /* clear */
-    else if (!argcmp(argv[i],"-close",4,1,&autoclose));	  /* close */
-    else if (!argcmp(argv[i],"-cmap", 3,1,&ctrlmap));	  /* ctrlmap */
 
-    else if (!argcmp(argv[i],"-cmtgeometry",5,0,&pm))	  /* comment geom */
+    else if (!argcmp(argv[i],"-cgeometry",4,0,&pm))	   /* ctrlgeom */
+      { if (++i<argc) ctrlgeom = argv[i]; }
+
+    else if (!argcmp(argv[i],"-clear",4,1,&clrroot));	   /* clear */
+    else if (!argcmp(argv[i],"-close",4,1,&autoclose));	   /* close */
+    else if (!argcmp(argv[i],"-cmap", 3,1,&ctrlmap));	   /* ctrlmap */
+
+    else if (!argcmp(argv[i],"-cmtgeometry",5,0,&pm))	   /* comment geom */
       { if (++i<argc) cmtgeom = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-cmtmap",5,1,&cmtmap));	  /* map cmt window */
-    
-    else if (!argcmp(argv[i],"-crop",3,0,&pm)) {          /* crop */
+
+    else if (!argcmp(argv[i],"-cmtmap",5,1,&cmtmap));	   /* map cmt window */
+
+    else if (!argcmp(argv[i],"-crop",3,0,&pm)) {           /* crop */
       if (i+4<argc) {
-	acropX = atoi(argv[++i]); 
-	acropY = atoi(argv[++i]); 
-	acropW = atoi(argv[++i]); 
-	acropH = atoi(argv[++i]); 
+	acropX = atoi(argv[++i]);
+	acropY = atoi(argv[++i]);
+	acropW = atoi(argv[++i]);
+	acropH = atoi(argv[++i]);
       }
       acrop++;
     }
-    
-    else if (!argcmp(argv[i],"-cursor",3,0,&pm))	  /* cursor */
+
+    else if (!argcmp(argv[i],"-cursor",3,0,&pm))	   /* cursor */
       { if (++i<argc) curstype = atoi(argv[i]); }
 
 #ifdef VMS    /* in VMS, cmd-line-opts are in lower case */
@@ -1247,84 +1513,100 @@ static void parseCmdLine(argc, argv)
     }
 #endif
 
-    else if (!argcmp(argv[i],"-dir",4,0,&pm))             /* search dir */
+    else if (!argcmp(argv[i],"-dir",4,0,&pm))              /* search dir */
       { if (++i<argc) strcpy(searchdir, argv[i]); }
 
-    else if (!argcmp(argv[i],"-display",4,0,&pm))         /* display */
+    else if (!argcmp(argv[i],"-display",4,0,&pm))          /* display */
       { if (++i<argc) display = argv[i]; }
 
-    else if (!argcmp(argv[i],"-dither",4,1,&autodither)); /* autodither */
+    else if (!argcmp(argv[i],"-dither",4,1,&autodither));  /* autodither */
 
-    else if (!argcmp(argv[i],"-drift",3,0,&pm)) {         /* drift kludge */
+    else if (!argcmp(argv[i],"-drift",3,0,&pm)) {          /* drift kludge */
       if (i<argc-2) {
 	kludge_offx = atoi(argv[++i]);
 	kludge_offy = atoi(argv[++i]);
       }
     }
 
-    else if (!argcmp(argv[i],"-expand",2,0,&pm)) {	  /* expand factor */
+    else if (!argcmp(argv[i],"-expand",2,0,&pm)) {	   /* expand factor */
       if (++i<argc) {
 	if (index(argv[i], ':')) {
-	  if (sscanf(argv[i], "%lf:%lf", &hexpand, &vexpand)!=2) 
+	  if (sscanf(argv[i], "%lf:%lf", &hexpand, &vexpand)!=2)
 	    { hexpand = vexpand = 1.0; }
 	}
 	else hexpand = vexpand = atof(argv[i]);
       }
     }
 
-    else if (!argcmp(argv[i],"-fg",3,0,&pm))              /* fg color */
+#ifdef HAVE_G3
+    else if (!argcmp(argv[i],"-fax",3,0,&highresfax));     /* fax */
+#endif
+
+    else if (!argcmp(argv[i],"-fg",3,0,&pm))               /* fg color */
       { if (++i<argc) fgstr = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-fixed",3,1,&fixedaspect)); /* fix asp. ratio */
-    
-    else if (!argcmp(argv[i],"-flist",3,0,&pm))           /* file list */
+
+    else if (!argcmp(argv[i],"-fixed",5,1,&fixedaspect));  /* fix asp. ratio */
+
+#ifdef ENABLE_FIXPIX_SMOOTH
+    else if (!argcmp(argv[i],"-fixpix",5,1,&do_fixpix_smooth)); /* dithering */
+#endif
+
+    else if (!argcmp(argv[i],"-flist",3,0,&pm))            /* file list */
       { if (++i<argc) flistName = argv[i]; }
 
-    else if (!argcmp(argv[i],"-gamma",3,0,&pm))	          /* gamma */
+    else if (!argcmp(argv[i],"-gamma",3,0,&pm))	           /* gamma */
       { if (++i<argc) gamval = atof(argv[i]);  gamset++; }
-    
-    else if (!argcmp(argv[i],"-geometry",3,0,&pm))	  /* geometry */
-      { if (++i<argc) maingeom = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-grabdelay",3,0,&pm))	  /* grabDelay */
-      { if (++i<argc) grabDelay = atoi(argv[i]); }
-    
-    else if (!argcmp(argv[i],"-gsdev",4,0,&pm))	          /* gsDevice */
-      { if (++i<argc) gsDev = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-gsgeom",4,0,&pm))          /* gsGeometry */
-      { if (++i<argc) gsGeomStr = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-gsres",4,0,&pm))           /* gsResolution */
-      { if (++i<argc) gsRes=abs(atoi(argv[i])); }
-    
-    else if (!argcmp(argv[i],"-hflip",3,1,&autohflip));   /* hflip */
 
-    else if (!argcmp(argv[i],"-hi",3,0,&pm))	          /* highlight */
+    else if (!argcmp(argv[i],"-geometry",3,0,&pm))	   /* geometry */
+      { if (++i<argc) maingeom = argv[i]; }
+
+    else if (!argcmp(argv[i],"-grabdelay",3,0,&pm))	   /* grabDelay */
+      { if (++i<argc) grabDelay = atoi(argv[i]); }
+
+    else if (!argcmp(argv[i],"-gsdev",4,0,&pm))	           /* gsDevice */
+      { if (++i<argc) gsDev = argv[i]; }
+
+    else if (!argcmp(argv[i],"-gsgeom",4,0,&pm))           /* gsGeometry */
+      { if (++i<argc) gsGeomStr = argv[i]; }
+
+    else if (!argcmp(argv[i],"-gsres",4,0,&pm))            /* gsResolution */
+      { if (++i<argc) gsRes=abs(atoi(argv[i])); }
+
+    else if (!argcmp(argv[i],"-hflip",3,1,&autohflip));    /* hflip */
+
+    else if (!argcmp(argv[i],"-hi",3,0,&pm))	           /* highlight */
       { if (++i<argc) histr = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-hist", 4,1,&autohisteq));  /* hist eq */
+
+#ifdef HAVE_G3
+    else if (!argcmp(argv[i],"-highresfax",4,0,&highresfax));/* high res. fax */
+#endif
+
+    else if (!argcmp(argv[i],"-hist", 4,1,&autohisteq));   /* hist eq */
 
     else if (!argcmp(argv[i],"-hsv",   3,1,&hsvmode));     /* hsvmode */
 
     else if (!argcmp(argv[i],"-icgeometry",4,0,&pm))       /* icon geometry */
       { if (++i<argc) icongeom = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-iconic",4,1,&startIconic)); /* iconic */
-    
+
     else if (!argcmp(argv[i],"-igeometry",3,0,&pm))        /* infogeom */
       { if (++i<argc) infogeom = argv[i]; }
-    
-    else if (!argcmp(argv[i],"-imap",     3,1,&imap));        /* imap */
-    else if (!argcmp(argv[i],"-lbrowse",  3,1,&browseMode));  /* browse mode */
 
-    else if (!argcmp(argv[i],"-lo",3,0,&pm))	        /* lowlight */
+    else if (!argcmp(argv[i],"-imap",3,1,&imap));          /* imap */
+
+    else if (!argcmp(argv[i],"-ibg",3,0,&pm))             /* image bkgd color */
+      { if (++i<argc) imagebgstr = argv[i]; }
+
+    else if (!argcmp(argv[i],"-lbrowse",3,1,&browseMode)); /* browse mode */
+
+    else if (!argcmp(argv[i],"-lo",3,0,&pm))	           /* lowlight */
       { if (++i<argc) lostr = argv[i]; }
 
     else if (!argcmp(argv[i],"-loadclear",4,1,&clearonload)); /* clearonload */
 
-    
-    else not_in_first_half = 1;     
+
+    else not_in_first_half = 1;
 
 
 
@@ -1339,103 +1621,130 @@ static void parseCmdLine(argc, argv)
     if (!argcmp(argv[i],"-max",4,1,&automax));	        /* auto maximize */
     else if (!argcmp(argv[i],"-maxpect",5,1,&pm))       /* auto maximize */
       { automax=pm; fixedaspect=pm; }
-    
+
+#ifdef MACBINARY
+    else if (!argcmp(argv[i],"-macbinary",3,1,&handlemacb)); /* macbinary */
+#endif
+
     else if (!argcmp(argv[i],"-mfn",3,0,&pm))           /* mono font name */
       { if (++i<argc) monofontname = argv[i]; }
 
+#ifdef HAVE_MGCSFX
+    else if (!argcmp(argv[i],"-mgcsfx", 4,1,&mgcsfx));  /* mgcsfx */
+#endif
+
     else if (!argcmp(argv[i],"-mono",3,1,&mono));	/* mono */
-    
+
     else if (!argcmp(argv[i],"-name",3,0,&pm))          /* name */
       { if (++i<argc) winTitle = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-ncols",3,0,&pm))        /* ncols */
       { if (++i<argc) ncols=abs(atoi(argv[i])); }
-    
-    else if (!argcmp(argv[i],"-ninstall",  3,1,&ninstall));   /* inst cmaps?*/
+
+    else if (!argcmp(argv[i],"-ninstall",  3,1,&ninstall));   /* inst cmaps? */
     else if (!argcmp(argv[i],"-nodecor",   4,1,&nodecor));
     else if (!argcmp(argv[i],"-nofreecols",4,1,&noFreeCols));
     else if (!argcmp(argv[i],"-nolimits",  4,1,&nolimits));   /* nolimits */
+#ifdef HAVE_MGCSFX
+    else if (!argcmp(argv[i],"-nomgcsfx", 4,1,&nomgcsfx));    /* nomgcsfx */
+#endif
+#if defined(HAVE_PIC) || defined(HAVE_PIC2)
+    else if (!argcmp(argv[i],"-nopicadjust", 4,1,&nopicadjust));/*nopicadjust*/
+#endif
     else if (!argcmp(argv[i],"-nopos",     4,1,&nopos));      /* nopos */
     else if (!argcmp(argv[i],"-noqcheck",  4,1,&noqcheck));   /* noqcheck */
-    else if (!argcmp(argv[i],"-noresetroot",5,1,&resetroot)); /* reset root*/
+    else if (!argcmp(argv[i],"-noresetroot",5,1,&resetroot)); /* reset root */
     else if (!argcmp(argv[i],"-norm",      5,1,&autonorm));   /* norm */
     else if (!argcmp(argv[i],"-nostat",    4,1,&nostat));     /* nostat */
     else if (!argcmp(argv[i],"-owncmap",   2,1,&owncmap));    /* own cmap */
+#ifdef HAVE_PCD
+    else if (!argcmp(argv[i],"-pcd",       4,0,&pm))         /* pcd with size */
+      { if (i+1<argc) PcdSize = atoi(argv[++i]); }
+#endif
     else if (!argcmp(argv[i],"-perfect",   3,1,&perfect));    /* -perfect */
+#ifdef HAVE_PIC2
+    else if (!argcmp(argv[i],"-pic2split", 3,1,&pic2split));  /* pic2split */
+#endif
     else if (!argcmp(argv[i],"-pkludge",   3,1,&winCtrPosKludge));
     else if (!argcmp(argv[i],"-poll",      3,1,&polling));    /* chk mod? */
 
     else if (!argcmp(argv[i],"-preset",3,0,&pm))      /* preset */
       { if (++i<argc) preset=abs(atoi(argv[i])); }
-    
+
     else if (!argcmp(argv[i],"-quick24",5,0,&pm))     /* quick 24-to-8 conv */
       conv24 = CONV24_FAST;
-    
+
     else if (!argcmp(argv[i],"-quit",   2,1,&autoquit));   /* auto-quit */
     else if (!argcmp(argv[i],"-random", 4,1,&randomShow)); /* random */
     else if (!argcmp(argv[i],"-raw",    4,1,&autoraw));    /* force raw */
 
     else if (!argcmp(argv[i],"-rbg",3,0,&pm))      /* root background color */
       { if (++i<argc) rootbgstr = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-rfg",3,0,&pm))      /* root foreground color */
       { if (++i<argc) rootfgstr = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-rgb",4,1,&pm))      /* rgb mode */
       hsvmode = !pm;
-    
+
     else if (!argcmp(argv[i],"-RM",3,0,&pm))	   /* auto-delete */
       autoDelete = 1;
-    
+
     else if (!argcmp(argv[i],"-rmode",3,0,&pm))	   /* root pattern */
-      { if (++i<argc) rootMode = atoi(argv[i]); 
+      { if (++i<argc) rootMode = atoi(argv[i]);
 	useroot++;  rmodeset++;
       }
-    
+
     else if (!argcmp(argv[i],"-root",4,1,&useroot));  /* use root window */
-    
+
     else if (!argcmp(argv[i],"-rotate",4,0,&pm))      /* rotate */
       { if (++i<argc) autorotate = atoi(argv[i]); }
-    
+
     else if (!argcmp(argv[i],"-rv",3,1,&revvideo));   /* reverse video */
     else if (!argcmp(argv[i],"-rw",3,1,&rwcolor));    /* use r/w color */
 
     else if (!argcmp(argv[i],"-slow24",3,0,&pm))      /* slow 24->-8 conv.*/
       conv24 = CONV24_SLOW;
-    
+
     else if (!argcmp(argv[i],"-smooth",3,1,&autosmooth));  /* autosmooth */
+    else if (!argcmp(argv[i],"-startgrab",3,1,&startGrab)); /* startGrab */
     else if (!argcmp(argv[i],"-stdcmap",3,1,&stdcmap));    /* use stdcmap */
 
     else if (!argcmp(argv[i],"-tgeometry",2,0,&pm))	   /* textview geom */
       { if (++i<argc) textgeom = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-vflip",3,1,&autovflip));	   /* vflip */
     else if (!argcmp(argv[i],"-viewonly",4,1,&viewonly));  /* viewonly */
 
     else if (!argcmp(argv[i],"-visual",4,0,&pm))           /* visual */
       { if (++i<argc) visualstr = argv[i]; }
-    
+
+#ifdef VS_ADJUST
+    else if (!argcmp(argv[i],"-vsadjust", 3,1,&vsadjust));  /* vsadjust */
+#endif
+
     else if (!argcmp(argv[i],"-vsdisable",4,1,&novbrowse)); /* disable sch? */
-    
+
     else if (!argcmp(argv[i],"-vsgeometry",4,0,&pm))	/* visSchnauzer geom */
       { if (++i<argc) browgeom = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-vsmap",4,1,&browmap));	/* visSchnauzer map */
-    
+
     else if (!argcmp(argv[i],"-vsperfect",3,1,&browPerfect));	/* vs perf. */
 
     else if (!argcmp(argv[i],"-wait",3,0,&pm)) {        /* secs betwn pics */
       if (++i<argc) {
-	waitsec = abs(atoi(argv[i]));
-	if (waitsec<0) waitsec = 0;
+	char *comma = strchr(argv[i], ',');
+	waitsec_nonfinal = fabs(atof(argv[i]));
+	waitsec_final = comma? fabs(atof(comma+1)) : waitsec_nonfinal;
       }
     }
-    
+
     else if (!argcmp(argv[i],"-white",3,0,&pm))	        /* white color */
       { if (++i<argc) whitestr = argv[i]; }
-    
+
     else if (!argcmp(argv[i],"-wloop",3,1,&waitloop));	/* waitloop */
-    
+
     else if (not_in_first_half) cmdSyntax();
   }
 
@@ -1453,7 +1762,11 @@ static void verifyArgs()
   /* check options for validity */
 
   if (strlen(searchdir)) {  /* got a search directory */
+#ifdef AUTO_EXPAND
+    if (Chvdir(searchdir)) {
+#else
     if (chdir(searchdir)) {
+#endif
       fprintf(stderr,"xv: unable to cd to directory '%s'.\n",searchdir);
       fprintf(stderr,
        "    Ignoring '-dir' option and/or 'xv.searchDirectory' resource\n");
@@ -1462,7 +1775,7 @@ static void verifyArgs()
   }
 
 
-  if (flistName) 
+  if (flistName)
     add_filelist_to_namelist(flistName, namelist, &numnames, MAXNAMES);
 
   RANGE(curstype,0,254);
@@ -1475,16 +1788,16 @@ static void verifyArgs()
 
   /* if using root, generally gotta map ctrl window, 'cause there won't be
      any way to ask for it.  (no kbd or mouse events from rootW) */
-  if (useroot && !autoquit) ctrlmap = -1;    
+  if (useroot && !autoquit) ctrlmap = -1;
 
-  
+
   if (abs(autorotate) !=   0 && abs(autorotate) != 90 &&
       abs(autorotate) != 180 && abs(autorotate) != 270) {
     fprintf(stderr,"Invalid auto rotation value (%d) ignored.\n", autorotate);
     fprintf(stderr,"  (Valid values:  0, +-90, +-180, +-270)\n");
 
     autorotate = 0;
-  } 
+  }
 
 
   if (grabDelay < 0 || grabDelay > 15) {
@@ -1498,9 +1811,9 @@ static void verifyArgs()
     fprintf(stderr,"  (Valid values:  1, 2, 3, 4)\n");
 
     preset = 0;
-  } 
+  }
 
-  if (waitsec < 0) noFreeCols = 0;   /* disallow nfc if not doing slideshow */
+  if (waitsec < 0.0) noFreeCols = 0;   /* disallow nfc if not doing slideshow */
   if (noFreeCols && perfect) { perfect = 0;  owncmap = 1; }
 
   /* decide what default color allocation stuff we've settled on */
@@ -1512,24 +1825,24 @@ static void verifyArgs()
 
   defaultCmapMode = colorMapMode;  /* default mode for 8-bit images */
 
-  if (nopos) { 
-    maingeom = infogeom = ctrlgeom = gamgeom = browgeom = textgeom = NULL;
-    cmtgeom = NULL;
+  if (nopos) {
+    maingeom = infogeom = ctrlgeom = gamgeom = browgeom = textgeom = cmtgeom =
+      (const char *) NULL;
   }
 
   /* if -root and -maxp, disallow 'integer' tiling modes */
-  if (useroot && fixedaspect && automax && !rmodeset && 
+  if (useroot && fixedaspect && automax && !rmodeset &&
       (rootMode == RM_TILE || rootMode == RM_IMIRROR))
     rootMode = RM_CSOLID;
 }
 
 
 
+static int cpos = 0;
 
 /***********************************/
-static int cpos = 0;
 static void printoption(st)
-     char *st;
+     const char *st;
 {
   if (strlen(st) + cpos > 78) {
     fprintf(stderr,"\n   ");
@@ -1540,8 +1853,26 @@ static void printoption(st)
   cpos = cpos + strlen(st) + 1;
 }
 
+
 static void cmdSyntax()
 {
+  /* GRR 19980605:  added version info for most common libraries */
+  fprintf(stderr, "XV - %s.\n", REVDATE);
+#ifdef HAVE_JPEG
+  VersionInfoJPEG();
+#endif
+#ifdef HAVE_JP2K
+  VersionInfoJP2K();
+#endif
+#ifdef HAVE_TIFF
+  VersionInfoTIFF();
+#endif
+#ifdef HAVE_PNG
+  VersionInfoPNG();
+#endif
+  /* pbm/pgm/ppm support is native, not via pbmplus/netpbm libraries */
+  fprintf(stderr, "\n");
+
   fprintf(stderr, "Usage:\n");
   printoption(cmd);
   printoption("[-]");
@@ -1579,8 +1910,14 @@ static void cmdSyntax()
   printoption("[-/+dither]");
   printoption("[-drift dx dy]");
   printoption("[-expand exp | hexp:vexp]");
+#ifdef HAVE_G3
+  printoption("[-fax]");
+#endif
   printoption("[-fg color]");
   printoption("[-/+fixed]");
+#ifdef ENABLE_FIXPIX_SMOOTH
+  printoption("[-/+fixpix]");
+#endif
   printoption("[-flist fname]");
   printoption("[-gamma val]");
   printoption("[-geometry geom]");
@@ -1591,8 +1928,12 @@ static void cmdSyntax()
   printoption("[-help]");
   printoption("[-/+hflip]");
   printoption("[-hi color]");
+#ifdef HAVE_G3
+  printoption("[-highresfax]");
+#endif
   printoption("[-/+hist]");
   printoption("[-/+hsv]");
+  printoption("[-ibg color]");  /* GRR 19980314 */
   printoption("[-icgeometry geom]");
   printoption("[-/+iconic]");
   printoption("[-igeometry geom]");
@@ -1600,9 +1941,15 @@ static void cmdSyntax()
   printoption("[-/+lbrowse]");
   printoption("[-lo color]");
   printoption("[-/+loadclear]");
+#ifdef MACBINARY
+  printoption("[-/+macbinary]");
+#endif
   printoption("[-/+max]");
   printoption("[-/+maxpect]");
   printoption("[-mfn font]");
+#ifdef HAVE_MGCSFX
+  printoption("[-/+mgcsfx]");
+#endif
   printoption("[-/+mono]");
   printoption("[-name str]");
   printoption("[-ncols #]");
@@ -1610,13 +1957,25 @@ static void cmdSyntax()
   printoption("[-/+nodecor]");
   printoption("[-/+nofreecols]");
   printoption("[-/+nolimits]");
+#ifdef HAVE_MGCSFX
+  printoption("[-/+nomgcsfx]");
+#endif
+#if defined(HAVE_PIC) || defined(HAVE_PIC2)
+  printoption("[-/+nopicadjust]");
+#endif
   printoption("[-/+nopos]");
   printoption("[-/+noqcheck]");
   printoption("[-/+noresetroot]");
   printoption("[-/+norm]");
   printoption("[-/+nostat]");
   printoption("[-/+owncmap]");
+#ifdef HAVE_PCD
+  printoption("[-pcd size(0=192*128,1,2,3,4=3072*2048)]");
+#endif
   printoption("[-/+perfect]");
+#ifdef HAVE_PIC2
+  printoption("[-/+pic2split]");
+#endif
   printoption("[-/+pkludge]");
   printoption("[-/+poll]");
   printoption("[-preset #]");
@@ -1635,17 +1994,22 @@ static void cmdSyntax()
   printoption("[-/+rw]");
   printoption("[-slow24]");
   printoption("[-/+smooth]");
+  printoption("[-/+startgrab]");
   printoption("[-/+stdcmap]");
   printoption("[-tgeometry geom]");
   printoption("[-/+vflip]");
   printoption("[-/+viewonly]");
   printoption("[-visual type]");
+#ifdef VS_ADJUST
+  printoption("[-/+vsadjust]");
+#endif
   printoption("[-/+vsdisable]");
   printoption("[-vsgeometry geom]");
   printoption("[-/+vsmap]");
   printoption("[-/+vsperfect]");
-  printoption("[-wait seconds]");
+  printoption("[-wait secs[,final_secs]]");
   printoption("[-white color]");
+  printoption("[-windowid windowid]");
   printoption("[-/+wloop]");
   printoption("[filename ...]");
   fprintf(stderr,"\n\n");
@@ -1656,7 +2020,7 @@ static void cmdSyntax()
 /***********************************/
 static void rmodeSyntax()
 {
-  fprintf(stderr,"%s: unknown root mode '%d'.  Valid modes are:\n", 
+  fprintf(stderr,"%s: unknown root mode '%d'.  Valid modes are:\n",
 	  cmd, rootMode);
   fprintf(stderr,"\t0: tiling\n");
   fprintf(stderr,"\t1: integer tiling\n");
@@ -1668,6 +2032,7 @@ static void rmodeSyntax()
   fprintf(stderr,"\t7: centered on a 'brick' background\n");
   fprintf(stderr,"\t8: symmetrical tiling\n");
   fprintf(stderr,"\t9: symmetrical mirrored tiling\n");
+  fprintf(stderr,"\t10: upper left corner\n");
   fprintf(stderr,"\n");
   Quit(1);
 }
@@ -1675,16 +2040,14 @@ static void rmodeSyntax()
 
 /***********************************/
 static int argcmp(a1, a2, minlen, plusallowed, plusminus)
-     char *a1, *a2;
+     const char *a1, *a2;
      int  minlen, plusallowed;
      int *plusminus;
 {
-  /* does a string compare between a1 and a2.  To return '0', a1 and a2 
-     must match to the length of a2, and that length has to
+  /* does a string compare between a1 and a2.  To return '0', a1 and a2
+     must match to the length of a1, and that length has to
      be at least 'minlen'.  Otherwise, return non-zero.  plusminus set to '1'
      if '-option', '0' if '+option' */
-
-  int i;
 
   if ((strlen(a1) < (size_t) minlen) || (strlen(a2) < (size_t) minlen))
     return 1;
@@ -1694,7 +2057,7 @@ static int argcmp(a1, a2, minlen, plusallowed, plusminus)
 
   if (a1[0]=='-' || (plusallowed && a1[0]=='+')) {
     /* only set if we match */
-    *plusminus = (a1[0] == '-');    
+    *plusminus = (a1[0] == '-');
     return 0;
   }
 
@@ -1721,8 +2084,11 @@ static int openPic(filenum)
   int   oldCXOFF, oldCYOFF, oldCWIDE, oldCHIGH, wascropped;
   char *tmp;
   char *fullname,       /* full name of the original file */
-        filename[512],  /* full name of file to load (could be /tmp/xxx)*/
-        globnm[512];    /* globbed version of fullname of orig file */
+        filename[512];  /* full name of file to load (could be /tmp/xxx)*/
+#ifdef MACBINARY
+  char origname[512];	/* file name of original file (NO processing) */
+  origname[0] = '\0';
+#endif
 
   xvbzero((char *) &pinfo, sizeof(PICINFO));
 
@@ -1748,7 +2114,7 @@ static int openPic(filenum)
 
   /* if we're not loading next or prev page in a multi-page doc, kill off
      page files */
-  if (strlen(pageBaseName) && filenum!=OP_PAGEDN && filenum!=OP_PAGEUP) 
+  if (strlen(pageBaseName) && filenum!=OP_PAGEDN && filenum!=OP_PAGEUP)
     killpage = 1;
 
 
@@ -1799,14 +2165,13 @@ static int openPic(filenum)
   }
 
   else if (filenum == PADDED) {
-    /* need fullfname (used for window/icon name), 
+    /* need fullfname (used for window/icon name),
        basefname(compute from fullfname) */
 
     i = LoadPad(&pinfo, fullfname);
     fullname = fullfname;
     strcpy(filename, fullfname);
-    tmp = BaseName(fullfname);
-    strcpy(basefname, tmp);
+    strcpy(basefname, BaseName(fullfname));
 
     if (!i) goto FAILED;   /* shouldn't happen */
 
@@ -1855,33 +2220,48 @@ static int openPic(filenum)
       frompipe = 1;
     }
   }
+#ifdef AUTO_EXPAND
+  else {
+    fullname = (char *) malloc(MAXPATHLEN+2);
+    strcpy(fullname, namelist[filenum]);   // 1 of 2 places fullname != const
+    freename = 1;
+  }
+  tmp = (char *) rindex(fullname, '/');
+  if (tmp) {
+    *tmp = '\0';			   // 2 of 2 places fullname != const
+    Mkvdir(fullname);
+    *tmp = '/';
+  }
+  Dirtovd(fullname);
+#else
   else fullname = namelist[filenum];
-
+#endif
 
   strcpy(fullfname, fullname);
-  tmp = BaseName(fullname);
-  strcpy(basefname, tmp);
+  strcpy(basefname, BaseName(fullname));
 
 
   /* chop off trailing ".Z", ".z", or ".gz" from displayed basefname, if any */
-  if (strlen(basefname) > (size_t) 2     && 
-      strcmp(basefname+strlen(basefname)-2,".Z")==0)
+  if (strlen(basefname)>2 && strcmp(basefname+strlen(basefname)-2,".Z")==0)
     basefname[strlen(basefname)-2]='\0';
   else {
 #ifdef GUNZIP
-    if (strlen(basefname)>2 && strcmp(basefname+strlen(basefname)-2,".Z")==0)
+    if (strlen(basefname)>2 && strcmp(basefname+strlen(basefname)-2,".z")==0)
       basefname[strlen(basefname)-2]='\0';
-
-    else if (strlen(basefname)>3 && 
-	     strcmp(basefname+strlen(basefname)-3,".gz")==0)
+    else
+    if (strlen(basefname)>3 && strcmp(basefname+strlen(basefname)-3,".gz")==0)
       basefname[strlen(basefname)-3]='\0';
-#endif /* GUNZIP */
+#endif
+#ifdef BUNZIP2
+    if (strlen(basefname)>4 && strcmp(basefname+strlen(basefname)-4,".bz2")==0)
+      basefname[strlen(basefname)-4]='\0';
+#endif
   }
 
 
   if (filenum == LOADPIC && ISPIPE(fullname[0])) {
     /* if we're reading from a pipe, 'filename' will have the /tmp/xvXXXXXX
-       filename, and we can skip a lot of stuff:  (such as prepending 
+       filename, and we can skip a lot of stuff:  (such as prepending
        'initdir' to relative paths, dealing with reading from stdin, etc. */
 
     /* at this point, fullname = "! do some commands",
@@ -1891,11 +2271,11 @@ static int openPic(filenum)
 
   else {  /* NOT reading from a PIPE */
 
-    /* if fullname doesn't start with a '/' (ie, it's a relative path), 
-       (and it's not LOADPIC and it's not the special case '<stdin>') 
+    /* if fullname doesn't start with a '/' (ie, it's a relative path),
+       (and it's not LOADPIC and it's not the special case '<stdin>')
        then we need to prepend a directory name to it:
-       
-       prepend 'initdir', 
+
+       prepend 'initdir',
        if we have a searchdir (ie, we have multiple places to look),
              see if such a file exists (via fopen()),
        if it does, we're done.
@@ -1904,7 +2284,7 @@ static int openPic(filenum)
        if it does, we're done.
        if it doesn't, remove all prepended directories, and fall through
              to error code below.  */
-    
+
     if (filenum!=LOADPIC && fullname[0]!='/' && strcmp(fullname,STDINSTR)!=0) {
       char *tmp1;
 
@@ -1954,28 +2334,40 @@ static int openPic(filenum)
 	}
       }
     }
-    
+
     strcpy(filename, fullname);
-    
-    
+
+
     /* if the file is STDIN, write it out to a temp file */
 
     if (strcmp(filename,STDINSTR)==0) {
-      FILE *fp;
+      FILE *fp = NULL;
+#ifndef USE_MKSTEMP
+      int tmpfd;
+#endif
 
-#ifndef VMS      
+#ifndef VMS
       sprintf(filename,"%s/xvXXXXXX",tmpdir);
 #else /* it is VMS */
       sprintf(filename, "[]xvXXXXXX");
 #endif
+
+#ifdef USE_MKSTEMP
+      fp = fdopen(mkstemp(filename), "w");
+#else
       mktemp(filename);
+      tmpfd = open(filename,O_WRONLY|O_CREAT|O_EXCL,S_IRWUSR);
+      if (tmpfd < 0) FatalError("openPic(): can't create temporary file");
+      fp = fdopen(tmpfd,"w");
+#endif
+      if (!fp) FatalError("openPic(): can't write temporary file");
 
       clearerr(stdin);
-      fp = fopen(filename,"w");
-      if (!fp) FatalError("openPic(): can't write temporary file");
-    
       while ( (i=getchar()) != EOF) putc(i,fp);
       fclose(fp);
+#ifndef USE_MKSTEMP
+      close(tmpfd);
+#endif
 
       /* and remove it from list, since we can never reload from stdin */
       if (strcmp(namelist[0], STDINSTR)==0) deleteFromList(0);
@@ -1990,20 +2382,26 @@ static int openPic(filenum)
     (no pipes or stdin, though it could be compressed) to be loaded */
   filetype = ReadFileType(filename);
 
+#ifdef HAVE_MGCSFX
+  if (mgcsfx && filetype == RFT_UNKNOWN){ /* force use MgcSfx */
+    if(getInputCom() != 0) filetype = RFT_MGCSFX;
+  }
+#endif
 
-  if (filetype == RFT_COMPRESS) {   /* a compressed file.  uncompress it */
+  /* if it's a compressed file, uncompress it: */
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
     char tmpname[128];
 
     if (
 #ifndef VMS
-	UncompressFile(filename, tmpname)
+	UncompressFile(filename, tmpname, filetype)
 #else
-	UncompressFile(basefname, tmpname)
+	UncompressFile(basefname, tmpname, filetype)
 #endif
 	) {
 
       filetype = ReadFileType(tmpname);    /* and try again */
-      
+
       /* if we made a /tmp file (from stdin, etc.) won't need it any more */
       if (strcmp(fullname,filename)!=0) unlink(filename);
 
@@ -2014,6 +2412,57 @@ static int openPic(filenum)
     WaitCursor();
   }
 
+#ifdef MACBINARY
+  if (handlemacb && macb_file == True) {
+    char tmpname[128];
+
+    if (RemoveMacbinary(filename, tmpname)) {
+      if (strcmp(fullname,filename)!=0) unlink(filename);
+      strcpy(origname, filename);
+      strcpy(filename, tmpname);
+    }
+    else filetype = RFT_ERROR;
+
+    WaitCursor();
+  }
+#endif
+
+#ifdef HAVE_MGCSFX_AUTO
+  if (filetype == RFT_MGCSFX) {
+      char tmpname[128], tmp[256];
+      char *icom;
+
+      if ((icom = mgcsfx_auto_input_com(filename)) != NULL) {
+	sprintf(tmpname, "%s/xvmsautoXXXXXX", tmpdir);
+#ifdef USE_MKSTEMP
+	close(mkstemp(tmpname));
+#else
+	mktemp(tmpname);
+#endif
+	SetISTR(ISTR_INFO, "Converting to known format by MgcSfx auto...");
+	sprintf(tmp,"%s >%s", icom, tmpname);
+      }
+      else goto ms_auto_no;
+
+#ifndef VMS
+      if (system(tmp))
+#else
+      if (!system(tmp))
+#endif
+      {
+	SetISTR(ISTR_INFO, "Unable to convert '%s' by MgcSfx auto.",
+	  BaseName(filename));
+	Warning();
+	filetype = RFT_ERROR;
+	goto ms_auto_no;
+      }
+
+      filetype = ReadFileType(tmpname);
+      if (strcmp(fullname,filename)!=0) unlink(filename);
+      strcpy(filename, tmpname);
+  }
+ms_auto_no:
+#endif /* HAVE_MGCSFX_AUTO */
 
   if (filetype == RFT_ERROR) {
     char  foostr[512];
@@ -2027,10 +2476,16 @@ static int openPic(filenum)
 
   if (filetype == RFT_UNKNOWN) {
     /* view as a text/hex file */
-    TextView(filename);
+#ifdef MACBINARY
+    if (origname[0])
+      i = TextView(origname);
+    else
+#endif
+      i = TextView(filename);
     SetISTR(ISTR_INFO,"'%s' not in a recognized format.", basefname);
     /* Warning();  */
-    goto SHOWN_AS_TEXT;
+    if (i) goto SHOWN_AS_TEXT;
+    else   goto FAILED;
   }
 
   if (filetype < RFT_ERROR) {
@@ -2058,8 +2513,9 @@ static int openPic(filenum)
   if (filetype == RFT_XBM && (!i || pinfo.w==0 || pinfo.h==0)) {
     /* probably just a '.h' file or something... */
     SetISTR(ISTR_INFO," ");
-    TextView(filename);
-    goto SHOWN_AS_TEXT;
+    i = TextView(filename);
+    if (i) goto SHOWN_AS_TEXT;
+    else   goto FAILED;
   }
 
   if (!i) {
@@ -2084,7 +2540,7 @@ static int openPic(filenum)
   /**************/
   /* SUCCESS!!! */
   /**************/
-    
+
 
  GOTIMAGE:
   /* successfully read this picture.  No failures from here on out
@@ -2097,7 +2553,7 @@ static int openPic(filenum)
   if (conv24MB.flags[CONV24_LOCK]) {  /* locked */
     if (pinfo.type==PIC24 && picType==PIC8) {           /* 24 -> 8 bit */
       byte *pic8;
-      pic8 = Conv24to8(pinfo.pic, pinfo.w, pinfo.h, ncols, 
+      pic8 = Conv24to8(pinfo.pic, pinfo.w, pinfo.h, ncols,
 		       pinfo.r, pinfo.g, pinfo.b);
       free(pinfo.pic);
       pinfo.pic = pic8;
@@ -2108,7 +2564,7 @@ static int openPic(filenum)
 
     else if (pinfo.type!=PIC24 && picType==PIC24) {    /* 8 -> 24 bit */
       byte *pic24;
-      pic24 = Conv8to24(pinfo.pic, pinfo.w, pinfo.h, 
+      pic24 = Conv8to24(pinfo.pic, pinfo.w, pinfo.h,
 			pinfo.r, pinfo.g, pinfo.b);
       free(pinfo.pic);
       pinfo.pic  = pic24;
@@ -2144,7 +2600,7 @@ static int openPic(filenum)
 
   if (mainW && !useroot) {
     /* avoid generating excess configure events while we resize the window */
-    XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask 
+    XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask
 		 | StructureNotifyMask
                  | ButtonPressMask | KeyReleaseMask
                  | EnterWindowMask | LeaveWindowMask);
@@ -2162,11 +2618,13 @@ static int openPic(filenum)
   pHIGH = pinfo.h;
   if (pinfo.frmType >=0) SetDirSaveMode(F_FORMAT, pinfo.frmType);
   if (pinfo.colType >=0) SetDirSaveMode(F_COLORS, pinfo.colType);
-  
+
   SetISTR(ISTR_FORMAT, pinfo.fullInfo);
   strcpy(formatStr, pinfo.shrtInfo);
   picComments = pinfo.comment;
   ChangeCommentText();
+  picExifInfo = pinfo.exifInfo;
+  picExifInfoSize = pinfo.exifInfoSize;
 
   for (i=0; i<256; i++) {
     rMap[i] = pinfo.r[i];
@@ -2194,12 +2652,15 @@ static int openPic(filenum)
   if (fullname && strcmp(fullname,filename)!=0) unlink(filename);
 
 
-  SetISTR(ISTR_INFO,formatStr);
-	
+  SetISTR(ISTR_INFO, "%s", formatStr);
+
   SetInfoMode(INF_PART);
-  SetISTR(ISTR_FILENAME, 
-	  (filenum==DFLTPIC || filenum==GRABBED || frompipe)
-	  ? "<none>" : basefname);
+  if (filenum==DFLTPIC || filenum==GRABBED || frompipe)
+    SetISTR(ISTR_FILENAME, "<none>");
+  else if (numPages > 1)
+    SetISTR(ISTR_FILENAME, "%s  Page %d of %d", basefname, curPage+1, numPages);
+  else
+    SetISTR(ISTR_FILENAME, "%s", basefname);
 
   SetISTR(ISTR_RES,"%d x %d",pWIDE,pHIGH);
   SetISTR(ISTR_COLOR, "");
@@ -2219,7 +2680,7 @@ static int openPic(filenum)
 
 
   /* handle various 'auto-whatever' command line options
-     Note that if 'frompoll' is set, things that have to do with 
+     Note that if 'frompoll' is set, things that have to do with
      setting the expansion factor are skipped, as we'll want it to
      display in the (already-existing) window at the same size */
 
@@ -2254,7 +2715,7 @@ static int openPic(filenum)
       w = eWIDE;  h = (w*3) / 4;
       eWIDE = w;  eHIGH = h;
     }
-    
+
 
     if (eWIDE != cWIDE || eHIGH != cHIGH) epic = (byte *) NULL;
 
@@ -2306,14 +2767,14 @@ static int openPic(filenum)
     aspWIDE = eWIDE;  aspHIGH = eHIGH;   /* aspect-corrected eWIDE,eHIGH */
 
     if (hexpand < 0.0) eWIDE=(int)(aspWIDE / -hexpand);  /* neg:  reciprocal */
-                  else eWIDE=(int)(aspWIDE *  hexpand);  
+                  else eWIDE=(int)(aspWIDE *  hexpand);
     if (vexpand < 0.0) eHIGH=(int)(aspHIGH / -vexpand);  /* neg:  reciprocal */
-                  else eHIGH=(int)(aspHIGH *  vexpand);  
+                  else eHIGH=(int)(aspHIGH *  vexpand);
 
     if (maingeom) {
       /* deal with geometry spec.  Note, they shouldn't have given us
        *both* an expansion factor and a geomsize.  The geomsize wins out */
-    
+
       int i,x,y,gewide,gehigh;  u_int w,h;
 
       gewide = eWIDE;  gehigh = eHIGH;
@@ -2321,11 +2782,11 @@ static int openPic(filenum)
 
       if (i&WidthValue)  gewide = (int) w;
       if (i&HeightValue) gehigh = (int) h;
-      
+
       /* handle case where the pinheads only specified width *or * height */
       if (( i&WidthValue && ~i&HeightValue) ||
 	  (~i&WidthValue &&  i&HeightValue)) {
-    
+
 	if (i&WidthValue) { gehigh = (aspHIGH * gewide) / pWIDE; }
 	             else { gewide = (aspWIDE * gehigh) / pHIGH; }
       }
@@ -2391,7 +2852,7 @@ static int openPic(filenum)
 
     /* if we're using an integer tiled root mode, truncate eWIDE/eHIGH to
        be an integer divisor of the display size */
-      
+
     if (useroot && (rootMode == RM_TILE || rootMode == RM_IMIRROR)) {
       /* make picture size a divisor of the rootW size.  round down */
       i = (dispWIDE + eWIDE-1) / eWIDE;   eWIDE = (dispWIDE + i-1) / i;
@@ -2409,7 +2870,7 @@ static int openPic(filenum)
     if (autodither && ncols>0) epicMode = EM_DITH;
 
     /* if in CM_STDCMAP mode, and *not* in '-wait 0', then autodither */
-    if (colorMapMode == CM_STDCMAP && waitsec != 0) epicMode = EM_DITH;
+    if (colorMapMode == CM_STDCMAP && waitsec != 0.0) epicMode = EM_DITH;
 
     /* if -smooth or image has been shrunk to fit screen */
     if (autosmooth || (pWIDE >maxWIDE || pHIGH>maxHIGH)
@@ -2419,7 +2880,7 @@ static int openPic(filenum)
 
     /* 'dithering' makes no sense in 24-bit mode */
     if (picType == PIC24 && epicMode == EM_DITH) epicMode = EM_RAW;
-    
+
     SetEpicMode();
   } /* end of !frompoll */
 
@@ -2450,7 +2911,7 @@ static int openPic(filenum)
   if (useroot) mainW = vrootW;
   if (eWIDE != cWIDE || eHIGH != cHIGH) epic = (byte *) NULL;
 
-  NewPicGetColors(autonorm, autohisteq); 
+  NewPicGetColors(autonorm, autohisteq);
 
   GenerateEpic(eWIDE, eHIGH);     /* want to dither *after* color allocs */
   CreateXImage();
@@ -2474,7 +2935,7 @@ static int openPic(filenum)
   SetISTR(ISTR_INFO,"%s  %s  %s", formatStr,
 	  (picType==PIC8) ? "8-bit mode." : "24-bit mode.",
 	  tmp);
-	
+
   SetInfoMode(INF_FULL);
   if (freename) free(fullname);
 
@@ -2495,20 +2956,24 @@ static int openPic(filenum)
      to generate the correct exposes (particularly with 'BitGravity' turned
      on */
 
-  if (mainW && !useroot) GenExpose(mainW, 0, 0, (u_int) eWIDE, (u_int) eHIGH);
+  /*Brian T. Schellenberger: fix for X 4.2 refresh problem*/
+  if (mainW && !useroot) {
+    XSync(theDisp, False);
+    GenExpose(mainW, 0, 0, (u_int) eWIDE, (u_int) eHIGH);
+  }
 
   return 1;
 
-  
+
  FAILED:
   SetCursors(-1);
   KillPageFiles(pinfo.pagebname, pinfo.numpages);
 
-  if (fullname && strcmp(fullname,filename)!=0) 
+  if (fullname && strcmp(fullname,filename)!=0)
     unlink(filename);   /* kill /tmp file */
   if (freename) free(fullname);
 
-  if (!fromint && !polling && filenum>=0 && filenum<nList.nstr) 
+  if (!fromint && !polling && filenum>=0 && filenum<nList.nstr)
     deleteFromList(filenum);
 
   if (polling) sleep(1);
@@ -2527,6 +2992,9 @@ static int openPic(filenum)
 }
 
 
+extern byte ZXheader[128];	/* [JCE] Spectrum screen magic number is
+                                  defined in xvzx.c */
+
 
 /********************************/
 int ReadFileType(fname)
@@ -2539,76 +3007,118 @@ int ReadFileType(fname)
 
   FILE *fp;
   byte  magicno[30];    /* first 30 bytes of file */
-  int   rv, n;
+  int   rv=RFT_UNKNOWN, n;
+#ifdef MACBINARY
+  int   macbin_alrchk = False;
+#endif
 
   if (!fname) return RFT_ERROR;   /* shouldn't happen */
 
   fp = xv_fopen(fname, "r");
   if (!fp) return RFT_ERROR;
 
-  n = fread(magicno, (size_t) 1, (size_t) 30, fp);  
+  if (strlen(fname) > 4 &&
+      strcasecmp(fname+strlen(fname)-5, ".wbmp")==0)          rv = RFT_WBMP;
+
+  n = fread(magicno, (size_t) 1, sizeof(magicno), fp);
   fclose(fp);
 
-  if (n<30) return RFT_UNKNOWN;    /* files less than 30 bytes long... */
+  if (n<=0) return RFT_UNKNOWN;
 
-  rv = RFT_UNKNOWN;
+  /* it is just barely possible that a few files could legitimately be as small
+     as 30 bytes (e.g., binary P{B,G,P}M format), so zero out rest of "magic
+     number" buffer and don't quit immediately if we read something small but
+     not empty */
+  if (n<30) memset(magicno+n, 0, sizeof(magicno)-n);
 
-  if (strncmp((char *) magicno,"GIF87a", (size_t) 6)==0 ||
-      strncmp((char *) magicno,"GIF89a", (size_t) 6)==0)        rv = RFT_GIF;
+#ifdef MACBINARY
+  macb_file = False;
+  while (1) {
+#endif
+
+#ifdef HAVE_MGCSFX
+  if (is_mgcsfx(fname, magicno, 30) != 0) rv = RFT_MGCSFX;
+  else
+#endif
+       if (strncmp((char *) magicno,"GIF87a", (size_t) 6)==0 ||
+	   strncmp((char *) magicno,"GIF89a", (size_t) 6)==0) rv = RFT_GIF;
 
   else if (strncmp((char *) magicno,"VIEW", (size_t) 4)==0 ||
-	   strncmp((char *) magicno,"WEIV", (size_t) 4)==0)     rv = RFT_PM;
+	   strncmp((char *) magicno,"WEIV", (size_t) 4)==0)   rv = RFT_PM;
 
-  else if (magicno[0] == 'P' && magicno[1]>='1' && 
-	   magicno[1]<='6')                             rv = RFT_PBM;
+#ifdef HAVE_PIC2
+  else if (magicno[0]=='P' && magicno[1]=='2' &&
+	   magicno[2]=='D' && magicno[3]=='T')                rv = RFT_PIC2;
+#endif
+
+  else if (magicno[0] == 'P' && magicno[1]>='1' &&
+	   (magicno[1]<='6' || magicno[1]=='8'))              rv = RFT_PBM;
 
   /* note: have to check XPM before XBM, as first 2 chars are the same */
   else if (strncmp((char *) magicno, "/* XPM */", (size_t) 9)==0) rv = RFT_XPM;
 
   else if (strncmp((char *) magicno,"#define", (size_t) 7)==0 ||
-	   (magicno[0] == '/' && magicno[1] == '*'))    rv = RFT_XBM;
+	   (magicno[0] == '/' && magicno[1] == '*'))          rv = RFT_XBM;
 
   else if (magicno[0]==0x59 && (magicno[1]&0x7f)==0x26 &&
-	   magicno[2]==0x6a && (magicno[3]&0x7f)==0x15) rv = RFT_SUNRAS;
+	   magicno[2]==0x6a && (magicno[3]&0x7f)==0x15)       rv = RFT_SUNRAS;
 
-  else if (magicno[0] == 'B' && magicno[1] == 'M')      rv = RFT_BMP;
+  else if (magicno[0] == 'B' && magicno[1] == 'M')            rv = RFT_BMP;
 
-  else if (magicno[0]==0x52 && magicno[1]==0xcc)        rv = RFT_UTAHRLE;
+  else if (magicno[0]==0x52 && magicno[1]==0xcc)              rv = RFT_UTAHRLE;
 
   else if ((magicno[0]==0x01 && magicno[1]==0xda) ||
-	   (magicno[0]==0xda && magicno[1]==0x01))      rv = RFT_IRIS;
+	   (magicno[0]==0xda && magicno[1]==0x01))            rv = RFT_IRIS;
 
-  else if (magicno[0]==0x1f && magicno[1]==0x9d)        rv = RFT_COMPRESS;
+  else if (magicno[0]==0x1f && magicno[1]==0x9d)              rv = RFT_COMPRESS;
 
 #ifdef GUNZIP
-  else if (magicno[0]==0x1f && magicno[1]==0x8b)        rv = RFT_COMPRESS;
+  else if (magicno[0]==0x1f && magicno[1]==0x8b)              rv = RFT_COMPRESS;
 #endif
 
-  else if (magicno[0]==0x0a && magicno[1] <= 5)         rv = RFT_PCX;
+#ifdef BUNZIP2
+  else if (magicno[0]==0x42 && magicno[1]==0x5a)              rv = RFT_BZIP2;
+#endif
 
-  else if (strncmp((char *) magicno,   "FORM", (size_t) 4)==0 && 
-	   strncmp((char *) magicno+8, "ILBM", (size_t) 4)==0)   rv = RFT_IFF;
+  else if (magicno[0]==0x0a && magicno[1] <= 5)               rv = RFT_PCX;
+
+  else if (strncmp((char *) magicno,   "FORM", (size_t) 4)==0 &&
+	   strncmp((char *) magicno+8, "ILBM", (size_t) 4)==0) rv = RFT_IFF;
 
   else if (magicno[0]==0 && magicno[1]==0 &&
 	   magicno[2]==2 && magicno[3]==0 &&
 	   magicno[4]==0 && magicno[5]==0 &&
-	   magicno[6]==0 && magicno[7]==0)              rv = RFT_TARGA;
+	   magicno[6]==0 && magicno[7]==0)                    rv = RFT_TARGA;
 
   else if (magicno[4]==0x00 && magicno[5]==0x00 &&
-	   magicno[6]==0x00 && magicno[7]==0x07)        rv = RFT_XWD;
+	   magicno[6]==0x00 && magicno[7]==0x07)              rv = RFT_XWD;
 
-  else if (strncmp((char *) magicno,"SIMPLE  ", (size_t) 8)==0 && 
-	   magicno[29] == 'T')                          rv = RFT_FITS;
-  
+  else if (strncmp((char *) magicno,"SIMPLE  ", (size_t) 8)==0 &&
+	   magicno[29] == 'T')                                rv = RFT_FITS;
+
+  /* [JCE] Spectrum screen */
+  else if (memcmp(magicno, ZXheader, (size_t) 18)==0)         rv = RFT_ZX;
 
 #ifdef HAVE_JPEG
-  else if (magicno[0]==0xff && magicno[1]==0xd8 && 
-	   magicno[2]==0xff)                            rv = RFT_JFIF;
+  else if (magicno[0]==0xff && magicno[1]==0xd8 &&
+	   magicno[2]==0xff)                                  rv = RFT_JFIF;
+#endif
+
+#ifdef HAVE_JP2K
+  else if (magicno[0]==0xff && magicno[1]==0x4f && 
+           magicno[2]==0xff && magicno[3]==0x51)              rv = RFT_JPC;
+
+  else if (memcmp(magicno, jp2k_magic, sizeof(jp2k_magic))==0) rv = RFT_JP2;
 #endif
 
 #ifdef HAVE_TIFF
   else if ((magicno[0]=='M' && magicno[1]=='M') ||
-	   (magicno[0]=='I' && magicno[1]=='I'))        rv = RFT_TIFF;
+	   (magicno[0]=='I' && magicno[1]=='I'))              rv = RFT_TIFF;
+#endif
+
+#ifdef HAVE_PNG
+  else if (magicno[0]==0x89 && magicno[1]=='P' &&
+           magicno[2]=='N'  && magicno[3]=='G')               rv = RFT_PNG;
 #endif
 
 #ifdef HAVE_PDS
@@ -2620,11 +3130,67 @@ int ReadFileType(fname)
       rv = RFT_PDSVICAR;
 #endif
 
-#ifdef GS_PATH
+#ifdef GS_PATH   /* Ghostscript handles both PostScript and PDF */
   else if (strncmp((char *) magicno, "%!",     (size_t) 2)==0 ||
-	   strncmp((char *) magicno, "\004%!", (size_t) 3)==0)   rv = RFT_PS;
+	   strncmp((char *) magicno, "\004%!", (size_t) 3)==0 ||
+           strncmp((char *) magicno, "%PDF",   (size_t) 4)==0) rv = RFT_PS;
 #endif
 
+#ifdef HAVE_G3
+  else if ((magicno[0]==  1 && magicno[1]==  1 &&
+            magicno[2]== 77 && magicno[3]==154 &&
+            magicno[4]==128 && magicno[5]==  0 &&
+            magicno[6]==  1 && magicno[7]== 77)
+           || highresfax || fax) /* kludge! */                rv = RFT_G3;
+#endif
+
+#ifdef HAVE_MAG
+  else if (strncmp((char *) magicno,"MAKI02  ", (size_t) 8)==0) rv = RFT_MAG;
+#endif
+
+#ifdef HAVE_MAKI
+  else if (strncmp((char *) magicno,"MAKI01A ", (size_t) 8)==0 ||
+	   strncmp((char *) magicno,"MAKI01B ", (size_t) 8)==0) rv = RFT_MAKI;
+#endif
+
+#ifdef HAVE_PIC
+  else if (magicno[0]=='P' && magicno[1]=='I'&&magicno[2]=='C') rv = RFT_PIC;
+#endif
+
+#ifdef HAVE_PI
+  else if (magicno[0]=='P' && magicno[1]=='i')                rv = RFT_PI;
+#endif
+
+#ifdef HAVE_HIPS
+  else if (strstr((char *) magicno, "./digest"))              rv = RFT_HIPS;
+#endif
+
+#ifdef HAVE_PCD
+  else if (magicno[0]==0xff && magicno[1]==0xff &&
+           magicno[2]==0xff && magicno[3]==0xff)              rv = RFT_PCD;
+#endif
+
+#ifdef MACBINARY
+    /* Now we try to handle MacBinary files, but the method is VERY dirty... */
+    if (macbin_alrchk == True) {
+      macb_file = True;
+      break;
+    }
+
+    if (rv != RFT_UNKNOWN)
+      break;
+
+    /* Skip MACBSIZE and recheck */
+    macbin_alrchk = True;
+    fp = xv_fopen(fname, "r");
+    if (!fp) return RFT_ERROR;
+    fseek(fp, MACBSIZE, SEEK_SET);
+    n = fread(magicno, (size_t) 1, (size_t) 30, fp);
+    fclose(fp);
+
+    if (n<30) return RFT_UNKNOWN;    /* files less than 30 bytes long... */
+  }
+#endif
   return rv;
 }
 
@@ -2637,9 +3203,10 @@ int ReadPicFile(fname, ftype, pinfo, quick)
      PICINFO *pinfo;
 {
   /* if quick is set, we're being called to generate icons, or something
-     like that.  We should load the image as quickly as possible.  Currently,
-     this only affects the LoadPS routine, which, if quick is set, only
-     generates the page file for the first page of the document */
+     like that.  We should load the image as quickly as possible.  Previously,
+     this affected only the LoadPS routine, which, if quick is set, only
+     generates the page file for the first page of the document.  Now it
+     also affects PCD, which loads only a thumbnail. */
 
   int rv = 0;
 
@@ -2650,7 +3217,11 @@ int ReadPicFile(fname, ftype, pinfo, quick)
   switch (ftype) {
   case RFT_GIF:     rv = LoadGIF   (fname, pinfo);         break;
   case RFT_PM:      rv = LoadPM    (fname, pinfo);         break;
+#ifdef HAVE_MGCSFX
+  case RFT_PBM:     rv = LoadPBM   (fname, pinfo, -1);     break;
+#else
   case RFT_PBM:     rv = LoadPBM   (fname, pinfo);         break;
+#endif
   case RFT_XBM:     rv = LoadXBM   (fname, pinfo);         break;
   case RFT_SUNRAS:  rv = LoadSunRas(fname, pinfo);         break;
   case RFT_BMP:     rv = LoadBMP   (fname, pinfo);         break;
@@ -2662,21 +3233,69 @@ int ReadPicFile(fname, ftype, pinfo, quick)
   case RFT_XPM:     rv = LoadXPM   (fname, pinfo);         break;
   case RFT_XWD:     rv = LoadXWD   (fname, pinfo);         break;
   case RFT_FITS:    rv = LoadFITS  (fname, pinfo, quick);  break;
+  case RFT_ZX:      rv = LoadZX    (fname, pinfo);         break; /* [JCE] */
+  case RFT_WBMP:    rv = LoadWBMP  (fname, pinfo);         break;
+
+#ifdef HAVE_PCD
+  /* if quick is switched on, use the smallest image size; don't ask the user */
+  case RFT_PCD:     rv = LoadPCD   (fname, pinfo, quick ? 0 : PcdSize);  break;
+#endif
 
 #ifdef HAVE_JPEG
-  case RFT_JFIF:    rv = LoadJFIF  (fname, pinfo, quick);    break;
+  case RFT_JFIF:    rv = LoadJFIF  (fname, pinfo, quick);  break;
+#endif
+
+#ifdef HAVE_JP2K
+  case RFT_JPC:     rv = LoadJPC   (fname, pinfo, quick);  break;
+  case RFT_JP2:     rv = LoadJP2   (fname, pinfo, quick);  break;
 #endif
 
 #ifdef HAVE_TIFF
-  case RFT_TIFF:    rv = LoadTIFF  (fname, pinfo);           break;
+  case RFT_TIFF:    rv = LoadTIFF  (fname, pinfo, quick);  break;
+#endif
+
+#ifdef HAVE_PNG
+  case RFT_PNG:     rv = LoadPNG   (fname, pinfo);         break;
 #endif
 
 #ifdef HAVE_PDS
-  case RFT_PDSVICAR: rv = LoadPDS  (fname, pinfo);           break;
+  case RFT_PDSVICAR: rv = LoadPDS  (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_G3
+  case RFT_G3:      rv = LoadG3    (fname, pinfo);         break;
 #endif
 
 #ifdef GS_PATH
-  case RFT_PS:      rv = LoadPS    (fname, pinfo, quick);    break;
+  case RFT_PS:      rv = LoadPS    (fname, pinfo, quick);  break;
+#endif
+
+#ifdef HAVE_MAG
+  case RFT_MAG:     rv = LoadMAG   (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_MAKI
+  case RFT_MAKI:    rv = LoadMAKI  (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_PIC
+  case RFT_PIC:     rv = LoadPIC   (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_PI
+  case RFT_PI:      rv = LoadPi    (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_PIC2
+  case RFT_PIC2:    rv = LoadPIC2  (fname, pinfo, quick);  break;
+#endif
+
+#ifdef HAVE_HIPS
+  case RFT_HIPS:    rv = LoadHIPS  (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_MGCSFX
+  case RFT_MGCSFX:  rv = LoadMGCSFX (fname, pinfo);        break;
 #endif
 
   }
@@ -2685,13 +3304,17 @@ int ReadPicFile(fname, ftype, pinfo, quick)
 
 
 /********************************/
-int UncompressFile(name, uncompname)
+int UncompressFile(name, uncompname, filetype)
      char *name, *uncompname;
+     int filetype;
 {
   /* returns '1' on success, with name of uncompressed file in uncompname
      returns '0' on failure */
 
   char namez[128], *fname, buf[512];
+#ifndef USE_MKSTEMP
+  int tmpfd;
+#endif
 
   fname = name;
   namez[0] = '\0';
@@ -2703,7 +3326,7 @@ int UncompressFile(name, uncompname)
      to what it was.  necessary because uncompress doesn't handle files
      that don't end with '.Z' */
 
-  if (strlen(name) >= (size_t) 2            && 
+  if (strlen(name) >= (size_t) 2            &&
       strcmp(name + strlen(name)-2,".Z")!=0 &&
       strcmp(name + strlen(name)-2,".z")!=0) {
     strcpy(namez, name);
@@ -2721,34 +3344,50 @@ int UncompressFile(name, uncompname)
 #endif   /* not VMS and not GUNZIP */
 
 
-  
 #ifndef VMS
   sprintf(uncompname, "%s/xvuXXXXXX", tmpdir);
-  mktemp(uncompname);
-  sprintf(buf,"%s -c %s >%s", UNCOMPRESS, fname, uncompname);
-#else /* it IS VMS */
+#else
   strcpy(uncompname, "[]xvuXXXXXX");
+#endif
+
+#ifdef USE_MKSTEMP
+  close(mkstemp(uncompname));
+#else
   mktemp(uncompname);
-#  ifdef GUNZIP
-  sprintf(buf,"%s %s %s", UNCOMPRESS, fname, uncompname);
-#  else
-  sprintf(buf,"%s %s", UNCOMPRESS, fname);
-#  endif
+  tmpfd = open(uncompname,O_WRONLY|O_CREAT|O_EXCL,S_IRWUSR);
+  if (tmpfd < 0) FatalError("UncompressFile(): can't create temporary file");
+  close(tmpfd);
+#endif
+
+#ifndef VMS
+  if (filetype == RFT_COMPRESS)
+    sprintf(buf,"%s -c '%s' > '%s'", UNCOMPRESS, fname, uncompname);
+# ifdef BUNZIP2
+  else if (filetype == RFT_BZIP2)
+    sprintf(buf,"%s -c '%s' > '%s'", BUNZIP2, fname, uncompname);
+# endif
+#else /* it IS VMS */
+# ifdef GUNZIP
+  sprintf(buf,"%s '%s' '%s'", UNCOMPRESS, fname, uncompname);
+# else
+  sprintf(buf,"%s '%s'", UNCOMPRESS, fname);
+# endif
 #endif
 
   SetISTR(ISTR_INFO, "Uncompressing '%s'...", BaseName(fname));
 #ifndef VMS
-  if (system(buf)) {
+  if (system(buf))
 #else
-  if (!system(buf)) {
+  if (!system(buf))
 #endif
+  {
     SetISTR(ISTR_INFO, "Unable to uncompress '%s'.", BaseName(fname));
     Warning();
     return 0;
   }
 
-#ifndef VMS  
-  /* if we renamed the file to end with a .Z for the sake of 'uncompress', 
+#ifndef VMS
+  /* if we renamed the file to end with a .Z for the sake of 'uncompress',
      rename it back to what it once was... */
 
   if (strlen(namez)) {
@@ -2769,9 +3408,65 @@ int UncompressFile(name, uncompname)
     }
    */
 #endif /* not VMS */
-  
+
   return 1;
 }
+
+
+#ifdef MACBINARY
+/********************************/
+int RemoveMacbinary(src, dst)
+     char *src, *dst;
+{
+  char buffer[8192]; /* XXX */
+  int n, eof;
+#ifndef USE_MKSTEMP
+  int tmpfd;
+#endif
+  FILE *sfp, *dfp;
+
+  sprintf(dst, "%s/xvmXXXXXX", tmpdir);
+#ifdef USE_MKSTEMP
+  close(mkstemp(dst));
+#else
+  mktemp(dst);
+  tmpfd = open(dst,O_WRONLY|O_CREAT|O_EXCL,S_IRWUSR);
+  if (tmpfd < 0) FatalError("RemoveMacbinary(): can't create temporary file");
+#endif
+
+  SetISTR(ISTR_INFO, "Removing MacBinary...");
+
+  sfp = xv_fopen(src, "r");
+#ifdef USE_MKSTEMP
+  dfp = xv_fopen(dst, "w");
+#else
+  dfp = fdopen(tmpfd, "w");
+#endif
+  if (!sfp || !dfp) {
+    SetISTR(ISTR_INFO, "Unable to remove a InfoFile header form '%s'.", src);
+    Warning();
+    return 0;
+  }
+  fseek(sfp, MACBSIZE, SEEK_SET);
+  while ((n = fread(buffer, 1, sizeof(buffer), sfp)) == 8192) /* XXX */
+    fwrite(buffer, 1, n, dfp);
+  if ((eof = feof(sfp)))
+    fwrite(buffer, 1, n, dfp);
+  fclose(sfp);
+  fflush(dfp);
+  fclose(dfp);
+#ifndef USE_MKSTEMP
+  close(tmpfd);
+#endif
+  if (!eof) {
+    SetISTR(ISTR_INFO, "Unable to remove a InfoFile header form '%s'.", src);
+    Warning();
+    return 0;
+  }
+
+  return 1;
+}
+#endif
 
 
 /********************************/
@@ -2789,6 +3484,10 @@ void KillPageFiles(bname, numpages)
     sprintf(tmp, "%s%d", bname, i);
     unlink(tmp);
   }
+
+  /* GRR 20070506:  basename file doesn't go away, at least on Linux and for
+   *   GIF and TIFF images, so explicitly unlink() it, too */
+  unlink(bname);
 }
 
 
@@ -2798,11 +3497,11 @@ void NewPicGetColors(donorm, dohist)
 {
   int i;
 
-  /* some stuff that necessary whenever running an algorithm or 
+  /* some stuff that necessary whenever running an algorithm or
      installing a new 'pic' (or switching 824 modes) */
 
   numcols = 0;   /* gets set by SortColormap:  set to 0 for PIC24 images */
-  for (i=0; i<256; i++) cols[i]=infobg;   
+  for (i=0; i<256; i++) cols[i]=infobg;
 
   if (picType == PIC8) {
     byte trans[256];
@@ -2811,18 +3510,18 @@ void NewPicGetColors(donorm, dohist)
   }
 
   if (picType == PIC8) {
-    /* see if image is a b/w bitmap.  
+    /* see if image is a b/w bitmap.
        If so, use '-black' and '-white' colors */
     if (numcols == 2) {
       if ((rMap[0] == gMap[0] && rMap[0] == bMap[0] && rMap[0] == 255) &&
 	  (rMap[1] == gMap[1] && rMap[1] == bMap[1] && rMap[1] ==   0)) {
 	/* 0=wht, 1=blk */
-	rMap[0] = (whtRGB>>16)&0xff;  
-	gMap[0] = (whtRGB>>8)&0xff;  
+	rMap[0] = (whtRGB>>16)&0xff;
+	gMap[0] = (whtRGB>>8)&0xff;
 	bMap[0] = whtRGB&0xff;
 
 	rMap[1] = (blkRGB>>16)&0xff;
-	gMap[1] = (blkRGB>>8)&0xff;  
+	gMap[1] = (blkRGB>>8)&0xff;
 	bMap[1] = blkRGB&0xff;
       }
 
@@ -2852,10 +3551,10 @@ void NewPicGetColors(donorm, dohist)
     }
 
     /* save the desired RGB colormap (before dicking with it) */
-    for (i=0; i<numcols; i++) { 
-      rorg[i] = rcmap[i] = rMap[i];  
-      gorg[i] = gcmap[i] = gMap[i];  
-      borg[i] = bcmap[i] = bMap[i];  
+    for (i=0; i<numcols; i++) {
+      rorg[i] = rcmap[i] = rMap[i];
+      gorg[i] = gcmap[i] = gMap[i];
+      borg[i] = bcmap[i] = bMap[i];
     }
   }
 
@@ -2888,19 +3587,29 @@ static int readpipe(cmd, fname)
 {
   /* cmd is something like: "! bggen 100 0 0"
    *
-   * runs command (with "> /tmp/xv******" appended).  
+   * runs command (with "> /tmp/xv******" appended).
    * returns "/tmp/xv******" in fname
    * returns '0' if everything's cool, '1' on error
    */
 
   char fullcmd[512], tmpname[64], str[512];
   int i;
+#ifndef USE_MKSTEMP
+  int tmpfd;
+#endif
 
   if (!cmd || (strlen(cmd) < (size_t) 2)) return 1;
 
   sprintf(tmpname,"%s/xvXXXXXX", tmpdir);
+#ifdef USE_MKSTEMP
+  close(mkstemp(tmpname));
+#else
   mktemp(tmpname);
-  if (tmpname[0] == '\0') {   /* mktemp() blew up */
+  tmpfd = open(tmpname,O_WRONLY|O_CREAT|O_EXCL,S_IRWUSR);
+  if (tmpfd < 0) FatalError("openPic(): can't create temporary file");
+  close(tmpfd);
+#endif
+  if (tmpname[0] == '\0') {   /* mktemp() or mkstemp() blew up */
     sprintf(str,"Unable to create temporary filename.");
     ErrPopUp(str, "\nHow unlikely!");
     return 1;
@@ -2939,24 +3648,19 @@ static void openFirstPic()
 {
   int i;
 
+  waitsec = (numnames <= 1)? waitsec_final : waitsec_nonfinal;
+
   if (!numnames) {  openPic(DFLTPIC);  return; }
 
   i = 0;
-  if (!randomShow) {
-    while (numnames>0) {
-      if (openPic(0)) return;  /* success */
-      else {
-	if (polling && !i) 
-	  fprintf(stderr,"%s: POLLING: Waiting for file '%s' \n\tto %s\n",
-		  cmd, namelist[0], "be created, or whatever...");
-	i = 1;
-      }
+  while (numnames>0) {
+    if (openPic(0)) return;  /* success */
+    else {
+      if (polling && !i)
+	fprintf(stderr,"%s: POLLING: Waiting for file '%s' \n\tto %s\n",
+		cmd, namelist[0], "be created, or whatever...");
+      i = 1;
     }
-  }
-
-  else {    /* pick random first picture */
-    for (i=findRandomPic();  i>=0;  i=findRandomPic())
-      if (openPic(i)) return;    /* success */
   }
 
   if (numnames>1) FatalError("couldn't open any pictures");
@@ -2970,11 +3674,11 @@ static void openNextPic()
   int i;
 
   if (curname>=0) i = curname+1;
-  else if (nList.selected >= 0 && nList.selected < numnames) 
+  else if (nList.selected >= 0 && nList.selected < numnames)
        i = nList.selected;
   else i = 0;
 
- 
+
   while (i<numnames && !openPic(i));
   if (i<numnames) return;    /* success */
 
@@ -2987,19 +3691,15 @@ static void openNextQuit()
 {
   int i;
 
-  if (!randomShow) {
-    if (curname>=0) i = curname+1;
-    else if (nList.selected >= 0 && nList.selected < numnames) 
-      i = nList.selected;
-    else i = 0;
+  if (curname>=0) i = curname+1;
+  else if (nList.selected >= 0 && nList.selected < numnames)
+    i = nList.selected;
+  else i = 0;
 
-    while (i<numnames && !openPic(i));
-    if (i<numnames) return;    /* success */
-  }
-  else {
-    for (i=findRandomPic(); i>=0; i=findRandomPic())
-      if (openPic(i)) return;
-  }
+  waitsec = (i == numnames-1)? waitsec_final : waitsec_nonfinal;
+
+  while (i<numnames && !openPic(i));
+  if (i<numnames) return;    /* success */
 
   Quit(0);
 }
@@ -3012,25 +3712,21 @@ static void openNextLoop()
 
   j = loop = 0;
   while (1) {
-    if (!randomShow) {
 
-      if (curname>=0) i = curname+1;
-      else if (nList.selected >= 0 && nList.selected < numnames) 
-	i = nList.selected;
-      else i = 0;
+    if (curname>=0) i = curname+1;
+    else if (nList.selected >= 0 && nList.selected < numnames)
+      i = nList.selected;
+    else i = 0;
 
-      if (loop) {  i = 0;   loop = 0; }
+    if (loop) {  i = 0;   loop = 0; }
 
-      while (i<numnames && !openPic(i));
-      if (i<numnames) return;
-    }
-    else {
-      for (i=findRandomPic(); i>=0; i=findRandomPic())
-	if (openPic(i)) return;
-    }
+    waitsec = (i == numnames-1)? waitsec_final : waitsec_nonfinal;
+
+    while (i<numnames && !openPic(i));
+    if (i<numnames) return;
 
     loop = 1;        /* back to top of list */
-    if (j) break;                         /* we're in a 'failure loop' */
+    if (j) break;    /* we're in a 'failure loop' */
     j++;
   }
 
@@ -3044,7 +3740,7 @@ static void openPrevPic()
   int i;
 
   if (curname>0) i = curname-1;
-  else if (nList.selected>0 && nList.selected < numnames) 
+  else if (nList.selected>0 && nList.selected < numnames)
     i = nList.selected - 1;
   else i = numnames-1;
 
@@ -3063,64 +3759,24 @@ static void openNamedPic()
   openPic(LOADPIC);
 }
 
-
-
-
-/****************/
-static int findRandomPic()
-/****************/
-{
-  static byte *loadList;
-  static int   left_to_load, listLen = -1;
-  int          k;
-  time_t       t;
-
-  /* picks a random name out of the list, and returns it's index.  If there
-     are no more names to pick, it returns '-1' and resets itself */
-
-  if (!loadList || numnames!=listLen) {
-    if (loadList) free(loadList);
-    else {
-      time(&t);
-      srandom((unsigned int) t); /* seed the random */
-    }
-
-    left_to_load = listLen = numnames;
-    loadList = (byte *) malloc((size_t) listLen);
-    for (k=0; k<listLen; k++) loadList[k] = 0;
-  }
-  
-  if (left_to_load <= 0) {   /* we've loaded all the pics */
-    for (k=0; k<listLen; k++) loadList[k] = 0;   /* clear flags */
-    left_to_load = listLen;
-    return -1;   /* 'done' return */
-  }
-
-  for (k=abs(random()) % listLen;  loadList[k];  k = (k+1) % listLen);
-  
-  left_to_load--;
-  loadList[k] = TRUE;
-
-  return k;
-}
-
 /****************/
 static void mainLoop()
 {
-  /* search forward until we manage to display a picture, 
-     then call EventLoop.  EventLoop will eventually return 
+  /* search forward until we manage to display a picture,
+     then call EventLoop.  EventLoop will eventually return
      NEXTPIC, PREVPIC, NEXTQUIT, QUIT, or, if >= 0, a filenum to GOTO */
 
   int i;
 
-  /* if curname<0 (there is no 'current' file), 'Next' means view the 
+  /* if curname<0 (there is no 'current' file), 'Next' means view the
      selected file (or the 0th file, if no selection either), and 'Prev' means
      view the one right before the selected file */
 
-  openFirstPic();   /* find first displayable picture, exit if none */
+  /* find first displayable picture, exit if none */
+  if (!startGrab) openFirstPic();
 
   if (!pic)  {  /* must've opened a text file...  display dflt pic */
-    openPic(DFLTPIC);
+    if (!startGrab) openPic(DFLTPIC);
     if (mainW && !useroot) RaiseTextWindows();
   }
 
@@ -3133,7 +3789,7 @@ static void mainLoop()
     }
 
     else if (i==PREVPIC) {
-      if (curname>0 || (curname<0 && nList.selected>0)) 
+      if (curname>0 || (curname<0 && nList.selected>0))
 	openPrevPic();
     }
 
@@ -3151,7 +3807,7 @@ static void mainLoop()
 
     else if (i==THISNEXT) {  /* open current sel, 'next' until success */
       int j;
-      j = nList.selected;  
+      j = nList.selected;
       if (j<0) j = 0;
       while (j<numnames && !openPic(j));
       if (!pic) openPic(DFLTPIC);
@@ -3169,7 +3825,7 @@ static void mainLoop()
 
 /***********************************/
 static void createMainWindow(geom, name)
-     char *geom, *name;
+     const char *geom, *name;
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
@@ -3195,22 +3851,35 @@ static void createMainWindow(geom, name)
   i = XParseGeometry(geom,&x,&y,&w,&h);
 
   hints.flags = 0;
-  if ((i&XValue || i&YValue)) hints.flags = USPosition;
+  if (i&XValue || i&YValue)
+      hints.flags |= USPosition;
 
-  if (i&XValue && i&XNegative) x = vrWIDE - eWIDE - abs(x);
-  if (i&YValue && i&YNegative) y = vrHIGH - eHIGH - abs(y);
+  hints.win_gravity = NorthWestGravity;
+  if (i&XValue && i&XNegative) {
+    hints.win_gravity = NorthEastGravity;
+    x = vrWIDE - (eWIDE + 2 * bwidth) - x;
+  }
+  if (i&YValue && i&YNegative) {
+    hints.win_gravity = (hints.win_gravity == NorthWestGravity) ?
+      SouthWestGravity : SouthEastGravity;
+    y = vrHIGH - (eHIGH + 2 * bwidth) - y;
+  }
+  hints.flags |= PWinGravity;
 
-  if (x+eWIDE > vrWIDE) x = vrWIDE - eWIDE;   /* keep on screen */
+  /* keep on screen */
+  if (x+eWIDE > vrWIDE) x = vrWIDE - eWIDE;
   if (y+eHIGH > vrHIGH) y = vrHIGH - eHIGH;
-
+  if (x < 0) x = 0;
+  if (y < 0) y = 0;
 
 #define VROOT_TRANS
 #ifdef VROOT_TRANS
-  if (vrootW != rootW) { /* virtual window manager running */
+  if (vrootW != rootW && !(hints.flags & USPosition)) { /* virtual window manager running */
     int x1,y1;
     Window child;
+
     XTranslateCoordinates(theDisp, rootW, vrootW, x, y, &x1, &y1, &child);
-    if (DEBUG) fprintf(stderr,"translate:  %d,%d -> %d,%d\n",x,y,x1,y1);
+    if (DEBUG) fprintf(stderr,"translate:  %d,%d -> %d,%d\n", x, y, x1, y1);
     x = x1;  y = y1;
   }
 #endif
@@ -3218,13 +3887,13 @@ static void createMainWindow(geom, name)
   hints.x = x;                  hints.y = y;
   hints.width = eWIDE;          hints.height = eHIGH;
   hints.max_width  = maxWIDE;   hints.max_height = maxHIGH;
-  hints.flags |= USSize | PMaxSize;
-    
-  xswa.bit_gravity = StaticGravity;
+  hints.flags |= PSize | PMaxSize;
+
+  xswa.bit_gravity      = StaticGravity;
   xswa.background_pixel = bg;
   xswa.border_pixel     = fg;
   xswa.colormap         = theCmap;
-  
+
   xswa.backing_store    = WhenMapped;
 
   /* NOTE: I've turned 'backing-store' off on the image window, as some
@@ -3233,9 +3902,9 @@ static void createMainWindow(geom, name)
      improvement anyway (for the image window), unless you're on a slow
      network.  In any event, I'm not *turning off* backing store, I'm
      just not explicitly turning it *on*.  If your X server is set up
-     that windows, by default, have backing-store turned on, then the 
+     that windows, by default, have backing-store turned on, then the
      image window will, too */
-  
+
   xswamask = CWBackPixel | CWBorderPixel | CWColormap /* | CWBackingStore */;
   if (!clearonload) xswamask |= CWBitGravity;
 
@@ -3244,18 +3913,18 @@ static void createMainWindow(geom, name)
     xwa.width = eWIDE;  xwa.height = eHIGH;
 
     /* try to keep the damned thing on-screen, if possible */
-    if (xwa.x + xwa.width  > dispWIDE) xwa.x = dispWIDE - xwa.width;
-    if (xwa.y + xwa.height > dispHIGH) xwa.y = dispHIGH - xwa.height;
+    if (xwa.x + xwa.width  > vrWIDE) xwa.x = vrWIDE - xwa.width;
+    if (xwa.y + xwa.height > vrHIGH) xwa.y = vrHIGH - xwa.height;
     if (xwa.x < 0) xwa.x = 0;
     if (xwa.y < 0) xwa.y = 0;
 
     SetWindowPos(&xwa);
     hints.flags = PSize | PMaxSize;
-  } 
+  }
 
   else {
     mainW = XCreateWindow(theDisp,rootW,x,y, (u_int) eWIDE, (u_int) eHIGH,
-			  (u_int) bwidth, (int) dispDEEP, InputOutput, 
+			  (u_int) bwidth, (int) dispDEEP, InputOutput,
 			  theVisual, xswamask, &xswa);
     if (!mainW) FatalError("can't create window!");
 
@@ -3267,15 +3936,11 @@ static void createMainWindow(geom, name)
     }
   }
 
-
-  XSetStandardProperties(theDisp,mainW,"","",None,NULL,0,&hints);
-  setWinIconNames(name);
-
   xwmh.input = True;
   xwmh.flags = InputHint;
 
-  xwmh.icon_pixmap = iconPix;  
-  xwmh.icon_mask   = iconmask;  
+  xwmh.icon_pixmap = iconPix;
+  xwmh.icon_mask   = iconmask;
   xwmh.flags |= (IconPixmapHint | IconMaskHint);
 
 
@@ -3295,14 +3960,15 @@ static void createMainWindow(geom, name)
       }
     }
   }
-  XSetWMHints(theDisp, mainW, &xwmh);
 
   classh.res_name = "xv";
   classh.res_class = "XVroot";
-  XSetClassHint(theDisp, mainW, &classh);
 
+  XmbSetWMProperties(theDisp, mainW, NULL, NULL, NULL, 0, &hints, &xwmh,
+                     &classh);
+  setWinIconNames(name);
 
-  if (nodecor) {   /* turn of image window decorations (in MWM) */ 
+  if (nodecor) {   /* turn of image window decorations (in MWM) */
     Atom mwm_wm_hints;
     struct s_mwmhints {
       long   flags;
@@ -3311,7 +3977,7 @@ static void createMainWindow(geom, name)
       u_long input_mode;
       long   status;
     } mwmhints;
-    
+
     mwm_wm_hints = XInternAtom(theDisp, "_MOTIF_WM_HINTS", False);
     if (mwm_wm_hints != None) {
       xvbzero((char *) &mwmhints, sizeof(mwmhints));
@@ -3319,20 +3985,20 @@ static void createMainWindow(geom, name)
       mwmhints.decorations = 4;
 
       XChangeProperty(theDisp, mainW, mwm_wm_hints, mwm_wm_hints, 32,
-		      PropModeReplace, (byte *) &mwmhints, 
-		      (int) (sizeof(mwmhints))/4); 
+		      PropModeReplace, (byte *) &mwmhints,
+		      (int) (sizeof(mwmhints))/4);
       XSync(theDisp, False);
     }
   }
 
-    
+
   firstTime = 0;
 }
 
 
 /***********************************/
 static void setWinIconNames(name)
-     char *name;
+     const char *name;
 {
   char winname[256], iconname[256];
 
@@ -3362,12 +4028,12 @@ static void setWinIconNames(name)
 
 /***********************************/
 void FixAspect(grow,w,h)
-int   grow;
-int   *w, *h;
+     int   grow;
+     int   *w, *h;
 {
   /* computes new values of eWIDE and eHIGH which will have aspect ratio
-     'normaspect'.  If 'grow' it will preserve aspect by enlarging, 
-     otherwise, it will shrink to preserve aspect ratio.  
+     'normaspect'.  If 'grow' it will preserve aspect by enlarging,
+     otherwise, it will shrink to preserve aspect ratio.
      Returns these values in 'w' and 'h' */
 
   float xr,yr,curaspect,a,exp;
@@ -3380,14 +4046,14 @@ int   *w, *h;
   curaspect  = xr / yr;
 
   /* if too narrow & shrink, shrink height.  too wide and grow, grow height */
-  if ((curaspect < normaspect && !grow) || 
+  if ((curaspect < normaspect && !grow) ||
       (curaspect > normaspect &&  grow)) {    /* modify height */
     exp = curaspect / normaspect;
     *h = (int) (eHIGH * exp + .5);
   }
 
   /* if too narrow & grow, grow width.  too wide and shrink, shrink width */
-  if ((curaspect < normaspect &&  grow) || 
+  if ((curaspect < normaspect &&  grow) ||
       (curaspect > normaspect && !grow)) {    /* modify width */
     exp = normaspect / curaspect;
     *w = (int) (eWIDE * exp + .5);
@@ -3423,22 +4089,22 @@ static void makeDispNames()
   suffix = namelist[0];
   prelen = 0;   /* length of prefix to be removed */
   n = i = 0;    /* shut up pesky compiler warnings */
-  
+
   done = 0;
   while (!done) {
     suffix = (char *) index(suffix,'/');    /* find next '/' in file name */
     if (!suffix) break;
-    
+
     suffix++;                       /* go past it */
     n = suffix - namelist[0];
     for (i=1; i<numnames; i++) {
       if (strncmp(namelist[0], namelist[i], (size_t) n)!=0) { done=1; break; }
     }
-    
+
     if (!done) prelen = n;
   }
-  
-  for (i=0; i<numnames; i++) 
+
+  for (i=0; i<numnames; i++)
     dispnames[i] = namelist[i] + prelen;
 }
 
@@ -3447,20 +4113,20 @@ static void makeDispNames()
 static void fixDispNames()
 {
   /* fix dispnames array so that names don't go off right edge */
-  
+
   int   i,j;
   char *tmp;
-  
+
   for (i=j=0; i<numnames; i++) {
     char *dname;
-    
+
     dname = dispnames[i];
     if (StringWidth(dname) > (nList.w-10-16)) {  /* have to trunc. */
       tmp = dname;
       while (1) {
 	tmp = (char *) index(tmp,'/'); /* find next '/' in filename */
 	if (!tmp) { tmp = dname;  break; }
-	
+
 	tmp++;                   /* move to char following the '/' */
 	if (StringWidth(tmp) <= (nList.w-10-16)) { /* is cool now */
 	  j++;  break;
@@ -3484,9 +4150,9 @@ void StickInCtrlList(select)
 
   name = GetDirFName();
   GetDirPath(cwd);
-  
+
   AddFNameToCtrlList(cwd, name);
-  
+
   if (select) {
     nList.selected = numnames-1;
     curname = numnames - 1;
@@ -3498,35 +4164,35 @@ void StickInCtrlList(select)
 
 /***********************************/
 void AddFNameToCtrlList(fpath,fname)
-     char *fpath, *fname;
+     const char *fpath, *fname;
 {
   /* stick given path/name into 'namelist'.  Doesn't redraw list */
-  
-  char *fullname, *dname;
+
+  char *fullname;
   char cwd[MAXPATHLEN], globnm[MAXPATHLEN+100];
   int i;
-  
+
   if (!fpath) fpath = "";  /* bulletproofing... */
-  if (!fname) fname = "";  
-  
+  if (!fname) fname = "";
+
   if (numnames == MAXNAMES) return;  /* full up */
-  
+
   /* handle globbing */
   if (fname[0] == '~') {
     strcpy(globnm, fname);
     Globify(globnm);
     fname = globnm;
   }
-  
+
   if (fname[0] != '/') {  /* prepend path */
     strcpy(cwd, fpath);   /* copy it to a modifiable place */
-    
+
     /* make sure fpath has a trailing '/' char */
     if (strlen(cwd)==0 || cwd[strlen(cwd)-1]!='/') strcat(cwd, "/");
-    
+
     fullname = (char *) malloc(strlen(cwd) + strlen(fname) + 2);
     if (!fullname) FatalError("couldn't alloc name in AddFNameToCtrlList()\n");
-    
+
     sprintf(fullname, "%s%s", cwd, fname);
   }
   else {                 /* copy name to fullname */
@@ -3534,15 +4200,15 @@ void AddFNameToCtrlList(fpath,fname)
     if (!fullname) FatalError("couldn't alloc name in AddFNameToCtrlList()\n");
     strcpy(fullname, fname);
   }
-  
-  
+
+
   /* see if this name is a duplicate.  Don't add it if it is. */
   for (i=0; i<numnames; i++)
     if (strcmp(fullname, namelist[i]) == 0) {
       free(fullname);
       return;
     }
-  
+
   namelist[numnames] = fullname;
   numnames++;
   makeDispNames();
@@ -3578,7 +4244,7 @@ void ActivePrevNext()
   /* called to enable/disable the Prev/Next buttons whenever curname and/or
      numnames and/or nList.selected change */
 
-  /* if curname<0 (there is no 'current' file), 'Next' means view the 
+  /* if curname<0 (there is no 'current' file), 'Next' means view the
      selected file (or the 0th file, if no selection either), and 'Prev' means
      view the one right before the selected file */
 
@@ -3591,18 +4257,19 @@ void ActivePrevNext()
     BTSetActive(&but[BPREV], (curname>0));
   }
 }
-  
+
 
 /***********************************/
 int DeleteCmd()
 {
   /* 'delete' button was pressed.  Pop up a dialog box to determine
      what should be deleted, then do it.
-     returns '1' if THE CURRENTLY VIEWED entry was deleted from the list, 
-     in which case the 'selected' filename on the ctrl list is now 
+     returns '1' if THE CURRENTLY VIEWED entry was deleted from the list,
+     in which case the 'selected' filename on the ctrl list is now
      different, and should be auto-loaded, or something */
 
-  static char *bnames[] = { "\004Disk File", "\nList Entry", "\033Cancel" };
+  static const char *bnames[] =
+    { "\004Disk File", "\nList Entry", "\033Cancel" };
   char str[512];
   int  del, i, delnum, rv;
 
@@ -3610,15 +4277,14 @@ int DeleteCmd()
   delnum = nList.selected;
   if (delnum < 0 || delnum >= numnames) return 0;
 
-  sprintf(str,"Delete '%s'?\n\n%s%s",
-	  namelist[delnum],
+  sprintf(str, "Delete '%s'?\n\n%s%s", namelist[delnum],
 	  "'List Entry' deletes selection from list.\n",
 	  "'Disk File' deletes file associated with selection.");
 
   del = PopUp(str, bnames, 3);
-  
+
   if (del == 2) return 0;   /* cancel */
-  
+
   if (del == 0) {           /* 'Disk File' */
     char *name;
     if (namelist[delnum][0] != '/') {    /* prepend 'initdir' */
@@ -3669,13 +4335,13 @@ static void deleteFromList(delnum)
 
   if (delnum != numnames-1) {
     /* snip out of namelist and dispnames lists */
-    xvbcopy((char *) &namelist[delnum+1], (char *) &namelist[delnum], 
+    xvbcopy((char *) &namelist[delnum+1], (char *) &namelist[delnum],
 	  (numnames - delnum - 1) * sizeof(namelist[0]));
 
-    xvbcopy((char *) &dispnames[delnum+1], (char *) &dispnames[delnum], 
+    xvbcopy((char *) &dispnames[delnum+1], (char *) &dispnames[delnum],
 	  (numnames - delnum - 1) * sizeof(dispnames[0]));
   }
-  
+
   numnames--;
   if (numnames==0) BTSetActive(&but[BDELETE],0);
   windowMB.dim[WMB_TEXTVIEW] = (numnames==0);
@@ -3686,7 +4352,7 @@ static void deleteFromList(delnum)
   if (nList.selected >= numnames) nList.selected = numnames-1;
   if (nList.selected < 0) nList.selected = 0;
 
-  SCSetRange(&nList.scrl, 0, numnames - nList.nlines, 
+  SCSetRange(&nList.scrl, 0, numnames - nList.nlines,
 	     nList.scrl.val, nList.nlines-1);
   ScrollToCurrent(&nList);
   DrawCtrlNumFiles();
@@ -3753,7 +4419,7 @@ void HandleDispMode()
     if (useroot && resetroot) ClearRoot();
 
     if (mainW == (Window) NULL || useroot) {  /* window not visible */
-      useroot = 0;  
+      useroot = 0;
 
       if (haveoldinfo) {             /* just remap mainW and resize it */
 	XWMHints xwmh;
@@ -3771,8 +4437,8 @@ void HandleDispMode()
 	xwmh.input = True;
 	xwmh.flags = InputHint;
 
-	xwmh.icon_pixmap = iconPix;  
-	xwmh.icon_mask   = iconmask;  
+	xwmh.icon_pixmap = iconPix;
+	xwmh.icon_mask   = iconmask;
 	xwmh.flags |= ( IconPixmapHint | IconMaskHint) ;
 
 	xwmh.flags |= StateHint;
@@ -3787,7 +4453,7 @@ void HandleDispMode()
       else {                         /* first time.  need to create mainW */
 	mainW = (Window) NULL;
 	createMainWindow(maingeom, fnam);
-	XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask 
+	XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask
 		     | StructureNotifyMask | ButtonPressMask
 		     | KeyReleaseMask | ColormapChangeMask
 		     | EnterWindowMask | LeaveWindowMask );
@@ -3802,7 +4468,7 @@ void HandleDispMode()
 
     else {                            /* mainW already visible */
       createMainWindow(maingeom, fnam);
-      XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask 
+      XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask
 		   | StructureNotifyMask | ButtonPressMask
 		   | KeyReleaseMask | ColormapChangeMask
 		   | EnterWindowMask | LeaveWindowMask );
@@ -3845,13 +4511,13 @@ void HandleDispMode()
       if (LocalCmap) regen=1;
 
       /* this reallocs the colors */
-      if (colorMapMode==CM_PERFECT || colorMapMode==CM_OWNCMAP) 
+      if (colorMapMode==CM_PERFECT || colorMapMode==CM_OWNCMAP)
 	ChangeCmapMode(CM_NORMAL, 0, 0);
-      
-      
+
+
       XUnmapWindow(theDisp, mainW);
       mainW = vrootW;
-      
+
       if (!ctrlUp) {    /* make sure ctrl is up when going to 'root' mode */
 	XWMHints xwmh;
 	xwmh.input         = True;
@@ -3861,7 +4527,7 @@ void HandleDispMode()
 	CtrlBox(1);
       }
     }
-      
+
     useroot = 1;
     rootMode = dispMode - RMB_ROOT;
     ew = eWIDE;  eh = eHIGH;
@@ -3877,7 +4543,7 @@ void HandleDispMode()
       GenerateEpic(ew, eh);
       CreateXImage();
     }
-    else if (regen) CreateXImage();                    
+    else if (regen) CreateXImage();
 
     KillOldRootInfo();
     MakeRootPic();
@@ -3923,7 +4589,7 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
 
 
   if (*numn == maxn) {
-    fprintf(stderr, "%s: too many filenames.  Only using first %d.\n",
+    fprintf(stderr, "%s: too many filenames.  Using only first %d.\n",
 	    flist, maxn);
   }
 
@@ -3947,14 +4613,14 @@ char *lower_str(str)
 
 /***********************************/
 int rd_int(name)
-     char *name;
+     const char *name;
 {
   /* returns '1' if successful.  result in def_int */
 
   if (rd_str_cl(name, "", 0)) {     /* sets def_str */
     if (sscanf(def_str, "%d", &def_int) == 1) return 1;
     else {
-      fprintf(stderr, "%s: couldn't read integer value for %s resource\n", 
+      fprintf(stderr, "%s: couldn't read integer value for %s resource\n",
 	      cmd, name);
       return 0;
     }
@@ -3965,7 +4631,7 @@ int rd_int(name)
 
 /***********************************/
 int rd_str(name)
-     char *name;
+     const char *name;
 {
   return rd_str_cl(name, "", 0);
 }
@@ -3973,17 +4639,17 @@ int rd_str(name)
 
 /***********************************/
 int rd_flag(name)
-char *name;
+     const char *name;
 {
   /* returns '1' if successful.  result in def_int */
-  
+
   char buf[256];
 
   if (rd_str_cl(name, "", 0)) {  /* sets def_str */
     strcpy(buf, def_str);
     lower_str(buf);
 
-    def_int = (strcmp(buf, "on")==0) || 
+    def_int = (strcmp(buf, "on")==0) ||
               (strcmp(buf, "1")==0) ||
 	      (strcmp(buf, "true")==0) ||
 	      (strcmp(buf, "yes")==0);
@@ -3992,16 +4658,16 @@ char *name;
 
   else return 0;
 }
-    
+
 
 
 
 static int xrm_initted = 0;
- 
+
 /***********************************/
 int rd_str_cl (name_str, class_str, reinit)
-     char *name_str;
-     char *class_str;
+     const char *name_str;
+     const char *class_str;
      int  reinit;
 {
   /* note: *all* X resource reading goes through this routine... */
@@ -4043,16 +4709,30 @@ int rd_str_cl (name_str, class_str, reinit)
       unsigned long nitems, nleft;
       byte *data;
 
-      i = XGetWindowProperty(theDisp, RootWindow(theDisp, 0),
-			     resAtom, 0L, 1L, False, 
-			     XA_STRING, &actType, &actFormat, &nitems, &nleft, 
-			     (unsigned char **) &data);
+      if (spec_window) {
+        i = XGetWindowProperty(theDisp, spec_window,
+			       resAtom, 0L, 1L, False,
+			       XA_STRING, &actType, &actFormat, &nitems, &nleft,
+			       (unsigned char **) &data);
+      } else {
+        i = XGetWindowProperty(theDisp, RootWindow(theDisp, 0),
+			       resAtom, 0L, 1L, False,
+			       XA_STRING, &actType, &actFormat, &nitems, &nleft,
+			       (unsigned char **) &data);
+      }
       if (i==Success && actType==XA_STRING && actFormat==8) {
 	if (nitems>0 && data) XFree(data);
-	i = XGetWindowProperty(theDisp, RootWindow(theDisp, 0), resAtom, 0L, 
-			       (long) ((nleft+4+3)/4),
-			       False, XA_STRING, &actType, &actFormat, 
-			       &nitems, &nleft, (unsigned char **) &data);
+        if (spec_window) {
+	  i = XGetWindowProperty(theDisp, spec_window, resAtom, 0L,
+			         (long) ((nleft+4+3)/4),
+			         False, XA_STRING, &actType, &actFormat,
+			         &nitems, &nleft, (unsigned char **) &data);
+        } else {
+	  i = XGetWindowProperty(theDisp, RootWindow(theDisp, 0), resAtom, 0L,
+			         (long) ((nleft+4+3)/4),
+			         False, XA_STRING, &actType, &actFormat,
+			         &nitems, &nleft, (unsigned char **) &data);
+        }
 	if (i==Success && actType==XA_STRING && actFormat==8 && data) {
 	  def_resource = XrmGetStringDatabase((char *) data);
 	  XFree(data);
@@ -4064,50 +4744,51 @@ int rd_str_cl (name_str, class_str, reinit)
 
 
     if (!gotit) {
-      xrm_str = XResourceManagerString(theDisp); 
-      
+      xrm_str = XResourceManagerString(theDisp);
+
       if (xrm_str) {
 	def_resource = XrmGetStringDatabase(xrm_str);
 	if (DEBUG) fprintf(stderr,"rd_str_cl: Using RESOURCE_MANAGER prop.\n");
       }
       else {    /* no RESOURCE_MANAGER prop.  read from 'likely' file */
-	char foo[256], *homedir, *xenviron;
+	char foo[256], *xenviron;
+	const char *homedir;
 	XrmDatabase res1;
-	
+
 #ifdef VMS
 	strcpy(foo, "SYS$LOGIN:DECW$XDEFAULTS.DAT");
 #else
-	homedir = (char *) getenv("HOME");
+	homedir = (const char *) getenv("HOME");
 	if (!homedir) homedir = ".";
 	sprintf(foo,"%s/.Xdefaults", homedir);
 #endif
-	
+
 	def_resource = XrmGetFileDatabase(foo);
-	
+
 	if (DEBUG) {
 	  fprintf(stderr,"rd_str_cl: No RESOURCE_MANAGER prop.\n");
 	  fprintf(stderr,"rd_str_cl: Using file '%s' (%s)  ",
 		  foo, (def_resource) ? "success" : "failure");
 	}
-	
-	
+
+
 	/* merge file pointed to by XENVIRONMENT */
 	xenviron = (char *) getenv("XENVIRONMENT");
 	if (xenviron) {
 	  res1 = XrmGetFileDatabase(xenviron);
-	  
+
 	  if (DEBUG) {
 	    fprintf(stderr,"merging XENVIRONMENT='%s' (%s)  ",
 		    xenviron, (res1) ? "success" : "failure");
 	  }
-	  
+
 	  if (res1) {    /* merge databases */
 	    if (!def_resource) def_resource = res1;
 	    else XrmMergeDatabases(res1, &def_resource);
 	  }
 	}
-	
-	
+
+
 	if (DEBUG) fprintf(stderr,"\n\n");
       }
     }
@@ -4120,16 +4801,15 @@ int rd_str_cl (name_str, class_str, reinit)
   strcpy (q_name, PROGNAME);
   strcat (q_name, ".");
   strcat (q_name, name_str);
-  
+
   strcpy (q_class, "Program");
   strcat (q_class, ".");
   strcat (q_class, class_str);
 
   (void) XrmGetResource(def_resource, q_name, q_class, &type, &result);
-  
-  def_str = result.addr;
-  if (def_str) return (1);
-  else return (0);
-}
 
+  def_str = result.addr;
+  if (def_str) return 1;
+  else return 0;
+}
 

@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# prep and build XV for FC5
+#
+# adapted from Slackware 10.2 -- john.cooper@third-harmonic.com
+#
+
+if [ ${1}foo == "__LOGGED__foo" ]; then
+	shift
+else
+	for i in `seq 0 9`
+		do
+		if [ -e ${0}.log.$((9-i)) ]; then
+			mv ${0}.log.$((9-i)) ${0}.log.$((9-i+1))
+		fi
+		done
+
+	exec $0 __LOGGED__ $@ 2>&1 | tee $BUILDDIR/$0.log.0
+	exit $?
+fi
+
+SOURCE=`pwd`
+if [ "$BUILD" = "" ]; then
+  BUILD=./build
+fi
+
+if [ ! -d $BUILD ]; then
+  mkdir -p $BUILD
+fi
+
+PFLAGS="--verbose --backup --suffix=.orig"
+
+function bail()
+	{
+	echo "$0: failed $1"
+	exit 1
+	}
+
+cd $BUILD
+rm -rf xv-3.10
+tar xzvf $SOURCE/xv-3.10.tar.gz
+cd xv-3.10
+zcat $SOURCE/xv-3.10a.patch.gz | patch -p0 $PFLAGS || \
+	bail $SOURCE/xv-3.10a.patch.gz
+bzcat $SOURCE/xv-3.10a-jumbo-fix-patch-20050410.txt.bz2 | patch -p1 $PFLAGS || \
+	bail $SOURCE/xv-3.10a-jumbo-fix-patch-20050410.txt.bz2
+bzcat $SOURCE/xv-3.10a-jumbo-enh-patch-20050501.txt.bz2 | patch -p1 $PFLAGS || \
+	bail $SOURCE/xv-3.10a-jumbo-enh-patch-20050501.txt.bz2
+zcat $SOURCE/xv.prefix.diff.gz | patch -p1 $PFLAGS || \
+	bail $SOURCE/xv.prefix.diff.gz
+make -f Makefile.std || bail make
+strip --strip-unneeded bggen vdcomp xcmap xv xvpictoppm || bail strip
+
+exit $?
+
+# vi:set ts=4:

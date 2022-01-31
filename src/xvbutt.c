@@ -1,4 +1,4 @@
-/* 
+/*
  * xvbutt.c - regular, 'radio', 'checkbox', and 'menu' pushbuttons
  *
  * callable functions:
@@ -16,7 +16,7 @@
  *   RBSetActive()          -  sets active status of an RBUTT
  *   RBClick()              -  finds clicked-on rb in a list
  *   RBTrack()              -  tracks rb after click, until release
- * 
+ *
  *   CBCreate()             -  create a CBUTT (checkbox button)
  *   CBRedraw()             -  redraw a CBUTT
  *   CBSetActive()          -  change active status of a CBUTT
@@ -26,7 +26,7 @@
  *   MBCreate()             -  create a MBUTT (menu button)
  *   MBRedraw()             -  redraw a MBUTT
  *   MBSetActive()          -  change active status of a MBUTT
- *   MBWhich()              -  returns # of first checked selection 
+ *   MBWhich()              -  returns # of first checked selection
  *   MBSelect()             -  similar to RBSelect() ...
  *   MBClick()              -  returns true if given MB was clicked on
  *   MBTrack()              -  tracks MBUTT after click, until release
@@ -76,7 +76,7 @@ void BTCreate(bp,win,x,y,w,h,str,fg,bg,hi,lo)
      Window        win;
      int           x,y;
      unsigned int  w,h;
-     char         *str;
+     const char   *str;
      unsigned long fg,bg,hi,lo;
 {
   bp->win = win;
@@ -116,7 +116,7 @@ int           act;
 void BTRedraw(bp)
 BUTT *bp;
 {
-  int          i,x,y,r,x1,y1;
+  int          x,y,r,x1,y1;
   unsigned int w,h;
   XPoint       tpts[10], bpts[10], ipts[5];
 
@@ -170,13 +170,13 @@ BUTT *bp;
     XSetForeground(theDisp, theGC, bp->fg);
     XDrawLines(theDisp, bp->win, theGC, ipts, 5, CoordModeOrigin);  /* inset */
 
-    XDrawLine(theDisp, bp->win, theGC, x+1,             y + 1,  
+    XDrawLine(theDisp, bp->win, theGC, x+1,             y + 1,
 	      ipts[0].x, ipts[0].y);
     XDrawLine(theDisp, bp->win, theGC, x+1,             y + (int) h - 1,
 	      ipts[1].x, ipts[1].y);
     XDrawLine(theDisp, bp->win, theGC, x + (int) w - 1, y + (int) h - 1,
 	      ipts[2].x, ipts[2].y);
-    XDrawLine(theDisp, bp->win, theGC, x + (int) w - 1, y+1,  
+    XDrawLine(theDisp, bp->win, theGC, x + (int) w - 1, y+1,
 	      ipts[3].x, ipts[3].y);
 
     if (bp->lit) {
@@ -184,12 +184,12 @@ BUTT *bp;
       XDrawRectangle(theDisp, bp->win, theGC, x+1, y+1, w-2, h-2);
     }
   }
-    
+
   else {   /* ctrlColor */
     XSetForeground(theDisp, theGC, bp->bg);
     XFillRectangle(theDisp, bp->win, theGC, x+1, y+1, w-1, h-1);
 
-    Draw3dRect(bp->win, x+1, y+1, w-2, h-2, R3D_OUT, bp->fwidth, 
+    Draw3dRect(bp->win, x+1, y+1, w-2, h-2, R3D_OUT, bp->fwidth,
 	       bp->hi, bp->lo, bp->bg);
 
     XSetForeground(theDisp, theGC, bp->fg);
@@ -198,7 +198,7 @@ BUTT *bp;
     if (bp->lit)
       XDrawRectangle(theDisp, bp->win, theGC, x+1, y+1, w-2, h-2);
   }
-    
+
 
 
 
@@ -210,7 +210,7 @@ BUTT *bp;
 
     XSetBackground(theDisp, theGC, bp->bg);
 
-    if (bp->colorpix) 
+    if (bp->colorpix)
       XCopyArea (theDisp,bp->pix, bp->win, theGC, 0,0,bp->pw,bp->ph, x1,y1);
     else
       XCopyPlane(theDisp,bp->pix, bp->win, theGC, 0,0,bp->pw,bp->ph, x1,y1,1L);
@@ -262,15 +262,15 @@ BUTT *bp;
     if (bp->lit==inval && PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) {
       bp->lit = !inval;  BTRedraw(bp);  XFlush(theDisp);
     }
-    
+
     if (bp->lit!=inval && !PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) {
       bp->lit = inval;  BTRedraw(bp);  XFlush(theDisp);
     }
   }
 
   rval = (bp->lit != inval);
-  
-  if (bp->lit && !bp->toggle) 
+
+  if (bp->lit && !bp->toggle)
     { bp->lit = 0;  BTRedraw(bp);  XFlush(theDisp); }
 
   return(rval);
@@ -290,18 +290,18 @@ RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
       RBUTT        *rblist;
       Window        win;
       int           x,y;
-      char         *str;
+      const char   *str;
       unsigned long fg,bg,hi,lo;
 {
   /* mallocs an RBUTT, fills in the fields, and appends it to rblist
      if rblist is NULL, this is the first rb in the list.  It will
-     be made the 'selected' one 
+     be made the 'selected' one
 
-     Note: no need to check return status.  It'll fatal error if it 
+     Note: no need to check return status.  It'll fatal error if it
      can't malloc */
 
   RBUTT *rb, *rbptr;
-  Pixmap rb_frame, rb_frame1, rb_top, rb_bot, rb_dtop, rb_dbot, rb_body, 
+  Pixmap rb_frame, rb_frame1, rb_top, rb_bot, rb_dtop, rb_dbot, rb_body,
          rb_dot;
 
   rb = (RBUTT *) malloc(sizeof(RBUTT));
@@ -348,7 +348,7 @@ RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
     rb_off    = XCreatePixmap(theDisp, rootW, RBSIZE, RBSIZE, dispDEEP);
     rb_off1   = XCreatePixmap(theDisp, rootW, RBSIZE, RBSIZE, dispDEEP);
 
-    if (!rb_frame || !rb_frame1 || !rb_top || !rb_bot || !rb_dtop || 
+    if (!rb_frame || !rb_frame1 || !rb_top || !rb_bot || !rb_dtop ||
 	!rb_dbot  || !rb_body   || !rb_dot || !rb_on  || !rb_on1  ||
 	!rb_off   || !rb_off1)
       FatalError("unable to create radio-button pixmaps");
@@ -410,7 +410,7 @@ RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
       XFillRectangle(theDisp, rb_on,   theGC, 0,0,RBSIZE,RBSIZE);
       XFillRectangle(theDisp, rb_on1,  theGC, 0,0,RBSIZE,RBSIZE);
     }
-      
+
     XSetStipple(theDisp, theGC, rb_frame);
     XSetForeground(theDisp, theGC, fg);
     XFillRectangle(theDisp, rb_on,   theGC, 0,0,RBSIZE,RBSIZE);
@@ -437,7 +437,7 @@ RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
 
   return(rb);
 }
-  
+
 
 
 
@@ -475,23 +475,23 @@ static void drawRB(rb, lit)
      int   lit;
 {
   /* draws the rb being pointed at */
-  
+
   Pixmap pix;
-  
+
   if (!rb) return;  /* rb = NULL */
-  
+
   XSetForeground(theDisp, theGC, rb->fg);
-  
+
   if (rb->selected) { pix = (lit) ? rb_on1 : rb_on; }
   else { pix = (lit) ? rb_off1 : rb_off; }
-  
+
   XCopyArea(theDisp, pix, rb->win, theGC, 0,0,RBSIZE,RBSIZE, rb->x, rb->y);
-  DrawString(rb->win, rb->x + RBSIZE + 4, 
+  DrawString(rb->win, rb->x + RBSIZE + 4,
 	     rb->y + RBSIZE/2 - CHIGH/2 + ASCENT, rb->str);
 
   if (!rb->active) {  /* if non-active, dim button and string */
     DimRect(rb->win, rb->x, rb->y, RBSIZE, RBSIZE, rb->bg);
-    DimRect(rb->win, rb->x + RBSIZE + 4, rb->y + RBSIZE/2 - CHIGH/2, 
+    DimRect(rb->win, rb->x + RBSIZE + 4, rb->y + RBSIZE/2 - CHIGH/2,
 	    (u_int) StringWidth(rb->str), (u_int) CHIGH, rb->bg);
   }
 }
@@ -527,19 +527,19 @@ int    n;
 }
 
 
-	      
+
 /***********************************************/
 int RBWhich(rblist)
      RBUTT *rblist;
 {
   int i;
-  
+
   /* returns index of currently selected rb.  if none, returns -1 */
-  
+
   i = 0;
-  while (rblist && !rblist->selected) 
+  while (rblist && !rblist->selected)
     { rblist = (RBUTT *) rblist->next;  i++; }
-  
+
   if (!rblist) return -1;             /* didn't find one */
   return i;
 }
@@ -550,9 +550,9 @@ int RBCount(rblist)
      RBUTT *rblist;
 {
   int i;
-  
+
   /* returns # of rb's in the list */
-  
+
   i = 0;
   while (rblist) { rblist = (RBUTT *) rblist->next; i++; }
   return i;
@@ -566,13 +566,13 @@ void RBSetActive(rblist, n, act)
 {
   RBUTT *rb;
   int    i;
-  
+
   /* sets 'active' status of rb #n.  does redrawing */
-  
+
   rb=rblist;  i=0;
   while (rb && i!=n) { rb = (RBUTT *) rb->next; i++; }
   if (!rb) return;                         /* n out of range.  do nothing */
-  
+
   if (rb->active != act) {
     rb->active = act;
     drawRB(rb, 0);
@@ -588,13 +588,13 @@ int    mx,my;
   int i;
 
   /* searches through rblist to see if mouse click at mx,my is in the
-     clickable region of any of the rb's.  If it finds one, it returns 
+     clickable region of any of the rb's.  If it finds one, it returns
      it's index in the list.  If not, returns -1 */
 
   i = 0;
   while (rblist) {
     if (PTINRECT(mx, my, rblist->x, rblist->y, RBSIZE, RBSIZE)) break;
-    
+
     rblist = (RBUTT *) rblist->next;
     i++;
   }
@@ -613,9 +613,9 @@ int RBTrack(rblist, n)
   Window       rW, cW;
   int          i, x, y, rx, ry, lit, rv;
   unsigned int mask;
-  
+
   /* returns '1' if selection changed */
-  
+
   rb=rblist;  i=0;
   while (rb && i!=n) { rb = (RBUTT *) rb->next; i++; }
   if (!rb) return 0;                    /* n out of range */
@@ -637,7 +637,7 @@ int RBTrack(rblist, n)
       drawRB(rb, lit);
       XFlush(theDisp);
     }
-    
+
     if (lit && !PTINRECT(x, y, rb->x, rb->y, RBSIZE, RBSIZE)) {
       lit=0;
       drawRB(rb, lit);
@@ -671,7 +671,7 @@ void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
       CBUTT        *cb;
       Window        win;
       int           x,y;
-      char         *str;
+      const char   *str;
       unsigned long fg,bg,hi,lo;
 {
   /* fill in the fields of the structure */
@@ -690,14 +690,14 @@ void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
      do so.  We'll be needing them, y'see... */
 
   if (!cbpixmade) {
-    cbcheck = XCreatePixmapFromBitmapData(theDisp, rootW, 
+    cbcheck = XCreatePixmapFromBitmapData(theDisp, rootW,
 	     (char *) cb_check_bits,
 	     cb_check_width, cb_check_height, fg, bg, dispDEEP);
 
     cbpixmade = 1;
   }
 }
-  
+
 
 
 
@@ -708,25 +708,25 @@ CBUTT *cb;
   /* draws the cb being pointed at */
 
   XSetForeground(theDisp, theGC, cb->bg);
-  XFillRectangle(theDisp, cb->win, theGC, cb->x+2, cb->y+2, 
+  XFillRectangle(theDisp, cb->win, theGC, cb->x+2, cb->y+2,
 		 XVCBSIZE-3,XVCBSIZE-3);
 
   XSetForeground(theDisp, theGC, cb->fg);
   XDrawRectangle(theDisp, cb->win, theGC, cb->x, cb->y, XVCBSIZE, XVCBSIZE);
   Draw3dRect(cb->win, cb->x+1, cb->y+1, XVCBSIZE-2, XVCBSIZE-2, R3D_OUT, 2,
-	     cb->hi, cb->lo, cb->bg); 
+	     cb->hi, cb->lo, cb->bg);
 
-  if (cb->val) XCopyArea(theDisp, cbcheck, cb->win, theGC, 
-			 0, 0, cb_check_width, cb_check_height, 
+  if (cb->val) XCopyArea(theDisp, cbcheck, cb->win, theGC,
+			 0, 0, cb_check_width, cb_check_height,
 			 cb->x+3, cb->y+3);
- 
+
   XSetForeground(theDisp, theGC, cb->fg);
-  DrawString(cb->win, cb->x + XVCBSIZE+4, 
+  DrawString(cb->win, cb->x + XVCBSIZE+4,
 	     cb->y+XVCBSIZE/2 - CHIGH/2 + ASCENT, cb->str);
 
   if (!cb->active) {  /* if non-active, dim button and string */
     DimRect(cb->win, cb->x, cb->y, XVCBSIZE, XVCBSIZE, cb->bg);
-    DimRect(cb->win, cb->x + XVCBSIZE+4, cb->y+XVCBSIZE/2 - CHIGH/2, 
+    DimRect(cb->win, cb->x + XVCBSIZE+4, cb->y+XVCBSIZE/2 - CHIGH/2,
 	    (u_int) StringWidth(cb->str), (u_int) CHIGH, cb->bg);
   }
 }
@@ -761,7 +761,6 @@ CBUTT *cb;
   Window       rW, cW;
   int          x, y, rx, ry, lit;
   unsigned int mask;
-  Pixmap litpix, darkpix;
 
   /* called once we've figured out that the mouse clicked in 'cb' */
 
@@ -782,7 +781,7 @@ CBUTT *cb;
       drawCB(cb,lit);
       XFlush(theDisp);
     }
-    
+
     if (lit && !PTINRECT(x, y, cb->x, cb->y, XVCBSIZE, XVCBSIZE)) {
       lit=0;
       drawCB(cb,lit);
@@ -809,28 +808,28 @@ int lit;
 {
   /* draws highlighting */
   if (lit) {
-    if (ctrlColor) 
+    if (ctrlColor)
       Draw3dRect(cb->win, cb->x+1, cb->y+1, XVCBSIZE-2, XVCBSIZE-2, R3D_IN, 2,
 		 cb->hi, cb->lo, cb->bg);
     else {
       XSetForeground(theDisp, theGC, cb->fg);
-      XDrawRectangle(theDisp, cb->win, theGC, cb->x+1, cb->y+1, 
+      XDrawRectangle(theDisp, cb->win, theGC, cb->x+1, cb->y+1,
 		     XVCBSIZE-2, XVCBSIZE-2);
     }
   }
 
   else {
-    if (ctrlColor) 
+    if (ctrlColor)
       Draw3dRect(cb->win, cb->x+1, cb->y+1, XVCBSIZE-2, XVCBSIZE-2, R3D_OUT, 2,
 		 cb->hi, cb->lo, cb->bg);
     else {
       XSetForeground(theDisp, theGC, cb->bg);
-      XDrawRectangle(theDisp, cb->win, theGC, cb->x+1, cb->y+1, 
+      XDrawRectangle(theDisp, cb->win, theGC, cb->x+1, cb->y+1,
 		     XVCBSIZE-2, XVCBSIZE-2);
     }
   }
 }
-    
+
 
 
 /******************* MBUTT ROUTINES ************************/
@@ -838,20 +837,20 @@ int lit;
 
 
 /***********************************************/
-void MBCreate(mb, win, x,y,w,h, str, list, nlist, fg, bg, hi, lo)
+void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
      MBUTT        *mb;
      Window        win;
      int           x,y;
      unsigned int  w,h;
-     char         *str;
-     char        **list;
+     const char   *title;
+     const char  * const *list;
      int           nlist;
      unsigned long fg,bg,hi,lo;
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
   int i;
-  
+
   if (!mbpixmade) {
     mbchk = XCreatePixmapFromBitmapData(theDisp, rootW, (char *) mb_chk_bits,
 	     mb_chk_width, mb_chk_height, fg, bg, dispDEEP);
@@ -865,7 +864,7 @@ void MBCreate(mb, win, x,y,w,h, str, list, nlist, fg, bg, hi, lo)
   mb->y        = y;
   mb->w        = w;
   mb->h        = h;
-  mb->title    = str;
+  mb->title    = title;
   mb->active   = 1;
   mb->list     = list;
   mb->nlist    = nlist;
@@ -889,7 +888,7 @@ void MBCreate(mb, win, x,y,w,h, str, list, nlist, fg, bg, hi, lo)
   xswa.save_under       = True;
   xswamask = CWBackPixel | CWBorderPixel | CWSaveUnder;
 
-  mb->mwin = XCreateWindow(theDisp, mb->win, x, y, w, h, 
+  mb->mwin = XCreateWindow(theDisp, mb->win, x, y, w, h,
 			   (u_int) 2, (int) dispDEEP, InputOutput,
 			   theVisual, xswamask, &xswa);
 
@@ -898,7 +897,7 @@ void MBCreate(mb, win, x,y,w,h, str, list, nlist, fg, bg, hi, lo)
   XSelectInput(theDisp, mb->mwin, ExposureMask | VisibilityChangeMask);
   XSetTransientForHint(theDisp, mb->mwin, mb->win);
 }
-  
+
 
 
 
@@ -908,15 +907,15 @@ void MBRedraw(mb)
 {
   /* draws a menu button in it's normal state.  (When it's actively being
      used (to select an item), all drawing is handled in MBTrack) */
-  
+
   int          x,y,i,r,x1,y1;
   unsigned int w,h;
-  
+
   r = 2;  /* amt of shadow */
   x = mb->x;  y = mb->y;  w = mb->w;  h = mb->h;
-  x1 = x + (int) w;  
+  x1 = x + (int) w;
   y1 = y + (int) h;
-  
+
   XSetForeground(theDisp, theGC, mb->bg);
   XFillRectangle(theDisp, mb->win, theGC, x+1, y+1, w-1, h-1);
 
@@ -940,12 +939,14 @@ void MBRedraw(mb)
     XSetBackground(theDisp, theGC, mb->bg);
     XCopyPlane(theDisp, mb->pix, mb->win, theGC, 0,0,
 	       (u_int) mb->pw, (u_int) mb->ph, x1,y1, 1L);
-    if (!mb->active) 
+    if (!mb->active)
       DimRect(mb->win, x1,y1, (u_int) mb->pw, (u_int) mb->ph, mb->bg);
   }
 
   else {                                    /* draw string centered in butt */
-    char *str, stbuf[256];
+    const char *str;
+    char       *tmp;
+    char        stbuf[256];
 
     if (mb->title) str = mb->title;
     else {  /* find first checked item, and show that as the title */
@@ -961,7 +962,7 @@ void MBRedraw(mb)
 
     /* truncate at TAB, if any */
     strcpy(stbuf, str);
-    if ((str = (char *) index(stbuf, '\t')) != NULL) *str = '\0';
+    if ((tmp = (char *) index(stbuf, '\t')) != NULL) *tmp = '\0';
     str = stbuf;
 
     x1 = CENTERX(mfinfo, x + w/2, str);
@@ -997,14 +998,14 @@ int MBWhich(mb)
      MBUTT *mb;
 {
   /* returns index of first checked selection, or '-1' if nothing selected */
-  
+
   int i;
 
   if (!mb->hascheck) return -1;
 
   for (i=0; i<mb->nlist; i++)
     if (mb->flags[i]) return i;
-  
+
   return -1;
 }
 
@@ -1017,13 +1018,13 @@ void MBSelect(mb, n)
   /* makes entry #n the selected entry (ie, the only one with a check mark)
      Does all redrawing.  Does nothing if entry #n already selected.
      Don't let it select 'dim' entries */
-  
+
   int i;
-  
+
   if (n<0 || n>mb->nlist) return;               /* # out of range */
   if (!mb->hascheck)      return;               /* shouldn't happen */
   if (mb->flags[n])       return;               /* already selected */
-  
+
   for (i=0; i<MAXMBLEN; i++) mb->flags[i] = 0;
 
   mb->flags[n] = 1;
@@ -1083,7 +1084,7 @@ int MBTrack(mb)
     }
   }
   mwide += 8;                             /* extra room at edges */
-  
+
   /* make wider if any checked menu items */
   for (i=0; i<mb->nlist && !mb->flags[i]; i++);
   hascheck = (i<mb->nlist || mb->hascheck);
@@ -1091,7 +1092,7 @@ int MBTrack(mb)
   if (hascheck && mb->title) mwide += 8;
 
   if (mwide < (mb->w+1)) mwide = mb->w+1; /* at least as wide as button */
-    
+
   mhigh = mb->nlist * LINEHIGH + 2 + extratop;
 
   mx = mb->x-1;  my = mb->y - 1;
@@ -1138,16 +1139,17 @@ int MBTrack(mb)
   y = ASCENT + SPACING + extratop;
   for (i=0; i<mb->nlist; i++) {
     char txtstr[256], *tabstr;
+
     strcpy(txtstr, mb->list[i]);
     if ((tabstr = (char *) index(txtstr, '\t'))) {
       *tabstr = '\0';  tabstr++;
     }
 
     if (mb->flags[i]) {
-      XCopyArea(theDisp, mbchk, win, theGC, 0, 0, mb_chk_width, mb_chk_height, 
+      XCopyArea(theDisp, mbchk, win, theGC, 0, 0, mb_chk_width, mb_chk_height,
 		x - 10, y - 8);
     }
-    
+
     if (!strcmp(mb->list[i], MBSEP)) {
       mb->dim[i] = 1;    /* don't select this one */
       if (ctrlColor) {
@@ -1161,15 +1163,15 @@ int MBTrack(mb)
 	XDrawLine(theDisp,win,theGC,4,y-(ASCENT/2)+1, mwide-5, y-(ASCENT/2)+1);
 	XSetForeground(theDisp, theGC, mb->fg);
       }
-      else 
+      else
 	XDrawLine(theDisp, win, theGC, 4, y-(ASCENT/2), mwide-5, y-(ASCENT/2));
     }
     else {
       DrawString(win, x, y, txtstr);
-      if (tabstr) 
+      if (tabstr)
 	DrawString(win, mwide - mtabwide - 4, y, tabstr);
 
-      if (mb->dim[i]) 
+      if (mb->dim[i])
 	DimRect(win, x, y-ASCENT, (u_int) mwide, (u_int) CHIGH, mb->bg);
       XSetForeground(theDisp, theGC, mb->fg);
     }

@@ -52,7 +52,7 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
      int   pwide, phigh, *pnumcols;
 {
   /* operates on 8-bit images.  sorts the colormap into 'best' order
-   * 'order' is the 'best' order to allocate the colors.  'trans' is a 
+   * 'order' is the 'best' order to allocate the colors.  'trans' is a
    * transformation to be done to pic, cpic, and epic (in PIC8 mode) to
    * compress the colormap
    */
@@ -67,22 +67,22 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
   /* initialize histogram and compute it */
   for (i=0; i<256; i++) hist[i]=0;
   for (i=pwide*phigh, p=pic; i; i--, p++) hist[*p]++;
-  
+
   if (DEBUG>1) {
     fprintf(stderr,"%s: Desired colormap\n",cmd);
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       if (hist[i]) fprintf(stderr,"(%3d  %02x,%02x,%02x %d)\n",
 			   i,rmap[i],gmap[i],bmap[i], hist[i]);
     fprintf(stderr,"\n\n");
   }
-  
-  
+
+
   /* put the actually-used colors into the 'c' array in the order they occur
      also, while we're at it, calculate ncols, and close up gaps in
      colortable */
-  
+
   for (i=ncols=0; i<256; i++) {
-    if (hist[i]) { 
+    if (hist[i]) {
       rmap[ncols] = rmap[i];
       gmap[ncols] = gmap[i];
       bmap[ncols] = bmap[i];
@@ -104,8 +104,8 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
   }
   xvbcopy((char *) &c[entry], (char *) &c1[0], sizeof(CMAPENT));
   c[entry].use = 0;   /* dealt with */
-  
-  
+
+
   /* sort rest of colormap.  Half of the entries are allocated on the
      basis of distance from already allocated colors, and half on the
      basis of usage.  (NB: 'taxicab' distance is used throughout this file.)
@@ -116,7 +116,7 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
      To obtain O(n^2) performance, we keep each unselected color
      (in c[], with use>0) marked with the minimum distance to any of
      the selected colors (in c1[]).  Each time we select a color, we
-     can update the minimum distances in O(n) time. 
+     can update the minimum distances in O(n) time.
 
      mod by Tom Lane   Tom.Lane@g.gp.cs.cmu.edu */
 
@@ -134,8 +134,8 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
       for (j=0, cj=c; j<ncols; j++,cj++) {
 	if (cj->use) {      /* this color has not been marked already */
 	  /* update mindist */
-          d = (cj->r - ckR)*(cj->r - ckR) + 
-	      (cj->g - ckG)*(cj->g - ckG) + 
+          d = (cj->r - ckR)*(cj->r - ckR) +
+	      (cj->g - ckG)*(cj->g - ckG) +
 	      (cj->b - ckB)*(cj->b - ckB);
           if (cj->mindist > d) cj->mindist = d;
 	  if (cj->mindist > mdist) { mdist = cj->mindist;  entry = j; }
@@ -148,8 +148,8 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
       for (j=0, cj=c; j<ncols; j++,cj++) {
 	if (cj->use) {  /* this color has not been marked already */
 	  /* update mindist */
-          d = (cj->r - ckR)*(cj->r - ckR) + 
-	      (cj->g - ckG)*(cj->g - ckG) + 
+          d = (cj->r - ckR)*(cj->r - ckR) +
+	      (cj->g - ckG)*(cj->g - ckG) +
     	      (cj->b - ckB)*(cj->b - ckB);
           if (cj->mindist > d) cj->mindist = d;
 	  if (cj->use > mdist) { mdist = cj->use;  entry = j; }
@@ -162,18 +162,18 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
     xvbcopy((char *) &c[entry], (char *) &c1[i], sizeof(CMAPENT));
     c[entry].use = 0;
   }
-  
+
 
   for (i=0; i<ncols; i++) order[i] = (byte) c1[i].oldindex;
 
   if (DEBUG>1) {
     fprintf(stderr,"%s: result of sorting colormap\n",cmd);
-    for (i=0; i<ncols; i++) 
+    for (i=0; i<ncols; i++)
       fprintf(stderr,"(%3d  %02x,%02x,%02x)     ",i,rmap[i],gmap[i],bmap[i]);
     fprintf(stderr,"\n\n");
-    
+
     fprintf(stderr,"%s: allocation order table\n",cmd);
-    for (i=0; i<ncols; i++) 
+    for (i=0; i<ncols; i++)
       fprintf(stderr,"order[%d] = -> %d\n", i, order[i]);
     fprintf(stderr,"\n");
   }
@@ -240,7 +240,7 @@ void AllocColors()
       SetISTR(ISTR_COLOR,"Using %s colormap.",
 	      (haveStdCmap == STD_111 ? "2x2x2" :
 	       haveStdCmap == STD_222 ? "4x4x4" :
-	       haveStdCmap == STD_232 ? "4x8x4" : 
+	       haveStdCmap == STD_232 ? "4x8x4" :
                haveStdCmap == STD_666 ? "6x6x6" : "8x8x4"));
 
       if (ncols>0) SetISTR(ISTR_COLOR2,stdCmapSuccess);
@@ -251,7 +251,7 @@ void AllocColors()
 
     for (i=0; i<numcols; i++) {
       int i332;
-      i332 = ((int)rMap[i]&0xe0) | (((int)gMap[i]&0xe0)>>3) | 
+      i332 = ((int)rMap[i]&0xe0) | (((int)gMap[i]&0xe0)>>3) |
 	     (((int)bMap[i]&0xc0)>>6);
 
       cols[i]  = stdcols[i332];
@@ -291,7 +291,7 @@ void FreeColors()
   }
 
   else {
-    for (i=0; i<nfcols; i++) 
+    for (i=0; i<nfcols; i++)
       xvFreeColors(theDisp, theCmap, &freecols[i], 1, 0L);
 
     nfcols = 0;
@@ -314,19 +314,19 @@ static void allocROColors()
   unique = p2alloc = 0;
   rwthistime = 0;
 
-  /* FIRST PASS COLOR ALLOCATION:  
+  /* FIRST PASS COLOR ALLOCATION:
      for each color in the 'desired colormap', try to get it via
      xvAllocColor().  If for any reason it fails, mark that pixel
      'unallocated' and worry about it later.  Repeat. */
 
-  /* attempt to allocate first ncols entries in colormap 
+  /* attempt to allocate first ncols entries in colormap
      note: On displays with less than 8 bits per RGB gun, it's quite
      possible that different colors in the original picture will be
      mapped to the same color on the screen.  X does this for you
-     silently.  However, this is not-desirable for this application, 
+     silently.  However, this is not-desirable for this application,
      because when I say 'allocate me 32 colors' I want it to allocate
      32 different colors, not 32 instances of the same 4 shades... */
-  
+
 
   for (i=0; i<256; i++) failed[i] = 1;
 
@@ -334,7 +334,7 @@ static void allocROColors()
 
   for (i=0; i<numcols && unique<ncols; i++) {
     c = colAllocOrder[i];
-    if (mono) { 
+    if (mono) {
       int intens = MONO(rMap[c], gMap[c], bMap[c]);
       defs[c].red = defs[c].green = defs[c].blue = intens<<8;
     }
@@ -346,8 +346,8 @@ static void allocROColors()
 
     defs[c].flags = DoRed | DoGreen | DoBlue;
 
-    if (!(colorMapMode==CM_OWNCMAP && cmap==theCmap && CMAPVIS(theVisual)) 
-	&& xvAllocColor(theDisp,cmap,&defs[c])) { 
+    if (!(colorMapMode==CM_OWNCMAP && cmap==theCmap && CMAPVIS(theVisual))
+	&& xvAllocColor(theDisp,cmap,&defs[c])) {
       unsigned long pixel, *fcptr;
 
       pixel = cols[c] = defs[c].pixel;
@@ -355,7 +355,7 @@ static void allocROColors()
       gdisp[c] = defs[c].green >> 8;
       bdisp[c] = defs[c].blue  >> 8;
       failed[c]= 0;
-      
+
       /* see if the newly allocated color is new and different */
       for (j=0, fcptr=freecols; j<nfcols && *fcptr!=pixel; j++,fcptr++);
       if (j==nfcols) unique++;
@@ -365,24 +365,24 @@ static void allocROColors()
     }
 
     else {
-      /* the allocation failed.  If we want 'perfect' color, and we haven't 
+      /* the allocation failed.  If we want 'perfect' color, and we haven't
 	 already created our own colormap, we'll want to do so */
       if ((colorMapMode == CM_PERFECT || colorMapMode == CM_OWNCMAP)
 	  && !LocalCmap && CMAPVIS(theVisual)) {
 	LocalCmap = XCreateColormap(theDisp, vrootW, theVisual, AllocNone);
-	
+
 	if (LocalCmap) {  /* succeeded, presumably */
 	  /* free all colors that were allocated, and try again with the
 	     new colormap.  This is necessary because 'XCopyColormapAndFree()'
 	     has the unpleasant side effect of freeing up the various
 	     colors I need for the control panel, etc. */
 
-	  for (i=0; i<nfcols; i++) 
+	  for (i=0; i<nfcols; i++)
 	    xvFreeColors(theDisp, theCmap, &freecols[i], 1, 0L);
-	  
+
 	  if (mainW && !useroot) XSetWindowColormap(theDisp,mainW, LocalCmap);
 
-	  if (mainW && !useroot && cmapInGam) 
+	  if (mainW && !useroot && cmapInGam)
 	    XSetWindowColormap(theDisp,gamW, LocalCmap);
 	  cmap = LocalCmap;
 
@@ -402,9 +402,9 @@ static void allocROColors()
       }
     }
   }  /* FIRST PASS */
-  
-  
-  
+
+
+
   if (nfcols==numcols) {
     if (numcols != unique)
       SetISTR(ISTR_COLOR,"Got all %d colors.  (%d unique)", numcols,
@@ -415,7 +415,7 @@ static void allocROColors()
     SetISTR(ISTR_COLOR2,"");
     return;
   }
-  
+
 
 
   /* SECOND PASS COLOR ALLOCATION:
@@ -427,7 +427,7 @@ static void allocROColors()
      is in the X colormap.  Try to allocate that color (read only).
      If that fails, the THIRD PASS will deal with it */
 
-  SetISTR(ISTR_COLOR,"Got %d of %d colors.  (%d unique)", 
+  SetISTR(ISTR_COLOR,"Got %d of %d colors.  (%d unique)",
 	  nfcols,numcols,unique);
 
   /* read entire colormap (or first 256 entries) into 'ctab' */
@@ -436,28 +436,28 @@ static void allocROColors()
   if (dc>0) {  /* only do SECOND PASS if there IS a colormap to read */
     for (i=0; i<dc; i++) ctab[i].pixel = (unsigned long) i;
     XQueryColors(theDisp, cmap, ctab, dc);
-    
+
     for (i=0; i<numcols && unique<ncols; i++) {
       c = colAllocOrder[i];
-      
+
       if (failed[c]) {  /* an unallocated pixel */
 	int d, mdist, close;
 	int rd, gd, bd, ri, gi, bi;
-	
+
 	mdist = 1000000;   close = -1;
 	ri = rMap[c];  gi = gMap[c];  bi = bMap[c];
-	
+
 	for (j=0; j<dc; j++) {
 	  rd = ri - (ctab[j].red  >>8);
 	  gd = gi - (ctab[j].green>>8);
 	  bd = bi - (ctab[j].blue >>8);
-	  
+
 	  d = rd*rd + gd*gd + bd*bd;
 	  if (d<mdist) { mdist=d; close=j; }
 	}
-	
+
 	if (close<0) FatalError("This Can't Happen! (How reassuring.)");
-	if (xvAllocColor(theDisp, cmap, &ctab[close])) { 
+	if (xvAllocColor(theDisp, cmap, &ctab[close])) {
 	  xvbcopy((char *) &ctab[close], (char *) &defs[c], sizeof(XColor));
 	  failed[c]= 0;
 	  cols[c]  = ctab[close].pixel;
@@ -487,7 +487,7 @@ static void allocROColors()
 
       mdist = 1000000;   close = -1;
       ri = rMap[c];  gi = gMap[c];  bi = bMap[c];
-      
+
       /* search the alloc'd colors */
       for (j=0; j<nfcols; j++) {
 	k = fc2pcol[j];
@@ -535,7 +535,7 @@ static void allocRWColors()
     unsigned long pmr[1], pix[1];
     c = colAllocOrder[i];
 
-    if (cellgroup[c]) {  
+    if (cellgroup[c]) {
       int n;
       /* this color is part of a group.  see if its group's
 	 been seen already, and if so, skip this */
@@ -548,11 +548,11 @@ static void allocRWColors()
       }
     }
 
-    if (!(colorMapMode==CM_OWNCMAP && cmap==theCmap && CMAPVIS(theVisual)) && 
+    if (!(colorMapMode==CM_OWNCMAP && cmap==theCmap && CMAPVIS(theVisual)) &&
 	XAllocColorCells(theDisp, cmap, False, pmr, 0, pix, 1)) {
       defs[c].pixel = cols[c] = pix[0];
       failed[c] = 0;
-      if (mono) { 
+      if (mono) {
 	int intens = MONO(rMap[c], gMap[c], bMap[c]);
 	defs[c].red = defs[c].green = defs[c].blue = intens<<8;
       }
@@ -573,20 +573,20 @@ static void allocRWColors()
     }
 
     else {
-      if ((colorMapMode == CM_PERFECT || colorMapMode == CM_OWNCMAP) 
+      if ((colorMapMode == CM_PERFECT || colorMapMode == CM_OWNCMAP)
 	  && !LocalCmap && CMAPVIS(theVisual)) {
 	LocalCmap = XCreateColormap(theDisp, vrootW, theVisual, AllocNone);
-	
+
 	/* free all colors that were allocated, and try again with the
 	   new colormap.  This is necessary because 'XCopyColormapAndFree()'
 	   has the unpleasant side effect of freeing up the various
 	   colors I need for the control panel, etc. */
 
-	for (i=0; i<nfcols; i++) 
+	for (i=0; i<nfcols; i++)
 	  xvFreeColors(theDisp, theCmap, &freecols[i], 1, 0L);
-	
+
 	if (mainW && !useroot) XSetWindowColormap(theDisp,mainW, LocalCmap);
-	if (mainW && !useroot && cmapInGam) 
+	if (mainW && !useroot && cmapInGam)
 	  XSetWindowColormap(theDisp,gamW, LocalCmap);
 	cmap = LocalCmap;
 
@@ -608,12 +608,12 @@ static void allocRWColors()
   }
 
   else {
-    /* Failed to allocate all colors in picture.  Map remaining desired 
+    /* Failed to allocate all colors in picture.  Map remaining desired
        colors into closest allocated desired colors */
 
       if (nfcols==0 && !LocalCmap) {
-	char tstr[128], *tmp,
-	    *foo = "No r/w cells available.  Using r/o color.";
+	char tstr[128], *tmp;
+	const char *foo = "No r/w cells available.  Using r/o color.";
 
 	tmp = GetISTR(ISTR_WARNING);
 	if (strlen(tmp) > (size_t) 0) sprintf(tstr, "%s  %s", tmp, foo);
@@ -623,7 +623,7 @@ static void allocRWColors()
 	allocROColors();
 	return;
       }
-	
+
       SetISTR(ISTR_COLOR,"Got %d of %d colors.",  nfcols,numcols);
 
       for (i=0; i<numcols; i++) {
@@ -662,7 +662,7 @@ static void allocRWColors()
     j = fc2pcol[i];
     defs[j].pixel = freecols[i];
 
-    if (mono) { 
+    if (mono) {
       int intens = MONO(rMap[j], gMap[j], bMap[j]);
       defs[j].red = defs[j].green = defs[j].blue = intens<<8;
     }
@@ -706,9 +706,9 @@ Status xvAllocColor(dp, cm, cdef)
   if (theVisual->class == TrueColor || theVisual->class == DirectColor) {
     unsigned long r, g, b, rmask, gmask, bmask, origr, origg, origb;
     int rshift, gshift, bshift;
-    
-    /* shift r,g,b so that high bit of 16-bit color specification is 
-     * aligned with high bit of r,g,b-mask in visual, 
+
+    /* shift r,g,b so that high bit of 16-bit color specification is
+     * aligned with high bit of r,g,b-mask in visual,
      * AND each component with its mask,
      * and OR the three components together
      */
@@ -781,7 +781,7 @@ Status xvAllocColor(dp, cm, cdef)
 	      "         mask=%04lx,%04lx,%04lx  pix=%08lx\n",
 	      rmask, gmask, bmask, cdef->pixel);
     }
-    
+
     return 1;
   }
   else {
@@ -811,7 +811,7 @@ int regroup;
 {
   int i, j;
 
-  /* if regroup is set, we *must* do a full realloc, as the cols[] array 
+  /* if regroup is set, we *must* do a full realloc, as the cols[] array
      isn't correct anymore.  (cell groupings changed) */
 
   ApplyECctrls();  /* set {r,g,b}cmap[editColor] based on dial settings */
@@ -830,16 +830,16 @@ int regroup;
     }
   }
 
-    
+
   /* do something clever if we're using R/W color and this colorcell isn't
      shared */
 
   if (!regroup && allocMode==AM_READWRITE && rwthistime) {
     /* let's try to be clever */
-    /* determine if the editColor cell is unique, or shared (among 
+    /* determine if the editColor cell is unique, or shared (among
        non-group members, that is) */
 
-    for (i=j=0; i<numcols; i++) 
+    for (i=j=0; i<numcols; i++)
       if (rwpc2pc[i] == rwpc2pc[editColor]) j++;
 
     /* if this is a group, subtract off the non-this-one pixels from group */
@@ -901,7 +901,7 @@ static void putECfirst()
   }
 
   /* shift 0..i-1 down one position */
-  xvbcopy((char *) colAllocOrder, (char *) colAllocOrder+1, 
+  xvbcopy((char *) colAllocOrder, (char *) colAllocOrder+1,
 	  i * sizeof(colAllocOrder[0]));
   colAllocOrder[0] = editColor;
 }
@@ -930,9 +930,9 @@ int MakeStdCmaps()
    *   stdfreecols[256]    - list of colors to free on exit
    *   stdnfcols           - # of colors to free
    *
-   * possibly modifies browR, browG, browB, and browcols arrays 
+   * possibly modifies browR, browG, browB, and browcols arrays
    *     (if !browPerfect)
-   */       
+   */
 
   /* returns '1' if the colors were reallocated, '0' otherwise */
 
@@ -946,18 +946,18 @@ int MakeStdCmaps()
 
   /* note:
    *   if (ncols==0) (ie, we're either on, or emulating a b/w display),
-   *   build std*[], std*disp[], colormaps, but don't actually 
+   *   build std*[], std*disp[], colormaps, but don't actually
    *   allocate any colors.
    */
 
-  int i,j,r,g,b, desMode, screwed;
+  int i, r,g,b, desMode, screwed;
   XColor def;
   byte rmap[256],gmap[256],bmap[256],order[256];
   unsigned long descols[256];
   int des2got[256], failed[256];
   int maplen, exactCnt, nearCnt;
-  
-  
+
+
   /* generate stdr,stdg,stdb cmap.  Same in all cases */
   for (r=0, i=0; r<8; r++)
     for (g=0; g<8; g++)
@@ -966,10 +966,10 @@ int MakeStdCmaps()
 	stdg[i] = (g*255)/7;
 	stdb[i] = (b*255)/3;
       }
-  
-  
+
+
   /* determine what size cmap we should build */
-  if (theVisual->class == TrueColor || 
+  if (theVisual->class == TrueColor ||
       theVisual->class == DirectColor) desMode = STD_332;
   else if (colorMapMode == CM_STDCMAP) desMode = STD_232;
   else desMode = STD_222;
@@ -983,9 +983,9 @@ int MakeStdCmaps()
   }
 
 
-  if (DEBUG) fprintf(stderr,"MakeStdCmaps: have=%d, des=%d, ncols=%d\n", 
+  if (DEBUG) fprintf(stderr,"MakeStdCmaps: have=%d, des=%d, ncols=%d\n",
 		     haveStdCmap, desMode, ncols);
-  
+
   if (haveStdCmap != STD_NONE && haveStdCmap == desMode) return 0;
   freeStdCmaps();
 
@@ -997,7 +997,7 @@ int MakeStdCmaps()
   for (i=0; i<256; i++) des2got[i] = i;
   exactCnt = nearCnt = 0;
 
-  
+
   if (desMode == STD_111) {   /* try to alloc 8 colors */
     /* generate a 1/1/1 desired colormap */
     maplen = 8;
@@ -1009,7 +1009,7 @@ int MakeStdCmaps()
 	  bmap[i] = (b*255);
 	}
   }
-  
+
   else if (desMode == STD_222) {   /* try to alloc 64 colors */
     /* generate a 2/2/2 desired colormap */
     maplen = 64;
@@ -1021,7 +1021,7 @@ int MakeStdCmaps()
 	  bmap[i] = (b*255)/3;
 	}
   }
-  
+
   else if (desMode == STD_232) {   /* try to alloc 128 colors */
     /* generate a 2/3/2 desired colormap */
     maplen = 128;
@@ -1033,7 +1033,7 @@ int MakeStdCmaps()
 	  bmap[i] = (b*255)/3;
 	}
   }
-  
+
   else if (desMode == STD_666) {   /* try to alloc 216 colors */
     /* generate a 6*6*6 desired colormap */
     maplen = 216;
@@ -1045,14 +1045,14 @@ int MakeStdCmaps()
 	  bmap[i] = (b*255)/5;
 	}
   }
-  
+
   else {   /* desMode == STD_332 */
     maplen = 256;
     for (i=0; i<maplen; i++) {
       rmap[i] = stdr[i];  gmap[i] = stdg[i];  bmap[i] = stdb[i];
     }
   }
-  
+
 
   /* sort the colors according to the diversity algorithm... */
   diverseOrder(rmap,gmap,bmap,maplen,order);
@@ -1072,7 +1072,7 @@ int MakeStdCmaps()
       def.red   = rmap[order[i]] << 8;
       def.green = gmap[order[i]] << 8;
       def.blue  = bmap[order[i]] << 8;
-      
+
       def.flags = DoRed | DoGreen | DoBlue;
 
       if (xvAllocColor(theDisp, theCmap, &def)) {  /* success */
@@ -1090,34 +1090,34 @@ int MakeStdCmaps()
 
     if (numgot != maplen) {
       /* PHASE 2:  find 'close' colors in colormap, try to alloc those */
-      
+
       /* read entire colormap (or first 256 entries) into 'ctab' */
       dc = (ncells<256) ? ncells : 256;
       if (dc>0) {
 	for (i=0; i<dc; i++) ctab[i].pixel = (unsigned long) i;
 	XQueryColors(theDisp, theCmap, ctab, dc);
-	
+
 	for (i=0; i<maplen; i++) {
 	  if (failed[i]) {
-	    
+
 	    /* find closest color in colormap, and try to alloc it */
 	    mind = 1000000;   /* greater than 3 * (256^2) */
 	    for (j=0,num = -1; j<dc; j++) {
 	      rd = rmap[i] - (ctab[j].red  >>8);
 	      gd = gmap[i] - (ctab[j].green>>8);
 	      bd = bmap[i] - (ctab[j].blue >>8);
-	      
+
 	      d = CDIST(rd, gd, bd);
 	      if (d<mind) { mind = d;  num = j; }
 	    }
-	    
+
 	    if (num < 0) screwed = 1;
 	    else if (xvAllocColor(theDisp, theCmap, &ctab[num])) {  /*success*/
 	      des2got[i] = i;
 	      descols[i] = ctab[num].pixel;
 	      failed[i]  = 0;
-	      nearCnt++; 
-	      /* for (j=0; j<stdnfcols && stdfreecols[j]!=ctab[num].pixel; 
+	      nearCnt++;
+	      /* for (j=0; j<stdnfcols && stdfreecols[j]!=ctab[num].pixel;
 		 j++); */
 	      stdfreecols[stdnfcols++] = ctab[num].pixel;
 	    }
@@ -1125,12 +1125,12 @@ int MakeStdCmaps()
 	}
       }
     }
-      
-    /* PHASE 3:  map remaining unallocated colors into closest we got */  
-    
+
+    /* PHASE 3:  map remaining unallocated colors into closest we got */
+
     for (i=0; i<maplen; i++) {
       if (failed[i]) {
-	
+
 	/* find closest alloc'd color */
 	mind = 1000000;   /* greater than 3 * (256^2) */
 	for (j=0,num=0; j<maplen; j++) {
@@ -1139,7 +1139,7 @@ int MakeStdCmaps()
 	    if (d<mind) { mind = d;  num = j; }
 	  }
 	}
-	
+
 	if (failed[num]) screwed = 1;
 	else {
 	  descols[i] = descols[num];
@@ -1151,8 +1151,8 @@ int MakeStdCmaps()
   }
 
 
-  /* at this point, we have 'descols', a maplen long array of 
-     X pixel values that maps 1/1/1, 2/2/2, 6*6*6, or 3/3/2 values 
+  /* at this point, we have 'descols', a maplen long array of
+     X pixel values that maps 1/1/1, 2/2/2, 6*6*6, or 3/3/2 values
      into an X pixel value */
 
   /* build stdcols and stdrdisp,stdgdisp,stdbdisp colormap */
@@ -1170,7 +1170,7 @@ int MakeStdCmaps()
 
 	  stdcols[i332] = descols[des2got[i111]];
 	}
-  } 
+  }
 
   else if (desMode == STD_222) {
     for (r=0; r<8; r++)
@@ -1186,7 +1186,7 @@ int MakeStdCmaps()
 
 	  stdcols[i332] = descols[des2got[i222]];
 	}
-  } 
+  }
 
   else if (desMode == STD_232) {
     for (r=0; r<8; r++)
@@ -1201,7 +1201,7 @@ int MakeStdCmaps()
 	  stdbdisp[i332] = bmap[des2got[i232]];
 	  stdcols[i332]  = descols[des2got[i232]];
 	}
-  } 
+  }
 
   else if (desMode == STD_666) {
     for (r=0,i=0; r<8; r++)
@@ -1221,7 +1221,7 @@ int MakeStdCmaps()
 
 	  stdcols[i]  = descols[des2got[i666]];
 	}
-  } 
+  }
 
   else {  /* desMode == STD_332 */
     for (i=0; i<256; i++) {
@@ -1249,22 +1249,22 @@ int MakeStdCmaps()
   if (DEBUG > 1) {
     fprintf(stderr,"MakeStdCmaps:  ncols=%d  maplen=%d\n", ncols, maplen);
     fprintf(stderr,"  std*[]= ");
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       fprintf(stderr,"%02x,%02x,%02x  ",stdr[i],stdg[i],stdb[i]);
     fprintf(stderr,"\n\n");
 
     fprintf(stderr,"  disp[]= ");
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       fprintf(stderr,"%02x,%02x,%02x  ",stdrdisp[i],stdgdisp[i],stdbdisp[i]);
     fprintf(stderr,"\n\n");
 
     fprintf(stderr,"  stdcols[]= ");
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       fprintf(stderr,"%02lx ",stdcols[i]);
     fprintf(stderr,"\n\n");
 
     fprintf(stderr,"  stdfreecols[%d] = ", stdnfcols);
-    for (i=0; i<stdnfcols; i++) 
+    for (i=0; i<stdnfcols; i++)
       fprintf(stderr,"%02lx ",stdfreecols[i]);
     fprintf(stderr,"\n\n");
   }
@@ -1272,8 +1272,8 @@ int MakeStdCmaps()
   if (exactCnt == maplen)
     sprintf(stdCmapSuccess, "Got all %d colors.", exactCnt);
   else {
-    if (nearCnt>0) 
-      sprintf(stdCmapSuccess, "Got %d out of %d colors.  (%d close color%s)", 
+    if (nearCnt>0)
+      sprintf(stdCmapSuccess, "Got %d out of %d colors.  (%d close color%s)",
 	      exactCnt, maplen, nearCnt, (nearCnt>1) ? "s" : "");
     else
       sprintf(stdCmapSuccess, "Got %d out of %d colors.", exactCnt, maplen);
@@ -1292,11 +1292,11 @@ void MakeBrowCmap()
   /* This function should only be called once, at the start of the program.
    *
    * produces many things:
-   *   browR,browG,browB[256] 
+   *   browR,browG,browB[256]
    *                       - a 3/3/2 colormap used by genIcon
    *   browcols[256]       - maps 3/3/2 values into X colors
    *   browCmap            - local cmap used in browse window, if browPerfect
-   */       
+   */
 
   int    i,j,r,g,b, screwed, num, exactCnt, nearCnt;
   XColor def;
@@ -1306,8 +1306,8 @@ void MakeBrowCmap()
   long   d, mind;
 
 
-  if (DEBUG) 
-    fprintf(stderr,"MakeBrowCmap:  perfect = %d, ncols = %d\n", 
+  if (DEBUG)
+    fprintf(stderr,"MakeBrowCmap:  perfect = %d, ncols = %d\n",
 	    browPerfect, ncols);
 
   if (ncols == 0 || !CMAPVIS(theVisual)) browPerfect = 0;
@@ -1350,7 +1350,7 @@ void MakeBrowCmap()
     def.red   = rmap[order[i]] << 8;
     def.green = gmap[order[i]] << 8;
     def.blue  = bmap[order[i]] << 8;
-      
+
     def.flags = DoRed | DoGreen | DoBlue;
 
     if (xvAllocColor(theDisp, browCmap, &def)) {  /* success */
@@ -1358,14 +1358,14 @@ void MakeBrowCmap()
       descols[order[i]] = def.pixel;
 
       if (DEBUG>1)
-	fprintf(stderr,"makebrowcmap: Phase 1: Alloc %x,%x,%x succeeded!\n", 
+	fprintf(stderr,"makebrowcmap: Phase 1: Alloc %x,%x,%x succeeded!\n",
 		rmap[order[i]], gmap[order[i]], bmap[order[i]]);
     }
     else failed[order[i]] = 1;
   }
 
-    
-  /* PHASE 2:  map remaining unallocated colors into closest we got */  
+
+  /* PHASE 2:  map remaining unallocated colors into closest we got */
 
   for (i=0; i<256; i++) {
     if (failed[i]) {
@@ -1377,9 +1377,9 @@ void MakeBrowCmap()
 	  if (d<mind) { mind = d;  num = j; }
 	}
       }
-	  
+
       if (DEBUG>1)
-	fprintf(stderr,"makebrowcmap: closest to %x,%x,%x = %x,%x,%x\n", 
+	fprintf(stderr,"makebrowcmap: closest to %x,%x,%x = %x,%x,%x\n",
 		rmap[i],gmap[i],bmap[i], rmap[num], gmap[num], bmap[num]);
 
       if (failed[num]) screwed = 1;
@@ -1406,7 +1406,7 @@ static void diverseOrder(rmap,gmap,bmap,maplen,order)
      byte *rmap, *gmap, *bmap, *order;
      int   maplen;
 {
-  /* takes a colormap (maxlen 256) and produces an order array that 
+  /* takes a colormap (maxlen 256) and produces an order array that
      contains the most-diverse order for allocating these colors */
 
   int dist[256], i, pick, maxv, ocnt, d;
@@ -1422,7 +1422,7 @@ static void diverseOrder(rmap,gmap,bmap,maplen,order)
 
   ocnt = 0;
   order[ocnt++] = pick;
-  
+
   /* init dist[] array */
   for (i=0; i<maplen; i++) dist[i] = 1000000;
 
@@ -1509,14 +1509,14 @@ void ChangeCmapMode(cmode, genepic, freeKludge)
   else if (cmode == CM_NORMAL) {
     if (novbrowse || browPerfect || haveStdCmap != iconCmapSize)
       freeStdCmaps();
-    
+
     /* if using browser, and killed stdcmap, make icon stdcmap */
     if (!novbrowse && !browPerfect && haveStdCmap == STD_NONE) {
       if (MakeStdCmaps() && anyBrowUp && CMAPVIS(theVisual))
 	RegenBrowseIcons();
     }
   }
-  
+
   else if (cmode == CM_PERFECT) { }
   else if (cmode == CM_OWNCMAP) { }
 
@@ -1540,7 +1540,7 @@ void ChangeCmapMode(cmode, genepic, freeKludge)
     SetEpicMode();
     if (genepic) GenerateEpic(eWIDE, eHIGH);
   }
-  else { 
+  else {
     if (oldmode == CM_STDCMAP && cmode != CM_STDCMAP && epicMode != EM_RAW) {
       /* just left STDCMAP mode.  Switch to using 'RAW' */
       epicMode = EM_RAW;

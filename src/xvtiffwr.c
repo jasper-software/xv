@@ -9,15 +9,15 @@
 
 #ifdef HAVE_TIFF
 
-#include "tiffio.h"    /* has to be after xv.h, as it needs varargs/stdarg */
+#include <tiffio.h>    /* has to be after xv.h, as it needs varargs/stdarg */
 
 
 #define ALLOW_JPEG 0  /* set to '1' to allow 'JPEG' choice in dialog box */
 
 
 static void setupColormap   PARM((TIFF *, byte *, byte *, byte *));
-static int  WriteTIFF       PARM((FILE *, byte *, int, int, int, 
-				  byte *, byte *, byte *, int, int, 
+static int  WriteTIFF       PARM((FILE *, byte *, int, int, int,
+				  byte *, byte *, byte *, int, int,
 				  char *, int, char *));
 
 
@@ -29,7 +29,7 @@ static void setupColormap(tif, rmap, gmap, bmap)
 {
   short red[256], green[256], blue[256];
   int i;
-  
+
   /* convert 8-bit colormap to 16-bit */
   for (i=0; i<256; i++) {
 #define	SCALE(x)	((((int)x)*((1L<<16)-1))/255)
@@ -43,6 +43,7 @@ static void setupColormap(tif, rmap, gmap, bmap)
 
 
 /*******************************************/
+/* Returns '0' if successful. */
 static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
 		     fname,comp,comment)
      FILE *fp;
@@ -55,6 +56,13 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
   TIFF *tif;
   byte *pix;
   int   i,j;
+  int   npixels = w*h;
+
+  if (w <= 0 || h <= 0 || npixels/w != h) {
+    SetISTR(ISTR_WARNING, "%s: image dimensions too large", fname);
+    /* TIFFError(fname, "Image dimensions too large"); */
+    return -1;
+  }
 
 #ifndef VMS
   tif = TIFFOpen(fname, "w");
@@ -62,7 +70,7 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
   tif = TIFFFdOpen(dup(fileno(fp)), fname, "w");
 #endif
 
-  if (!tif) return 0;
+  if (!tif) return -1;   /* GRR:  was 0 */
 
   WaitCursor();
 
@@ -78,25 +86,36 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
       TIFFSetField(tif, TIFFTAG_GROUP3OPTIONS,
 	  GROUP3OPT_2DENCODING+GROUP3OPT_FILLBITS);
 
+  if (comp == COMPRESSION_LZW)
+      TIFFSetField(tif, TIFFTAG_PREDICTOR, 2);
+
   TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
   TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
   TIFFSetField(tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
   TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, h);
 
   TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, (int)2);
-  TIFFSetField(tif, TIFFTAG_XRESOLUTION, (float)1200.0);
-  TIFFSetField(tif, TIFFTAG_YRESOLUTION, (float)1200.0);
+  TIFFSetField(tif, TIFFTAG_XRESOLUTION, (float) 72.0);
+  TIFFSetField(tif, TIFFTAG_YRESOLUTION, (float) 72.0);
 
 
   /* write the image data */
 
   if (ptype == PIC24) {  /* only have to deal with FULLCOLOR or GREYSCALE */
     if (colorstyle == F_FULLCOLOR) {
+      int count = 3*npixels;
+
+      if (count/3 != npixels) {  /* already know w, h, npixels > 0 */
+        /* SetISTR(ISTR_WARNING, "%s: image dimensions too large", fname); */
+        TIFFError(fname, "Image dimensions too large");
+        return -1;
+      }
+
       TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 3);
       TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE,   8);
       TIFFSetField(tif, TIFFTAG_PHOTOMETRIC,     PHOTOMETRIC_RGB);
-      
-      TIFFWriteEncodedStrip(tif, 0, pic, w*h*3);
+
+      TIFFWriteEncodedStrip(tif, 0, pic, count);
     }
 
     else {  /* colorstyle == F_GREYSCALE */
@@ -106,13 +125,13 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
       TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE,   8);
       TIFFSetField(tif, TIFFTAG_PHOTOMETRIC,    PHOTOMETRIC_MINISBLACK);
 
-      tpic = (byte *) malloc((size_t) w*h);
+      tpic = (byte *) malloc((size_t) npixels);
       if (!tpic) FatalError("unable to malloc in WriteTIFF()");
 
-      for (i=0, tp=tpic, sp=pic; i<w*h; i++, sp+=3) 
+      for (i=0, tp=tpic, sp=pic; i<npixels; i++, sp+=3)
 	*tp++ = MONO(sp[0],sp[1],sp[2]);
-      
-      TIFFWriteEncodedStrip(tif, 0, tpic, w*h);
+
+      TIFFWriteEncodedStrip(tif, 0, tpic, npixels);
 
       free(tpic);
     }
@@ -123,32 +142,42 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
       TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
       TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_PALETTE);
       setupColormap(tif, rmap, gmap, bmap);
-      TIFFWriteEncodedStrip(tif, 0, pic, w*h);
+      TIFFWriteEncodedStrip(tif, 0, pic, npixels);
     }
 
     else if (colorstyle == F_GREYSCALE) {             /* 8-bit greyscale */
       byte rgb[256];
-      byte *tpic = (byte *) malloc((size_t) w*h);
+      byte *tpic = (byte *) malloc((size_t) npixels);
       byte *tp = tpic;
       TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 8);
       TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
       for (i=0; i<numcols; i++) rgb[i] = MONO(rmap[i],gmap[i],bmap[i]);
-      for (i=0, pix=pic; i<w*h; i++,pix++) {
+      for (i=0, pix=pic; i<npixels; i++,pix++) {
 	if ((i&0x7fff)==0) WaitCursor();
 	*tp++ = rgb[*pix];
       }
-      TIFFWriteEncodedStrip(tif, 0, tpic, w*h);
+      TIFFWriteEncodedStrip(tif, 0, tpic, npixels);
       free(tpic);
     }
 
     else if (colorstyle == F_BWDITHER) {             /* 1-bit B/W stipple */
       int bit,k,flipbw;
       byte *tpic, *tp;
+      tsize_t stripsize;  /* signed */
 
       flipbw = (MONO(rmap[0],gmap[0],bmap[0]) > MONO(rmap[1],gmap[1],bmap[1]));
       TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 1);
       TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-      tpic = (byte *) malloc((size_t) TIFFStripSize(tif));
+      stripsize = TIFFStripSize(tif);
+      if (stripsize <= 0) {
+        TIFFError(fname, "Image dimensions too large");
+        return -1;
+      }
+      tpic = (byte *) malloc((size_t) stripsize);
+      if (tpic == 0) {
+        TIFFError(fname, "No space for strip buffer");
+        return -1;
+      }
       tp = tpic;
       for (i=0, pix=pic; i<h; i++) {
 	if ((i&15)==0) WaitCursor();
@@ -167,7 +196,7 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
 	  *tp++ = (byte) (k & 0xff);
 	}
       }
-      TIFFWriteEncodedStrip(tif, 0, tpic, TIFFStripSize(tif));
+      TIFFWriteEncodedStrip(tif, 0, tpic, stripsize);
       free(tpic);
     }
   }
@@ -209,16 +238,16 @@ void CreateTIFFW()
 {
   int	     y;
 
-  tiffW = CreateWindow("xv tiff", "XVtiff", NULL, 
+  tiffW = CreateWindow("xv tiff", "XVtiff", NULL,
 		       TWIDE, THIGH, infofg, infobg, 0);
   if (!tiffW) FatalError("can't create tiff window!");
 
   XSelectInput(theDisp, tiffW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  BTCreate(&tbut[T_BOK], tiffW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH, 
+  BTCreate(&tbut[T_BOK], tiffW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&tbut[T_BCANC], tiffW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH, 
+  BTCreate(&tbut[T_BCANC], tiffW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
   y = 55;
@@ -237,7 +266,7 @@ void CreateTIFFW()
 
   XMapSubwindows(theDisp, tiffW);
 }
-  
+
 
 /***************************************************/
 void TIFFDialog(vis)
@@ -288,9 +317,9 @@ XEvent *xev;
 
   else if (xev->type == KeyPress) {
     XKeyEvent *e = (XKeyEvent *) xev;
-    char buf[128];  KeySym ks;  XComposeStatus status;  
+    char buf[128];  KeySym ks;  XComposeStatus status;
     int stlen;
-	
+
     stlen = XLookupString(e,buf,128,&ks,&status);
     buf[stlen] = '\0';
 
@@ -350,7 +379,7 @@ int col;
 static void drawTD(x,y,w,h)
 int x,y,w,h;
 {
-  char *title  = "Save TIFF file...";
+  const char *title  = "Save TIFF file...";
   int  i;
   XRectangle xr;
 
@@ -381,7 +410,7 @@ int x,y;
   /* check BUTTs */
 
   /* check the RBUTTS first, since they don't DO anything */
-  if ( (i=RBClick(compRB, x,y)) >= 0) { 
+  if ( (i=RBClick(compRB, x,y)) >= 0) {
     (void) RBTrack(compRB, i);
     return;
   }
@@ -417,7 +446,7 @@ int cmd;
     }
   }
     break;
-    
+
   case T_BCANC:	TIFFDialog(0);   break;
 
   default:	break;

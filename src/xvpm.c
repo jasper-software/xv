@@ -42,9 +42,9 @@ typedef struct {
 /***** end PM.H *****/
 
 
-pmpic  thePic;
+static pmpic thePic;
 
-static int  pmError  PARM((char *, char *));
+static int  pmError  PARM((const char *, const char *));
 static int  flip4    PARM((int));
 static int  getint32 PARM((FILE *));
 static void putint32 PARM((int, FILE *));
@@ -60,8 +60,8 @@ int LoadPM(fname, pinfo)
 
   FILE  *fp;
   byte  *pic8;
-  int    isize,i,flipit,w,h;
-  char  *bname;
+  int    isize,i,flipit,w,h,npixels,nRGBbytes;
+  const char  *bname;
 
   bname = BaseName(fname);
   thePic.pm_image = (char *) NULL;
@@ -103,10 +103,11 @@ int LoadPM(fname, pinfo)
     thePic.pm_cmtsize = flip4(thePic.pm_cmtsize);
     }
 
-  w = thePic.pm_ncol;  h = thePic.pm_nrow;
+  w = thePic.pm_ncol;
+  h = thePic.pm_nrow;
 
   /* make sure that the input picture can be dealt with */
-  if ( thePic.pm_nband!=1 || 
+  if ( thePic.pm_nband!=1 ||
       (thePic.pm_form!=PM_I && thePic.pm_form!=PM_C) ||
       (thePic.pm_form==PM_I && thePic.pm_np>1) ||
       (thePic.pm_form==PM_C && (thePic.pm_np==2 || thePic.pm_np>4)) ) {
@@ -114,20 +115,27 @@ int LoadPM(fname, pinfo)
     fprintf(stderr,"(ie, 1-plane PM_I, or 1-, 3-, or 4-plane PM_C)\n");
 
     return pmError(bname, "PM file in unsupported format");
-  }	
+  }
 
 
   isize = pm_isize(&thePic);
+  npixels = w*h;
+  nRGBbytes = 3*npixels;
 
-  if (DEBUG) 
+  /* make sure image is more-or-less valid (and no overflows) */
+  if (isize <= 0 || w <= 0 || h <= 0 || npixels/w < h ||
+      nRGBbytes/3 < npixels || thePic.pm_cmtsize < 0)
+    return pmError(bname, "Bogus PM file!!");
+
+  if (DEBUG)
     fprintf(stderr,"%s: LoadPM() - loading a %dx%d %s pic, %d planes\n",
-	    cmd, w, h, (thePic.pm_form==PM_I) ? "PM_I" : "PM_C", 
+	    cmd, w, h, (thePic.pm_form==PM_I) ? "PM_I" : "PM_C",
 	    thePic.pm_np);
 
-	      
+
   /* allocate memory for picture and read it in */
   thePic.pm_image = (char *) malloc((size_t) isize);
-  if (thePic.pm_image == NULL) 
+  if (thePic.pm_image == NULL)
     return( pmError(bname, "unable to malloc PM picture") );
 
   if (fread(thePic.pm_image, (size_t) isize, (size_t) 1, fp) != 1)   {
@@ -147,7 +155,7 @@ int LoadPM(fname, pinfo)
       }
     }
   }
-   
+
   fclose(fp);
 
 
@@ -155,11 +163,11 @@ int LoadPM(fname, pinfo)
     int  *intptr;
     byte *pic24, *picptr;
 
-    if ((pic24 = (byte *) malloc((size_t) w*h*3))==NULL) {
+    if ((pic24 = (byte *) malloc((size_t) nRGBbytes))==NULL) {
       if (thePic.pm_cmt) free(thePic.pm_cmt);
       return( pmError(bname, "unable to malloc 24-bit picture") );
     }
-      
+
     intptr = (int *) thePic.pm_image;
     picptr = pic24;
 
@@ -190,7 +198,7 @@ int LoadPM(fname, pinfo)
   else if (thePic.pm_form == PM_C && thePic.pm_np>1) {
     byte *pic24, *picptr, *rptr, *gptr, *bptr;
 
-    if ((pic24 = (byte *) malloc((size_t) w*h*3))==NULL) {
+    if ((pic24 = (byte *) malloc((size_t) nRGBbytes))==NULL) {
       if (thePic.pm_cmt) free(thePic.pm_cmt);
       return( pmError(bname, "unable to malloc 24-bit picture") );
     }
@@ -210,12 +218,12 @@ int LoadPM(fname, pinfo)
     pinfo->pic  = pic24;
     pinfo->type = PIC24;
   }
-  
+
 
   else if (thePic.pm_form == PM_C && thePic.pm_np==1) {
     /* don't have to convert, just point pic at thePic.pm_image */
     pic8 = (byte *) thePic.pm_image;
-    for (i=0; i<256; i++) 
+    for (i=0; i<256; i++)
       pinfo->r[i] = pinfo->g[i] = pinfo->b[i] = i;  /* build mono cmap */
 
     pinfo->pic  = pic8;
@@ -228,13 +236,13 @@ int LoadPM(fname, pinfo)
   pinfo->normw = pinfo->w;   pinfo->normh = pinfo->h;
 
   pinfo->frmType = F_PM;
-  pinfo->colType = (thePic.pm_form==PM_I || thePic.pm_np>1) 
+  pinfo->colType = (thePic.pm_form==PM_I || thePic.pm_np>1)
                          ? F_FULLCOLOR : F_GREYSCALE;
-  sprintf(pinfo->fullInfo,"PM, %s.  (%d plane %s)  (%ld bytes)",
-	  (thePic.pm_form==PM_I || thePic.pm_np>1) 
+  sprintf(pinfo->fullInfo,"PM, %s.  (%d plane %s)  (%d bytes)",
+	  (thePic.pm_form==PM_I || thePic.pm_np>1)
 	        ? "24-bit color" : "8-bit greyscale",
 	  thePic.pm_np, (thePic.pm_form==PM_I) ? "PM_I" : "PM_C",
-	  isize + PM_IOHDR_SIZE + thePic.pm_cmtsize);
+	  isize + (int)PM_IOHDR_SIZE + thePic.pm_cmtsize);
 
   sprintf(pinfo->shrtInfo, "%dx%d PM.", w,h);
   pinfo->comment = thePic.pm_cmt;
@@ -313,7 +321,7 @@ int WritePM(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
 
   else if (colorstyle == 1) {    /* GreyScale: 8 bits per pixel */
     byte rgb[256];
-    
+
     if (ptype == PIC8) {
       for (i=0; i<numcols; i++) rgb[i] = MONO(rmap[i],gmap[i],bmap[i]);
       for (i=0, p=pic; i<w*h; i++, p++) {
@@ -351,7 +359,7 @@ int WritePM(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
 
 /*****************************/
 static int pmError(fname, st)
-     char *fname, *st;
+     const char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   if (thePic.pm_image != NULL) free(thePic.pm_image);

@@ -14,7 +14,7 @@
  * provided "as is" without express or implied warranty.
  */
 
-
+#define  NEEDSDIR /* for S_IRUSR|S_IWUSR */
 #include "xv.h"
 
 #define NCARDS    (36)
@@ -39,17 +39,17 @@ typedef struct {
 static char *fits_block=NULL;
 
 
-static int   splitfits  PARM((byte *, char *, int, int, int, char *));
-static char *ftopen3d   PARM((FITS *, char *, int *, int *, int *, int *));
-static void  ftclose    PARM((FITS *));
-static int   ftgbyte    PARM((FITS *, byte *, int));
-static char *rdheader   PARM((FITS *));
-static char *wrheader   PARM((FILE *, int, int, char *));
-static char *rdcard     PARM((char *, char *, DATTYPE, long int *));
-static void  wrcard     PARM((char *, char *, DATTYPE, int, char *));
-static int   ftgdata    PARM((FITS *, void *, int));
-static void  ftfixdata  PARM((FITS *, void *, int));
-static void  flip       PARM((byte *, int, int));
+static       int   splitfits PARM((byte *, char *, int, int, int, char *));
+static const char *ftopen3d  PARM((FITS *, char *, int *, int *, int *, int *));
+static       void  ftclose   PARM((FITS *));
+static       int   ftgbyte   PARM((FITS *, byte *, int));
+static const char *rdheader  PARM((FITS *));
+static const char *wrheader  PARM((FILE *, int, int, char *));
+static const char *rdcard    PARM((char *, const char *, DATTYPE, long int *));
+static       void  wrcard    PARM((char *, const char *, DATTYPE, int, char *));
+static       int   ftgdata   PARM((FITS *, void *, int));
+static       void  ftfixdata PARM((FITS *, void *, int));
+static       void  flip      PARM((byte *, int, int));
 
 
 
@@ -63,16 +63,16 @@ int LoadFITS(fname, pinfo, quick)
   /* returns '1' on success */
 
   FITS  fs;
-  int   i, nx, ny, nz, bitpix, np, nrd, ioerror;
+  int   i, nx, ny, nz, bitpix, nrd, ioerror, npixels, bufsize;
   byte *image;
-  char *error;
+  const char *error;
   char  basename[64];
 
   if (fits_block == NULL) {
     fits_block = (char *) malloc((size_t) BLOCKSIZE);
     if (!fits_block) FatalError("Insufficient memory for FITS block buffer");
   }
-  
+
   error = ftopen3d(&fs, fname, &nx, &ny, &nz, &bitpix);
   if (error) {
     SetISTR(ISTR_WARNING, "%s", error);
@@ -80,9 +80,15 @@ int LoadFITS(fname, pinfo, quick)
   }
 
   if (quick) nz = 1;             /* only load first plane */
-  np = nx * ny * nz;
+  npixels = nx * ny;
+  bufsize = nz * npixels;
+  if (nx <= 0 || ny <= 0 || npixels/nx != ny || bufsize/nz != npixels) {
+    SetISTR(ISTR_WARNING, "FITS image dimensions out of range (%dx%dx%d)",
+      nx, ny, nz);
+    return 0;
+  }
 
-  image = (byte *) malloc((size_t) np);
+  image = (byte *) malloc((size_t) bufsize);
   if (!image) FatalError("Insufficient memory for image");
 
   /*
@@ -90,7 +96,7 @@ int LoadFITS(fname, pinfo, quick)
    * to ensure that we get that same scaling for all planes.
    */
 
-  nrd     = ftgbyte(&fs, image, np);
+  nrd     = ftgbyte(&fs, image, bufsize);
   ioerror = ferror(fs.fp);
   ftclose(&fs);
 
@@ -104,33 +110,32 @@ int LoadFITS(fname, pinfo, quick)
     return 0;
   }
 
-  else if (nrd < np) {       /* read partial image */
+  else if (nrd < bufsize) {       /* read partial image */
     if (ioerror)
       SetISTR(ISTR_WARNING, "%s", "Truncated FITS file due to I/O error");
     else
       SetISTR(ISTR_WARNING, "%s", "Truncated FITS file");
-    
+
     { byte *foo;
-      for (foo=image+nrd; foo<image+np; foo++) *foo=0x80;  /* pad with grey */
+      for (foo=image+nrd; foo<image+bufsize; foo++) *foo=0x80;  /* pad with grey */
     }
   }
 
   if (nz > 1) {
     /* how many planes do we actually have? */
-    nz = (nrd-1)/(nx*ny) + 1;
+    nz = (nrd-1)/(npixels) + 1;
 
     /* returns how many sub-files created */
     nz = splitfits(image, fs.comment, nx, ny, nz, basename);
-    np = nx * ny;
-    image = (byte *)realloc(image, (size_t) np);  /* toss all but first */
+    image = (byte *)realloc(image, (size_t) npixels);  /* toss all but first */
   }
-  
+
   /* There seems to be a convention that fits files be displayed using
    * a cartesian coordinate system. Thus the first pixel is in the lower left
    * corner. Fix this by reflecting in the line y=ny/2.
    */
   flip(image, nx, ny);
-  
+
   /* Success! */
   pinfo->pic  = image;
   pinfo->type = PIC8;
@@ -149,12 +154,12 @@ int LoadFITS(fname, pinfo, quick)
     pinfo->numpages = nz;
     strcpy(pinfo->pagebname, basename);
   }
-  
+
   return 1;
-}  
+}
 
 
-	  
+
 /*******************************************/
 int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
      FILE *fp;
@@ -164,16 +169,16 @@ int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
      int   numcols, colorstyle;
      char *comment;
 {
-  int   i, j, np, nend;
+  int   i, j, npixels, nend;
   byte *ptr;
-  char *error;
+  const char *error;
   byte  rgb[256];
-  
+
   if (!fits_block) {
     fits_block = (char *) malloc((size_t) BLOCKSIZE);
     if (!fits_block) FatalError("Insufficient memory for FITS block buffer");
   }
-  
+
   error = wrheader(fp, w, h, comment);
   if (error) {
     SetISTR(ISTR_WARNING, "%s", error);
@@ -197,12 +202,12 @@ int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
     }
   }
 
-  np = w*h;
+  npixels = w*h;
 
   /* nend is the number of padding characters at the end of the last block */
-  nend = ((np+BLOCKSIZE-1)/BLOCKSIZE)*BLOCKSIZE - np;
+  nend = ((npixels+BLOCKSIZE-1)/BLOCKSIZE)*BLOCKSIZE - npixels;
   if (nend) for (i=0; i<nend; i++) putc('\0', fp);
-  
+
   return 0;
 }
 
@@ -216,17 +221,16 @@ static int splitfits(image, comment, nx, ny, nz, basename)
      char *basename;
 {
   /*
-   * Given a 3 dimensional FITS image, this splits it up into nz 2-d files.
+   * Given a 3-dimensional FITS image, this splits it up into nz 2-d files.
    * It returns the number of files actually stored.
    * If only one file could be written, then no split files are created.
    * It returns the basename of the split files in bname.
    * If there was a problem writing files, then a error message will be set.
    */
-  
-  int   i, np=nx * ny, ioerror, nwrt;
+
+  int   i, npixels=nx * ny, nwrt, tmpfd;
   FILE *fp;
-  char *error;
-  byte *work;
+  const char *error;
   char  filename[70];
 
 #ifndef VMS
@@ -234,8 +238,12 @@ static int splitfits(image, comment, nx, ny, nz, basename)
 #else
   sprintf(basename, "Sys$Disk:[]xvpgXXXXXX");
 #endif
-  
+
+#ifdef USE_MKSTEMP
+  close(mkstemp(basename));
+#else
   mktemp(basename);
+#endif
   if (basename[0] == '\0') {
     SetISTR(ISTR_WARNING, "%s", "Unable to build temporary filename");
     return 1;
@@ -246,28 +254,37 @@ static int splitfits(image, comment, nx, ny, nz, basename)
 
   for (i=0; i < nz && !error; i++) {
     sprintf(filename, "%s%d", basename, i+1);
-    fp = xv_fopen(filename, "w");
+    tmpfd = open(filename,O_WRONLY|O_CREAT|O_EXCL,S_IRWUSR);
+    if (tmpfd < 0) {
+      error = "Unable to open temporary file";
+      break;
+    }
+    fp = fdopen(tmpfd, "w");
     if (!fp) {
       error = "Unable to open temporary file";
       break;
     }
-    
+
     if (wrheader(fp, nx, ny, comment)) {
       error = "I/O error writing temporary file";
+      fflush(fp);
       fclose(fp);
       unlink(filename);
+      close(tmpfd);
       break;
     }
 
-    nwrt = fwrite(image+i*np, sizeof(byte), (size_t) np, fp);
+    nwrt = fwrite(image+i*npixels, sizeof(byte), (size_t) npixels, fp);
+    fflush(fp);
     fclose(fp);
+    close(tmpfd);
 
     if (nwrt == 0) {  /* failed to write any data */
       error = "I/O error writing temporary file";
       unlink(filename);
       break;
-    } 
-    else if (nwrt < np)
+    }
+    else if (nwrt < npixels)
       error = "I/O error writing temporary file";
   }
 
@@ -285,19 +302,19 @@ static int splitfits(image, comment, nx, ny, nz, basename)
 
 
 /************************************/
-static char *wrheader(fp, nx, ny, comment)
+static const char *wrheader(fp, nx, ny, comment)
      FILE *fp;
      int nx, ny;
      char *comment;
 {
   /* Writes a minimalist FITS file header */
-  
+
   char *block = fits_block, *bp;
-  int   i, j, wrotehist, lenhist;
+  int   i, j, lenhist;
   char  history[80];
 
   for (i=0, bp=block; i<BLOCKSIZE; i++, bp++) *bp = ' ';
-  
+
   sprintf(history, "Written by XV %s", VERSTR);
   lenhist = strlen(history);
 
@@ -309,7 +326,7 @@ static char *wrheader(fp, nx, ny, comment)
   wrcard(&block[80*i++], "NAXIS2", T_INT, ny, NULL);  /* write NAXIS2 card */
 
   /* Write HISTORY keyword */
-  wrcard(&block[80*i++], "HISTORY", T_STR, lenhist, history); 
+  wrcard(&block[80*i++], "HISTORY", T_STR, lenhist, history);
 
   if (comment && *comment != '\0') {
     while (*comment == '\n') comment++;  /* Skip any blank lines */
@@ -317,7 +334,7 @@ static char *wrheader(fp, nx, ny, comment)
       for (j=0; j<72; j++)
 	if (comment[j] == '\0' || comment[j] == '\n') break;
 
-      /* 
+      /*
        * Check to see if it is an xv history record; if so, then avoid
        * duplicating it.
        */
@@ -330,7 +347,7 @@ static char *wrheader(fp, nx, ny, comment)
 	for (i=0, bp=block; i<BLOCKSIZE; i++, bp++) *bp = ' ';
 	i = 0;
       }
-      
+
       comment += j;
       while (*comment == '\n') comment++;  /* Skip any blank lines */
     }
@@ -346,7 +363,7 @@ static char *wrheader(fp, nx, ny, comment)
 
 
 /************************************/
-static char *ftopen3d(fs, file, nx, ny, nz, bitpix)
+static const char *ftopen3d(fs, file, nx, ny, nz, bitpix)
      FITS *fs;
      char *file;
      int  *nx, *ny, *nz, *bitpix;
@@ -358,40 +375,40 @@ static char *ftopen3d(fs, file, nx, ny, nz, bitpix)
    * Will return an error message if the primary data unit is not a
    * 2 or 3-dimensional array.
    */
-  
+
   FILE *fp;
   int naxis, i;
-  char *error;
-  
+  const char *error;
+
   fp = xv_fopen(file, "r");
   if (!fp) return "Unable to open FITS file";
-  
+
   fs->fp     = fp;
   fs->bitpix = 0;
   fs->naxis  = 0;
   fs->cpos   = 0;
-  
+
   /* read header */
   error = rdheader(fs);
   if (error) {
     ftclose(fs);
     return error;
   }
-  
+
   naxis = fs->naxis;
-  
+
   /* get number of data */
   fs->ndata = 1;
-  for (i=0; i<naxis; i++) 
+  for (i=0; i<naxis; i++)
     fs->ndata = fs->ndata * fs->axes[i];
-  
+
   *nx = fs->axes[0];
   *ny = fs->axes[1];
   if (naxis == 2) *nz = 1;
              else *nz = fs->axes[2];
-  
+
   *bitpix = fs->bitpix;
-  
+
   return NULL;
 }
 
@@ -406,7 +423,7 @@ static void ftclose(fs)
 
 
 /************************************/
-static char *rdheader(fs)
+static const char *rdheader(fs)
      FITS *fs;
 {
   /* reads the fits header, and updates the FITS structure fs.
@@ -416,13 +433,13 @@ static char *rdheader(fs)
   int i, j, res, commlen, commsize;
   char name[9];
   char *block=fits_block, *p;
-  char *error;
+  const char *error;
   long int val;         /* the value */
-  
+
   fs->comment = NULL;
   commlen     = 0;
   commsize    = 256;
-  
+
   res = fread(block, sizeof(char), (size_t) BLOCKSIZE, fs->fp);
   if (res != BLOCKSIZE) return "Error reading FITS file";
   i = 0;
@@ -464,13 +481,13 @@ static char *rdheader(fs)
       if (res != BLOCKSIZE) return "Error reading FITS file";
       i = 0;
     }
-    
+
     sprintf(name, "NAXIS%d", j+1);
     error = rdcard(&block[i*80], name, T_INT, &val);
     if (error)    return error;
     if (val < 0)  return "Bad NAXISn value in FITS file";
     if (val == 0) return "FITS file does not contain an image";
-    
+
     if (j < 3)    fs->axes[j] = val;
     else if (val != 1) return "FITS file has more than three dimensions";
     i++;
@@ -488,21 +505,21 @@ static char *rdheader(fs)
       if (res != BLOCKSIZE) return "Unexpected eof in FITS file";
       i = 0;
     }
-    
+
     p = &block[i*80];
     if (strncmp(p, "END     ", (size_t) 8) == 0) break;
-    if (strncmp(p, "HISTORY ", (size_t) 8) == 0 || 
+    if (strncmp(p, "HISTORY ", (size_t) 8) == 0 ||
 	strncmp(p, "COMMENT ", (size_t) 8) == 0) {
       p += 8;                       /* skip keyword */
       for (j=71; j >= 0; j--) if (p[j] != ' ') break;
       j++;                          /* make j length of comment */
       if (j > 0) {                  /* skip blank comment cards */
 	if (fs->comment == NULL) {
-	  fs->comment = (char *) malloc((size_t) commsize);
+	  fs->comment = (char *) malloc((size_t) commsize);  /* initially 256 */
 	  if (fs->comment == NULL)
 	    FatalError("Insufficient memory for comment buffer");
 	}
-	
+
 	if (commlen + j + 2 > commsize) { /* if too small */
 	  char *new;
 	  commsize += commsize;      /* double size of array */
@@ -515,7 +532,7 @@ static char *rdheader(fs)
 	  free(fs->comment);
 	  fs->comment = new;
 	}
-	
+
 	xvbcopy(p, &fs->comment[commlen], (size_t) j);  /* add string */
 	commlen += j;
 	fs->comment[commlen++] = '\n';       /* with trailing cr */
@@ -531,7 +548,8 @@ static char *rdheader(fs)
 
 /************************************/
 static void wrcard(card, name, dtype, kvalue, svalue)
-     char *card, *name;
+     char *card;
+     const char *name;
      DATTYPE dtype;   /* type of value */
      int kvalue;
      char *svalue;
@@ -556,9 +574,9 @@ static void wrcard(card, name, dtype, kvalue, svalue)
 
   l = strlen(name);
   if (l) xvbcopy(name, card, (size_t) l);   /* copy name */
-  
+
   if (dtype == T_NOVAL) return;
-  
+
   if (dtype == T_STR) {
     l = kvalue;
     if (l <= 0) return;
@@ -566,9 +584,9 @@ static void wrcard(card, name, dtype, kvalue, svalue)
     xvbcopy(svalue, &card[8], (size_t) l);
     return;
   }
-  
+
   card[8] = '=';
-  
+
   if (dtype == T_LOG)
     card[29] = kvalue ? 'T' : 'F';
   else { /* T_INT */
@@ -579,8 +597,9 @@ static void wrcard(card, name, dtype, kvalue, svalue)
 
 
 /************************************/
-static char *rdcard(card, name, dtype, kvalue)
-     char *card, *name;
+static const char *rdcard(card, name, dtype, kvalue)
+     char *card;
+     const char *name;
      DATTYPE dtype;   /* type of value */
      long int *kvalue;
 {
@@ -599,7 +618,7 @@ static char *rdcard(card, name, dtype, kvalue)
   int         i, ptr;
   char        namestr[9];
   static char error[45];
-  
+
   xvbcopy(card, namestr, (size_t) 8);
 
   for (i=7; i>=0 && namestr[i] == ' '; i--);
@@ -609,24 +628,24 @@ static char *rdcard(card, name, dtype, kvalue)
     sprintf(error, "Keyword %s not found in FITS file", name);
     return error;
   }
-  
+
 
   /* get start of value */
   ptr = 10;
   while (ptr < 80 && card[ptr] == ' ') ptr++;
   if (ptr == 80) return "FITS file has missing keyword value"; /* no value */
-  
+
   if (dtype == T_LOG) {
     if (ptr != 29 || (card[29] != 'T' && card[29] != 'F'))
       return "Keyword has bad logical value in FITS file";
     *kvalue = (card[29] == 'T');
-  } 
+  }
 
   else {  /* an integer */
     int j;
     long int ival;
     char num[21];
-    
+
     if (ptr > 29) return "Keyword has bad integer value in FITS file";
     xvbcopy(&card[ptr], num, (size_t) (30-ptr));
     num[30-ptr] = '\0';
@@ -634,7 +653,7 @@ static char *rdcard(card, name, dtype, kvalue)
     if (j != 1) return "Keyword has bad integer value in FITS file";
     *kvalue = ival;
   }
-  
+
   return NULL;
 }
 
@@ -660,13 +679,13 @@ static int ftgdata(fs, buffer, nelem)
    */
 
   int res;
-  
+
   if (nelem == 0) return 0;
-  
+
   res = fread(buffer, (size_t) fs->size, (size_t) nelem, fs->fp);
   /* if failed to read all the data because at end of file */
   if (res != nelem && feof(fs->fp)) {
-    /* nblock is the number of elements in a record. 
+    /* nblock is the number of elements in a record.
        size is always a factor of BLOCKSIZE */
 
     int loffs, nblock=BLOCKSIZE/fs->size;
@@ -714,7 +733,7 @@ static void ftfixdata(fs, buffer, nelem)
   byte *ptr=buffer;
 
   /*
-   * conversions. Although the data may be signed, reverse using unsigned 
+   * conversions. Although the data may be signed, reverse using unsigned
    * variables.
    * Because the native int types may be larger than the types in the file,
    * we start from the end and work backwards to avoid overwriting data
@@ -741,12 +760,12 @@ static void ftfixdata(fs, buffer, nelem)
 	      ((unsigned int)ptr[2] << 8)  |
 	      ((unsigned int)ptr[3]);
   }
-  
+
   /* convert from IEE 754 single precision to native form */
   else if (fs->bitpix == -32) {
     int j, k, expo;
     static float *exps=NULL;
-    
+
     if (exps == NULL) {
       exps = (float *)malloc(256 * sizeof(float));
       if (exps == NULL) FatalError("Insufficient memory for exps store");
@@ -754,7 +773,7 @@ static void ftfixdata(fs, buffer, nelem)
       for (i=151; i < 256; i++) exps[i] = 2.*exps[i-1];
       for (i=149; i >= 0; i--) exps[i] = 0.5*exps[i+1];
     }
-	      
+
     for (i=0; i < n; i++, ptr+=4) {
       k = (int)*ptr;
       j = ((int)ptr[1] << 16) | ((int)ptr[2] << 8) | (int)ptr[3];
@@ -765,13 +784,13 @@ static void ftfixdata(fs, buffer, nelem)
     }
 
   }
-  
+
   /* convert from IEE 754 double precision to native form */
   else if (fs->bitpix == -64) {
     int expo, k, l;
     unsigned int j;
     static double *exps=NULL;
-    
+
     if (exps == NULL) {
       exps = (double *)malloc(2048 * sizeof(double));
       if (exps == NULL) FatalError("Insufficient memory for exps store");
@@ -779,7 +798,7 @@ static void ftfixdata(fs, buffer, nelem)
       for (i=1076; i < 2048; i++) exps[i] = 2.*exps[i-1];
       for (i=1074; i >= 0; i--) exps[i] = 0.5*exps[i+1];
     }
-	      
+
     for (i=0; i < n; i++, ptr+=8) {
       k = (int)*ptr;
       j = ((unsigned int)ptr[1] << 24) | ((unsigned int)ptr[2] << 16) |
@@ -813,23 +832,36 @@ static int ftgbyte(fs, cbuff, nelem)
    */
 
   void *voidbuff;
-  int i, n, nrd;
+  int i, n, nrd, bufsize, overflow=0;
 
   /* if the data is byte, then read it directly */
   if (fs->bitpix == 8)
     return ftgdata(fs, cbuff, nelem);
-  
-  /* allocate a buffer to store the image */
-  if (fs->bitpix == 16)
-    voidbuff = (void *)malloc(nelem * sizeof(short int));
-  else if (fs->bitpix == 32)
-    voidbuff = (void *)malloc(nelem * sizeof(int));
-  else
-    voidbuff = (void *)malloc(nelem * (size_t) fs->size);  /* float, double */
 
+  /* allocate a buffer to store the image */
+  if (fs->bitpix == 16) {
+    bufsize = nelem * sizeof(short int);
+    if (bufsize/nelem != (int)sizeof(short int))
+      overflow = 1;
+  } else if (fs->bitpix == 32) {
+    bufsize = nelem * sizeof(int);
+    if (bufsize/nelem != (int)sizeof(short int))
+      overflow = 1;
+  } else {
+    bufsize = nelem * fs->size;  /* float, double */
+    if (bufsize/nelem != fs->size)
+      overflow = 1;
+  }
+
+  if (overflow) {
+    SetISTR(ISTR_WARNING, "FITS image dimensions out of range");
+    return 0;
+  }
+
+  voidbuff = (void *)malloc((size_t) bufsize);
   if (voidbuff == NULL) {
     char emess[60];
-    sprintf(emess, "Insufficient memory for raw image of %d bytes", 
+    sprintf(emess, "Insufficient memory for raw image of %d bytes",
 	    nelem*fs->size);
     FatalError(emess);
   }
@@ -843,28 +875,28 @@ static int ftgbyte(fs, cbuff, nelem)
     short int *buffer=voidbuff;
     int max, min, maxmin_t;
     float scale;
-    
+
     min = max = buffer[0];
     for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
     scale = (max == min) ? 0. : 255./(float)(max-min);
-    
+
     /* rescale and convert */
     for (i=0, buffer=voidbuff; i < n; i++)
       cbuff[i] = (byte)(scale*(float)((int)buffer[i]-min));
-    
+
     /* convert long int to byte */
-  } 
+  }
 
   else if (fs->bitpix == 32) {
     int *buffer=voidbuff;
     int max, min, maxmin_t;
     float scale, fmin;
-    
+
     min = max = buffer[0];
     for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
     scale = (max == min) ? 1. : 255./((double)max-(double)min);
     fmin = (float)min;
-    
+
     /* rescale and convert */
     if (scale < 255./2.1e9) /* is max-min too big for an int ? */
       for (i=0, buffer=voidbuff; i < n; i++)
@@ -872,34 +904,34 @@ static int ftgbyte(fs, cbuff, nelem)
     else /* use integer subtraction */
       for (i=0, buffer=voidbuff; i < n; i++)
 	cbuff[i] = (byte)(scale*(float)(buffer[i]-min));
-    
-   
-  } 
+
+
+  }
 
   /* convert float to byte */
   else if (fs->bitpix == -32) {
     float *buffer=voidbuff;
     float max, min, maxmin_t, scale;
-    
+
     min = max = buffer[0];
     for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
     scale = (max == min) ? 0. : 255./(max-min);
-    
+
     /* rescale and convert */
     for (i=0, buffer=voidbuff; i < n; i++)
       cbuff[i] = (byte)(scale*(buffer[i]-min));
-    
-  } 
+
+  }
 
   /* convert double to byte */
   else if (fs->bitpix == -64) {
     double *buffer=voidbuff;
     double max, min, maxmin_t, scale;
-    
+
     min = max = buffer[0];
     for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
     scale = (max == min) ? 0. : 255./(max-min);
-    
+
     /* rescale and convert */
     for (i=0, buffer=voidbuff; i < n; i++)
       cbuff[i] = (byte)(scale*(buffer[i]-min));
@@ -923,7 +955,7 @@ static void flip(buffer, nx, ny)
   int i;
   int j, v;
   byte *buff1, *buff2;
-  
+
   for (i=0; i < ny/2; i++) {
     buff1 = &buffer[i*nx];
     buff2 = &buffer[(ny-1-i)*nx];

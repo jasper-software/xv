@@ -1,4 +1,4 @@
-/* 
+/*
  * xvgam.c
  *
  * callable functions:
@@ -87,7 +87,7 @@ struct gamstate { struct hmap hmap[N_HMAP];
 		  GRAF_STATE istate, rstate, gstate, bstate;
 		};
 
-static struct gamstate undo[MAXUNDO], preset[4], defstate; 
+static struct gamstate undo[MAXUNDO], preset[4], defstate;
 static struct gamstate *defLoadState;
 
 static int uptr, uhead, utail;
@@ -99,7 +99,7 @@ typedef struct huedial {
 		 int    stval;    /* start of range (ONLY val ifnot range) */
 		 int    enval;    /* end of range */
 		 int    ccwise;   /* 1 if range goes ccwise, 0 if cwise */
-		 char  *str;      /* title string */
+		 const char *str; /* title string */
 		 u_long fg,bg;    /* colors */
 		 int    satval;   /* saturation value on non-range dial */
 		 BUTT   hdbutt[N_HDBUTT];
@@ -122,7 +122,7 @@ static int    hremap[360];
 static int    defAutoApply;
 static int    hsvnonlinear = 0;
 
-static void printUTime       PARM((char *));
+static void printUTime       PARM((const char *));
 
 static void computeHSVlinear PARM((void));
 static void changedGam       PARM((void));
@@ -153,8 +153,8 @@ static void dragGamma        PARM((void));
 static void dragHueDial      PARM((void));
 static void dragEditColor    PARM((void));
 
-static void HDCreate         PARM((HDIAL *, Window, int, int, int, int, 
-				   int, int, char *, u_long, u_long));
+static void HDCreate         PARM((HDIAL *, Window, int, int, int, int,
+				   int, int, const char *, u_long, u_long));
 
 static void HDRedraw         PARM((HDIAL *, int));
 static int  HDClick          PARM((HDIAL *, int, int));
@@ -191,10 +191,11 @@ static void build_hremap     PARM((void));
 
 /***************************/
 static void printUTime(str)
-     char *str;
+     const char *str;
 {
 #ifdef TIMING_TEST
-  int i;  struct rusage ru;
+  int i;
+  struct rusage ru;
 
   i = getrusage(RUSAGE_SELF, &ru);
   fprintf(stderr,"%s: utime = %ld.%ld seconds\n",
@@ -206,19 +207,19 @@ static void printUTime(str)
 
 /***************************************************/
 void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
-     char   *geom;
-     double  gam, rgam, ggam, bgam;
-     int     defpreset;
+     const char *geom;
+     double      gam, rgam, ggam, bgam;
+     int         defpreset;
 {
   XSetWindowAttributes xswa;
 
-  gamW = CreateWindow("xv color editor", "XVcedit", geom, 
+  gamW = CreateWindow("xv color editor", "XVcedit", geom,
 		      GAMW, GAMH, infofg,infobg, 0);
   if (!gamW) FatalError("can't create cedit window!");
-  
+
   cmapF = XCreateSimpleWindow(theDisp,gamW, 10,   8,CMAPF_WIDE,CMAPF_HIGH,
 			      1,infofg,infobg);
-  butF  = XCreateSimpleWindow(theDisp,gamW, 10, 336,BUTF_WIDE,BUTF_HIGH, 
+  butF  = XCreateSimpleWindow(theDisp,gamW, 10, 336,BUTF_WIDE,BUTF_HIGH,
 			      1,infofg,infobg);
   modF  = XCreateSimpleWindow(theDisp,gamW, 10, 438,MODF_WIDE,MODF_HIGH,
 			      1,infofg,infobg);
@@ -227,7 +228,7 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   rgbF  = XCreateSimpleWindow(theDisp,gamW, 467,  8,RGBF_WIDE,RGBF_HIGH,
 			      1,infofg,infobg);
 
-  if (!cmapF || !butF || !modF || !hsvF || !rgbF) 
+  if (!cmapF || !butF || !modF || !hsvF || !rgbF)
     FatalError("couldn't create frame windows");
 
 #ifdef BACKING_STORE
@@ -251,25 +252,25 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   /********** COLORMAP editing doo-wahs ***********/
 
 
-  BTCreate(&gbut[G_BCOLUNDO], cmapF, 5, 165, 66, BUTTH, 
+  BTCreate(&gbut[G_BCOLUNDO], cmapF, 5, 165, 66, BUTTH,
 	   "ColUndo", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BCOLREV], cmapF,  5 + 66 + 1, 165, 67, BUTTH, 
+  BTCreate(&gbut[G_BCOLREV], cmapF,  5 + 66 + 1, 165, 67, BUTTH,
 	   "Revert", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BHSVRGB], cmapF,  5+66+67+2,  165, 66, BUTTH, 
+  BTCreate(&gbut[G_BHSVRGB], cmapF,  5+66+67+2,  165, 66, BUTTH,
 	   "RGB/HSV", infofg, infobg, hicol, locol);
 
-  BTCreate(&gbut[G_BMONO], cmapF,    5, 189, 66, BUTTH, 
+  BTCreate(&gbut[G_BMONO], cmapF,    5, 189, 66, BUTTH,
 	   "Grey", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BRV],   cmapF,    5 + 66 + 1, 189, 67, BUTTH, 
+  BTCreate(&gbut[G_BRV],   cmapF,    5 + 66 + 1, 189, 67, BUTTH,
 	   "RevVid", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BRNDCOL], cmapF,  5 + 66 + 67 + 2, 189, 66, BUTTH, 
+  BTCreate(&gbut[G_BRNDCOL], cmapF,  5 + 66 + 67 + 2, 189, 66, BUTTH,
 	   "Random", infofg, infobg, hicol, locol);
 
-  DCreate(&rhDial, cmapF, 5, 215, 66, 100,   0,360,180, 5, 
+  DCreate(&rhDial, cmapF, 5, 215, 66, 100,   0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Hue", NULL);
-  DCreate(&gsDial, cmapF, 72, 215, 66, 100,  0,360,180, 5, 
+  DCreate(&gsDial, cmapF, 72, 215, 66, 100,  0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Sat.", NULL);
-  DCreate(&bvDial, cmapF, 139, 215, 66, 100,   0,360,180, 5, 
+  DCreate(&bvDial, cmapF, 139, 215, 66, 100, 0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Value", NULL);
 
   rhDial.drawobj = gsDial.drawobj = bvDial.drawobj = dragEditColor;
@@ -291,44 +292,44 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 #define BY2 (BY0 + BYSPACE*2)
 #define BY3 (BY0 + BYSPACE*3)
 
-  BTCreate(&gbut[G_BAPPLY],  butF, BX0,BY0, 52,BUTTH,"Apply", 
+  BTCreate(&gbut[G_BAPPLY],  butF, BX0,BY0, 52,BUTTH,"Apply",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BNOGAM],  butF, BX0,BY1, 52,BUTTH,"NoMod", 
+  BTCreate(&gbut[G_BNOGAM],  butF, BX0,BY1, 52,BUTTH,"NoMod",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BMAXCONT],butF, BX0,BY2, 52,BUTTH,"Norm",  
+  BTCreate(&gbut[G_BMAXCONT],butF, BX0,BY2, 52,BUTTH,"Norm",
 	   infofg,infobg,hicol,locol);
   BTCreate(&gbut[G_BHISTEQ], butF, BX0,BY3, 52,BUTTH,"HistEq",
 	   infofg,infobg,hicol,locol);
 
   BTCreate(&gbut[G_BUP_BR],butF, BX1,BY0, 52,BUTTH,"Brite",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BDN_BR],butF, BX1,BY1, 52,BUTTH,"Dim",  
+  BTCreate(&gbut[G_BDN_BR],butF, BX1,BY1, 52,BUTTH,"Dim",
 	   infofg,infobg,hicol,locol);
   BTCreate(&gbut[G_BUP_CN],butF, BX1,BY2, 52,BUTTH,"Sharp",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BDN_CN],butF, BX1,BY3, 52,BUTTH,"Dull", 
+  BTCreate(&gbut[G_BDN_CN],butF, BX1,BY3, 52,BUTTH,"Dull",
 	   infofg,infobg,hicol,locol);
 
-  BTCreate(&gbut[G_BRESET],butF, BX2,   BY0, 52,BUTTH,"Reset", 
+  BTCreate(&gbut[G_BRESET],butF, BX2,   BY0, 52,BUTTH,"Reset",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B1],    butF, BX2,   BY1, 25,BUTTH,"1",    
+  BTCreate(&gbut[G_B1],    butF, BX2,   BY1, 25,BUTTH,"1",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B2],    butF, BX2+26,BY1, 26,BUTTH,"2",    
+  BTCreate(&gbut[G_B2],    butF, BX2+26,BY1, 26,BUTTH,"2",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B3],    butF, BX2,   BY2, 25,BUTTH,"3",    
+  BTCreate(&gbut[G_B3],    butF, BX2,   BY2, 25,BUTTH,"3",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B4],    butF, BX2+26,BY2, 26,BUTTH,"4",    
+  BTCreate(&gbut[G_B4],    butF, BX2+26,BY2, 26,BUTTH,"4",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BSET],  butF, BX2,   BY3, 52,BUTTH,"Set",  
+  BTCreate(&gbut[G_BSET],  butF, BX2,   BY3, 52,BUTTH,"Set",
 	   infofg,infobg,hicol,locol);
 
-  BTCreate(&gbut[G_BUNDO], butF, BX3, BY0, 52,BUTTH,"Undo",   
+  BTCreate(&gbut[G_BUNDO], butF, BX3, BY0, 52,BUTTH,"Undo",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BREDO], butF, BX3, BY1, 52,BUTTH,"Redo",   
+  BTCreate(&gbut[G_BREDO], butF, BX3, BY1, 52,BUTTH,"Redo",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BGETRES],butF,BX3, BY2, 52,BUTTH,"CutRes", 
+  BTCreate(&gbut[G_BGETRES],butF,BX3, BY2, 52,BUTTH,"CutRes",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BCLOSE],butF, BX3, BY3, 52,BUTTH,"Close",  
+  BTCreate(&gbut[G_BCLOSE],butF, BX3, BY3, 52,BUTTH,"Close",
 	   infofg,infobg,hicol,locol);
 
 
@@ -338,11 +339,11 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 
   CBCreate(&enabCB, modF,2,2,     "Display with HSV/RGB mods.",
 	   infofg,infobg,hicol,locol);
-  CBCreate(&autoCB, modF,2,2+17,  "Auto-apply HSV/RGB mods.",  
+  CBCreate(&autoCB, modF,2,2+17,  "Auto-apply HSV/RGB mods.",
 	   infofg,infobg,hicol,locol);
   CBCreate(&dragCB, modF,2,2+17*2,"Auto-apply while dragging.",
 	   infofg,infobg,hicol,locol);
-  CBCreate(&resetCB,modF,2,2+17*3,"Auto-reset on new image.",  
+  CBCreate(&resetCB,modF,2,2+17*3,"Auto-reset on new image.",
 	   infofg,infobg,hicol,locol);
 
   enabCB.val = autoCB.val = resetCB.val = dragCB.val = 1;
@@ -359,23 +360,23 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 
   srcHD.drawobj = dstHD.drawobj = whtHD.drawobj = dragHueDial;
 
-  DCreate(&satDial, hsvF, 100, 199, 100, 121, -100, 100, 0, 5, 
+  DCreate(&satDial, hsvF, 100, 199, 100, 121, -100.0, 100.0, 0.0, 1.0, 5.0,
 	   infofg, infobg,hicol,locol, "Saturation", "%");
 
-  hueRB = RBCreate(NULL, hsvF,  7, 153, "1", 
+  hueRB = RBCreate(NULL, hsvF,  7, 153, "1",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 47, 153, "2", 
+  RBCreate        (hueRB,hsvF, 47, 153, "2",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 87, 153, "3", 
+  RBCreate        (hueRB,hsvF, 87, 153, "3",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF,  7, 170, "4", 
+  RBCreate        (hueRB,hsvF,  7, 170, "4",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 47, 170, "5", 
+  RBCreate        (hueRB,hsvF, 47, 170, "5",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 87, 170, "6", 
+  RBCreate        (hueRB,hsvF, 87, 170, "6",
 		   infofg, infobg,hicol,locol);
 
-  BTCreate(&hueclrB, hsvF, 127, 158, 70, BUTTH, "Reset", 
+  BTCreate(&hueclrB, hsvF, 127, 158, 70, BUTTH, "Reset",
 	   infofg, infobg,hicol,locol);
 
   initHmap();
@@ -394,13 +395,13 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 
   InitGraf(&gGraf);
   CreateGraf(&gGraf, rgbF, 10, 179, infofg, infobg, "Green");
-  
+
   InitGraf(&bGraf);
   CreateGraf(&bGraf, rgbF, 10, 338, infofg, infobg, "Blue");
 
   satDial.drawobj = dragGamma;
   intGraf.drawobj = rGraf.drawobj = gGraf.drawobj = bGraf.drawobj = dragGamma;
-  
+
   SetHSVmode();
 
   ctrls2gamstate(&defstate);
@@ -415,14 +416,14 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   Str2Graf(&preset[1].rstate,"L 4 : 0,0 : 127,0 : 128,255 : 255,255");
   Str2Graf(&preset[1].gstate,"L 4 : 0,0 : 127,0 : 128,255 : 255,255");
   Str2Graf(&preset[1].bstate,"L 4 : 0,0 : 127,0 : 128,255 : 255,255");
-  
+
 
   /* set up preset2 as a 'temperature' pseudo-color preset */
   ctrls2gamstate(&preset[2]);
   Str2Graf(&preset[2].rstate,"S 4 : 0,0 : 105,0 : 155,140 : 255,255");
   Str2Graf(&preset[2].gstate,"S 5 : 0,0 : 57,135 : 127,255 : 198,135 : 255,0");
   Str2Graf(&preset[2].bstate,"S 4 : 0,255 : 100,140 : 150,0 : 255,0");
-  
+
 
   /* set up preset3 as a 'map' pseudo-color preset */
   ctrls2gamstate(&preset[3]);
@@ -480,7 +481,7 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 
   computeHSVlinear();
 }
-  
+
 
 /***************************************************/
 int GamCheckEvent(xev)
@@ -492,14 +493,14 @@ XEvent *xev;
   int rv;
 
   rv = 1;
-  
+
   if (xev->type == Expose) {
     int x,y,w,h;
     XExposeEvent *e = (XExposeEvent *) xev;
     x = e->x;  y = e->y;  w = e->width;  h = e->height;
 
     /* throw away excess redraws for 'dumb' windows */
-    if (e->count > 0 && 
+    if (e->count > 0 &&
 	(e->window == satDial.win || e->window == rhDial.win ||
 	 e->window == gsDial.win  || e->window == bvDial.win ||
 	 e->window == cmapF       || e->window == modF       ||
@@ -600,7 +601,7 @@ XEvent *xev;
 
 
       else if (e->window == hsvF) {
-	if (HDClick(&srcHD, x,y) || HDClick(&dstHD, x,y)) { 
+	if (HDClick(&srcHD, x,y) || HDClick(&dstHD, x,y)) {
 	  dials2hmap();
 	  build_hremap();
 	  changedGam();
@@ -654,7 +655,7 @@ XEvent *xev;
 	       e->window == gsDial.win ||
 	       e->window == bvDial.win) {
 
-	if ((e->window == rhDial.win && DTrack(&rhDial, x,y)) || 
+	if ((e->window == rhDial.win && DTrack(&rhDial, x,y)) ||
 	    (e->window == gsDial.win && DTrack(&gsDial, x,y)) ||
 	    (e->window == bvDial.win && DTrack(&bvDial, x,y))) {
 	  saveCMap(&prevcmap);
@@ -683,7 +684,7 @@ XEvent *xev;
     XKeyEvent *e = (XKeyEvent *) xev;
     char buf[128];  KeySym ks;
     int stlen;
-	
+
     stlen = XLookupString(e,buf,128,&ks,(XComposeStatus *) NULL);
     buf[stlen] = '\0';
 
@@ -722,7 +723,7 @@ static void computeHSVlinear()
 
   if (whtHD.enabCB.val && whtHD.satval) hsvnonlinear++;
 
-  if (satDial.val != 0) hsvnonlinear++;
+  if (satDial.val != 0.0) hsvnonlinear++;
 
   /* check intensity graf */
   for (i=0; i<256 && intGraf.func[i]==i; i++);
@@ -792,7 +793,7 @@ static void drawArrow(x,y)
 int x,y;
 {
   XPoint pts[8];
-  
+
   pts[0].x = x+10;     pts[0].y = y;
   pts[1].x = x-4;      pts[1].y = y-100;
   pts[2].x = x-4;      pts[2].y = y-40;
@@ -873,11 +874,11 @@ void RedrawCMap()
   XSetForeground(theDisp, theGC, infofg);
 
   if (picType != PIC8) {
-    CenterString(cmapF, CMAPX + CMAPW/2, CMAPY + CMAPH/2, 
+    CenterString(cmapF, CMAPX + CMAPW/2, CMAPY + CMAPH/2,
 		 "No colormap in 24-bit mode.");
     return;
   }
-      
+
 
 
   for (i=0; i<numcols; i++) {
@@ -941,14 +942,14 @@ int x,y;
     if (bp->win == butF && PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) break;
   }
 
-  /* if 'Set' is lit, and we didn't click 'set' or 'Reset' or '1'..'4', 
+  /* if 'Set' is lit, and we didn't click 'set' or 'Reset' or '1'..'4',
      turn it off */
   if (i!=G_BSET && i!=G_B1 && i!=G_B2 && i!=G_B3 && i!=G_B4 && i!=G_BRESET
       && gbut[G_BSET].lit) {
-    gbut[G_BSET].lit = 0;  
+    gbut[G_BSET].lit = 0;
     BTRedraw(&gbut[G_BSET]);
   }
-  
+
 
   if (i<G_NBUTTS) {  /* found one */
     if (BTTrack(bp)) doCmd(i);
@@ -1003,7 +1004,7 @@ int x,y,but;
       } /* if i<numcols */
     } /* if but==1 */
 
-    
+
     else if (but==2) {   /* color smooth */
       int cellnum, delc, col1, j, delr, delg, delb;
 
@@ -1025,9 +1026,9 @@ int x,y,but;
 	    gcmap[col1 + i] = gcmap[col1] + (delg * i) / delc;
 	    bcmap[col1 + i] = bcmap[col1] + (delb * i) / delc;
 
-	    if (cellgroup[col1 + i]) { 
+	    if (cellgroup[col1 + i]) {
 	      /* propogate new color to all members of this group */
-	      for (j=0; j<numcols; j++) 
+	      for (j=0; j<numcols; j++)
 		if (cellgroup[j] == cellgroup[col1 + i]) {
 		  rcmap[j] = rcmap[col1 + i];
 		  gcmap[j] = gcmap[col1 + i];
@@ -1043,7 +1044,7 @@ int x,y,but;
 	  }
 
 	  if (i<numcols) {  /* something changed */
-	    xvbcopy((char *) &tmpcmap, (char *) &prevcmap, 
+	    xvbcopy((char *) &tmpcmap, (char *) &prevcmap,
 		    sizeof(struct cmapstate));
 	    BTSetActive(&gbut[G_BCOLUNDO],1);
 	    applyGamma(1);
@@ -1067,7 +1068,7 @@ int x,y,but;
 
 	lastcell = curcell;
 
-	j = XGrabPointer(theDisp, cmapF, False, 0, GrabModeAsync, 
+	j = XGrabPointer(theDisp, cmapF, False, 0, GrabModeAsync,
 			 GrabModeAsync, None, None, (Time) CurrentTime);
 	while (1) {
 	  Window       rW,cW;
@@ -1076,7 +1077,7 @@ int x,y,but;
 
 	  if (XQueryPointer(theDisp,cmapF,&rW,&cW,&rx,&ry,&x,&y,&mask)) {
 	    /* if button3 and shift released */
-	    if (!(mask & (Button3Mask | ShiftMask))) break;  
+	    if (!(mask & (Button3Mask | ShiftMask))) break;
 
 	    /* if user lets go of B3, reset addonly/delonly flag & lastcell */
 	    if (!(mask & Button3Mask) && (mask & ShiftMask)) {
@@ -1112,7 +1113,7 @@ int x,y,but;
 
 	if (recolor) {
 	  /* colors changed.  save to color undo area */
-	  xvbcopy((char *) &tmpcmap, (char *) &prevcmap, 
+	  xvbcopy((char *) &tmpcmap, (char *) &prevcmap,
 		  sizeof(struct cmapstate));
 	  BTSetActive(&gbut[G_BCOLUNDO],1);
 	  applyGamma(1);   /* have to regen entire image when groupings chg */
@@ -1146,12 +1147,12 @@ int cnum, first;
   /* cases:  curgroup>0, clicked on something in same group
                          remove target from group
 	     curgroup>0, clicked on something in different group
-	                 merge groups.  (target group gets 
+	                 merge groups.  (target group gets
 			 set equal to current values)
              curgroup>0, clicked on something in no group
 	                 add target to curgroup
              curgroup=0, clicked on something in a group
-	                 add editColor to target group, 
+	                 add editColor to target group,
 			 set curgroup = target group
 			 target group gets current values
 	     curgroup=0, clicked on something in no group
@@ -1185,7 +1186,7 @@ int cnum, first;
       }
     }
 
-    else if ((mode!=DELONLY) && cellgroup[cnum] != curgroup && 
+    else if ((mode!=DELONLY) && cellgroup[cnum] != curgroup &&
 	     cellgroup[cnum]>0) {
       /* merge clicked-on group into curgroup */
       mode = ADDONLY;
@@ -1196,11 +1197,11 @@ int cnum, first;
 	  selectCell(i,1);
 	  rcmap[i] = rcmap[editColor];
 	  gcmap[i] = gcmap[editColor];
-	  bcmap[i] = bcmap[editColor]; 
+	  bcmap[i] = bcmap[editColor];
 	}
       }
     }
-	    
+
     else if ((mode!=DELONLY) && cellgroup[cnum] == 0) {
       /* merge clicked-on cell into curgroup */
       mode = ADDONLY;
@@ -1209,7 +1210,7 @@ int cnum, first;
       selectCell(cnum,1);
       rcmap[cnum] = rcmap[editColor];
       gcmap[cnum] = gcmap[editColor];
-      bcmap[cnum] = bcmap[editColor]; 
+      bcmap[cnum] = bcmap[editColor];
     }
   }
 
@@ -1224,14 +1225,14 @@ int cnum, first;
 	  selectCell(i,1);
 	  rcmap[i] = rcmap[editColor];
 	  gcmap[i] = gcmap[editColor];
-	  bcmap[i] = bcmap[editColor]; 
+	  bcmap[i] = bcmap[editColor];
 	}
       }
       curgroup = cellgroup[cnum];
       cellgroup[editColor] = curgroup;
     }
-	    
-    else if ((mode!=DELONLY) && (cellgroup[cnum] == 0) 
+
+    else if ((mode!=DELONLY) && (cellgroup[cnum] == 0)
 	     && (cnum != editColor)) {
       /* create new group for these two cells (cnum and editColor) */
       mode = ADDONLY;
@@ -1247,14 +1248,14 @@ int cnum, first;
   }
 
   return rv;
-}	    
-	    
+}
+
 
 /*********************/
 void ChangeEC(num)
 int num;
 {
-  /* given a color # that is to become the new editColor, do all 
+  /* given a color # that is to become the new editColor, do all
      highlighting/unhighlighting, copy editColor's rgb values to
      the rgb/hsv dials */
 
@@ -1291,18 +1292,18 @@ int num;
     rgb2hsv(rcmap[editColor], gcmap[editColor], bcmap[editColor], &h, &s, &v);
     if (h<0) h = 0;
 
-    DSetVal(&rhDial, (int) h);
-    DSetVal(&gsDial, (int) (s*100));
-    DSetVal(&bvDial, (int) (v*100));
+    DSetVal(&rhDial, h);
+    DSetVal(&gsDial, s*100);
+    DSetVal(&bvDial, v*100);
   }
   else {
-    DSetVal(&rhDial, rcmap[editColor]);
-    DSetVal(&gsDial, gcmap[editColor]);
-    DSetVal(&bvDial, bcmap[editColor]);
+    DSetVal(&rhDial, (double)rcmap[editColor]);
+    DSetVal(&gsDial, (double)gcmap[editColor]);
+    DSetVal(&bvDial, (double)bcmap[editColor]);
   }
 }
-  
-    
+
+
 /*********************/
 void ApplyECctrls()
 {
@@ -1310,16 +1311,15 @@ void ApplyECctrls()
 
   if (hsvmode) {
     int rv, gv, bv;
-    hsv2rgb((double) rhDial.val, ((double) gsDial.val) / 100.0, 
-	    ((double) bvDial.val) / 100.0, &rv, &gv, &bv);
+    hsv2rgb(rhDial.val, gsDial.val / 100.0, bvDial.val / 100.0, &rv, &gv, &bv);
     rcmap[editColor] = rv;
     gcmap[editColor] = gv;
     bcmap[editColor] = bv;
   }
   else {
-    rcmap[editColor] = rhDial.val;
-    gcmap[editColor] = gsDial.val;
-    bcmap[editColor] = bvDial.val;
+    rcmap[editColor] = (int)rhDial.val;
+    gcmap[editColor] = (int)gsDial.val;
+    bcmap[editColor] = (int)bvDial.val;
   }
 }
 
@@ -1330,7 +1330,7 @@ void GenerateFSGamma()
 {
   /* this function generates the Floyd-Steinberg gamma curve (fsgamcr)
 
-     This function generates a 4 point spline curve to be used as a 
+     This function generates a 4 point spline curve to be used as a
      non-linear grey 'colormap'.  Two of the points are nailed down at 0,0
      and 255,255, and can't be changed.  You specify the other two.  If
      you specify points on the line (0,0 - 255,255), you'll get the normal
@@ -1345,7 +1345,7 @@ void GenerateFSGamma()
   double yf[4];
 
   InitSpline(x, y, 4, yf);
-  
+
   for (i=0; i<256; i++) {
     j = (int) EvalSpline(x, y, yf, 4, (double) i);
     if (j<0) j=0;
@@ -1364,14 +1364,14 @@ int cmd;
 
   switch (cmd) {
 
-  case G_BAPPLY: 
+  case G_BAPPLY:
     if (enabCB.val != 1) { enabCB.val = 1;  CBRedraw(&enabCB); }
-    applyGamma(0);           
+    applyGamma(0);
     break;
 
   case G_BNOGAM:
     if (enabCB.val != 0) { enabCB.val = 0;  CBRedraw(&enabCB); }
-    applyGamma(0);           
+    applyGamma(0);
     break;
 
   case G_BUNDO:  gamUndo();  break;
@@ -1383,7 +1383,7 @@ int cmd;
 
 
 
-  case G_BDN_BR: 
+  case G_BDN_BR:
   case G_BUP_BR: GetGrafState(&intGraf, &gs);
                  for (i=0; i < gs.nhands; i++) {
 		   if (cmd==G_BUP_BR) gs.hands[i].y += 10;
@@ -1434,7 +1434,7 @@ int cmd;
 	       else if (cmd==G_B3)     ptr = &preset[2];
 	       else if (cmd==G_B4)     ptr = &preset[3];
 	       else if (cmd==G_BRESET) ptr = &defstate;
-                
+
 	       if (gbut[G_BSET].lit) {
 		 ctrls2gamstate(ptr);
 		 gbut[G_BSET].lit = 0;
@@ -1454,7 +1454,7 @@ int cmd;
     break;
 
 
-  case G_BCOLREV: 
+  case G_BCOLREV:
     {
       struct cmapstate tmp1cmap;
       int gchg;
@@ -1463,9 +1463,9 @@ int cmd;
       gchg = (i!=numcols);
 
       saveCMap(&tmpcmap);         /* buffer current cmapstate */
-    
+
       for (i=0; i<numcols; i++) { /* do reversion */
-	rcmap[i] = rorg[i];  
+	rcmap[i] = rorg[i];
 	gcmap[i] = gorg[i];
 	bcmap[i] = borg[i];
 	cellgroup[i] = 0;
@@ -1473,12 +1473,12 @@ int cmd;
       curgroup = maxgroup = 0;
 
       saveCMap(&tmp1cmap);        /* buffer current cmapstate */
-    
+
       /* prevent multiple 'Undo All's from filling Undo buffer */
-      if (xvbcmp((char *) &tmpcmap, (char *) &tmp1cmap, 
+      if (xvbcmp((char *) &tmpcmap, (char *) &tmp1cmap,
 		 sizeof(struct cmapstate))) {
 	/* the reversion changed the cmapstate */
-	xvbcopy((char *) &tmpcmap, (char *) &prevcmap, 
+	xvbcopy((char *) &tmpcmap, (char *) &prevcmap,
 		sizeof(struct cmapstate));
 	BTSetActive(&gbut[G_BCOLUNDO],1);
 
@@ -1496,7 +1496,7 @@ int cmd;
     BTSetActive(&gbut[G_BCOLUNDO],1);
     rndCols();
     break;
-  
+
   case G_BRV:
     saveCMap(&prevcmap);
     BTSetActive(&gbut[G_BCOLUNDO],1);
@@ -1523,7 +1523,7 @@ int cmd;
     ChangeEC(editColor);
     applyGamma(1);
     break;
-  
+
 
   case G_BMONO:
     saveCMap(&prevcmap);
@@ -1534,7 +1534,7 @@ int cmd;
     ChangeEC(editColor);
     applyGamma(1);
     break;
-  
+
 
   case G_BCOLUNDO:
     for (i=0; i<numcols && cellgroup[i]==prevcmap.cellgroup[i]; i++);
@@ -1560,10 +1560,10 @@ static void SetHSVmode()
     rhDial.title = "Red";
     gsDial.title = "Green";
     bvDial.title = "Blue";
-		   
-    DSetRange(&rhDial, 0, 255, rcmap[editColor], 16);
-    DSetRange(&gsDial, 0, 255, gcmap[editColor], 16);
-    DSetRange(&bvDial, 0, 255, bcmap[editColor], 16);
+
+    DSetRange(&rhDial, 0.0, 255.0, (double)rcmap[editColor], 1.0, 16.0);
+    DSetRange(&gsDial, 0.0, 255.0, (double)gcmap[editColor], 1.0, 16.0);
+    DSetRange(&bvDial, 0.0, 255.0, (double)bcmap[editColor], 1.0, 16.0);
 
     XClearWindow(theDisp, rhDial.win);    DRedraw(&rhDial);
     XClearWindow(theDisp, gsDial.win);    DRedraw(&gsDial);
@@ -1581,9 +1581,9 @@ static void SetHSVmode()
 	    &h, &s, &v);
 
     if (h<0.0) h = 0.0;
-    DSetRange(&rhDial, 0, 360, (int) h, 5);
-    DSetRange(&gsDial, 0, 100, (int) (s*100), 5);
-    DSetRange(&bvDial, 0, 100, (int) (v*100), 5);
+    DSetRange(&rhDial, 0.0, 360.0,     h, 1.0, 5.0);
+    DSetRange(&gsDial, 0.0, 100.0, s*100, 1.0, 5.0);
+    DSetRange(&bvDial, 0.0, 100.0, v*100, 1.0, 5.0);
 
     XClearWindow(theDisp, rhDial.win);    DRedraw(&rhDial);
     XClearWindow(theDisp, gsDial.win);    DRedraw(&gsDial);
@@ -1615,12 +1615,12 @@ static void applyGamma(cmapchange)
     GammifyColors();
 
     /* if current 'desired' colormap hasn't changed, don't DO anything */
-    if (!xvbcmp((char *) rMap, (char *) oldr, (size_t) numcols) && 
-	!xvbcmp((char *) gMap, (char *) oldg, (size_t) numcols) && 
+    if (!xvbcmp((char *) rMap, (char *) oldr, (size_t) numcols) &&
+	!xvbcmp((char *) gMap, (char *) oldg, (size_t) numcols) &&
 	!xvbcmp((char *) bMap, (char *) oldb, (size_t) numcols)) return;
 
     /* special case: if using R/W color, just modify the colors and leave */
-    if (allocMode==AM_READWRITE && rwthistime && 
+    if (allocMode==AM_READWRITE && rwthistime &&
 	(!cmapchange || nfcols==numcols)) {
       XColor ctab[256];
 
@@ -1647,10 +1647,10 @@ static void applyGamma(cmapchange)
 	gdisp[i] = gMap[rwpc2pc[i]];
 	bdisp[i] = bMap[rwpc2pc[i]];
       }
-      
+
       return;
     }
-    
+
     FreeColors();
 
     {
@@ -1663,10 +1663,10 @@ static void applyGamma(cmapchange)
     AllocColors();
 
 
-    if (epicMode != EM_RAW) {  
+    if (epicMode != EM_RAW) {
       /* regen image, as we'll probably want to dither differently, given
 	 new colors and such */
-      
+
       GenerateEpic(eWIDE, eHIGH);
     }
   }
@@ -1701,7 +1701,7 @@ static void calcHistEQ(histeq, rminv, rmaxv)
     for (i=255; i>0 && !hist[i]; i--);
     *rmaxv = i;
   }
-  
+
   else {  /* PIC24 */
     int v,minv,maxv;
 
@@ -1724,7 +1724,7 @@ static void calcHistEQ(histeq, rminv, rmaxv)
 	hist[v]++;
       }
     }
-    
+
     *rminv = minv;  *rmaxv = maxv;
   }
 
@@ -1764,13 +1764,13 @@ void DoHistEq()
   int i, histeq[256], minv, maxv;
 
   calcHistEQ(histeq, &minv, &maxv);  /* ignore minv,maxv */
-    
-  for (i=0; i<256; i++) 
+
+  for (i=0; i<256; i++)
     intGraf.func[i] = histeq[i];
-    
+
   for (i=0; i< intGraf.nhands; i++)
     intGraf.hands[i].y = intGraf.func[intGraf.hands[i].x];
-    
+
   intGraf.entergamma = 0;
 
   if (gamUp) {
@@ -1797,7 +1797,7 @@ void DoNorm()
       if (v>maxv) maxv = v;
     }
   }
-  else { 
+  else {
     int histeq[256];
     calcHistEQ(histeq, &minv, &maxv);  /* ignore histeq */
   }
@@ -1833,11 +1833,11 @@ void GammifyColors()
     for (i=0; i<numcols; i++) Gammify1(i);
   }
   else {
-    for (i=0; i<numcols; i++) { 
+    for (i=0; i<numcols; i++) {
       rMap[i] = rcmap[i];
       gMap[i] = gcmap[i];
       bMap[i] = bcmap[i];
-      if (!ncols) 
+      if (!ncols)
 	cols[i] = (((int)rMap[i]) + ((int)gMap[i]) + ((int)bMap[i]) >= 128*3)
 	  ? white : black;
     }
@@ -1875,7 +1875,7 @@ int col;
     if (DEBUG>1) fprintf(stderr," (v=%f)",v);
 
     if (h>=0) {
-      hi = (int) h;  
+      hi = (int) h;
       if (hi<0)    hi += 360;
       if (hi>=360) hi -= 360;
       h = (double) hremap[hi];
@@ -1884,14 +1884,14 @@ int col;
       if (whtHD.enabCB.val) {
 	h = (double) whtHD.stval;
 	s = (double) whtHD.satval / 100.0;
-	
+
 	/* special case:  if stval = satval = 0, set hue = -1 */
 	if (whtHD.stval == 0 && whtHD.satval == 0) h = -1.0;
       }
     }
 
     /* apply satDial value to s */
-    s = s + ((double) satDial.val) / 100.0;
+    s = s + satDial.val / 100.0;
     if (s<0.0) s = 0.0;
     if (s>1.0) s = 1.0;
 
@@ -1899,13 +1899,13 @@ int col;
     if (DEBUG>1) fprintf(stderr," -> %d,%d,%d",rv,gv,bv);
   }
 
-  rMap[col] = rGraf.func[rv];  
+  rMap[col] = rGraf.func[rv];
   gMap[col] = gGraf.func[gv];
   bMap[col] = bGraf.func[bv];
 
-  if (!ncols) 
-    cols[col] = 
-      (((int)rMap[col]) + ((int)gMap[col]) + ((int)bMap[col]) >= 128*3) 
+  if (!ncols)
+    cols[col] =
+      (((int)rMap[col]) + ((int)gMap[col]) + ((int)bMap[col]) >= 128*3)
 	? white : black;
 
   if (DEBUG>1) fprintf(stderr," -> %d,%d,%d\n",rMap[col],gMap[col],bMap[col]);
@@ -2001,13 +2001,13 @@ static void ctrls2gamstate(gs)
 {
   xvbcopy((char *) hmap, (char *) gs->hmap, sizeof(hmap));
 
-  gs->wht_stval = whtHD.stval;  
-  gs->wht_satval = whtHD.satval;  
+  gs->wht_stval = whtHD.stval;
+  gs->wht_satval = whtHD.satval;
   gs->wht_enab = whtHD.enabCB.val;
 
   gs->hueRBnum = RBWhich(hueRB);
 
-  gs->satval = satDial.val;
+  gs->satval = (int)satDial.val;
   GetGrafState(&intGraf,&gs->istate);
   GetGrafState(&rGraf,  &gs->rstate);
   GetGrafState(&gGraf,  &gs->gstate);
@@ -2042,7 +2042,7 @@ struct gamstate *gs;
       srcHD.ccwise = hm->src_ccw;
       HDRedraw(&srcHD, HD_ALL | HD_CLEAR);
     }
-    
+
     if (dstHD.stval  != hm->dst_st ||
 	dstHD.enval  != hm->dst_en ||
 	dstHD.ccwise != hm->dst_ccw) {
@@ -2051,7 +2051,7 @@ struct gamstate *gs;
       dstHD.ccwise = hm->dst_ccw;
       HDRedraw(&dstHD, HD_ALL | HD_CLEAR);
     }
-  }    
+  }
 
 
   if (whtHD.stval != gs->wht_stval || whtHD.satval != gs->wht_satval ||
@@ -2063,9 +2063,9 @@ struct gamstate *gs;
     HDRedraw(&whtHD, HD_ALL | HD_CLEAR);
     changed++;
   }
-    
-  if (gs->satval != satDial.val) {
-    DSetVal(&satDial,gs->satval);
+
+  if (gs->satval != (int)satDial.val) {
+    DSetVal(&satDial,(double)gs->satval);
     changed++;
   }
 
@@ -2203,7 +2203,7 @@ struct cmapstate *cst;
 }
 
 
-    
+
 
 /*********************/
 static void parseResources()
@@ -2226,7 +2226,7 @@ static void parseResources()
     if (i) { sprintf(gname,"preset%d",i);  gsp = &preset[i-1]; }
       else { sprintf(gname,"default");     gsp = &defstate; }
 
-    xvbcopy((char *) gsp, (char *) &gs, 
+    xvbcopy((char *) gsp, (char *) &gs,
 	    sizeof(struct gamstate));   /* load 'gs' with defaults */
 
     for (j=0; j<6; j++) {                       /* xv.*.huemap resources */
@@ -2239,7 +2239,7 @@ static void parseResources()
 	lower_str(def_str);
 	if (sscanf(def_str,"%d %d %s %d %d %s",
 		   &fst, &fen, fcw, &tst, &ten, tcw) != 6) {
-	  fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n", 
+	  fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n",
 		  cmd, tmp, def_str);
 	}
 	else {
@@ -2260,7 +2260,7 @@ static void parseResources()
       int wst, wsat, enab;
       if (DEBUG) fprintf(stderr,"parseResource 'xv.%s: %s'\n",tmp, def_str);
       if (sscanf(def_str,"%d %d %d", &wst, &wsat, &enab) != 3) {
-	fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n", 
+	fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n",
 		cmd, tmp, def_str);
       }
       else {                                    /* successful parse */
@@ -2276,7 +2276,7 @@ static void parseResources()
       int sat;
       if (DEBUG) fprintf(stderr,"parseResource 'xv.%s: %s'\n",tmp, def_str);
       if (sscanf(def_str,"%d", &sat) != 1) {
-	fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n", 
+	fprintf(stderr,"%s: unable to parse resource 'xv.%s: %s'\n",
 		cmd, tmp, def_str);
       }
       else {                                    /* successful parse */
@@ -2304,7 +2304,7 @@ static void parseResources()
 	}
       }
     }
-    
+
     /* copy (potentially) modified gs back to default/preset */
     xvbcopy((char *) &gs, (char *) gsp, sizeof(struct gamstate));
   }
@@ -2324,16 +2324,16 @@ static void makeResources()
   /* write out current state */
   ctrls2gamstate(&gstate);
   strcpy(gname, "xv.default");
-  
+
   /* write out huemap resources */
   for (i=0; i<6; i++) {
     if (1 || gstate.hmap[i].src_st  != gstate.hmap[i].dst_st ||
 	gstate.hmap[i].src_en  != gstate.hmap[i].dst_en ||
 	gstate.hmap[i].src_ccw != gstate.hmap[i].dst_ccw) {
-      sprintf(tmp, "%s.huemap%d: %3d %3d %3s %3d %3d %3s\n", gname, i+1, 
-	      gstate.hmap[i].src_st, gstate.hmap[i].src_en, 
+      sprintf(tmp, "%s.huemap%d: %3d %3d %3s %3d %3d %3s\n", gname, i+1,
+	      gstate.hmap[i].src_st, gstate.hmap[i].src_en,
 	      gstate.hmap[i].src_ccw ? "CCW" : "CW",
-	      gstate.hmap[i].dst_st, gstate.hmap[i].dst_en, 
+	      gstate.hmap[i].dst_st, gstate.hmap[i].dst_en,
 	      gstate.hmap[i].dst_ccw ? "CCW" : "CW");
       strcat(rsrc, tmp);
     }
@@ -2341,7 +2341,7 @@ static void makeResources()
 
   /* write out whtmap resource */
   if (1 || gstate.wht_stval || gstate.wht_satval || gstate.wht_enab != 1) {
-    sprintf(tmp, "%s.whtmap:  %d %d %d\n", gname, gstate.wht_stval, 
+    sprintf(tmp, "%s.whtmap:  %d %d %d\n", gname, gstate.wht_stval,
 	    gstate.wht_satval, gstate.wht_enab);
     strcat(rsrc, tmp);
   }
@@ -2372,7 +2372,7 @@ static void makeResources()
 
   NewCutBuffer(rsrc);
 }
-    
+
 
 /*****************************/
 static void dragGamma ()
@@ -2381,14 +2381,14 @@ static void dragGamma ()
      while gamma ctrls are being dragged
      applies change to image if dragCB.val is set
      does NOT call saveGamState() (as changedGam does) */
-  
+
   if (dragCB.val && dragCB.active) {
     hsvnonlinear = 1;   /* force HSV calculations during drag */
     applyGamma(0);
   }
 }
 
-  
+
 /*****************************/
 static void dragHueDial()
 {
@@ -2396,7 +2396,7 @@ static void dragHueDial()
      while hue gamma ctrls are being dragged
      applies change to image if dragCB.val is set
      does NOT call saveGamState() (as changedGam does) */
-  
+
   if (dragCB.val && dragCB.active) {
     dials2hmap();
     build_hremap();
@@ -2413,14 +2413,14 @@ static void dragEditColor()
      while color editor ctrls are being dragged
      applies change to image if dragCB.val is set
      does NOT call saveCMap(&prevcmap); BTSetActive(&gbut[G_BCOLUNDO],1); */
-  
+
   if (dragCB.val && dragCB.active) ApplyEditColor(0);
 }
 
 
-    
-    
-        
+
+
+
 
 /**********************************************/
 /*************  HUE wheel functions ***********/
@@ -2435,11 +2435,11 @@ static Pixmap hdbpix2[N_HDBUTT2];
 
 /**************************************************/
 static void HDCreate(hd, win, x, y, r, st, en, ccwise, str, fg, bg)
-HDIAL *hd;
-Window win;
-int x,y,r,st,en,ccwise;
-char *str;
-u_long fg,bg;
+     HDIAL      *hd;
+     Window      win;
+     int         x, y, r, st, en, ccwise;
+     const char *str;
+     u_long      fg, bg;
 {
   int i;
 
@@ -2470,7 +2470,7 @@ u_long fg,bg;
     hdbpix2[HDB_ROTR]  = hdbpix1[HDB_ROTR];
   }
 
-    
+
 #define BCOLS fg,bg,hicol,locol
 
   if (hd->range) {
@@ -2520,13 +2520,13 @@ int flags;
   }
 
   if (flags & HD_FRAME) {
-    static char *colstr = "RYGCBM";
+    static const char *colstr = "RYGCBM";
     char tstr[2];
 
     XSetForeground(theDisp, theGC, hd->fg);
     XDrawArc(theDisp, hd->win, theGC, hd->x - HD_RADIUS, hd->y - HD_RADIUS,
 	     HD_RADIUS*2, HD_RADIUS*2, 0, 360*64);
-    
+
     for (i=0; i<6; i++) {
       int kldg;
 
@@ -2553,8 +2553,8 @@ int flags;
       a = hdg2xdg(hd->stval) * DEG2RAD;
       pol2xy(hd->x, hd->y, a, HD_RADIUS - 4, &x, &y);
       XDrawLine(theDisp, hd->win, theGC, hd->x, hd->y, x,y);
-      
-      if (flags & HD_CLHNDS) 
+
+      if (flags & HD_CLHNDS)
 	XFillRectangle(theDisp, hd->win, theGC, x-2,y-2, 5,5);
       else {
 	XSetForeground(theDisp, theGC, hd->bg);
@@ -2567,8 +2567,8 @@ int flags;
       a = hdg2xdg(hd->enval) * DEG2RAD;
       pol2xy(hd->x, hd->y, a, HD_RADIUS - 4, &x, &y);
       XDrawLine(theDisp, hd->win, theGC, hd->x, hd->y, x,y);
-    
-      if (flags & HD_CLHNDS) 
+
+      if (flags & HD_CLHNDS)
 	XFillRectangle(theDisp, hd->win, theGC, x-2,y-2, 5,5);
       else {
 	XSetForeground(theDisp, theGC, hd->bg);
@@ -2587,7 +2587,7 @@ int flags;
       r = ((HD_RADIUS - 4) * hd->satval) / 100;
       pol2xy(hd->x, hd->y, a, r, &x, &y);
 
-      if (flags & HD_CLHNDS) 
+      if (flags & HD_CLHNDS)
 	XFillRectangle(theDisp, hd->win, theGC, x-2,y-2, 5,5);
       else {
 	XFillRectangle(theDisp, hd->win, theGC, hd->x-1, hd->y-1, 3,3);
@@ -2600,7 +2600,7 @@ int flags;
       }
     }
   }
-    
+
 
 
 
@@ -2653,13 +2653,13 @@ int flags;
     XSetBackground(theDisp, theGC, hd->bg);
 
     if (hd->range) {
-      sprintf(vstr,"%3d\007,%3d\007 %s", hd->stval, hd->enval, 
+      sprintf(vstr,"%3d\007,%3d\007 %s", hd->stval, hd->enval,
 	      hd->ccwise ? "CCW" : " CW");
     }
     else {
       sprintf(vstr,"%3d\007 %3d%%", hd->stval, hd->satval);
     }
-      
+
     XDrawImageString(theDisp, hd->win, theGC,
 		     hd->x - XTextWidth(monofinfo, vstr, (int) strlen(vstr))/2,
 		     hd->y + HD_RADIUS + 24, vstr, (int) strlen(vstr));
@@ -2669,7 +2669,7 @@ int flags;
 
   if (flags & HD_TITLE) {
     XSetForeground(theDisp, theGC, hd->fg);
-    ULineString(hd->win, hd->x - HD_RADIUS - 15, hd->y - HD_RADIUS - 4, 
+    ULineString(hd->win, hd->x - HD_RADIUS - 15, hd->y - HD_RADIUS - 4,
 		hd->str);
   }
 
@@ -2694,7 +2694,7 @@ int flags;
 }
 
 
-    
+
 /**************************************************/
 static int HDClick(hd,mx,my)
 HDIAL *hd;
@@ -2716,7 +2716,7 @@ int mx, my;
   if (!hd->range && !hd->enabCB.val) return 0;    /* disabled */
 
 
-  if ( ((mx - hd->x) * (mx - hd->x)  +  (my - hd->y) * (my - hd->y)) 
+  if ( ((mx - hd->x) * (mx - hd->x)  +  (my - hd->y) * (my - hd->y))
       < (HD_RADIUS * HD_RADIUS)) {
     return HDTrack(hd,mx,my);
   }
@@ -2816,14 +2816,14 @@ int mx, my;
 	      hd->satval--;  if (hd->satval<0) hd->satval = 0;
 	      HDRedraw(hd, HD_HANDS | HD_VALS);
 	    }
-	      
+
 	    else if (bnum == HDB_SAT && hd->satval<100) {
 	      HDRedraw(hd, HD_CLHNDS);
 	      hd->satval++;  if (hd->satval>100) hd->satval = 100;
 	      HDRedraw(hd, HD_HANDS | HD_VALS);
 	    }
 	  }
-	      
+
 	  break;
 	}
 
@@ -2836,7 +2836,7 @@ int mx, my;
   }
 
   if (bp->lit) {  bp->lit = 0;  BTRedraw(bp); }
-    
+
   return 1;
 }
 
@@ -2872,7 +2872,7 @@ int mx,my;
 
       dx = x - hd->x;  dy = y - hd->y;
       dist = sqrt(dx*dx + dy*dy);
-      
+
       newsat = (int) (dist / ((double) (HD_RADIUS - 4)) * 100);
       RANGE(newsat,0,100);
 
@@ -2899,7 +2899,7 @@ int mx,my;
     a = hdg2xdg(hd->enval) * DEG2RAD;
     pol2xy(hd->x, hd->y, a, HD_RADIUS-4, &x,&y);
     if (PTINRECT(mx,my,x-3,y-3,7,7)) handle = 2;
-    
+
 
 
     if (!handle) {  /* not in either, rotate both */
@@ -2939,7 +2939,7 @@ int mx,my;
       }
       rv = (origj != j);
     }
-	    
+
 
     else {  /* in one of the handles */
       if (handle==1) valp = &(hd->stval);  else valp = &(hd->enval);
@@ -2958,22 +2958,22 @@ int mx,my;
 
 	  if (!hd->ccwise) {
 	    ddist = (hd->enval - hd->stval + 360) % 360;
-	    if (handle==1) 
+	    if (handle==1)
 	      ndist = (hd->enval - j + 360) % 360;
 	    else
 	      ndist = (j - hd->stval + 360) % 360;
 	  }
 	  else {
 	    ddist = (hd->stval - hd->enval + 360) % 360;
-	    if (handle==1) 
+	    if (handle==1)
 	      ndist = (j - hd->enval + 360) % 360;
 	    else
 	      ndist = (hd->stval - j + 360) % 360;
 	  }
 
-	  if (abs(ddist - ndist) >= 180 && ddist<180) 
+	  if (abs(ddist - ndist) >= 180 && ddist<180)
 	    hd->ccwise = !hd->ccwise;
-	  
+
 	  *valp = j;
 	  HDRedraw(hd, HD_HANDS | HD_DIR | HD_VALS);
 
@@ -2986,8 +2986,8 @@ int mx,my;
 
   return rv;
 }
-    
-      
+
+
 
 /**************************************************/
 static int hdg2xdg(hdg)
@@ -3012,7 +3012,7 @@ double ang;
   *yp = cy - (int) (sin(ang) * (double) rad);
 }
 
-  
+
 /***************************************************/
 static int computeHDval(hd, x, y)
 HDIAL *hd;
@@ -3044,7 +3044,7 @@ int x, y;
 
 
 
-    
+
 /****************************************************/
 static void initHmap()
 {
@@ -3117,10 +3117,10 @@ static void build_hremap()
 	(hmap[i].src_en  != hmap[i].dst_en) ||
 	(hmap[i].src_ccw != hmap[i].dst_ccw)) {   /* not a 1:1 mapping */
 
-      st1  = hmap[i].src_st;  
+      st1  = hmap[i].src_st;
       en1  = hmap[i].src_en;
       if (hmap[i].src_ccw) {
-	inc1 = -1; 
+	inc1 = -1;
 	len1 = (st1 - en1 + 360) % 360;
       }
       else {
@@ -3131,7 +3131,7 @@ static void build_hremap()
       st2 = hmap[i].dst_st;
       en2 = hmap[i].dst_en;
       if (hmap[i].dst_ccw) {
-	inc2 = -1; 
+	inc2 = -1;
 	len2 = (st2 - en2 + 360) % 360;
       }
       else {
@@ -3179,7 +3179,7 @@ byte *GammifyPic24(pic24, wide, high)
 
   byte *pp, *op;
   int   i,j;
-  int   rv, gv, bv, vi, hi;
+  int   rv, gv, bv;
   byte *outpic;
   int   min, max, del, h, s, v;
   int   f, p, q, t, vs100, vsf10000;
@@ -3200,7 +3200,7 @@ byte *GammifyPic24(pic24, wide, high)
 
   if (whtHD.enabCB.val && whtHD.satval) hsvmod++;
 
-  if (satDial.val != 0) hsvmod++;
+  if (satDial.val != 0.0) hsvmod++;
 
   /* check intensity graf */
   for (i=0; i<256; i++) {
@@ -3270,7 +3270,7 @@ byte *GammifyPic24(pic24, wide, high)
 
       /* map near-black to black to avoid weird effects */
       if (v <= 16) s = 0;
-      
+
       /* apply intGraf.func[] function to 'v' (the intensity) */
       v = intGraf.func[v];
 
@@ -3284,7 +3284,7 @@ byte *GammifyPic24(pic24, wide, high)
       }
 
       /* apply satDial value to s */
-      s = s + satDial.val;
+      s = s + (int)satDial.val;
       if (s<  0) s =   0;
       if (s>100) s = 100;
 
@@ -3295,7 +3295,7 @@ byte *GammifyPic24(pic24, wide, high)
       if (h==NOHUE || !s) { rv = gv = bv = v; }
       else {
 	if (h==360) h = 0;
-	
+
 	h        = (h*100) / 60;    /* h is in range 000..599 (0.0 - 5.99) */
 	j        = h - (h%100);     /* j = 000, 100, 200, 300, 400, 500 */
 	f        = h - j;           /* 'fractional' part of h (00..99) */
@@ -3305,7 +3305,7 @@ byte *GammifyPic24(pic24, wide, high)
 	p = v - vs100;
 	q = v - vsf10000;
 	t = v - vs100 + vsf10000;
-	
+
 	switch (j) {
 	case 000:  rv = v;  gv = t;  bv = p;  break;
 	case 100:  rv = q;  gv = v;  bv = p;  break;
@@ -3319,7 +3319,7 @@ byte *GammifyPic24(pic24, wide, high)
     }   /* if hsvmod */
 
 
-    *op++ = rGraf.func[rv];  
+    *op++ = rGraf.func[rv];
     *op++ = gGraf.func[gv];
     *op++ = bGraf.func[bv];
   }

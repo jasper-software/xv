@@ -1,0 +1,159 @@
+Copyright 1993-2001 David Clunie.
+
+PCD patch for XV 3.10a Release Notes 2001/07/08.
+
+See also the progress notes at the end of this file. Thanks to all those
+contributors who have substantially improved this patch.
+
+These patches allow xv to read Kodak photocd files and choose which of the
+5 available resolutions one wants to view.
+
+When a photocd file is loaded, a dialog box asks which resolution you
+would like. The visual schnauzer builds thumbnails by reading the lowest
+resolution image. The selected resolution can be selected from the
+command line with the -pcd option:
+
+	[-pcd 0|1|2|3|4]
+
+where:
+
+	0=192*128,	base/16 resolution
+	1=384*256,	base/4 resolution
+	2=768*512,	base resolution
+	3=1536*1024,	4base resolution
+	4=3072*2048	16base resolution.
+
+Note that the Pro format is not supported.
+
+The command line option allows loops without the dialog box popping up, eg.:
+
+	xv -pcd 1 -wloop -wait 10 *.pcd
+
+The code is pretty crude and was written quickly for a specific purpose and
+has not really been cleaned up. It is poorly structured, full of debugging
+codes and verbose comments, and there is very little attempt at optimizing
+things. No profiling has been done.
+
+There is not yet support for overview files, nor is there a facility to
+use the higher resolution chroma planes from when viewing lower resolution
+images.
+
+It's only claim to fame is that it works and produces reasonable looking
+images.
+
+The outline of this is shamelessly derived from xvpbm.c to read the
+file, and xvtiffwr.c to handle the popup window and X stuff (X never
+has been my forte !), and the PhotoCD format information (though not
+the code) was found in Hadmut Danisch's (danisch@ira.uka.de) hpcdtoppm
+program in which he has reverse engineered the format by studying
+hex dumps of PhotoCDs ! The color stuff and Huffman decding were
+extensively revised by Matthew Francey.
+
+Feel free to send me comments or improvements, or even better, more
+information about the photo CD format ... hopefully someone who really
+knows what they are doing will tidy it up or do a neater job.
+
+david (dclunie@dclunie.com)
+
+---------
+
+The trace #define in xvpcd.c is now in the right place, and the ansi
+prototype for the magnify function has been fixed. Colin made me switch to
+xvbcopy() which seems like a good idea for System V victims.
+
+---------
+
+Date: Wed, 22 Dec 1993 16:09:52 --1000
+From: colinc@fitmail.fit.qut.edu.au (Colin Canfield )
+
+I have done some more work using your patch I thought you might be intested in.
+The major change was adding a size parameter to the LoadPCD; either -1 to mean
+the popup or else the size you desired. This allows batch mode processing,
+specifically xv -pcd <size> <filename>, and the visual schnauzer can work in 
+quick mode (ie. you don't have to select each image size when it is building 
+the icons)
+
+I have added an xbm file for the file type but haven't drawn an icon for it,
+this is in bitmaps/br_pcd.xbm. I will just send you the new files.
+
+---------
+
+From: andrew@andrew.triumf.ca (Andrew Daviel)
+Date: 16 Feb 1995 23:32:21 GMT
+
+This is David Clunie's patch for xv-3.00 tuned a bit to work
+on xv-3.10. The code's all the same except for replacing 
+"trace" with "fprintf" in xvpcd.c and adding an "unsigned" qualifier to 
+keep my compiler (gcc) happy. Oh yes, changed RFT_PCD to 20 as
+John Bradley has now used 15 through 19.
+
+---------
+
+From: dclunie@flash.us.com (David A. Clunie)
+Date: Thu Jun 15 14:43:46 GMT+0300 1995
+
+Andrew's patch didn't include Colin's browser changes, so I redid the
+xv-3.10 update from scratch ... it seems pretty much the same as
+Andrew's changes. I also edited the Imakefile and Makefiles in order
+to support the PCD changes, as well as make the install process a
+little more flexible, with options to strip and set modes and so on.
+Also made RFT_PCD 25 so as not to conflict with magpic patch from Japan
+by Ikemoto Masahiro <ikeyan@airlab.cs.ritsumei.ac.jp>, and used his
+bitmap icon for pcd files.
+
+Now there are two versions of the patch, one which should be applied
+to the xv-3.10 distribution.
+
+The other should be applied to xv-3.10 AFTER Ikemoto Masahiro's 
+Patch.magpic2.PhotoCD.XV319a, in order to add the browser features to
+the latter, as well as fixing a Makefile typo (was xcpcd.c not xvpcd.c)
+and including unistd.h for the SEEK_xxx constants in the magicpic
+stuff.
+
+---------
+
+Subject: Re: photo-cd patch for xv 
+From: Matthew Francey <mdf@angoss.com>
+Date: Mon, 26 Mar 2001 15:37:55 +0000
+
+Attached is a revised version of xvpcd.c;  the areas that I have
+re-written or changed are in a different coding style so you can tell
+what has changed.  The GNU 'indent' program can be run against the file
+to enforce a consistent style ..
+
+Here is what I've done though:
+
+a) huffman table reader re-written, because it would fail on some
+   photocd files with "unusual" huffman codes.
+
+b) the huffman-coded corrections are now properly applied
+
+c) the corrections can sometimes over or underflow;  clipping has been
+   introduced and effectively fixes the problem, but I suspect that
+   there is something deeper going on.
+
+d) the "official" YCC->sRGB transform is done.  a "beyond 100% white"
+   mapping table was snarfed from ImageMagick.  an option for using a
+   flat linear LUT was added -- this can make somewhat over-exposed images
+   look alot nicer.
+
+e) there were strange problems where the code wouldn't be able to find
+   the huffman tables and data for the 16base image (the bit-buffering
+   code was starting mid-sector, instead of at a sector boundary).  Looking
+   at a pcd file with a hex editor suggests to me that it is possible to
+   just skip directly to these huffman tables -- no special "+12" and such
+   constants necessary.  But I haven't tried this yet.
+
+The results:  I've been able to read about 50 or 60 .pcd files [scattered
+in age from 6 years old to scans done last week] with this code without
+incident.  Image quality at the high resolution is excellent.  Even the
+trivial amount of LUT control is useful when dealing with over-exposed
+images.
+
+If I get around to it:  finer LUT control to take advantage of the
+slightly extended dynamic range of PhotoCD scans, especially in regards to
+dark or somewhat underexposed scenes.
+
+
+
+

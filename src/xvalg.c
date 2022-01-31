@@ -38,7 +38,7 @@ static void doRotate       PARM((byte *,int,int,byte *, int,int,int,int,
 				 double, int));
 static void doPixel        PARM((byte *,int,int,byte *, int,int,int,int,
 				 int, int));
-static void doSpread       PARM((byte *,int,int,byte *, int,int,int,int, 
+static void doSpread       PARM((byte *,int,int,byte *, int,int,int,int,
 				 int, int));
 static void doMedianFilter PARM((byte *,int,int,byte *, int,int,int,int, int));
 
@@ -53,7 +53,7 @@ static void intsort        PARM((int *, int));
 static int  start24bitAlg  PARM((byte **, byte **));
 static void end24bitAlg    PARM((byte *, byte *));
 
-static void printUTime     PARM((char *));
+static void printUTime     PARM((const char *));
 
 static byte *origPic = (byte *) NULL;
 static int  origPicType;
@@ -70,10 +70,11 @@ static byte origrmap[256], origgmap[256], origbmap[256];
 
 /***************************/
 static void printUTime(str)
-     char *str;
+     const char *str;
 {
 #ifdef TIMING_TEST
-  int i;  struct rusage ru;
+  int i;
+  struct rusage ru;
 
   i = getrusage(RUSAGE_SELF, &ru);
   fprintf(stderr,"%s: utime = %d.%d seconds\n",
@@ -89,7 +90,7 @@ static void printUTime(str)
 /************************************************************/
 void AlgInit()
 {
-  /* called whenver an image file is loaded.  disposes of origPic 
+  /* called whenver an image file is loaded.  disposes of origPic
      if neccessary, and points it to null */
 
   if (origPic) free(origPic);
@@ -160,16 +161,16 @@ static void Blur()
 {
   /* runs a n*n convolution mask (all 1's) over 'pic',
      producing a 24-bit version.  Then calls 24to8 to generate a new 8-bit
-     image, and installs it. 
+     image, and installs it.
 
      Note that 'n' must be odd for things to work properly */
 
-  byte        *pic24, *tmpPic;
-  int          i, sx,sy,sw,sh, n;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '3', '\0' };
-  
+  byte              *pic24, *tmpPic;
+  int                i, sx,sy,sw,sh, n;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '3', '\0' };
+
   sprintf(txt, "Blur:                                   \n\n%s",
 	  "Enter mask size (ex. 3, 5, 7, ...)");
 
@@ -178,7 +179,7 @@ static void Blur()
   n = atoi(buf);
 
   if (n < 1 || (n&1)!=1) {
-    ErrPopUp("Error:  The value entered must be odd and greater than zero.", 
+    ErrPopUp("Error:  The value entered must be odd and greater than zero.",
 	     "\nOh!");
     return;
   }
@@ -194,7 +195,7 @@ static void Blur()
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
-    
+
   doBlurConvolv(pic24, pWIDE,pHIGH, tmpPic, sx,sy,sw,sh, n);
 
   end24bitAlg(pic24, tmpPic);
@@ -207,12 +208,12 @@ static void Sharpen()
 {
   /* runs an edge-enhancment algorithm */
 
-  byte        *pic24, *tmpPic;
-  int          i, sx,sy,sw,sh, n;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '7', '5', '\0' };
-  
+  byte              *pic24, *tmpPic;
+  int                i, sx,sy,sw,sh, n;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '7', '5', '\0' };
+
   sprintf(txt, "Sharpen:                                   \n\n%s",
 	  "Enter enhancement factor (0-99%)");
 
@@ -236,7 +237,7 @@ static void Sharpen()
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
-    
+
   doSharpConvolv(pic24, pWIDE,pHIGH, tmpPic, sx,sy,sw,sh, n);
 
   end24bitAlg(pic24, tmpPic);
@@ -248,7 +249,7 @@ static void Sharpen()
 static void EdgeDetect()
 {
   byte *pic24, *p24, *tmpPic, *tlp;
-  char *str;
+  const char *str;
   int  i, j, v, maxv, sx,sy,sw,sh;
 
   WaitCursor();
@@ -264,7 +265,7 @@ static void EdgeDetect()
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
 
   doEdgeConvolv(pic24, pWIDE, pHIGH, tmpPic, sx,sy,sw,sh);
-  
+
   SetISTR(ISTR_INFO, "%snormalizing...", str);
 
   /* Normalize results */
@@ -292,19 +293,19 @@ static void EdgeDetect()
 /************************/
 static void TinFoil()
 {
-  byte *pic24, *p24, *tmpPic, *tp, *tlp;
-  char *str;
-  int  i, j, v, maxv,sx,sy,sw,sh;
-  
+  byte *pic24, *tmpPic, *tp, *tlp;
+  const char *str;
+  int  i, j, v, sx,sy,sw,sh;
+
   WaitCursor();
-  
+
   str = "Doing cheesy embossing effect...";
   SetISTR(ISTR_INFO, str);
-  
+
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   if (start24bitAlg(&pic24, &tmpPic)) return;
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
 
@@ -315,9 +316,9 @@ static void TinFoil()
       *tp++ = 128;  *tp++ = 128;  *tp++ = 128;
     }
   }
-  
+
   doAngleConvolv(pic24, pWIDE, pHIGH, tmpPic, sx,sy,sw,sh);
-  
+
   /* mono-ify selected area of tmpPic */
   for (i=sy; i<sy+sh; i++) {
     tp = tlp = tmpPic + (i*pWIDE + sx) * 3;
@@ -327,9 +328,9 @@ static void TinFoil()
       tp[0] = tp[1] = tp[2] = (byte) v;
     }
   }
-    
+
   end24bitAlg(pic24, tmpPic);
-}  
+}
 
 
 /************************/
@@ -345,7 +346,7 @@ static void OilPaint()
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   if (start24bitAlg(&pic24, &tmpPic)) return;
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
 
@@ -365,7 +366,7 @@ static void Blend()
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   WaitCursor();
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
@@ -381,12 +382,12 @@ static void Blend()
 static void FineRotate(clr)
      int clr;
 {
-  byte        *pic24, *tmpPic;
-  int          i,sx,sy,sw,sh;
-  double       rotval;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '\0' };
+  byte              *pic24, *tmpPic;
+  int                i,sx,sy,sw,sh;
+  double             rotval;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '\0' };
 
   sprintf(txt, "Rotate (%s):\n\nEnter rotation angle, in degrees:  (>0 = CCW)",
 	  (clr ? "Clear" : "Copy"));
@@ -396,12 +397,12 @@ static void FineRotate(clr)
   rotval = atof(buf);
 
   if (rotval == 0.0) return;
-  
+
 
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   WaitCursor();
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
@@ -416,11 +417,11 @@ static void FineRotate(clr)
 /************************/
 static void Pixelize()
 {
-  byte        *pic24, *tmpPic;
-  int          i,sx,sy,sw,sh, pixX,pixY,err;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '4', '\0' };
+  byte              *pic24, *tmpPic;
+  int                i,sx,sy,sw,sh, pixX,pixY,err;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '4', '\0' };
 
   sprintf(txt, "Pixelize:\n\nEnter new pixel size, in image pixels:  %s",
 	  "(ex. '3', '5x8')");
@@ -443,11 +444,11 @@ static void Pixelize()
     return;
   }
 
-  
+
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   WaitCursor();
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
@@ -463,11 +464,11 @@ static void Pixelize()
 /************************/
 static void Spread()
 {
-  byte        *pic24, *tmpPic;
-  int          i,sx,sy,sw,sh, pixX,pixY,err;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '5', '\0' };
+  byte              *pic24, *tmpPic;
+  int                i,sx,sy,sw,sh, pixX,pixY,err;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '5', '\0' };
 
   sprintf(txt, "Spread:\n\nEnter spread factor (or x,y factors):  %s",
 	  "(ex. '10', '1x5')");
@@ -493,11 +494,11 @@ static void Spread()
     return;
   }
 
-  
+
   if (HaveSelection()) GetSelRCoords(&sx,&sy,&sw,&sh);
   else { sx = 0;  sy = 0;  sw = pWIDE;  sh = pHIGH; }
   CropRect2Rect(&sx,&sy,&sw,&sh, 0,0,pWIDE,pHIGH);
-  
+
   WaitCursor();
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
@@ -516,12 +517,12 @@ static void MedianFilter()
   /* runs median filter algorithm (for n*n rect centered around each pixel,
      replace with median value */
 
-  byte        *pic24, *tmpPic;
-  int          i, sx,sy,sw,sh, n;
-  static char *labels[] = { "\nOk", "\033Cancel" };
-  char         txt[256];
-  static char  buf[64] = { '3', '\0' };
-  
+  byte              *pic24, *tmpPic;
+  int                i, sx,sy,sw,sh, n;
+  static const char *labels[] = { "\nOk", "\033Cancel" };
+  char               txt[256];
+  static char        buf[64] = { '3', '\0' };
+
   sprintf(txt, "DeSpeckle (median filter):                          \n\n%s",
 	  "Enter mask size (ex. 3, 5, 7, ...)");
 
@@ -530,7 +531,7 @@ static void MedianFilter()
   n = atoi(buf);
 
   if (n < 1 || (n&1)!=1) {
-    ErrPopUp("Error:  The value entered must be odd and greater than zero.", 
+    ErrPopUp("Error:  The value entered must be odd and greater than zero.",
 	     "\nOh!");
     return;
   }
@@ -546,7 +547,7 @@ static void MedianFilter()
 
   if (start24bitAlg(&pic24, &tmpPic)) return;
   xvbcopy((char *) pic24, (char *) tmpPic, (size_t) (pWIDE*pHIGH*3));
-    
+
   doMedianFilter(pic24, pWIDE,pHIGH, tmpPic, sx,sy,sw,sh, n);
 
   end24bitAlg(pic24, tmpPic);
@@ -560,7 +561,7 @@ static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
      int   w,h, selx,sely,selw,selh, n;
 {
 
-  /* convolves with an n*n array, consisting of only 1's.  
+  /* convolves with an n*n array, consisting of only 1's.
      Operates on rectangular region 'selx,sely,selw,selh' (in pic coords)
      Region is guaranteed to be completely within pic boundaries
      'n' must be odd */
@@ -568,7 +569,7 @@ static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
   register byte *p24;
   register int   rsum,gsum,bsum;
   byte          *rp;
-  int            i,j,k,x,y,x1,y1,count,n2;
+  int            x,y,x1,y1,count,n2;
 
 
   printUTime("start of blurConvolv");
@@ -589,7 +590,7 @@ static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
       for (y1=y-n2; y1<=y+n2; y1++) {
 
 	if (y1>=sely && y1<sely+selh) {
-	  p24 = pic24 + y1*w*3 +(x-n2)*3; 
+	  p24 = pic24 + y1*w*3 +(x-n2)*3;
 
 	  for (x1=x-n2; x1<=x+n2; x1++) {
 	    if (x1>=selx && x1<selx+selw) {
@@ -631,7 +632,7 @@ static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
   byte  *p24;
   int    rv, gv, bv;
   byte  *rp;
-  int    i,j,k,x,y,x1,y1;
+  int    i,x,y;
   double fact, ifact, hue,sat,val, vsum;
   double *linem1, *line0, *linep1, *tmpptr;
 
@@ -673,7 +674,7 @@ static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
   for (y=sely+1; y<(sely+selh)-1; y++) {
     ProgressMeter(sely+1, (sely+selh)-2, y, "Sharpen");
     if ((y & 15) == 0) WaitCursor();
-    
+
     tmpptr = linem1;   linem1 = line0;   line0 = linep1;   linep1 = tmpptr;
 
     /* get next line */
@@ -691,7 +692,7 @@ static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
       vsum = linem1[i-1] + linem1[i] + linem1[i+1] +
 	     line0 [i-1] + line0 [i] + line0 [i+1] +
 	     linep1[i-1] + linep1[i] + linep1[i+1];
-      
+
       rgb2hsv((int) p24[0], (int) p24[1], (int) p24[2], &hue, &sat, &val);
 
       val = ((val - (fact * vsum) / 9) / ifact);
@@ -723,22 +724,22 @@ static void doEdgeConvolv(pic24, w, h, results, selx,sely,selw,selh)
 {
 
   /* convolves with two edge detection masks (vertical and horizontal)
-     simultaneously, taking Max(abs(results)) 
-     
+     simultaneously, taking Max(abs(results))
+
      The two masks are (hard coded):
 
           -1 0 1             -1 -1 -1
       H = -1 0 1     and V =  0  0  0
           -1 0 1              1  1  1
 
-     divided into 
+     divided into
            -1 0 0         0 0 0         0 0 1        0  1 0
        a =  0 0 0 ,  b = -1 0 1 ,  c =  0 0 0 ,  d = 0  0 0 .
             0 0 1         0 0 0        -1 0 0        0 -1 0
 
      So H = a + b + c,  V = a - c - d.
      gradient = max(abs(H),abs(V)).
-          
+
      Also, only does pixels in which the masks fit fully onto the picture
      (no pesky boundary conditionals)  */
 
@@ -746,7 +747,7 @@ static void doEdgeConvolv(pic24, w, h, results, selx,sely,selw,selh)
   register byte *p24;
   register int   bperlin, a, b, c, d, rsum, gsum, bsum;
   byte          *rp;
-  int            i, x, y;
+  int            x, y;
 
 
   printUTime("start of edgeConvolv");
@@ -818,13 +819,13 @@ static void doAngleConvolv(pic24, w, h, results, selx,sely,selw,selh)
 {
 
   /* convolves with edge detection mask, at 45 degrees to horizontal.
-     
+
      The mask is (hard coded):
 
              -2 -1 0
              -1  0 1
               0  1 2
-          
+
      Also, only does pixels in which the masks fit fully onto the picture
      (no pesky boundary conditionals)
 
@@ -833,7 +834,7 @@ static void doAngleConvolv(pic24, w, h, results, selx,sely,selw,selh)
   register byte *p24;
   register int   bperlin,rsum,gsum,bsum;
   byte          *rp;
-  int            i, x,y;
+  int            x,y;
 
 
   printUTime("start of doAngleConvolv");
@@ -912,14 +913,14 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
      for each pixel in the image (assume, for a second, a grayscale image),
      compute a histogram of the n*n rectangle centered on the pixel.
      replace the pixel with the color that had the greatest # of hits in
-     the histogram.  Note that 'n' should be odd. 
+     the histogram.  Note that 'n' should be odd.
 
      I've modified the algorithm to do the *right* thing for RGB images.
      (jhb, 6/94)  */
 
 
   register byte *pp;
-  register int   bperlin, rsum,gsum,bsum;
+  register int   bperlin;
   byte          *rp, *p24, *plin;
   int            i,j,k,x,y,n2,col,cnt,maxcnt;
   int           *nnrect;
@@ -933,7 +934,7 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
 
   /* nnrect[] is an n*n array of ints, with '-1' meaning 'outside the region'
      otherwise they'll have 24-bit RGB values */
-  
+
   nnrect = (int *) malloc(n * n * sizeof(int));
   if (!nnrect) FatalError("can't malloc nnrect[] in doOilPaint()\n");
 
@@ -943,13 +944,13 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
 
     p24 = pic24 + ((y-n2)*w + selx-n2)*3;   /* pts to top-left of mask */
     rp  = results + (y*w + selx)*3;
-    
+
     for (x=selx; x<selx+selw; x++) {
       /* fill 'nnrect' with valid pixels from n*n region centered round x,y */
       pp = plin = p24;
       for (i=y-n2, k=0; i<y+n2; i++) {
 	for (j=x-n2; j<x+n2; j++, k++, pp+=3) {
-	  if (i>=sely && i<sely+selh && j>=selx && j<selx+selw) { 
+	  if (i>=sely && i<sely+selh && j>=selx && j<selx+selw) {
 	    nnrect[k] = (((int) pp[0])<<16) | (((int) pp[1])<<8) | pp[2];
 	  }
 	  else nnrect[k] = -1;
@@ -957,7 +958,7 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
 	plin += bperlin;  pp = plin;
       }
 
-      
+
       /* find 'most popular color' in nnrect, not counting '-1' */
       maxcnt = cnt = col = 0;
       for (i=0; i<n*n; i++) {
@@ -1021,7 +1022,7 @@ static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
     p24 = pic24 + (y*w + selx) * 3;
     rf += (double) p24[0];  gf += (double) p24[1];  bf += (double) p24[2];
     i++;
-    
+
     p24 = pic24 + (y*w + (selx+selw-1)) * 3;
     rf += (double) p24[0];  gf += (double) p24[1];  bf += (double) p24[2];
     i++;
@@ -1047,7 +1048,7 @@ static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
       if (dx==0 && dy==0) { ex = selx;  ey = sely; }  /* don't care */
       else if (dx==0) {	ex = cx;  ey = (dy<0) ? sely : sely+selh-1; }
       else if (dy==0) {	ey = cy;  ex = (dx<0) ? selx : selx+selw-1; }
-      else { 
+      else {
 	slope = ((double) dy) / dx;
 	if (fabs(slope) > fabs(dslope)) {   /* y axis is major */
 	  ey = (dy<0) ? sely : sely+selh-1;
@@ -1092,7 +1093,7 @@ static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
   printUTime("end of blend");
 }
 
-  
+
 
 /************************/
 static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
@@ -1104,7 +1105,7 @@ static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
      by the amount specified in degrees (rotval), and stores the result in
      'results', which is also a w*h 24-bit image.  The rotated bits are
      clipped to fit in 'results'.  If 'clear', the (unrotated) rectangular
-     region is cleared (in results) first.  
+     region is cleared (in results) first.
      sel[x,y,w,h] is guaranteed to be within image bounds */
 
   byte  *pp, *dp;
@@ -1118,7 +1119,7 @@ static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
   printUTime("start of rotate");
 
   /*
-   * cfx,cfy  -  center point of sel rectangle (double) 
+   * cfx,cfy  -  center point of sel rectangle (double)
    * rx1,ry1  -  top-left  of sel, rotated
    * rx2,ry2  -  bot-left  of sel, rotated
    * rx3,ry3  -  top-right of sel, rotated
@@ -1174,7 +1175,7 @@ static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
   /* now, for each pixel in rb[x,y,w,h], do the inverse rotation to see if
      it would be in the original unrotated selection rectangle.  if it *is*,
      compute and store an appropriate color, otherwise skip it */
- 
+
   for (y=rby; y<rby+rbh; y++) {
     dp = results + (y * w + rbx) * 3;
 
@@ -1194,7 +1195,7 @@ static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
 	int    p0r,p0g,p0b, p1r,p1g,p1b, p2r,p2g,p2b, p3r,p3g,p3b;
 	int    rv,gv,bv;
 	double rd,gd,bd, p0wgt, p1wgt, p2wgt, p3wgt;
-	
+
 	/* compute the color, same idea as in Smooth**().  The color
 	   will be a linear combination of the colors of the center pixel,
 	   its left-or-right neighbor, its top-or-bottom neighbor, and
@@ -1265,9 +1266,9 @@ if (0)	{
 }
 #endif /* ROTATE_FOO */
 
-	dp[0] = (byte) (rv&0xff);  
-	dp[1] = (byte) (gv&0xff);  
-	dp[2] = (byte) (bv&0xff);  
+	dp[0] = (byte) (rv&0xff);
+	dp[1] = (byte) (gv&0xff);
+	dp[2] = (byte) (bv&0xff);
       }
     }
   }
@@ -1311,11 +1312,11 @@ static void rotXfer(x,y, rx,ry, cx,cy, rad)
 #ifdef FOO
   fprintf(stderr,"rotXfer:  rotating (%4d,%4d) %7.2f degrees around",
 	  x,y, rad*180.0 / M_PI);
-  fprintf(stderr,"(%4d,%4d) -> %7.2f %7.2f  (d=%f ang=%f)\n", 
+  fprintf(stderr,"(%4d,%4d) -> %7.2f %7.2f  (d=%f ang=%f)\n",
 	  cx,cy, *rx,*ry, d, ang);
 #endif
 }
-  
+
 
 
 /************************/
@@ -1323,29 +1324,29 @@ static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh, pixX,pixY;
 {
-  /* runs 'pixelization' algorithm.  replaces each pixX-by-pixY region 
+  /* runs 'pixelization' algorithm.  replaces each pixX-by-pixY region
      (smaller on edges) with the average color within that region */
-  
+
   byte  *pp;
   int    nwide, nhigh, i,j, x,y, x1,y1, stx,sty;
   int    nsum, rsum, gsum, bsum;
-  
+
   printUTime("start of pixelize");
-  
+
   /* center grid on selection */
   nwide = (selw + pixX-1) / pixX;
   nhigh = (selh + pixY-1) / pixY;
-  
+
   stx = selx - (nwide*pixX - selw)/2;
   sty = sely - (nhigh*pixY - selh)/2;
-  
+
   y = sty;
   for (i=0; i<nhigh; i++, y+=pixY) {
     ProgressMeter(0, nhigh-1, i, "Pixelize");
-    
+
     x = stx;
     for (j=0; j<nwide; j++, x+=pixX) {
-      
+
       /* COMPUTE AVERAGE COLOR FOR RECT:[x,y,pixX,pixY] */
       nsum = rsum = gsum = bsum = 0;
       for (y1=y; y1<y+pixY; y1++) {
@@ -1357,17 +1358,17 @@ static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 	  }
 	}
       }
-      
+
       if (nsum>0) {   /* just to be safe... */
 	rsum /= nsum;  gsum /= nsum;  bsum /= nsum;
 	RANGE(rsum,0,255);  RANGE(gsum,0,255);  RANGE(bsum,0,255);
       }
-      
-      
+
+
       /* STORE color in rect:[x,y,pixX,pixY] */
       for (y1=y; y1<y+pixY; y1++) {
 	if (!j && (y1 & 255)==0) WaitCursor();
-	
+
 	pp = results + (y1 * w + x) * 3;
 	for (x1=x; x1<x+pixX; x1++, pp+=3) {
 	  if (PTINRECT(x1,y1, selx,sely,selw,selh)) {
@@ -1381,7 +1382,7 @@ static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
   printUTime("end of pixelize");
 }
 
-  
+
 
 /************************/
 static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
@@ -1393,17 +1394,17 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
      by pixX,pixY.  If pixX<0, it is treated as a single 'distance' value
      (after being abs()'d). */
 
-  /* assumes that initially 'results' is a copy of pic24.  Doesn't 
+  /* assumes that initially 'results' is a copy of pic24.  Doesn't
      even look at pic24 */
-  
+
   byte  *pp, *dp, r,g,b;
-  int    x,y, dx,dy, x1,y1, d, xrng, xoff, yrng, yoff, i,j;
+  int    x,y, x1,y1, d;
   int    minx, maxx, miny, maxy, rdist;
   time_t nowT;
 
   time(&nowT);
   srandom((unsigned int) nowT);
-  
+
   printUTime("start of spread");
 
   for (y=sely; y<sely+selh; y++) {
@@ -1453,7 +1454,7 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
   printUTime("end of spread");
 }
 
-  
+
 
 /************************/
 static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
@@ -1468,7 +1469,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
   register byte *p24;
   register int   rsum,gsum,bsum;
   byte          *rp;
-  int            i,j,k,x,y,x1,y1,count,n2,nsq,c2;
+  int            x,y,x1,y1,count,n2,nsq,c2;
   int           *rtab, *gtab, *btab;
 
   printUTime("start of doMedianFilter");
@@ -1494,7 +1495,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
       for (y1=y-n2; y1<=y+n2; y1++) {
 
 	if (y1>=sely && y1<sely+selh) {
-	  p24 = pic24 + y1*w*3 +(x-n2)*3; 
+	  p24 = pic24 + y1*w*3 +(x-n2)*3;
 
 	  for (x1=x-n2; x1<=x+n2; x1++) {
 	    if (x1>=selx && x1<selx+selw) {
@@ -1509,12 +1510,12 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
       }
 
 
-      /* now sort the rtab,gtab,btab arrays, (using shell sort) 
-	 and pick the middle value.  doing it in-line, rather than 
+      /* now sort the rtab,gtab,btab arrays, (using shell sort)
+	 and pick the middle value.  doing it in-line, rather than
 	 as a function call (ie, 'qsort()') , for speed */
-      {  
+      {
 	int i,j,t,d;
-	
+
 	for (d=count/2;  d>0;  d=d/2) {
 	  for (i=d; i<count; i++) {
 	    for (j=i-d;  j>=0 && rtab[j]>rtab[j+d];  j-=d) {
@@ -1531,14 +1532,14 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
 	  }
 	}
       }
-      
+
       c2 = count/2;
       *rp++ = (byte) ( (count&1) ? rtab[c2] : (rtab[c2] + rtab[c2-1])/2);
       *rp++ = (byte) ( (count&1) ? gtab[c2] : (gtab[c2] + gtab[c2-1])/2);
       *rp++ = (byte) ( (count&1) ? btab[c2] : (btab[c2] + btab[c2-1])/2);
     }
   }
-  
+
   free(rtab);  free(gtab);  free(btab);
   printUTime("end of doMedianFilter");
 }
@@ -1549,7 +1550,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
 static void intsort(a, n)
      int *a, n;
 {
-  /* uses the shell-sort algorithm.  for the relatively small data sets 
+  /* uses the shell-sort algorithm.  for the relatively small data sets
      we'll be using, should be quicker than qsort() because of all the
      function calling overhead associated with qsort(). */
 
@@ -1571,7 +1572,7 @@ static int start24bitAlg(pic24, tmpPic)
      byte **pic24, **tmpPic;
 {
   /* generates a 24-bit version of 'pic', if neccessary, and also mallocs
-   * a pWIDE*pHIGH*3 24-bit output pic.  
+   * a pWIDE*pHIGH*3 24-bit output pic.
    *
    * Returns '1' if there's some sort of screwup, '0' if cool
    */
@@ -1588,7 +1589,7 @@ static int start24bitAlg(pic24, tmpPic)
   *tmpPic = (byte *) calloc((size_t) (pWIDE * pHIGH * 3), (size_t) 1);
   if (!(*tmpPic)) {
     SetCursors(-1);
-    ErrPopUp("Unable to malloc() tmp 24-bit image in start24bitAlg()", 
+    ErrPopUp("Unable to malloc() tmp 24-bit image in start24bitAlg()",
 	     "\nTough!");
     if (picType == PIC8) free(*pic24);
     return 1;
@@ -1609,16 +1610,16 @@ static void end24bitAlg(pic24, outPic)
   saveOrigPic();  /* also kills pic/cpic/epic/egampic/theImage, NOT pic24 */
 
   /* copy results to pic24 */
-  xvbcopy((char *) outPic, (char *) pic24, (size_t) (pWIDE*pHIGH*3)); 
+  xvbcopy((char *) outPic, (char *) pic24, (size_t) (pWIDE*pHIGH*3));
   free(outPic);
 
   if (picType == PIC8) {
     pic = Conv24to8(pic24, pWIDE, pHIGH, ncols, rMap,gMap,bMap);
     free(pic24);
-    if (!pic) { 
+    if (!pic) {
       SetCursors(-1);
       ErrPopUp("Some sort of failure occured in 24to8 conversion\n","\nDamn!");
-      NoAlg(); 
+      NoAlg();
       return;
     }
   }
@@ -1632,7 +1633,7 @@ static void end24bitAlg(pic24, outPic)
 static void saveOrigPic()
 {
   /* saves original picture into origPic, if it hasn't already been done.
-     This allows us to undo algorithms...  
+     This allows us to undo algorithms...
 
      Also, frees all pics, (except 'pic', if we're in PIC24 mode) */
 
@@ -1649,7 +1650,7 @@ static void saveOrigPic()
     /* make a backup copy of 'pic' */
     origPic = (byte *) malloc((size_t)(pWIDE*pHIGH*((picType==PIC8) ? 1 : 3)));
     if (!origPic) FatalError("out of memory in 'saveOrigPic()'");
-    xvbcopy((char *) pic, (char *) origPic, 
+    xvbcopy((char *) pic, (char *) origPic,
 	    (size_t) (pWIDE * pHIGH * ((picType==PIC8) ? 1 : 3)));
 
     origPicType = picType;

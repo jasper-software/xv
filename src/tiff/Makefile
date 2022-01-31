@@ -30,13 +30,15 @@ MAKE= make -${MAKEFLAGS}
 # OF THIS SOFTWARE.
 #
 
-AR=     ar
-RANLIB=	./RANLIB.csh
+AR=	ar
+CHMOD=	chmod
+#RANLIB=	./RANLIB.csh
+RANLIB=	./RANLIB.sh
 
 IPATH= -I.
 
 COPTS=	-O
-CFLAGS=	${COPTS} ${IPATH}
+CFLAGS=	${COPTS} ${IPATH} -D_BSD_SOURCE
 
 INCS=	tiff.h tiffio.h
 
@@ -60,6 +62,7 @@ all:	 ${ALL}
 
 ${ALL}:	${OBJS}
 	${AR} rc libtiff.a $?
+	${CHMOD} +x ${RANLIB}
 	${RANLIB} libtiff.a
 
 ${OBJS}:	tiffio.h tiff.h tiffcomp.h tiffiop.h tiffconf.h

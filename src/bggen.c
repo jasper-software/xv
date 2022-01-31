@@ -18,6 +18,11 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifdef __STDC__
+#  include <stdlib.h>	/* atoi() */
+#  include <ctype.h>	/* isdigit() */
+#endif
+
 #ifndef M_PI
 #  define M_PI       3.1415926535897932385
 #endif
@@ -29,7 +34,7 @@
 #define MAXCOLS  128
 
 /* some VMS thing... */
-#ifdef vax11c
+#if defined(vax11c) || (defined(__sony_news) && (defined(bsd43) || defined(__bsd43) || defined(SYSTYPE_BSD) || defined(__SYSTYPE_BSD)))
 #include <ctype.h>
 #endif
 
@@ -46,8 +51,8 @@
 
 typedef unsigned char byte;
 
-struct   color { int   r,g,b; 
-		 int   y; 
+struct   color { int   r,g,b;
+		 int   y;
 	       } colors[MAXCOLS], *cur, *nex;
 
 int      numcols;
@@ -62,7 +67,7 @@ void   dorot       PARM((byte *, int, int, int));
 double computeDist PARM((int, int, int, int, int));
 void   writePPM    PARM((byte *, int, int, int));
 
-     
+
 /*************************************/
 int main(argc,argv)
      int    argc;
@@ -80,18 +85,18 @@ int main(argc,argv)
   char *geom    = NULL;
   char *rptgeom = NULL;
 
-  
+
 #ifdef VMS
   getredirection(&argc, &argv);
 #endif
-  
+
 
   for (i=1; i<argc; i++) {
     if (!strncmp(argv[i],"-d",(size_t) 2)) {         /* -d disp */
       i++;  if (i<argc) dname = argv[i];
     }
   }
-    
+
   if ((theDisp = XOpenDisplay(dname)) == NULL) {
     fprintf(stderr,"bggen:  Warning - can't open display, screen %s",
 	    "size unknown, color names not accepted.\n");
@@ -99,41 +104,41 @@ int main(argc,argv)
 
 
   cnt = 0;  numcols = 0;
-  
+
   /* parse cmd-line args */
   for (i=1; i<argc; i++) {
     if (!strcmp(argv[i],"-h")) {                          /* -h high */
       i++;  if (i<argc) high = atoi(argv[i]);
       hset++;
     }
-    
+
     else if (!strcmp(argv[i],"-w")) {                     /* -w wide */
       i++;  if (i<argc) wide = atoi(argv[i]);
       wset++;
     }
-    
+
     else if (!strcmp(argv[i],"-b")) {                     /* -b bits */
       i++;  if (i<argc) bits = atoi(argv[i]);
     }
-    
+
     else if (!strncmp(argv[i],"-g",(size_t) 2)) {         /* -g geom */
       i++;  if (i<argc) geom = argv[i];
     }
-    
+
     else if (!strncmp(argv[i],"-d",(size_t) 2)) {         /* -d disp */
       i++;  if (i<argc) dname = argv[i];
     }
-    
+
     else if (!strcmp(argv[i],"-G")) {                      /* -G rptgeom */
       i++;  if (i<argc) rptgeom = argv[i];
     }
-    
+
     else if (!strncmp(argv[i],"-a",(size_t) 2)) doascii++;  /* -a */
-    
+
     else if (!strcmp(argv[i],"-r")) {                     /* -r rot */
       i++;  if (i<argc) rot = atoi(argv[i]);
     }
-    
+
     else if (argv[i][0]=='-') usage();    /* any other '-' option is unknown */
 
     else if (isdigit(argv[i][0])) {
@@ -143,7 +148,7 @@ int main(argc,argv)
       case 2:  colors[numcols].b = atoi(argv[i]);  break;
       }
       cnt++;
-      
+
       if (cnt==3) {
 	if (numcols<MAXCOLS) numcols++;
 	cnt = 0;
@@ -176,50 +181,50 @@ int main(argc,argv)
       }
     }
   }
-  
-  
-  
+
+
+
   /* print error/usage message, if appropriate */
   if (cnt || numcols==0 || high<1 || wide<1 || bits<1 || bits>8) usage();
-  
-  
+
+
   if (geom) {
     int x,y;  unsigned int w,h;
     i = XParseGeometry(geom, &x, &y, &w, &h);
     if (i&WidthValue)  { wset++;  wide = (int) w; }
     if (i&HeightValue) { hset++;  high = (int) h; }
   }
-  
-  
+
+
   /* attempt to connect to X server and get screen dimensions */
   if (theDisp) {
     i = DefaultScreen(theDisp);
     if (!wset) wide = DisplayWidth(theDisp, i);
     if (!hset) high = DisplayHeight(theDisp, i);
   }
-  
-  
+
+
   /* normalize 'rot' */
   while (rot<   0) rot += 360;
   while (rot>=360) rot -= 360;
-  
-  
+
+
   rptwide = wide;  rpthigh = high;
   if (rptgeom) {
     int x,y;  unsigned int w,h;
     i = XParseGeometry(rptgeom, &x, &y, &w, &h);
     if (i&WidthValue)  rptwide = (int) w;
     if (i&HeightValue) rpthigh = (int) h;
-    
+
     RANGE(rptwide, 1, wide);
     RANGE(rpthigh, 1, high);
   }
-  
-  
 
-  
+
+
+
   rpic24 = (byte *) malloc(rptwide * rpthigh * 3 * sizeof(byte));
-  if (rptwide != wide || rpthigh != high) 
+  if (rptwide != wide || rpthigh != high)
     pic24  = (byte *) malloc(wide * high * 3 * sizeof(byte));
   else pic24 = rpic24;
 
@@ -229,7 +234,7 @@ int main(argc,argv)
     exit(1);
   }
   for (i=0, pp=pic24; i<wide*high*3; i++) *pp++ = 0;
-  
+
 
 
   /*** generate image ***/
@@ -244,34 +249,34 @@ int main(argc,argv)
       }
     }
   }
-  
-  
+
+
   else if (rot==0) {   /* un-rotated linear (vertical) gradient */
     for (i=0; i<numcols; i++)
       colors[i].y = ((rpthigh-1) * i) / (numcols-1);
-    
+
     cur = &colors[0];  nex = cur+1;
-    
+
     for (i=0; i<rpthigh; i++) {
       pp = rpic24 + (i * rptwide * 3);
 
       /* advance to next pair of colors if we're outside region */
       while (nex->y < i) { cur++; nex++; }
-      
+
       r = cur->r + ((nex->r - cur->r) * (i - cur->y)) / (nex->y - cur->y);
       g = cur->g + ((nex->g - cur->g) * (i - cur->y)) / (nex->y - cur->y);
       b = cur->b + ((nex->b - cur->b) * (i - cur->y)) / (nex->y - cur->y);
-      
+
       r = r & bmask[bits-1];
       g = g & bmask[bits-1];
       b = b & bmask[bits-1];
-      
+
       for (j=0; j<rptwide; j++) {
 	*pp++ = (byte) r;  *pp++ = (byte) g;  *pp++ = (byte) b;
       }
     }
   }
-  
+
   else dorot(rpic24, rptwide, rpthigh, rot);
 
 
@@ -293,7 +298,7 @@ int main(argc,argv)
 	y = ((i-ay) % rpthigh);
 
 	sp = rpic24 + (y * rptwide + x) * 3;
-	
+
 	pp[0] = *sp++;  pp[1] = *sp++;  pp[2] = *sp++;
       }
     }
@@ -355,12 +360,12 @@ void dorot(pic, w, h, rot)
     mind = computeDist(w-1,  0,    cx, cy, rot);
     maxd = computeDist(0,    h-1,  cx, cy, rot);
   }
-  
+
   del = maxd - mind;         /* maximum distance */
-  
+
   distdebug = 0;
-  
-  
+
+
   for (y=0; y<h; y++) {
     pp = pic + (y * w * 3);
     for (x=0; x<w; x++) {
@@ -368,11 +373,11 @@ void dorot(pic, w, h, rot)
       rat = (d - mind) / del;
       if (rat<0.0) rat = 0.0;
       if (rat>1.0) rat = 1.0;
-      
+
       cval = rat * nc1;
       bc   = floor(cval);
       crat = cval - bc;
-      
+
       if (bc < nc1) {
 	r = colors[bc].r + crat * (colors[bc+1].r - colors[bc].r);
 	g = colors[bc].g + crat * (colors[bc+1].g - colors[bc].g);
@@ -383,7 +388,7 @@ void dorot(pic, w, h, rot)
 	g = colors[nc1].g;
 	b = colors[nc1].b;
       }
-      
+
       *pp++ = (byte) r;  *pp++ = (byte) g;  *pp++ = (byte) b;
     }
   }
@@ -395,9 +400,9 @@ double computeDist(x, y, cx, cy, rot)
      int x,y,cx,cy,rot;
 {
   /* rot has to be in range 0-359 */
-  
-  double x1, y1, x2, y2, x3, y3, d, d1, b, theta;
-  
+
+  double x1, y1, x2, y2, x3, y3, d, d1, b;
+
   if (rot == 0)   return (double) (y - cy);
   if (rot == 180) return (double) (cy - y);
 
@@ -407,7 +412,7 @@ double computeDist(x, y, cx, cy, rot)
   /* x2,y2 = vertical projection onto a || line that runs through cx,cy */
   x2 = x1;
   y2 = cy - (cx-x2)*tant1;
-  
+
   d1 = y2 - y1;  /* vertical distance between lines */
   b  = d1 * cost1;
 
@@ -435,11 +440,11 @@ void writePPM(pic, w, h, doascii)
      int   w,h,doascii;
 {
   /* dumps a pic24 in PPM format to stdout */
-  
+
   int x,y;
-  
+
   printf("P%s %d %d 255\n", (doascii) ? "3" : "6", w, h);
-  
+
   for (y=0; y<h; y++) {
     if (doascii) {
       for (x=0; x<w; x++, pic+=3)
