@@ -53,7 +53,7 @@
 #  define TV_J_NBUTTS 8
 #endif
 
-#define TITLELEN 128
+#define TITLELEN (NAME_MAX+sizeof("File: ''")+1)
 
 #ifdef TV_MULTILINGUAL
 struct coding_spec {

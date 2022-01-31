@@ -64,7 +64,7 @@ static const char *maingeom = NULL;
 static const char *icongeom = NULL;
 static Atom   __SWM_VROOT = None;
 
-static char   basefname[128];   /* just the current fname, no path */
+static char   basefname[NAME_MAX+1];   /* just the current fname, no path */
 
 #ifdef TV_L10N
 #  ifndef TV_FONTSET
@@ -2169,11 +2169,13 @@ static int openPic(filenum)
        basefname(compute from fullfname) */
 
     i = LoadPad(&pinfo, fullfname);
+    if (!i) goto FAILED;   /* shouldn't happen */
+
     fullname = fullfname;
     strcpy(filename, fullfname);
+    if (strlen(BaseName(fullfname)) > NAME_MAX) goto FAILED;
     strcpy(basefname, BaseName(fullfname));
 
-    if (!i) goto FAILED;   /* shouldn't happen */
 
     if (killpage) {      /* kill old page files, if any */
       KillPageFiles(pageBaseName, numPages);
@@ -2238,6 +2240,7 @@ static int openPic(filenum)
 #endif
 
   strcpy(fullfname, fullname);
+  if (strlen(BaseName(fullfname)) > NAME_MAX) goto FAILED;
   strcpy(basefname, BaseName(fullname));
 
 
@@ -4000,7 +4003,7 @@ static void createMainWindow(geom, name)
 static void setWinIconNames(name)
      const char *name;
 {
-  char winname[256], iconname[256];
+  char winname[NAME_MAX+sizeof("xv : ")+sizeof(VERSTR)+sizeof(" <unregistered>")+1], iconname[NAME_MAX+1];
 
   if (winTitle) {
     strcpy(winname, winTitle);
