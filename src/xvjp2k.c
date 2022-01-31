@@ -108,7 +108,8 @@ static int print_log(jas_logtype_t type, const char *format, va_list ap) {
 		if (get_debug_level() >= 1) {
 			jas_eprintf("%s", buffer);
 		} else {
-			for (int i = 0; i < count; ++i) {
+			int i;
+			for (i = 0; i < count; ++i) {
 				if (buffer[i] == '\n') {
 					buffer[i] = ' ';
 				}
@@ -343,9 +344,10 @@ static int LoadJP2K(char *fname, register PICINFO *pinfo, int quick,
 		int num_comps = vstride;
 		int width = w;
 		int height = h;
+		int comp_ind;
 		data = jas_matrix_create(height, width);
 		assert(data);
-		for (int comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
+		for (comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
 			if (jas_image_readcmpt(img, comp_ind, 0, 0, width, height, data)) {
 				ret = 0;
 				goto done;
@@ -353,10 +355,11 @@ static int LoadJP2K(char *fname, register PICINFO *pinfo, int quick,
 			unsigned char *buffer;
 			jas_seqent_t *src;
 			unsigned char *dst;
+			int xx, yy;
 			dst = pinfo->pic + comp_ind;
-			for (int yy = 0; yy < height; ++yy) {
+			for (yy = 0; yy < height; ++yy) {
 				src = jas_matrix_getvref(data, yy);
-				for (int xx = 0; xx < width; ++xx) {
+				for (xx = 0; xx < width; ++xx) {
 					*dst = *src;
 					++src;
 					dst += num_comps;
@@ -714,12 +717,13 @@ static void StoreJP2K(char *options) {
 	fp2 = 0;
 
 	int num_comps = (colorType == F_GREYSCALE) ? 1 : 3;
+	int comp_ind;
 	if (num_comps == 3) {
 		color_space = JAS_CLRSPC_SRGB;
 	} else {
 		color_space = JAS_CLRSPC_SGRAY;
 	}
-	for (int comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
+	for (comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
 		parm[comp_ind].tlx = 0;
 		parm[comp_ind].tly = 0;
 		parm[comp_ind].hstep = 1;
@@ -739,11 +743,12 @@ static void StoreJP2K(char *options) {
 	}
 
 	{
+		int comp_ind;
 		if (!(data = jas_matrix_create(h, w))) {
 			goto done;
 		}
 		if (num_comps == 3) {
-			for (int comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
+			for (comp_ind = 0; comp_ind < num_comps; ++comp_ind) {
 				int comp_type;
 				switch (comp_ind) {
 				case 0:
@@ -760,10 +765,11 @@ static void StoreJP2K(char *options) {
 				unsigned char *buffer;
 				unsigned char *src;
 				jas_seqent_t *dst;
+				int x, y;
 				src = pic + comp_ind;
-				for (int y = 0; y < h; ++y) {
+				for (y = 0; y < h; ++y) {
 					dst = jas_matrix_getvref(data, y);
-					for (int x = 0; x < w; ++x) {
+					for (x = 0; x < w; ++x) {
 						*dst = *src;
 						++dst;
 						src += num_comps;
@@ -780,10 +786,11 @@ static void StoreJP2K(char *options) {
 			unsigned char *buffer;
 			unsigned char *src;
 			jas_seqent_t *dst;
+			int x, y;
 			src = pic;
-			for (int y = 0; y < h; ++y) {
+			for (y = 0; y < h; ++y) {
 				dst = jas_matrix_getvref(data, y);
-				for (int x = 0; x < w; ++x) {
+				for (x = 0; x < w; ++x) {
 					int v;
 					if (mode == 0) {
 						v = *src;
