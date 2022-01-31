@@ -26,6 +26,11 @@ static int   vd_UncompressFile		PARM((char *, char *));
 static int   vd_tarc			PARM((char *));
 static u_int vd_tar_sumchk		PARM((char *));
 
+static XtSignalId IdHup = 0;
+static XtSignalId IdInt = 0;
+static int   UsedSignal = 0;
+extern XtAppContext context;
+
 #define VD_VDTABLESIZE	100
 
 #define VD_ERR -2
@@ -1041,7 +1046,15 @@ char *prog, *mode;
  * If XV end by C-c, there are dust of directory which name is .xvvd???,
  * made by xvvd. Then, I handle SIGINT, and add good finish.
  */
-void vd_HUPhandler()
+static void vd_HUPhandler(int sig)
+{
+    XtNoticeSignal(IdHup);
+#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
+    signal(SIGHUP, (void (*)PARM((int))) vd_HUPhandler);
+#endif
+}
+
+static void HUPhandler(XtPointer dummy, XtSignalId* Id)
 {
 #if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
     sighold(SIGHUP);
@@ -1054,19 +1067,23 @@ void vd_HUPhandler()
 
 #if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
     sigrelse(SIGHUP);
-    signal(SIGHUP, (void (*)PARM((int))) vd_HUPhandler);
 #else
     sigsetmask(mask);
 #endif
 }
 
-void vd_handler(sig)
-int sig;
+static void vd_handler(int sig)
+{
+    UsedSignal = sig;
+    XtNoticeSignal(IdInt);
+}
+
+static void INThandler(XtPointer dummy, XtSignalId* Id)
 {
 #if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sighold(sig);
+    sighold(UsedSignal);
 #else
-    sigblock(sigmask(sig));
+    sigblock(sigmask(UsedSignal));
 #endif
 
     Quit(1); /*exit(1);*/
@@ -1091,6 +1108,9 @@ Display *disp;
 
 void vd_handler_setup()
 {
+    IdHup = XtAppAddSignal(context, HUPhandler, NULL);
+    IdInt = XtAppAddSignal(context, INThandler, NULL);
+
     signal(SIGHUP, (void (*)PARM((int))) vd_HUPhandler);
     signal(SIGINT, (void (*)PARM((int))) vd_handler);
     signal(SIGTERM,(void (*)PARM((int))) vd_handler);

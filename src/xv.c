@@ -159,6 +159,8 @@ static int  curstype, stdinflag, browseMode, savenorm, preview, pscomp, preset,
 static int  nodecor;
 static double gamval, rgamval, ggamval, bgamval;
 
+XtAppContext context;
+
 /*******************************************/
 int main(argc, argv)
      int    argc;
@@ -173,6 +175,12 @@ int main(argc, argv)
   Window rootReturn, parentReturn, *children;
   unsigned int numChildren, rootDEEP;
 
+#ifdef AUTO_EXPAND
+  signal(SIGHUP, SIG_IGN);
+#endif
+#ifndef NOSIGNAL
+  signal(SIGQUIT, SIG_IGN);
+#endif
 
 #ifdef VMS
   /* convert VMS-style arguments to unix names and glob */
@@ -270,11 +278,6 @@ int main(argc, argv)
   tmpdir = (char *) malloc(strlen(tmpstr) + 1);
   if (!tmpdir) FatalError("can't malloc 'tmpdir'\n");
   strcpy(tmpdir, tmpstr);
-
-#ifdef AUTO_EXPAND
-  Vdinit();
-  vd_handler_setup();
-#endif
 
   /* init command-line options flags */
   infogeom = DEFINFOGEOM;  ctrlgeom = DEFCTRLGEOM;
@@ -375,7 +378,10 @@ int main(argc, argv)
   parseResources(argc,argv);
   parseCmdLine(argc, argv);
   verifyArgs();
-
+#ifdef AUTO_EXPAND
+  Vdinit();
+  vd_handler_setup();
+#endif
 
 #if 0
 #ifdef XVEXECPATH
@@ -1245,6 +1251,10 @@ static void parseResources(argc, argv)
     exit(1);
   }
 
+  i = 0;
+  XtToolkitInitialize();
+  context = XtCreateApplicationContext();
+  XtDisplayInitialize(context, theDisp, NULL, "XV", NULL, 0, &i, argv);
 
 
   if (rd_str ("aspect")) {

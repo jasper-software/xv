@@ -114,6 +114,10 @@ static  byte  Y[351] = {
   255
 };
 
+#ifndef NOSIGNAL
+extern XtAppContext context;
+#endif
+
 /*******************************************/
 /* The size should be -1 for the popup to ask otherwise fast is assumed */
 /* returns '1' on success */
@@ -259,7 +263,11 @@ data for 16 base:
     while (leaveitup) {
       int i;
       XEvent event;
+#ifndef NOSIGNAL
+      XtAppNextEvent(context, &event);
+#else
       XNextEvent(theDisp, &event);
+#endif
       HandleEvent(&event, &i);
     }
     /* At this point goforit and size will have been set */

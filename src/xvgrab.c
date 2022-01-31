@@ -69,6 +69,10 @@ static int    CountColors24       PARM((byte *, int, int,
 static int    Trivial24to8        PARM((byte *, int, int, byte *,
 					byte *, byte *, byte *, int));
 
+#ifndef NOSIGNAL
+extern XtAppContext context;
+#endif
+
 /***********************************/
 int Grab()
 {
@@ -113,7 +117,11 @@ int Grab()
       if (t >= startT + grabDelay) break;
       if (XPending(theDisp)>0) {
 	XEvent evt;
+#ifndef NOSIGNAL
+	XtAppNextEvent(context, &evt);
+#else
 	XNextEvent(theDisp, &evt);
+#endif
 	i = HandleEvent(&evt, &done);
 	if (done) {                    /* only 'new image' cmd accepted=quit */
 	  if (i==QUIT) Quit(0);
@@ -175,7 +183,11 @@ int Grab()
       }
 
       /* continue to handle events while waiting... */
+#ifndef NOSIGNAL
+      XtAppNextEvent(context, &evt);
+#else
       XNextEvent(theDisp, &evt);
+#endif
       i = HandleEvent(&evt, &done);
       if (done) {                    /* only 'new image' cmd accepted=quit */
 	if (i==QUIT) {
@@ -365,7 +377,11 @@ int Grab()
       state = 0;
       while (state != 3) {
 	XEvent event;
+#ifndef NOSIGNAL
+	XtAppNextEvent(context, &event);
+#else
 	XNextEvent(theDisp, &event);
+#endif
 	HandleEvent(&event, &i);
 
 	if (!(state&1) && event.type == MapNotify &&

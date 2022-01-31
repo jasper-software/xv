@@ -1982,10 +1982,6 @@ int   Rmvdir               PARM((char *));
 int   Movevdir             PARM((char *, char *));
 int   Isarchive            PARM((char *));
 int   Isvdir               PARM((char *));
-void  vd_HUPhandler        PARM((void));
-void  vd_handler           PARM((int));
-int   vd_Xhandler          PARM((Display *, XErrorEvent *));
-int   vd_XIOhandler        PARM((Display *));
 void  vd_handler_setup     PARM((void));
 
 

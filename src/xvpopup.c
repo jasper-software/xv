@@ -130,6 +130,9 @@ static int         padLoadLen = 0;
 static const char *padLoadNames[PAD_MAXDEFLEN];
 static const char *padLoadVals [PAD_MAXDEFLEN];
 
+#ifndef NOSIGNAL
+extern XtAppContext context;
+#endif
 
 /***************************************************/
 void CenterMapWindow(win, dx, dy, w, h)
@@ -311,7 +314,11 @@ static int doPopUp(txt, labels, n, poptyp, wname)
 
   /* block until this window gets closed */
   while (popUp) {
+#ifndef NOSIGNAL
+    XtAppNextEvent(context, &event);
+#else
     XNextEvent(theDisp, &event);
+#endif
     HandleEvent(&event, &i);
   }
 

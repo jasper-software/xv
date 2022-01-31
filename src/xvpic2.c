@@ -321,6 +321,10 @@ struct _form_tab {
 #define P2BM 2
 #define P2BI 3
 
+#ifndef NOSIGNAL
+extern XtAppContext context;
+#endif
+
 /* The main routine to load a PIC2 file. */
 int LoadPIC2(fname, pinfo, quick)
 char *fname;
@@ -3541,7 +3545,11 @@ int cmd;
 	x_offset = atoi(x_offsetp);
 	y_offset = atoi(y_offsetp);
 
+#ifndef NOSIGNAL
+	XtAppNextEvent(context, &event);
+#else
         XNextEvent(theDisp, &event);
+#endif
 	HandleEvent(&event, &i);
 
 	writePIC2();
