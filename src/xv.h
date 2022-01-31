@@ -1573,7 +1573,7 @@ int    CBTrack             PARM((CBUTT *));
 
 
 void   MBCreate            PARM((MBUTT *, Window, int, int, u_int, u_int,
-				 const char *, const char * const *, int,
+				 const char *, const char **, int,
 				 u_long, u_long, u_long, u_long));
 
 void   MBRedraw            PARM((MBUTT *));

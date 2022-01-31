@@ -100,7 +100,7 @@ static void  doInterlace PARM((int));
 static int   gifError    PARM((PICINFO *, const char *));
 static void  gifWarning  PARM((const char *));
 
-static int         filesize;
+static long int    filesize;
 static const char *bname;
 static byte       *dataptr;
 
@@ -140,7 +140,7 @@ int LoadGIF(fname, pinfo)
   filesize = ftell(fp);
   fseek(fp, 0L, 0);
 
-  if (filesize + 256 < filesize)
+  if (filesize > (2147483647L - 256))
     return( gifError(pinfo, "GIF file size is too large") );
 
   /* the +256's are so we can read truncated GIF files without fear of
@@ -769,7 +769,7 @@ static int readImage(pinfo)
   pinfo->normw = pinfo->w;   pinfo->normh = pinfo->h;
 
   sprintf(pinfo->fullInfo,
-	  "GIF%s, %d bit%s per pixel, %sinterlaced.  (%d bytes)",
+	  "GIF%s, %d bit%s per pixel, %sinterlaced.  (%ld bytes)",
  	  (gif89) ? "89" : "87", BitsPerPixel,
 	  (BitsPerPixel==1) ? "" : "s",
  	  Interlace ? "" : "non-", filesize);

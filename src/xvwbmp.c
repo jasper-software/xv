@@ -75,7 +75,7 @@ int LoadWBMP(fname, pinfo)
     int im_type;	/* image type (only type 0 supported) */
     uint8 fix_header;	/* fixed header field */
     int width, height;
-    int npixels, raw_size, aux;
+    unsigned int npixels, raw_size, aux;
     uint8 * raw;
 
     st_fname = fname;

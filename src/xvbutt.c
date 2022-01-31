@@ -843,7 +843,7 @@ void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
      int           x,y;
      unsigned int  w,h;
      const char   *title;
-     const char  * const *list;
+     const char  **list;
      int           nlist;
      unsigned long fg,bg,hi,lo;
 {

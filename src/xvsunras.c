@@ -54,7 +54,7 @@ int LoadSunRas(fname, pinfo)
      PICINFO *pinfo;
 {
   FILE	*fp;
-  int	 linesize,lsize,csize,isize,i,w,h,d,npixels,nbytes;
+  unsigned int	 linesize,lsize,csize,isize,i,w,h,d,npixels,nbytes;
   byte	 *image, *line;
   struct rasterfile sunheader;
   const char *bname;
