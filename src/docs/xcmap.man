@@ -1,0 +1,27 @@
+.TH xcmap 1X
+.SH NAME
+xcmap \- displays the default colormap on X11 displays
+.SH SYNTAX
+\fBxcmap\fP [ [-d] \fIdisplay\fP] [ [-g] \fIgeometry\fP]
+.SH DESCRIPTION
+\fBxcmap\fP is an X11 program that displays the contents of the colormap
+on 4, 6, and 8-bit PseudoColor (or GreyScale) displays.  It displays a grid 
+of squares, (4x4, 8x8, or 16x16 grid, depending on the number of planes)
+that correspond to entries in the colormap.  The squares are (of course)
+drawn in their corresponding color.
+.PP
+You may click (with the left button) on any of these squares.  Doing so
+will display the pixel number corresponding to that square, and its red,
+green, and blue components (as 4-digit hex numbers).  It will continue to do
+this as long as you hold the button down.
+.PP
+.SH BUGS
+This program only works on colormapped displays (PseudoColor, GreyScale, 
+StaticColor, and StaticGrey visuals).  Running it on a display that has
+a default visual type of 'TrueColor' or 'DirectColor' will do nothing of value,
+and may or may not work at all.
+.PP
+Also, this program only works on 4, 6, and 8-bit displays.  Period.
+.PP
+.SH AUTHOR
+John Bradley  -  bradley@dccs.upenn.edu

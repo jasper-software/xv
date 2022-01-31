@@ -1,0 +1,34 @@
+.TH XV l "2 December 1994" "Rev. 3.10"
+.SH NAME
+\fBxv\fP \- interactive image display for the X Window System
+.SH SYNTAX
+.B xv
+.RI [ options ]
+.RI [ filename [ filename... ]]
+.SH DESCRIPTION
+The
+.I xv
+program displays images in the GIF, JPEG, TIFF,
+PBM, PGM, PPM, X11 bitmap, Utah Raster Toolkit RLE, PDS/VICAR, Sun Rasterfile, 
+BMP, PCX, IRIS RGB, XPM, Targa, XWD, possibly PostScript, and PM formats on 
+workstations and terminals running the X Window System, Version 11.
+.LP
+The documentation for XV is now distributed
+.I only
+as a PostScript file, as it has gotten enormous, 
+and is no longer very well suited to the 'man' page format.
+Print a copy of the (100-ish page) manual found in
+.IR docs/xvdocs.ps .
+If you are unable to get the manual to print on your printer,
+you may purchase a printed copy of the XV manual.  Click on 'About XV' in
+the program to get further information.
+.PP
+If you don't 
+.I have
+the PostScript file, it is part of the standard XV distribution, the
+latest version of which can be obtained via anonymous ftp from 
+.IR ftp.cis.upenn.edu
+in the directory pub/xv
+.PP
+.SH AUTHOR
+John Bradley

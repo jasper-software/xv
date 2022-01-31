@@ -1,0 +1,116 @@
+#	$Header: /usr/people/sam/tiff/libtiff/RCS/Makefile.mpw,v 1.5 1994/07/26 16:47:18 sam Exp $
+#
+# Tag Image File Format Library
+#
+# Copyright (c) 1988, 1989, 1990, 1991, 1992, 1993, 1994 Sam Leffler
+# Copyright (c) 1991, 1992, 1993, 1994 Silicon Graphics, Inc.
+# 
+# Permission to use, copy, modify, distribute, and sell this software and 
+# its documentation for any purpose is hereby granted without fee, provided
+# that (i) the above copyright notices and this permission notice appear in
+# all copies of the software and related documentation, and (ii) the names of
+# Sam Leffler and Silicon Graphics may not be used in any advertising or
+# publicity relating to the software without the specific, prior written
+# permission of Sam Leffler and Silicon Graphics.
+# 
+# THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, 
+# EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY 
+# WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+# 
+# IN NO EVENT SHALL SAM LEFFLER OR SILICON GRAPHICS BE LIABLE FOR
+# ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
+# OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+# WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF 
+# LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE 
+# OF THIS SOFTWARE.
+#
+
+#
+# Makefile for Mac using MPW 3.2.3 and MPW C 3.2.4
+#
+# Note that the LZW and CCIT code are not included because there are
+# structures larger than 32K (which cause the compiler to choke).
+#
+.c.o Ä .c
+	{C} {COptions} {CFLAGS} -s {Default} {DepDir}{Default}.c -o {TargDir}{Default}.c.o
+
+CONF_LIBRARY= ¶
+	-d HAVE_IEEEFP=1 ¶
+	-d BSDTYPES 
+
+CONF_COMPRESSION= ¶
+	-d COMPRESSION_SUPPORT ¶
+	-d PACKBITS_SUPPORT 	¶
+	-d THUNDER_SUPPORT ¶
+	-d NEXT_SUPPORT 
+
+CFLAGS=	{COPTS} {IPATH} {CONF_LIBRARY} {CONF_COMPRESSION}
+
+INCS=	tiff.h tiffio.h
+
+SRCS=	¶
+	tif_aux.c ¶
+	tif_ccittrle.c ¶
+	tif_close.c ¶
+	tif_compress.c ¶
+	tif_dir.c ¶
+	tif_dirinfo.c ¶
+	tif_dirread.c ¶
+	tif_dirwrite.c ¶
+	tif_dumpmode.c ¶
+	tif_error.c ¶
+	tif_getimage.c ¶
+	tif_jpeg.c ¶
+	tif_flush.c ¶
+	tif_next.c ¶
+	tif_open.c ¶
+	tif_packbits.c ¶
+	tif_print.c ¶
+	tif_read.c ¶
+	tif_swab.c ¶
+	tif_strip.c ¶
+	tif_thunder.c ¶
+	tif_tile.c ¶
+	tif_apple.c ¶
+	tif_version.c ¶
+	tif_warning.c ¶
+	tif_write.c 
+
+OBJS=	¶
+	tif_aux.c.o ¶
+	tif_ccittrle.c.o ¶
+	tif_close.c.o ¶
+	tif_compress.c.o ¶
+	tif_dir.c.o ¶
+	tif_dirinfo.c.o ¶
+	tif_dirread.c.o ¶
+	tif_dirwrite.c.o ¶
+	tif_dumpmode.c.o ¶
+	tif_error.c.o ¶
+	tif_getimage.c.o ¶
+	tif_jpeg.c.o ¶
+	tif_flush.c.o ¶
+	tif_next.c.o ¶
+	tif_open.c.o ¶
+	tif_packbits.c.o ¶
+	tif_print.c.o ¶
+	tif_read.c.o ¶
+	tif_strip.c.o ¶
+	tif_swab.c.o ¶
+	tif_thunder.c.o ¶
+	tif_tile.c.o ¶
+	tif_apple.c.o ¶
+	tif_version.c.o ¶
+	tif_warning.c.o ¶
+	tif_write.c.o 
+
+all Ä libtiff.o
+
+libtiff.o Ä {OBJS}
+	Lib  {OBJS} -o libtiff.o
+	
+
+{OBJS} Ä tiffio.h tiff.h tiffcomp.h tiffiop.h tiffconf.h
+
+clean Ä
+	delete -i {ALL} {OBJS} core a.out mkg3states g3states.h

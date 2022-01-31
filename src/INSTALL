@@ -1,0 +1,237 @@
+XV Installation Instructions
+============================
+Note: While an 'Imakefile' has been provided for you, I *strongly* recommend 
+that you using the regular 'Makefile', as that's what I use.  
+
+Edit 'config.h'.
+
+Edit the Makefile, and make appropriate changes, if any.  See notes below.
+
+Also Note:  The tiff library *REQUIRES* an ANSI C compiler.  Trying to build
+it with an old K&R-style C compiler will be painful, and probably a waste of
+time.  If your vendor-supplied C compiler (if any!) doesn't handle ANSI C, 
+you're encouraged to get a copy of 'gcc' from prep.ai.mit.edu, in pub/gnu.
+In the interim, if you are unable to build the TIFF library, it is easy 
+enough to disable XV's TIFF support in the XV Makefile.
+
+Do a 'make' to (hopefully) build XV, but read the system-specific notes below
+FIRST.
+
+
+--------------------------------
+If you *insist* on using imake, do this, it might work:
+  cd jpeg ; ./configure ; make libjpeg.a ; cd ..
+  xmkmf 
+  make Makefiles
+  make depend
+  make
+
+(By the way, if the 'imake' goes awry, there are backups of the original
+ minimalist Makefiles in 'Makefile.std' and 'tiff/Makefile.std'.  imake
+ doesn't touch the jpeg/Makefile, so don't worry about that one.)
+--------------------------------
+
+
+The following are installation instructions for some of the more common
+types of systems.
+
+	--------------------------------------------------------------
+        DECstations (alpha) running OSF/1
+	DECstations (mips) running Ultrix
+	SUNs running SunOS 4.x and MIT's X11R4 distribution
+	IBM RS/6000s running AIX (using IBM's 'cc')
+
+	On these machines, you should be able to just type 'make' and
+	have everything compile cleanly.  (On the DECstation, you'll see
+	some warnings about some functions being too long to be optimized.
+	Ignore such messages, as those functions don't need to be
+	optimized.)
+
+        Note: Sun's 'cc' compiler is *not* ANSI-compatible.  You will *not*
+	be able to get the TIFF library compiled with it.  Either turn
+	off the tiff support (see the notes in the Makefile), or use 'gcc'.
+
+	--------------------------------------------------------------
+	SUNs running OpenWindows
+
+	By default the Makefile assumes your X11 include files and the
+	libX11.a library are in the 'normal places' (/usr/include/X11/*.h and
+	/usr/lib/libX11.a) If this is not the case on your system, (as is
+	often the case on Suns running OpenWindows) you should add '-L' and
+	'-I' options on the CCOPTS line in the Makefile to tell the compiler
+	where to find said files.  See the Makefile for more details.
+
+	--------------------------------------------------------------
+	SUNs running Solaris 2.x
+
+	Turn on the '-DSVR4' option in the Makefile.  Also see the note
+	above if you're running OpenWindows.  You may also have to add
+	'-lsocket -lnsl' to the CCOPTS line, as the X11 library may 
+	require the socket/networking libraries.
+
+	--------------------------------------------------------------
+	HP Workstations running HPUX 9.0
+
+	For HP workstations running HPUX 9.0 or later, set "CC = cc -Aa"
+	or "CC = gcc -ansi" in the Makefile, and uncomment the MCHN
+	definition for HPUX.  You'll also need to copy tiff/Makefile.hpux
+	to tiff/Makefile.  If you have HP's minimal C compiler that
+	doesn't accept the -Aa (ANSI) option, either use gcc or comment
+	out the TIFF options, because libtiff won't compile.
+
+	--------------------------------------------------------------
+	SGI IRIS running IRIX
+
+	Edit the Makefile, and turn on the SVR4 and SGI options
+	
+	--------------------------------------------------------------
+	Other SVR4 systems
+	
+	Edit the Makefile, and turn on the SVR4 option.
+	
+	--------------------------------------------------------------
+	IBM RS/6000s running AIX and using gcc
+
+	Edit the Makefile, and add '-D_AIX' to the CCOPTS line.
+
+	--------------------------------------------------------------
+
+
+If you run into problems during the build, check the Makefile (or the
+Imakefile) for additional configuration options that may help.
+
+
+The following are things to be wary of when building XV, and some
+hints for building XV on some less-popular systems.
+
+
+GCC USERS: It is important that the XV source and the contents of the
+JPEG and TIFF subdirectories all be compiled with the same compiler.
+While this should normally be the case, as the value of the CC
+variable in the XV makefile is propogated to the makefiles in the
+subdirectories, it's something to keep in mind.  Also, you may need to
+specify '-traditional' when compiling with gcc, as it may blow up on
+some code in the TIFF subdirectory.
+
+
+GCC USERS: If you compile XV with gcc, and find XV crashing in the
+function 'vsprintf()', the gcc-specific include files on your system
+are screwed up.  You should get your sysadmin-type to fix the
+gcc-include files (you can test it by compiling 'vargs.c', a simple
+varargs-verification program in the unsupt directory), or alternately,
+just use 'cc' instead.
+
+
+HP USERS: If you are running HP-UX 7.* , you should remove the '-O'
+compiler flag from the Makefile.  The optimizer supplied with that
+version of the OS has been known to break code in xvgam.c (and
+possibly elsewhere, as well).  You'll know the optimizer has broken
+the code if pictures come out 'purple'.
+
+
+DECSTATION USERS: I've had a report that compiling 'xvevent.c' with
+the optimizer turned on (Ultrix 4.1, MIPS C compiler version 2.1)
+breaks the routine TrackPicValues().  I haven't been able to verify
+this behavior, but if you're building on this sort of system, you may
+want to turn optimization off, at least for that routine.
+
+
+IRIS/HP/Other SysV-based machines: If you find XV 'going out to lunch'
+when you click on any of the buttons in the controls window, (or do
+any of a number of other things), it is almost certainly a matter of
+configuring the 'Timer()' function (in xvmisc.c) to correctly wait the
+requested number of milliseconds.  This is one of those things that
+doesn't seem to be very well nailed down in the different variants of
+Unix.  IF you experience problems, take a look at that function, and
+add an '#ifdef' for your machine that makes it use the whatever the
+proper 'sleep for some number of milliseconds' call on your machine.
+(Could be poll(), usleep(), setitimer(), or possibly select(), and
+probably some others.)
+
+
+Once you've built the program succesfully, do a 'make install', which
+will copy the programs 'xv', 'bggen', 'xcmap', 'xvpictoppm' and
+'vdcomp' (if you want PDS/VICAR support) to wherever you like your
+binaries to live, and copy the files 'docs/xv.man', 'docs/xcmap.man',
+'docs/bggen.man' and 'docs/xvpictoppm.man' to the approprate man-page
+directory.  You can edit the Makefile to fine-tune these locations for
+your system.
+
+
+Note: also included in this distribution (in the unsupt directory) is
+'getweather', a dopey little shell script that you may want to run in
+a crontab entry every hour, on the half-hour or so.  It will
+automagically go out and get the current US weather map via anonymous
+ftp, and stick it in some standard place (normally
+/usr/local/lib/weather.gif).
+
+
+Finally, print out a copy of docs/xvdocs.ps on a PostScript printer.
+If you are unable to do so, and would like a printed copy of the
+manual, see the bit about ordering printed copies of the manual.
+
+
+Note: If you are using 'transcript 2.1' to drive your PostScript
+printer, you may run into a problem where the xvdocs.ps file prints in
+the wrong font (courier, or something, instead of helvetica).  This
+seems to be caused by 'psrv', which tries to reverse the pages of all
+PostScript files.  It fails on this PostScript file.  You (or the
+local system administrator) can temporarily fix this by replacing the
+line:
+  'REVERSE = /pkg/lib/ps/psrv'
+with
+  'REVERSE = /bin/cat'
+in the file /pkg/lib/ps/psint.sh.  (Your pathnames may vary.)
+
+
+Bizarrities
+-----------
+There are some known problems with running XV in conjunction with
+'dxwm'.  I'm hoping that that is now a defunct window manager, and
+that everybody who was using that will switch to mwm.  Whether this
+hope is well-founded or not is another matter entirely.  See the DXWM
+option in the Makefile/Imakefile.
+
+
+Problems with TWM and TVTWM
+---------------------------
+XV would appear to exercise a pair of bugs in the version of TWM in
+MIT's X11R4 Standard Distribution tape.  Perhaps they've been fixed by
+now.
+
+Colormap Installation: under twm, if you have multiple XVs running,
+and each has their own colormap, sometimes the colormap doesn't get
+properly installed if you move the mouse directly from one XV to the
+other, quickly, so that it doesn't see the mouse go into the root
+window, or any other window.  If you move the mouse outside the window
+and move it back in, it SHOULD install the colormap correctly.
+
+Colormap Installation: Note, if an alternate colormap is installed, it
+will ONLY be installed when the mouse is inside the IMAGE window.  It
+will not be installed when the mouse is in any other XV windows
+(except, possibly, the color editor window).  This is because I can't
+guarantee that the other windows will still have contrasting
+foreground/background colors when the alternate colormap is installed.
+It is assumed that if you put the mouse in a window, you will want to
+use that window, so you'd better be able to READ that window...
+
+There's a bug in my version of TWM that creeps up if you have
+titlebars turned off.  Essentially, XV tells the window manager to
+make the window a certain size.  TWM (wrongly) adds enough room at the
+top to put its title bar there, but doesn't draw it, since titlebars
+are turned off.  XV gets back a ConfigureNotify event on the window
+with the new size, which is large by 20-odd pixels in height.
+
+There *used* to be a '-twmkludge' option in a previous version of xv
+to 'work around' this problem.  Unfortunately, this workaround
+introduced more problems than it solved, and has since been removed.
+The current thinking is: if you're using TWM, you should probably be
+using titlebars.  If you insist on not having titlebars, and your TWM
+doesn't behave properly, you should fix TWM.  (It's a one-line fix,
+and I'll gladly send it to anybody who asks for it.)
+
+
+Be sure to read the README file for shareware information, copyright notice,
+and other such things.
+
+--jhb,  12/19/94

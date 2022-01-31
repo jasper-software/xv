@@ -1,0 +1,82 @@
+.\"
+.\" $Id: vdcomp.man,v 1.2 1995/01/12 23:35:28 qralston Exp $
+.\"
+.\" $Log: vdcomp.man,v $
+.\" Revision 1.2  1995/01/12  23:35:28  qralston
+.\" Created from the information in the comments in vdcomp.c.
+.\" James Ralston Crawford <qralston+@pitt.edu>
+.\"
+.TH vdcomp 1
+.SH Name
+\fIvdcomp\fP - decompress a compressed PDS image
+.SH Synopsis
+\fIvdcomp\fP [ infile ] [ outfile ] [ format-code ]
+.SH Description
+The \fIvdcomp\fP program reads a variable length compressed PDS image
+and outputs a fixed length uncompressed image file in PDS format with
+labels, image histogram, engineering table, line header table and an
+image with PDS, FITS, VICAR or no labels.
+.PP
+If used on a non-byte-swapped machine the image histogram is
+un-swapped.
+.SH Options
+\fIVdcomp\fP will prompt for any options that are not supplied on the
+command-line.
+.PP
+\fIinfile\fP
+.br
+.RS
+The name of compressed image file.
+.RE
+.PP
+\fIoutfile\fP
+.br
+.RS
+The name of uncompressed image file.
+.RE
+.PP
+\fIformat-code\fP
+.br
+.RS
+Select from the following list:
+.br
+.RS
+\fI1\fP - SFDU/PDS format [default]
+.br
+\fI2\fP - FITS format
+.br
+\fI3\fP - VICAR format
+.br
+\fI4\fP - unlabelled binary array
+.RE
+.RE
+.SH Limitations
+This program has been tested on a VAX 780 (VMS 4.6), SUN Workstation
+(UNIX 4.2, release 3.4), an IBM PC (MICROSOFT 5.1 compiler) and
+Macintosh IIx using Lightspeed C version 3.0.  When converting to
+other systems, check for portability conflicts.
+.SH Credits
+This program uses Kris Becker's subroutine DECOMP.C (which is included
+in this program in a shortened version).
+.SH History
+bradley@cis.upenn.edu 06-23-94 ansi-fied program
+.PP
+datri@convex.com, 11-15-91 added recognition of - as stdout for output
+filename; disabled various messages; directed messages to stderr;
+added exit status
+.PP
+DEC89 Modified program to handle both Voyager and Viking images.
+.PP
+OCT89 Converted Voyager decompression program to handle Viking
+compressed images.  Changed obuf to 'unsigned' to simplify computation
+of checksum.
+.PP
+AUG89 Added code to get command line arguments for filenames and
+output format; routines to free memory used by the Huffman tree);
+fixed the SFDU label output length; and modified the I/O routines so
+that the open for Host type 2 uses binary I/O.
+.PP
+JUN89 Fixed READVAR, to get length on 16-bit unswapped hosts.
+.PP
+JUL88 C driver to decompress standard Voyager Compressed images by
+Mike Martin 1989/12/02.

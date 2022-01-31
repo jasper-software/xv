@@ -1,0 +1,191 @@
+--------
+Schnauzer:  add fields to BRINFO structure.  Want to be able to sort on
+name, size, and mtime  (atime is useless, given that we access files all
+the time in the schnauzer...)  
+
+Have a '-noshrink' option & resource.  When enabled, and you view an image
+	that's larger than the max window size, it should *crop* the image
+	to the window, rather than shrink it.  This should probably also
+	become the new default behavior, so maybe call it '-shrink' or 
+	something...  (Concerns:  'Normal' command, 'Uncrop' command...)
+
+Option to change how TrackPicValues displays stuff.  Let user enter
+conversion factors (slope + offset) for intensity and x,y values (so folks
+can do x,y -> lat,long or i -> temperature conversions automagically)
+		Craig Motell  -  motell@avian.nmfs.hawaii.edu
+
+
+
+CODE TO WRITE (maybe)
+---------------------
+> From: Peder Langlo
+> To do comments without writing a full-blown text-editor...
+>   one could push a "Annotate" button for a subwindow
+>   prompting for a one line annotation or a file containing the text.
+>
+> BETTER IDEA:
+>   write comments (if any) to a temp file, exec an emacs (or whatever 
+>   'EDITOR' is set to) on that file, and when it exits, reload contents of
+>   the file as comments.  Should be easy enough, but I'm not making any more
+>   changes until after 3.10 ships...
+
+An Iconify All button.
+
+A 'show hidden' checkbox in load/save windows
+
+Be able to load/save colormap files?
+
+'-alg #' option to execute a specific algorithm on initial image load?
+
+"slideshow" script files that would contain image manip. commands and file
+	names and times to wait (or wait for key/mouse).  Need to load up and
+	manip the next image while displaying the current one...
+	(David Koontz (dak@mosaic.uncc.edu))
+
+The only thing missing in your package is a raw file reader. Since I get my
+data from NASA/JPL, they use their strange VICAR stuff and so I can not
+open their files using xv. Can you provide an OPEN AS... option, where I
+can define the parameters of the image (such as No of rows, No. of cols,
+header bytes and No. of channels (interleaved or not)). It would be very
+helpful, because the different file formats at our site are really slowing
+down the working process!
+
+On-line help of some sort!  (Maybe an HTML page.)
+
+Make a '-update' option to do an 'Update' (generate icons) in the specified
+	directory, without any user intervention.
+
+If '-perfect' or '-owncmap', we could create a private colormap when in 
+	stdcmap mode (and then we can pick a 3/3/2 on 8-bit displays, and
+	have a better chance of getting 2/2/2 on 6-bit displays.)
+
+Add '-1xlimit' option (to keep 'old style' behavior, for folks who liked it),
+	and make '-2xlimits' the default.  Also change UnCrop behavior 
+	(should uncrop at current expansion:  if that would be bigger than
+	the screen, just go back to 'normal' size)
+
+Add a '-convert {gif,tiff,jpeg,pm,etc...}' option that suppresses most of the
+	X stuff.  Never needs to fall into HandleEvent(), ferinstance...
+
+Make the 'uncrop' less likely to generate a HUGE image, and then relax the
+window max-size limitations to see what happens...
+
+Instead of alternating diversity and popularity, you could
+multiply the distance by the popularity of a color (expressed,
+for example, as a percentage of the total points).
+	From: rjohnson@shell.com (Roy Johnson)
+
+
+UNLIKELY, BUT GOOD IDEAS TO THINK ABOUT
+---------------------------------------
+Scroll bars for the image window.  Have a toggle to specify whether resizing
+the window rescales the image, or just shows more or less of it.
+
+Continue to handle events ('exposes' and keypresses, at least) during certain
+long computations?  (such as smooth, loading jpegs, etc.)
+
+look into a more-diverse 'slow24' algorithm (n****.tif)
+	From: mjm@as.arizona.edu (Mark McCaughrean)
+
+Stick in a '-cecmap' checkbox in the color editor window, somewhere.
+
+be able to select 'ncols' values with a dial (while the program is running).
+	Useful for folks trying to generate reduced color images.
+
+Keyboard accelerators for the RGB dials in the color editor.
+
+
+
+
+RIGHT BEFORE HELL FREEZES OVER
+------------------------------
+
+> Let you type 'xv <dirname>' it should do the 'right thing'  (including 
+> 	recursing down subdirs...)
+> Should probably have a '-only_use_recognized_suffixes' option to speed things
+> up?  (ie, so it won't bother stat'ing (or including in the list, at least)
+> things that don't end with '.gif', '.jpg', etc...)
+
+
+> Deal with the virtual WM scene (tvtwm, at least)
+>  
+> '-root' modes in tvtwm core dump?
+> 
+> '-virtual' option:  geomspecs should normally be relative to the physical
+> root window.  If '-virtual' is specified, they should be relative to the 
+> virtual root window (if any)  (ALTERNATELY:  modify parsing of the geometry
+> string slightly (look for a leading 'a' or 'r'???)
+>
+> Also, '-vmax' or something to let you generate a root image that's the size
+> of the *virtual* root, not the physical root.
+
+
+Faster compressed/color-on-grayscale-printers postscript output?
+
+> The Hue remapping control is a wonder. Would it be possible to put xv in
+> a mode so that saturation and value changes only apply for colors in the
+> `From' dial? This would surely make xv more powerful in making the sky more
+> blue and lipstick more red.  ('global' checkboxes next to the two controls)
+
+Randomize function shouldn't be *so* random.  Maybe just randomly swap r,g,b
+	colormap components, flip their signs, etc. ???
+
+
+'real' colormap undo/redo controls.  (Hook into main coloreditor undo/redo
+	controls.  Keep 'revert', though)
+
+One question re usage:  can I place the "xv" window on one
+"screen" (smaller, color) and the controls on another (large, grey-scale)?
+I looked/read the docs, but couldn't figure out if this was possible.
+
+
+Histograms (possibly toggle switches for all four graph windows?)  Possibly 
+it's own window...  (See message from Jon Brinkmann describing ideas.)
+
+
+> What I want is that if I Shift-rightbutton'ed on a pixel in the image, the 
+> pixel got the yanked color. Should be very easy to implement if desired.
+
+
+
+---------
+
+1) (this is a minor point, but would be a nice touch)
+   in 24bit mode, you can't turn the image to gray by simply clicking
+the "gray" button in the colormap editor -- since there is no
+colormap. However, turning the image to grayscale is still a useful,
+and fairly simple, operation. (I know, you can always save the image
+as grayscale, and the re-load it, but that's kinda a long way to go
+for something as simple as this.)
+
+2) (my big wish)
+we run X on 8-bit greyscale machines (DECstations to be precise).
+Now, 8 bit grey can display all the gray information there is in a
+24bit image. However, color images are still dithered down to gray --
+especially in 24bit mode, with 6x6x6 color dithering, this makes the
+image look far worse than it could. I propose, therefore, an
+additional 24bit->8bit algorithm : Display as Gray (or something like
+that), which should be the default on greyscale servers, or if the
+-mono flag is used. This would not dither the image, but simply
+convert it to grey. this would be pretty fast (right?) and would make
+24bit images look _much_ better on 8bit greyscale devices (but we
+wouldn't be sacrificing speed). Preferrably, this should be selectable
+just like the other 24bit algorithms.
+
+
+
+-----------
+From: Phil.Richards@prg.oxford.ac.uk
+
+  (iii) possibly make the Image window keeping backing store an option
+ (command-line/resources); I'm sure you've already thought of that
+
+
+
+----------
+From: "Anthony A. Datri" <aad@lovecraft.siemens.com>
+
+It seems that when I save (eg., after cropping) or delete a file, XV
+stats and opens *every* file in the current directory, even if -nostat
+is specified.
+

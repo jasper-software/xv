@@ -1,0 +1,85 @@
+.TH bggen l
+.SH NAME
+bggen \- generates colored backgrounds on X11 displays
+.SH SYNTAX
+\fBbggen\fP [-d display] [-g geometry] [-G rptgeom] [-r rot] 
+[-a] [-w width] [-h height] [-b bits] <color-spec> [<color-spec> ...]
+.SH DESCRIPTION
+\fBbggen\fP is a program that generates a rectangular 24-bit image, with
+a smooth vertical gradient between the listed colors.  (If you only specify one
+color, the image will be a single solid color.)
+The top of the image will be in color (r1,g1,b1), and the
+bottom of the image will be in color (rn,gn,bn).  Intermediate positions
+in the image are interpolated between these colors.  If you specify 
+more than 2 colors, the
+gradient passes through all the specified colors, in the order specified.
+.PP
+The '-d' option lets you specify what display to connect to.  \fBbggen\fP
+only connects to the display to find out the size of the screen (and hence,
+the default size for the generated image).
+.PP
+The '-g' option lets you control the size of the image, as a standard
+X geometry specification.  (ie, something like "512x348")
+.PP
+The '-G' option lets you control the tile size, as a standard
+X geometry specification.  (ie, something like "32x32")  
+Normally, (if you don't give a -G option), the gradient fills the entire
+image.  If you specify a -G option, the gradient will fill a portion of the
+image, and that portion will be 'center-tiled' to fill the rest of the image.
+.PP
+The '-r' option lets you rotate the gradient counter-clockwise by the
+specified number of degrees.
+.PP
+The '-a' option lets you force bggen to generate an image in PPM 'Ascii'
+format, rather than in PPM 'raw' format.
+.PP
+The '-w' and '-h' options also let you set the size of the image.
+They are provided only for backward compatibility.
+.PP
+The '-b' option specifies the number of significant bits in the (output)
+color specifications.  It must range between 1 and 8, inclusive.  Use
+values less than 8 (the default) to limit color use by increasing the color
+granularity.  Since XV can do this sort of thing better, this is of dubious
+value.
+.PP
+A <color-spec> can be three integers separated by spaces, forming an R,G,B 
+triple ("0 255 0").  The values should be between 0 and 255.
+.PP
+A <color-spec> can also be a standard X color specification by name ("green")
+or value ("#00ff00").  This is decidedly easier, and the 'three integer'
+method remains mainly for backward compatibility.  One note:  the '#' character
+is treated specially by many shells, and should probably be protected by
+putting a '\\' character in front of it, or wrapping the entire value with
+a pair of single-quotes.
+.PP
+\fBbggen\fP doesn't actually affect your background directly.  \fBbggen\fP
+merely generates a PPM (Portable Pixmap Format) datafile and dumps it
+to 'stdout'.  It's up to some other program (such as XV) to read this file
+and display it.
+.PP
+To use \fBbggen\fP, you should pipe its output into an XV command, such as:
+"xv -root -quit -"
+.SH TRY THESE
+.nf
+Light Blue to Dark Blue
+	bggen 100 100 255  0 0 100  | xv -root -quit  -
+RGB Rainbow
+	bggen red green blue | xv -root -quit -
+Green Cylinders
+	bggen black green black -h 128 | xv -root -quit -
+Blue to Magenta
+	bggen blue magenta | xv -root -quit -
+Full Rainbow
+	bggen black red yellow green blue purple black | xv -root -quit  -
+Repeating Rainbow
+	bggen red yellow green blue purple red -h 256 | xv -root -quit -
+Green Tiles
+	bggen green black  -r 30 -g 32x32 | xv -root -quit -
+Red Balls
+	bggen red black -r 45 -g 32x32 | xv -root -quit -rmode 3 -
+Red+Yellow Diamonds
+	bggen red yellow  -r 45 -g 32x32 | xv -root -quit -rmode 3 -
+.fi
+.SH AUTHOR
+John Bradley  -  bradley@dccs.upenn.edu
+

@@ -1,0 +1,14 @@
+.TH xvpictoppm 1X
+.SH NAME
+xvpictoppm \- converts XV 'thumbnail' files to standard PPM format
+.SH SYNTAX
+\fBxvpictoppm\fP
+.SH DESCRIPTION
+\fBxvpictoppm\fP reads an XV 'thumbnail' file (located in the '.xvpics' 
+subdirectories) on stdin, and writes a standard PPM version of same to stdout.
+This may be useful for putting thumbnails in WWW pages, or something like
+that.
+.PP
+.SH AUTHOR
+John Bradley  -  bradley@dccs.upenn.edu
+

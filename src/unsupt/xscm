@@ -1,0 +1,620 @@
+(Message /usr/users/bradley/Mail/inbox:15)
+Return-Path: kaczowka@apollo.hp.com
+Posted-Date: Wed, 20 Jul 94 15:09:14 EDT
+Received-Date: Wed, 20 Jul 1994 15:09:12 -0400
+Received: from music.ch.apollo.hp.com by amway.ch.apollo.hp.com id <AA13557@amway.ch.apollo.hp.com> Wed, 20 Jul 1994 15:09:15 -0400    
+Received: by music.ch.apollo.hp.com id <AA22351@music.ch.apollo.hp.com>; Wed, 20 Jul 94 15:09:14 -0400    
+From: kaczowka@apollo.hp.com
+Subject: Re: diffs of changes to xv
+To: xvtech@devo.dccs.upenn.edu
+Date: Wed, 20 Jul 94 15:09:14 EDT
+X-Hpvue$Revision: 1.8 $
+Mime-Version: 1.0
+Content-Type: Message/rfc822
+X-Vue-Mime-Level: 4
+Mailer: Elm [revision: 70.85]
+
+Forwarded message:
+
+Snarfer: $Revision: 1.1.2.9 $ $Date: 1992/11/13 23:40:23 $
+Date: Wed, 20 Jul 1994 14:04:39 -0400
+From: John Bradley <bradley@central.cis.upenn.edu>
+Posted-Date: Wed, 20 Jul 1994 14:04:39 -0400
+Message-Id: <199407201804.OAA25164@central.cis.upenn.edu>
+To: kaczowka@apollo.hp.com
+Subject: Re: diffs of changes to xv
+Status: RO
+
+
+
+   Mail regarding XV should be sent to one of these three addresses:
+       xv@devo.dccs.upenn.edu           - general XV questions
+       xvbiz@devo.dccs.upenn.edu        - all XV licensing questions
+       xvtech@devo.dccs.upenn.edu       - bug reports, technical questions
+
+   Mail to John Bradley *not* regarding XV should be sent to:
+       bradley@dccs.upenn.edu
+
+--------
+John,
+
+We talked (via email) earlier.  I have made some changes to xv-3.00a
+which allow to work with "Xscm", a standard colormap program for X.
+You will need the Xscm package to use the changes; see below.
+My diffs are included below, as well as info on Xscm.  I would like
+to see my changes be used in xv if you feel they have merit.
+The posting info below should explain what the changes do, and maybe
+explain a lot of other things you are not interested in :-)
+If there are questions on any of this feel free to contact me
+(kaczowka@ch.hp.com, or 508-436-4051).
+
+A couple of warnings about my changes: I seem to have broken
+the Visual Schnauzer.  I don't feel I did the best job but it
+does make xv work well with the xscm standard colormap.
+On the newer machines (e.g. 712/60, 712/80 and 715/100)
+my changes allow xv to use the "Color Recovery" feature,
+which yields near 24-bit quality on an 8 bit frame buffer.
+This is actually independent of having an Xscm standard
+colormap defined.  The results are quite neat.
+
+Also, I am trying to get someone here at my site at HP to
+step up and take care of getting a site license from you.
+I'm not sure if that will happen, so my changes may be
+used only by you if you are interested; we (HP/Chelmsford)
+may be "xv-less".  I know that HP Labs in Palo Alto does have
+a site license, and they have my changes and have found
+them useful.
+
+Anyway, below are the outputs from "diff -c" for the files I
+changed, and much more info on Xscm.  Again, contact me if
+you like with any questions or comments.  We (various parts
+of HP) are pursuing making Xscm a standard part of COSE/CDE
+but at this point it is unknown if that will happen.
+
+Peter Kaczowka
+HP Chelmsford MA
+
+------------------------- Makefile ---------------------------------
+*** xv-3.00a/Makefile	Thu Apr 22 21:33:36 1993
+--- xv-3.00a_xscm/Makefile	Tue Jun 14 15:20:14 1994
+***************
+*** 11,17 ****
+  # if compiling on a Mips machine, (not a DECstation), try this: 
+  #    CCOPTS = -Olimit 2000 -systype bsd43
+  
+! CCOPTS = -O
+  
+  # if you're using a Sun running OpenWindows, you may want to add these two
+  # options to the CCOPTS line, so it finds the libs and include files
+--- 11,17 ----
+  # if compiling on a Mips machine, (not a DECstation), try this: 
+  #    CCOPTS = -Olimit 2000 -systype bsd43
+  
+! CCOPTS = -O -DXSCM
+  
+  # if you're using a Sun running OpenWindows, you may want to add these two
+  # options to the CCOPTS line, so it finds the libs and include files
+***************
+*** 190,196 ****
+  	$(UNIX) $(BSDTYPES) $(RAND) $(DXWM) \
+  	$(SGI) $(SCO) $(HPUX7) $(UMAX)
+  
+! LIBS = -lX11 $(LIBJPEG) $(LIBTIFF) -lm
+  
+  BITMAPS = bitmaps/grasp bitmaps/penn bitmaps/down bitmaps/down1 \
+  	  bitmaps/up bitmaps/up1 bitmaps/scrlgray bitmaps/gray50 \
+--- 190,196 ----
+  	$(UNIX) $(BSDTYPES) $(RAND) $(DXWM) \
+  	$(SGI) $(SCO) $(HPUX7) $(UMAX)
+  
+! LIBS = libxscm.a -L /usr/lib/X11R4 -lX11 $(LIBJPEG) $(LIBTIFF) -lm
+  
+  BITMAPS = bitmaps/grasp bitmaps/penn bitmaps/down bitmaps/down1 \
+  	  bitmaps/up bitmaps/up1 bitmaps/scrlgray bitmaps/gray50 \
+
+---------------------------------- xv.c ----------------------------------
+*** xv-3.00a/xv.c	Thu Apr 22 21:32:29 1993
+--- xv-3.00a_xscm/xv.c	Mon Jun 20 09:26:59 1994
+***************
+*** 86,91 ****
+--- 86,99 ----
+  #include "xv.h"
+  #include "bitmaps.h"
+  
++ #ifdef XSCM
++ #include "xscmlib.h"
++ 
++ XscmInfoRec XscmInfo;
++ int         haveXscm = 0;
++ int         Xscm484  = 0;
++ #endif
++ 
+  #include <X11/Xatom.h>
+  
+  #ifdef VMS
+***************
+*** 205,212 ****
+    unsigned int numChildren;
+    int not_in_first_half;
+  
+  
+- 
+  #ifdef VMS
+    /* convert VMS-style arguments to unix names and glob */
+    do_vms_wildcard(&argc, &argv);
+--- 213,222 ----
+    unsigned int numChildren;
+    int not_in_first_half;
+  
++ #ifdef XSCM
++   int doXscm = 1;
++ #endif
+  
+  #ifdef VMS
+    /* convert VMS-style arguments to unix names and glob */
+    do_vms_wildcard(&argc, &argv);
+***************
+*** 461,466 ****
+--- 471,479 ----
+    if (rd_str ("searchDirectory"))  strcpy(searchdir, def_str);
+    if (rd_str ("textviewGeometry")) textgeom  = def_str;
+    if (rd_flag("useStdCmap"))     stdcmap     = def_int;
++ #ifdef XSCM
++   if (rd_flag("useXscm"))        doXscm      = def_int;
++ #endif
+    if (rd_str ("visual"))         visualstr   = def_str;
+    if (rd_flag("vsDisable"))      novbrowse   = def_int;
+    if (rd_str ("vsGeometry"))     browgeom    = def_str;
+***************
+*** 773,778 ****
+--- 786,796 ----
+      else if (!argcmp(argv[i],"-stdcmap",3))     /* use stdcmap */
+        stdcmap = !stdcmap;
+  
++ #ifdef XSCM
++     else if (!argcmp(argv[i],"-xscm",4))        /* use stdcmap */
++       doXscm = !doXscm;
++ #endif
++ 
+      else if (!argcmp(argv[i],"-tgeometry",2))	/* text viewer geom */
+        { if (++i<argc) textgeom = argv[i]; }
+      
+***************
+*** 907,912 ****
+--- 925,983 ----
+    vrHIGH = dispHIGH  = DisplayHeight(theDisp,theScreen);
+    maxWIDE = dispWIDE;  maxHIGH = dispHIGH;
+  
++ #ifdef XSCM
++ haveXscm = Xscm484 = 0;
++ if (doXscm)
++ {
++   /* Look for Xscm standard colormap.  If returned visual is Direct/TrueColor,
++      ok: xv handles them correctly.  Otherwise must be 484 render, which is
++      recognized and handled in xvcolor.c as a (new) std cmap.
++   */
++   if (XscmFindColorSCM(theDisp, theScreen, XSCM_ANY, &XscmInfo)) {
++       if ((XscmInfo.visual->class == TrueColor) 
++        || (XscmInfo.visual->class == DirectColor))
++         haveXscm = 1;
++       else if (XscmInfo.renderType == XSCM_RENDER_484) {
++         haveXscm = Xscm484 = 1;
++         stdcmap = 1;
++         defaultCmapMode = colorMapMode = CM_STDCMAP;
++         browPerfect = 0;
++         }
++ 
++       if (haveXscm) {
++         theVisual = XscmInfo.visual;
++         theCmap = XscmInfo.colormap;
++         dispDEEP = XscmInfo.depth;
++         visualstr = NULL;
++ 
++   	{
++   	  /* create a temporary window using this visual so we can
++   	     create a GC for this visual */
++   
++           Window win;  
++           XSetWindowAttributes xswa;
++           XGCValues xgcv;
++           unsigned long xswamask;
++           
++           XFlush(theDisp);
++           XSync(theDisp, False);
++           xswa.background_pixel = 0;
++           xswa.border_pixel     = 1;
++           xswa.colormap         = theCmap;
++           xswamask = CWBackPixel | CWBorderPixel | CWColormap;
++           win = XCreateWindow(theDisp, rootW, 0, 0, 100, 100, 2, dispDEEP,
++                               InputOutput, theVisual, xswamask, &xswa);
++           XFlush(theDisp);
++           XSync(theDisp, False);
++           theGC = XCreateGC(theDisp, win, 0L, &xgcv);
++           XDestroyWindow(theDisp, win);
++         }
++       }
++     }
++ }
++ 
++ #endif
++ 
+    if (visualstr) {     /* handle non-default visual */
+      int vclass = -1;
+      int vid = -1;
+***************
+*** 1507,1512 ****
+--- 1578,1586 ----
+    printoption("[-vsgeometry geom]");
+    printoption("[-vsmap]");
+    printoption("[-vsperfect]");
++ #ifdef XSCM
++   printoption("[-xscm]");
++ #endif
+    printoption("[-wait seconds]");
+    printoption("[-white color]");
+    printoption("[-wloop]");
+
+------------------------------ xvcolor.c -------------------------------------
+*** xv-3.00a/xvcolor.c	Thu Apr 22 21:32:44 1993
+--- xv-3.00a_xscm/xvcolor.c	Mon Jun 20 08:40:45 1994
+***************
+*** 71,77 ****
+--- 71,85 ----
+  
+  #include "xv.h"
+  
++ #ifdef XSCM
++ #include "xscmlib.h"
+  
++ extern XscmInfoRec XscmInfo;
++ extern int haveXscm;
++ extern int Xscm484;
++ 
++ #endif
++ 
+  #ifdef __STDC__
+  static void allocROColors(void);
+  static void allocRWColors(void);
+***************
+*** 110,116 ****
+    int   i, j, mdist, entry, d, hist[256], trans[256];
+    static CMAPENT c[256], c1[256], *cp, *cj, *ck;
+  
+- 
+    if (picType != PIC8) return;   /* only 8bit images *have* a colormap */
+  
+    /* init some stuff */
+--- 118,123 ----
+***************
+*** 287,292 ****
+--- 294,307 ----
+        if (ncols>0) SetISTR(ISTR_COLOR2,stdCmapSuccess);
+                else SetISTR(ISTR_COLOR2,"Dithering with 'black' & 'white'.");
+      }
++ #ifdef XSCM
++     if (haveXscm) {
++       if (Xscm484)
++         SetISTR(ISTR_COLOR,"Using Xscm 4x8x4 colormap.");
++       else
++         SetISTR(ISTR_COLOR,"Using Xscm TrueColor/DirectColor visual.");
++     }
++ #endif
+  
+      rwthistime = 0;
+  
+***************
+*** 350,356 ****
+    XColor   ctab[256];
+    int      dc;
+  
+- 
+    unique = p2alloc = 0;
+    rwthistime = 0;
+  
+--- 365,370 ----
+***************
+*** 970,976 ****
+    int des2got[256];
+    int maplen, exactCnt, nearCnt;
+  
+- 
+    /* generate stdr,stdg,stdb cmap.  Same in all cases */
+    for (r=0, i=0; r<8; r++)
+      for (g=0; g<8; g++)
+--- 984,989 ----
+***************
+*** 980,985 ****
+--- 993,1038 ----
+  	stdb[i] = (b*255)/3;
+        }
+  
++ #ifdef XSCM
++ if (haveXscm) {
++   int i, base, p0, p1;
++   stdnfcols = 0;
++ 
++   if (Xscm484) {
++     /* setup 484 ramp: same as 884 except levels 0,1 of red same, etc. */
++     base = XscmInfo.basePixel;
++     for (r=0, i=0; r<4; r++)
++       for (g=0; g<8; g++)
++         for (b=0; b<4; b++, i++) {
++           p0 = (r * 64)            + (g * 4) + b;
++           p1 = (r * 64) + (1 * 32) + (g * 4) + b;
++           stdrdisp[p0] = stdrdisp[p1] = (r*255)/3;
++           stdgdisp[p0] = stdgdisp[p1] = (g*255)/7;
++           stdbdisp[p0] = stdbdisp[p1] = (b*255)/3;
++           stdcols[p0]  = stdcols[p1]  = i + base;
++ 	  }
++     }
++   else {
++     /* setup 884 ramp */
++     for (i=0; i<256; i++) {
++       stdrdisp[i] = stdr[i];
++       stdgdisp[i] = stdg[i];
++       stdbdisp[i] = stdb[i];
++       stdcols[i] = i;
++       }
++     }
++ 
++   if (!browPerfect) {  /* we've changed the colors the browser icons used */
++     for (i=0; i<256; i++) {
++       browR[i]    = stdr[i];
++       browG[i]    = stdg[i];
++       browB[i]    = stdb[i];
++       browcols[i] = stdcols[i];
++       }
++     }
++   return 1;
++   }
++ #endif
+  
+    /* determine what size cmap we should build */
+    if (theVisual->class == TrueColor || 
+
+----------------------------------- xvimage.c ---------------------------------
+*** xv-3.00a/xvimage.c	Thu Apr 22 21:32:48 1993
+--- xv-3.00a_xscm/xvimage.c	Mon Jun 20 09:29:18 1994
+***************
+*** 78,84 ****
+--- 78,91 ----
+  
+  #include "xv.h"
+  
++ #ifdef XSCM
++ #include "xscmlib.h"
+  
++ extern XscmInfoRec XscmInfo;
++ extern int haveXscm;
++ 
++ #endif
++ 
+  #ifdef __STDC__
+  static void do_zoom(int, int);
+  static void compute_zoom_crop(int, int);
+***************
+*** 1193,1198 ****
+--- 1200,1244 ----
+    }
+  
+  
++ #ifdef XSCM
++   if (haveXscm) {
++      unsigned char *imagedata, *src;
++      int            srcRowBytes, dstRowBytes, i;
++      int            reds[256], greens[256], blues[256], *pr, *pg, *pb;
++  
++     dstRowBytes = eWIDE * XscmInfo.bytesPerPixel; 
++     imagedata = (unsigned char *)malloc (eHIGH * dstRowBytes); 
++     if (!imagedata) 
++       FatalError("couldn't create xim!"); 
++ 
++     if (picType == PIC8) {
++       src = (unsigned char *)epic;
++       srcRowBytes = eWIDE;
++       pr = reds;
++       pg = greens;
++       pb = blues;
++       for (i = 0; i < 256; i++) {
++           reds[i]   = rMap[i] << 8 | rMap[i];
++           greens[i] = gMap[i] << 8 | gMap[i];
++           blues[i] = bMap[i] << 8 | bMap[i];
++           }
++         }
++     else {
++       pr = pg = pb = (int *)0;
++       src = (unsigned char *)egampic;
++       srcRowBytes = eWIDE * 3;
++       }
++     if (!XscmRender (&XscmInfo, src, srcRowBytes, eWIDE, eHIGH, pr, pg, pb,
++                       dstRowBytes, imagedata))
++       FatalError("couldn't render xim!"); 
++     theImage = XCreateImage (XscmInfo.display, XscmInfo.visual, XscmInfo.depth, 
++                              ZPixmap,  0, (char *)imagedata, eWIDE, eHIGH, 
++                              8 * XscmInfo.bytesPerPixel, dstRowBytes); 
++     if (!theImage)
++       FatalError("couldn't create Xscm xim!"); 
++     return;
++     }
++ #endif
+    if (picType == PIC8) 
+      theImage = Pic8ToXImage(epic, eWIDE, eHIGH, cols, rMap, gMap, bMap);
+    else if (picType == PIC24)
+
+------------------------------ Xscm ftp info ----------------------------------
+This notice is to announce the availability of "Xscm", a program and library
+for creating and using X standard colormaps.  The source code can be obtained
+via anonymous ftp from the following location:
+
+    Name:      hpcvaaz.cv.hp.com
+    Address:   15.255.72.15
+    Directory: pub/xscm
+
+Two files are available there: README and xscm10.tar.Z, a compressed tar file
+containing the source for xscm and Xscmlib.  The README file is included below
+to explain what Xscm is.
+
+Please send all comments and questions to:
+    Peter Kaczowka
+    kaczowka@ch.hp.com
+    HP Chelmsford MA
+
+----------------------------------------------------------------------------
+/*
+(c) Copyright 1994 HEWLETT-PACKARD COMPANY
+
+To anyone who acknowledges that this file is provided 
+"AS IS" without any express or implied warranty:
+permission to use, copy, modify, and distribute this 
+file for any purpose is hereby granted without fee, 
+provided that the above copyright notice and this 
+notice appears in all copies, and that the name of 
+Hewlett-Packard Company not be used in advertising or 
+publicity pertaining to distribution of the software 
+without specific, written prior permission.  Hewlett-
+Packard Company makes no representations about the 
+suitability of this software for any purpose.
+*/
+
+The code contained herein has been developed to help foster the use of standard
+colormaps within X applications, middleware, vendor offerings and future
+standardization efforts.  Please feel free to contact me with any questions
+regarding this software.
+
+    Peter Kaczowka
+    kaczowka@ch.hp.com
+    HP Chelmsford MA
+
+
+This directory contains source code for "xscm" a program to create X standard
+colormaps.  For more information on X standard colormaps see (starting at page
+220):
+
+    "Xlib Programming Manual for Version 11, Release 4" by Adrian Nye
+    (c) 1990 O'Reilly & Associates, Inc.
+    ISBN 0-937175-11-0
+
+The program "xstdcmap" also creates standard colormaps, but xscm differs in 
+several ways, described below.  
+
+Xscmlib provides support for the standard colormaps created by xscm.  Xscmlib
+contains functions that allow standard colormaps to be easily found and used,
+including functions that render and display certain types of images.  Xscmlib
+can be used "as is" or as sample code.
+
+Depending on the option(s) used (see below) xscm may allocate colors from
+an existing colormap, e.g. the default.  Note that this allocation may fail 
+even if sufficient free colors are available because standard colormaps require
+contiguous pixels and the colormap may be "fragmented".  For this reason it is
+recommended that xscm be run first after the X server is started, for example
+as part of the X startup script.
+
+xscm uses portions of the Xmu library.  For convenience those parts used are
+included in this release.  See those files for appropriate copyrights.
+
+
+Three types of standard colormaps can be created with xscm:
+
+1) The "best" map (XA_RGB_BEST_MAP).  This is the "best" RGB colormap available
+on the screen.  It is created by using the "-best" or "-all" option.  xscm only
+creates the best map if a 24 or 8 bit TrueColor or DirectColor visual exists
+on the display.  This is in contrast to xstdcmap which will create a private
+colormap for example for PseudoColor displays and make that the best map.
+Applications which then use that "best" map may cause the screen to "go
+technicolor".
+
+Since creating the best map does not use up any color cells it is recommended
+that the best map always be created.  Programs should always search for the
+best map and use it if it exists.  Note that the best visual and colormap
+are generally not the DefaultVisual and DefaultColormap so only programs which
+are not "hardwired" to the default visual and colormap can safely use the 
+best map.
+
+The best map created by xscm may not be the best map for a given display.
+Vendors and users are encouraged to modify xscm as necessary to support such
+displays.  Note however that Xscmlib may not support such displays.
+
+Vendors and users however are *discouraged* from changing the allocations used 
+for the default and gray maps, as that can discourage application portability
+and colormap sharing by applications run from remote hosts.
+
+
+2) The "default" map (XA_RGB_DEFAULT_MAP).  This is a ramp of RGB values that
+exist as contiguous pixels in the default colormap.  These colors can be used
+by programs that use the default visual and colormap.  It is created by using
+the "-default" or "-all" option.
+
+xscm creates a ramp that consists of 484 RGB levels, or in bits, 232.  128
+colors are allocated from the default colormap.  This is in contrast to 
+xstdcmap which tries to allocate a 666 ramp, or 555, etc. if insufficient
+colors are available.  484 was chosen over 216 because it uses fewer colors
+(128 vs. 216) and because it in general produces better quality because it
+has 8 levels of green instead of 6 in the 666 case.  Because the human eye
+is about twice as sensitive to green as to red (and about 4x as to blue) having
+more levels of green produces better quality images.  In fact 484 yields
+quality close to that or 884 (aka 332) which is generally considered the best
+ramp for 8 bits; 884 is used by xscm as the best map on 8 bit True/DirectColor
+visuals.
+
+Another advantage of 484 over 666 is that all levels are powers of two (2), so
+that packing color values into pixels can be done with shifts, as opposed to 
+multiplies, table lookups, or multiple shifts and adds to do 666.  This helps
+the performance of image rendering.
+
+Note also that the 484 ramp is compatible with the color usage of HP image and
+video products, e.g. MPower, Image Library (IL), Video_Play (MPEG software
+playback).
+
+
+3) The "gray" map (XA_RGB_GRAY_MAP).  It is created by using the "-gray" or
+"-all" option.
+
+As defined for X the gray map can use a visual and colormap other than the
+default.  On an 8 bit display for example xstdcmap creates a private colormap
+and loads it with 256 grays.  Displaying using such a gray map can result in
+the screen and / or other windows (e.g. ones using the best map) "going
+technicolor".
+
+xscm creates a ramp of 32 grays in the default visual and colormap.  32 grays
+was chosen because high quality display of gray images can be achieved with 
+32 grays.  Another use of a gray map is to display high resolution bitonal
+(monochrome) images such as FAX images scaled to gray.
+
+
+The following are some ways to using xscm:
+
+    o Create all maps (see below); this is the recommended usage:
+          xscm -all -replace
+
+    o Create the best map if display supports it:
+          xscm -best -replace
+
+      This creates the best map if there is a 24 or 8 bit True/DirectColor
+      visual.  Since no colors are allocated from existing colormaps no color
+      slots are lost.  Applications that then use the best map will not cause
+      technicolor unless the X server supports for example both an 8 bit 
+      TrueColor and a PseudoColor visual on a display with only one hardware
+      colormap.  If technicolor results creation of the best map can be 
+      omitted.
+
+    o Create the default map:
+          xscm -default -replace
+      This allocates up to 128 colors from the default colormap.
+
+    o Create the gray map:
+          xscm -gray -replace
+      This allocates up to 32 colors from the default colormap.
+
+    o List the colormaps found
+          xscm -list
+      "-list" can be used in conjunction with any other option to list the
+      standard colormaps found after all other operations are performed.
+
+    o Get help on all options:
+          xscm -help
+
+
+
+
+
+

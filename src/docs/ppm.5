@@ -1,0 +1,85 @@
+.TH ppm 5 "05 September 1989"
+.SH NAME
+ppm - portable pixmap file format
+.SH DESCRIPTION
+The portable pixmap format is a lowest common denominator color image
+file format.
+The definition is as follows:
+.IP - 2
+A "magic number" for identifying the file type.
+A ppm file's magic number is the two characters "P3".
+.IP - 2
+Whitespace (blanks, TABs, CRs, LFs).
+.IP - 2
+A width, formatted as ASCII characters in decimal.
+.IP - 2
+Whitespace.
+.IP - 2
+A height, again in ASCII decimal.
+.IP - 2
+Whitespace.
+.IP - 2
+The maximum color-component value, again in ASCII decimal.
+.IP - 2
+Whitespace.
+.IP - 2
+Width * height pixels, each three ASCII decimal values between 0 and the
+specified maximum value, starting at the top-left
+corner of the pixmap, proceding in normal English reading order.
+The three values for each pixel represent red, green, and blue, respectively;
+a value of 0 means that color is off, and the maximum value means that color
+is maxxed out.
+.IP - 2
+Characters from a "#" to the next end-of-line are ignored (comments).
+.IP - 2
+No line should be longer than 70 characters.
+.PP
+Here is an example of a small pixmap in this format:
+.PP
+.nf
+P3
+# feep.ppm
+4 4
+15
+ 0  0  0    0  0  0    0  0  0   15  0 15
+ 0  0  0    0 15  7    0  0  0    0  0  0
+ 0  0  0    0  0  0    0 15  7    0  0  0
+15  0 15    0  0  0    0  0  0    0  0  0
+.fi
+.PP
+Programs that read this format should be as lenient as possible,
+accepting anything that looks remotely like a pixmap.
+.PP
+There is also a variant on the format, available
+by setting the RAWBITS option at compile time.  This variant is
+different in the following ways:
+.IP - 2
+The "magic number" is "P6" instead of "P3".
+.IP - 2
+The pixel values are stored as plain bytes, instead of ASCII decimal.
+.IP - 2
+Whitespace is not allowed in the pixels area.
+.IP - 2
+The files are smaller and many times faster to read and write.
+.PP
+Note that this raw format can only be used for maxvals less than
+or equal to 255.
+If you use the PPM library and try to write a file with a larger maxval,
+it will automatically fall back on the slower but more general ASCII
+format.
+.SH "SEE ALSO"
+giftoppm(1), ilbmtoppm(1), imgtoppm(1), mtvtoppm(1), qrttoppm(1), rasttoppm(1),
+tgatoppm(1), xwdtoppm(1),
+ppmtogif(1), ppmtoilbm(1), ppmtopgm(1), ppmtops(1), ppmtorast(1), ppmtoxwd(1),
+ppmarith(1), ppmconvol(1), ppmcscale(1), ppmhist(1), ppmquant(1), ppmrotate(1),
+ppmscale(1), ppmshear(1),
+pnm(5), pgm(5), pbm(5)
+.SH AUTHOR
+Copyright (C) 1989 by Jef Poskanzer.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation.  This software is provided "as is" without express or
+implied warranty.

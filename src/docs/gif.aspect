@@ -1,0 +1,54 @@
+XV also supports the GIF 'aspect ratio' extension that was discussed on 
+comp.graphics.  Here's the description:
+----------------------------------------------------------------------------
+
+There was quite a discussion in comp.graphics a few weeks ago, with a
+lot of people complaining about GIF images coming with many different
+aspect ratios, but no indication what the initial aspect ratio was.
+
+Several suggestions were made, the best of which was Chris Schoeneman
+(i think) suggesting the following extension block be added to specify
+the aspect ratio:
+#   7 6 5 4 3 2 1 0   Byte #
+#  +---------------+
+#  |0 0 1 0 0 0 0 1|    1        '!' - GIF extension block introducer
+#  +---------------+
+#  |0 1 0 1 0 0 1 0|    2        'R' - For 'aspect Ratio'
+#  +---------------+
+#  |0 0 0 0 0 0 1 0|    3         2  - Two bytes in block
+#  +---------------+
+#  |  pixel width  |    4            - First part of ratio (numerator)
+#  +---------------+
+#  | pixel height  |    5            - Second part of ratio (denominator)
+#  +---------------+
+#  |0 0 0 0 0 0 0 0|    6         0  - extension block end code
+#  +---------------+
+#
+#Let byte four equal 'x' and byte five equal 'y'  Then x:y is the _pixel_
+#aspect ratio.  'x' and 'y' should be relatively prime (ie they should
+#have no common divisor except one), but they don't have to be.
+
+Jef Paskanzer [of PBMPLUS fame]  modified his
+gif decoder to recognize this. I also modified my own, not that I count :-)
+Jef and I cross-checked ours and these diffs are compatible with both.
+
+This code, by the way, isn't terrible robust, and will only skip extensions
+found BEFORE the image separator, but it is a lot better than nothing.
+
+Since then, there has been a seemingly official announcement about a GIF89a
+standard from CompuServe, and the possibility of both GIF's becoming outlawed
+because of the Unisys LZW patent,  etc. etc. etc. oh, well... life goes on.
+
+anyway... I hope this is of some help. you are welcome to post these patches
+to wherever is appropriate (i didnt do a patch on patchlevel.h, b.t.w.), or
+incorporate them into your new program, or whatever. I relinquish all claims,
+etc. etc.
+
+-steve
+-------------------------------------------------------+"Come, Watson, come!"
+ Steve Swales                (716) 275-0265,-3857,-5101| he cried. "The game is
+ steve@bat.lle.rochester.edu           (128.151.32.111)| afoot. Not a word!
+ {decvax,harvard,ames,rutgers}!rochester!ur-laser!steve| Into your clothes and
+ University of Rochester            250 East River Road| come!"		S.H.
+ Laboratory for Laser Energetics    Rochester, NY 14623|     'The Abbey Grange'
+

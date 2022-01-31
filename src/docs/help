@@ -1,0 +1,167 @@
+XV Mouse and Keyboard Usage
+===========================
+
+Part 1:  Mouse Usage in the Image Window
+----------------------------------------
+                 Button1 - draws a selection rectangle
+                 Button2 - pixel values, measures distance, picks color
+                 Button3 - opens/closes the 'xv controls' window
+  
+          ctrl + Button1 - zooms in
+          ctrl + Button2 - pans
+          ctrl + Button3 - zooms out
+  
+  shift        + Button1 - draws a square selection rectangle
+  shift        + Button2 - freehand drawing tool
+  shift + ctrl + Button2 - draws lines
+  shift        + Button3 - smudging tool
+  
+Part 1a:  Mouse Usage in Selection Rectangle
+--------------------------------------------
+                 Button1 - moves selection rectangle
+  shift        + Button1 - moves selection, constrains motion
+                 Button2 - 'drag-and-drop' cut and paste
+  shift        + Button2 - 'drag-and-drop' cut and paste, constrain
+          ctrl + Button2 - 'drag-and-drop' copy and paste
+  shift + ctrl + Button2 - 'drag-and-drop' copy and paste, constrain
+  
+  
+  
+Part 2:  Normal Keyboard Equivalents
+------------------------------------
+The following keys can be used in most xv windows, including the image,
+controls, and color editor windows, but *not* the visual schnauzer.
+  
+  Tab or 
+  Space         - 'Next' command
+  
+  Return        - reload currently displayed image file
+  
+  Del or 
+  Backspace     - 'Prev' command
+  
+  ctrl+'l'      - 'Load' command
+  ctrl+'s'      - 'Save' command
+  ctrl+'p'      - 'Print' command
+  ctrl+'d'      - 'Delete' command
+  
+  'q' or 
+  ctrl+'q'      - 'Quit' command
+  
+  meta+'x'      - 'cut' command
+  meta+'c'      - 'copy' command
+  meta+'v'      - 'paste' command
+  meta+'d'      - 'clear' command
+  
+  'n'           - reset image to normal (unexpanded) size
+  'm'           - maximum image size
+  'M'           - maximum image size, maintaining aspect ratio
+  '>'           - double image size
+  '<'           - half image size
+  '.'           - make image 10% larger
+  ','           - make image 10% smaller
+  'S'           - set image to specified size/expansion
+  'a'           - reset image to normal aspect ratio
+  '4'           - make image have a 4x3 width/height ratio
+  'I'           - round image size to integer expansion/compression ratios
+  
+  't'           - turn image 90 degrees clockwise
+  'T'           - turn image 90 degrees counter-clockwise
+  'h'           - flip image horizontally
+  'v'           - flip image vertically
+  
+  'P'           - pad image
+  'A'           - image annotation
+  'c'           - 'Crop' command
+  'u'           - 'UnCrop' command
+  'C'           - 'AutoCrop' command
+  
+  'r'           - raw mode
+  'd'           - dithered mode
+  's'           - smooth mode
+  meta+'8'      - toggle 8/24 bit mode
+  
+  'V' or 
+  ctrl+'v'      - Visual Schnauzer
+  'e'           - Color Editor
+  'i'           - Image Info
+  ctrl+'c'      - Image Comments
+  ctrl+'t'      - Text View
+  
+  ctrl+'g'      - 'Grab' command
+  ctrl+'a'      - 'About XV' command
+  
+  meta+'b'      - Blur algorithm
+  meta+'s'      - Sharpen algorithm
+  meta+'e'      - Edge Detection algorithm
+  meta+'m'      - Emboss algorithm
+  meta+'o'      - Oil Paint algorithm
+  meta+'B'      - Blend algorithm
+  meta+'t'      - Copy rotate algorithm
+  meta+'T'      - Clear rotate algorithm
+  meta+'p'      - Pixelize algorithm
+  meta+'S'      - Spread algorithm
+  
+  'R' or
+  meta+'r' or 
+  meta+'0'      - 'Reset' command in color editor
+  
+  meta+'1'      - select preset 1 in color editor
+  meta+'2'      - select preset 2 in color editor
+  meta+'3'      - select preset 3 in color editor
+  meta+'4'      - select preset 4 in color editor
+  meta+'a'      - 'Apply' command in color editor
+  
+  
+  
+Part 2a:  Image Window Keys
+---------------------------
+The following keys can *only* be used inside the image window.
+  
+  ctrl + Up     - crops 1 pixel off the bottom of the image
+  ctrl + Down   - crops 1 pixel off the top of the image
+  ctrl + Left   - crops 1 pixel off the right side of the image
+  ctrl + Right  - crops 1 pixel off the left side of the image
+  
+  If you're viewing a multi-page document:
+  'p'           -  opens a 'go to page #' dialog box
+  
+  PageUp, or
+  Prev, or 
+  shift+Up      - previous page
+  
+  PageDown, or
+  Next, or 
+  shift+Down    - next page
+  
+  
+  If a selection rectangle is active
+  Up            - move rectangle up 1 pixel
+  Down          - move rectangle down 1 pixel
+  Left          - move rectangle left 1 pixel
+  Right         - move rectangle right 1 pixel
+  shift+Up      - shrink rectangle vertically by 1 pixel
+  shift+Down    - expand rectangle vertically by 1 pixel
+  shift+Left    - shrink rectangle horizontally by 1 pixel
+  shift+Right   - expand rectangle horizontally by 1 pixel
+  
+  
+Part 2b:  Visual Schnauzer Keys
+-------------------------------
+The following keys can only be used in the visual schnauzer windows.
+  
+  ctrl+'d'      - delete file(s)
+  ctrl+'n'      - create new directory
+  ctrl+'r'      - rename file
+  ctrl+'s'      - rescan directory
+  ctrl+'w'      - open new window
+  ctrl+'u'      - update icons
+  ctrl+'g'      - generate icons for selected files
+  ctrl+'a'      - select all files
+  ctrl+'t'      - view selected file as text
+  ctrl+'q'      - quit XV
+  ctrl+'c'      - change directory
+  Esc           - close window
+  Return        - load currently selected file(s)
+  Space         - load next file
+  Backspace     - load previous file

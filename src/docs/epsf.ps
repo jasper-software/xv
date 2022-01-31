@@ -1,0 +1,2343 @@
+%!PS-Adobe-2.1
+%%Title: epsf2.psx
+%%Creator: Glenn Reid and still.ps (V 1.0d release 10 edit 10)
+%%BoundingBox: (atend)
+%%Pages: (atend)
+%%DocumentProcSets: Adobe_distill 0.96
+%%EndComments
+%%BeginProcSet: Adobe_distill 0.96
+/PROLOGUE 30 40 add dict def
+ % 30 procedure entries + room for 40 cached font dictionaries
+ PROLOGUE begin
+ /clip { } def    % causes problems. remove if "clip" is needed
+ /bdef { bind def } bind def	/ldef { load def } bdef
+ /T { moveto show } bdef	/A { moveto ashow } bdef
+ /W { moveto widthshow } bdef	/AW { moveto awidthshow } bdef
+ /f /fill ldef			/R { { rlineto } repeat } bdef
+ /r /rlineto ldef		/L { { lineto } repeat } bdef
+ /m /moveto ldef		/l { moveto lineto stroke } bdef
+ /x { 0 rlineto } bdef		/y { 0 exch rlineto } bdef
+ /c /curveto ldef		/cp /closepath ldef
+ /s /stroke ldef		/w /setlinewidth ldef
+ /g /setgray ldef		/j /setlinejoin ldef
+ /d /setdash ldef		/F /setfont ldef
+ /C /setcmykcolor where { /setcmykcolor get }{ %ifelse
+   { %def
+     1 sub 3 { 3 index add neg dup 0 lt { pop 0 } if 3 1 roll } repeat
+     setrgbcolor
+   } bind
+ } ifelse def
+ /selectfont where { pop }{ %ifelse
+     /selectfont { exch findfont exch scalefont setfont } bdef
+ } ifelse
+ /MF { exch findfont exch makefont setfont } bdef
+ /FF /selectfont ldef
+ /DF { selectfont currentfont def } bdef
+ /BEGINPAGE { pop /pagesave save def } bdef
+ /ENDPAGE { pop pagesave restore showpage } def
+ /REMAP { %def
+   FontDirectory 2 index known { pop pop pop } { %ifelse
+     findfont dup length dict begin
+       { 1 index /FID ne {def}{pop pop} ifelse } forall
+       exch dup length 0 gt { /Encoding exch def }{ pop } ifelse
+     currentdict end definefont pop
+   } ifelse
+ } bdef
+ /RECODE { %def
+    3 -1 roll 1 index findfont /Encoding get 256 array copy exch
+    0 exch { %forall
+     dup type/nametype eq
+       { 3 {2 index} repeat put pop 1 add }{ exch pop }ifelse
+    } forall pop 3 1 roll REMAP
+ } bdef
+ end %PROLOGUE
+%%EndProcSet: Adobe_distill 0.96
+%%EndProlog
+%%BeginSetup
+PROLOGUE begin
+/stdvec
+[
+  /.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+  /.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+  /.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+  /.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+  /space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle
+  /parenleft/parenright/asterisk/plus/comma/hyphen/period/slash
+  /zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon
+  /less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N
+  /O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright
+  /asciicircum/underscore/grave/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o
+  /p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde/.notdef
+  /Adieresis/Aring/Ccedilla/Eacute/Ntilde/Odieresis/Udieresis
+  /aacute/agrave/acircumflex/adieresis/atilde/aring/ccedilla/eacute
+  /egrave/ecircumflex/edieresis/iacute/igrave/icircumflex/idieresis
+  /ntilde/oacute/ograve/ocircumflex/odieresis/otilde/uacute/ugrave
+  /ucircumflex/udieresis/dagger/.notdef/cent/sterling/section
+  /bullet/paragraph/germandbls/registered/copyright/trademark
+  /acute/dieresis/.notdef/AE/Oslash/.notdef/.notdef/.notdef/.notdef
+  /yen/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/ordfeminine
+  /ordmasculine/.notdef/ae/oslash/questiondown/exclamdown/logicalnot
+  /.notdef/florin/.notdef/.notdef/guillemotleft/guillemotright
+  /ellipsis/.notdef/Agrave/Atilde/Otilde/OE/oe/endash/emdash/quotedblleft
+  /quotedblright/quoteleft/quoteright/.notdef/.notdef/ydieresis
+  /Ydieresis/fraction/currency/guilsinglleft/guilsinglright/fi
+  /fl/daggerdbl/periodcentered/quotesinglbase/quotedblbase/perthousand
+  /Acircumflex/Ecircumflex/Aacute/Edieresis/Egrave/Iacute/Icircumflex
+  /Idieresis/Igrave/Oacute/Ocircumflex/.notdef/Ograve/Uacute/Ucircumflex
+  /Ugrave/dotlessi/circumflex/tilde/macron/breve/dotaccent/ring
+  /cedilla/hungarumlaut/ogonek/caron
+]def
+stdvec /CourierR /Courier REMAP
+%%EndSetup
+%%Page: 1 1
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+1 BEGINPAGE
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 10 DF
+(January 16, 1989) 180 541 T
+(PostScript\250 Developer Tools & Strategies Group) 180 530 T
+(Last Minor Documentation Bug Fix: June 5, 1989) 180 486 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F2 /HelveticaR 9 DF
+(Adobe Systems Incorporated) 180 105 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F3 /HelveticaR 8 DF
+(1585 Charleston Road PO Box 7900) 180 96 T
+(Mountain View, CA  94039-7900) 180 87 T
+(\(415\) 961-4400) 180 78 T
+1 g
+2 setlinecap
+144 53 m
+390 x
+-19 y
+-390 x
+eofill
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F4 /HelveticaR 7 DF
+(PN LPS5002) 180 40 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F5 /Helvetica-BoldR 14 DF
+(ENCAPSULATED P) 180 691 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F6 /Helvetica-BoldR 12 DF
+(OST) 308.34 691 T
+F5 F
+(S) 333.01 691 T
+F6 F
+(CRIPT) 342.35 691 T
+F5 F
+( FILES) 378.35 691 T
+(Speci\336cation) 180 676 T
+(Version 2.0) 180 661 T
+1.268 w
+0 setlinecap
+4 setmiterlimit
+[] 0 d
+109.698 714.182 m
+111.525 713.672 112.472 713.234 113.624 712.431 c
+-22.3128 -25.8381 r
+97.4019 682.652 103.794 672.84 100.329 664.844 c
+102.034 675.687 90.7436 683.82 84.1099 684.842 c
+25.588 29.3407 r
+f
+1.0361 w
+f
+f
+91.8805 654.468 m
+96.0255 654.285 100.155 654.188 104.481 654.188 c
+113.804 654.188 122.752 654.636 131.141 655.44 c
+134.222 655.737 136.724 658.133 137.108 661.279 c
+137.79 666.855 138.107 672.696 138.107 678.705 c
+138.107 684.714 137.79 690.555 137.108 696.131 c
+136.724 699.277 134.222 701.674 131.141 701.97 c
+127.476 702.321 123.704 702.604 119.84 702.813 c
+119.84 702.813 103.842 668.373 102.231 664.827 c
+99.8549 659.595 96.601 655.765 91.8805 654.468 c
+f
+0.7851 w
+77.8202 655.44 m
+74.7171 655.948 72.2887 657.716 71.8525 661.279 c
+71.1725 666.855 70.8549 672.696 70.8549 678.705 c
+70.8549 684.714 71.1725 690.555 71.8525 696.131 c
+72.2381 699.277 74.7417 701.674 77.8202 701.97 c
+82.1335 702.383 86.5932 702.702 91.1764 702.916 c
+8.16241 9.07727 r
+99.2863 711.98 101.266 712.345 102.996 711.921 c
+-28.4564 -32.9334 r
+80.6983 681.906 98.7446 677.354 98.7446 666.708 c
+98.7446 655.332 86.3243 654.054 77.8202 655.44 c
+f
+stdvec /Times-BoldR /Times-Bold  REMAP
+/Times-BoldR [12.4145 0 0 13.7154 0 0 ] MF
+(S) 98.2019 637.828 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(C) 104.482 637.834 T
+0.0843 w
+139.67 644.154 m
+140.194 644.154 140.619 644.576 140.619 645.098 c
+140.619 645.619 140.194 646.042 139.67 646.042 c
+139.146 646.042 138.721 645.619 138.721 645.098 c
+138.721 644.576 139.146 644.154 139.67 644.154 c
+cp s
+s
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F7 /Times-RomanR 1.32667 DF
+(R) 139.234 644.677 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(RIPT) 111.816 637.799 T
+/Times-BoldR [11.083 0 0 12.2444 0 0 ] MF
+(T) 91.1855 637.796 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(S) 85.467 637.798 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(O) 77.4887 637.818 T
+/Times-BoldR [12.4145 0 0 13.7154 0 0 ] MF
+(P) 70.3947 637.831 T
+1 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Bold Times-Roman 
+%%PageBoundingBox: 14 15 534 714 
+%%Page: 2 2 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+2 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b2)255.26 36 W
+1 g
+2 setlinecap
+31 63 m
+452 x
+-40 y
+-452 x
+eofill
+0 g
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F2 /Times-RomanR 8 DF
+(Copyright \251 1988, 1987 by Adobe Systems Incorporated.) 144 606 T
+0.74 0 32 (All rights reserved. No part of this publication may be\
+ reproduced, stored in a retrieval system, or) 
+144 586 W
+0.12 0 32 (transmitted, in any form or by any means, electronic, mechanical,\
+ photocopying, recording, or other-) 
+144 576 W
+(wise, without the prior written permission of the publisher.) 144 566 T
+1.14 0 32 (PostScript is a registered trademark of and the PostScript logo is\
+ a trademark of Adobe Systems) 
+144 546 W
+0.37 0 32 (Incorporated. Macintosh is a registered trademark of and QuickDraw\
+ is a trademark of Apple Com-) 
+144 536 W
+(puter, Inc. Microsoft is a registered trademark of Microsoft Corporation.)
+ 144 526 T
+0.54 0 32 (The information herein is furnished for informational use only, is\
+ subject to change without notice,) 
+144 506 W
+1.19 0 32 (and should not be construed as a commitment by Adobe Systems\
+ Incorporated.  Adobe Systems) 
+144 496 W
+0.45 0 32 (Incorporated assumes no responsibility or liability for any errors\
+ or inaccuracies that may appear in) 
+144 486 W
+0.53 0 32 (this book.  The software described in this book is furnished under\
+ license and may only be used or) 
+144 476 W
+(copied in accordance with the terms of such license.) 144 466 T
+2 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Times-Roman 
+%%PageBoundingBox: 31 23 483 606 
+%%Page: 3 3 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+3 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+177.428 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b3)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 14 DF
+(ENCAPSULATED P) 180 691 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F3 /Helvetica-BoldR 12 DF
+(OST) 308.34 691 T
+F2 F
+(S) 333.01 691 T
+F3 F
+(CRIPT) 342.35 691 T
+F2 F
+( FILES) 378.35 691 T
+(Specification) 180 676 T
+(Version 2.0) 180 661 T
+stdvec /Helvetica-ObliqueR /Helvetica-Oblique  REMAP
+/F4 /Helvetica-ObliqueR 10 DF
+(January 16, 1989) 180 626 T
+(PostScript\250 Developer Tools and Strategies Group) 180 615 T
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F5 /Times-RomanR 10 DF
+2.95 0 32 (This document specifies the format required for import of\
+ Encapsulated PostScript) 
+180 585 W
+1.88 0 32 (\(EPS\) Files into an application.  This specification suggests a\
+ standard for importing) 
+180 574 W
+4.69 0 32 (PostScript language files in all environments, and contains\
+ specific information) 
+180 563 W
+2.85 0 32 (about both the Macintosh\250 and MS-DOS environments.  This format\
+ conforms to) 180 552 W
+(Adobe Systems\325 Document Structuring Conventions, Version 2.0.) 180 541 T
+3.01 0 32 (The rules that should be followed in creating importable\
+ PostScript language files) 
+180 515 W
+1.65 0 32 (are a subset of the structuring conventions proposed by Adobe\
+ Systems Incorporated;) 
+180 504 W
+3.67 0 32 (refer to the ) 180 493 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F6 /Times-ItalicR 10 DF
+3.67 0 32 (PostScript Language Reference Manual) 237.39 493 W
+F5 F
+3.67 0 32 (, Appendix C, and ) 408.66 493 W
+F6 F
+3.67 0 32 (Document) 498.9 493 W
+3.56 0 32 (Structuring Conventions) 180 482 W
+F5 F
+3.56 0 32 (, version 2.0, available from Adobe Systems.  Files must) 281.62
+ 482 W
+5.55 0 32 (also be "well-behaved" in their use of certain PostScript language\
+ operators,) 
+180 471 W
+2.92 0 32 (manipulation of the graphics state, and manipulation of the\
+ PostScript interpreter\325s) 
+180 460 W
+5 0 32 (stacks and any global dictionaries.  These conventions are designed\
+ to allow) 
+180 449 W
+(cooperative sharing of files between many systems using the PostScript\
+ language.) 
+180 438 T
+3.5 0 32 (Fundamentally, an EPS file is a standard PostScript language file\
+ with a bitmap) 
+180 412 W
+2.04 0 32 (screen preview included optionally in the format.  The purpose of\
+ an EPS file is to) 
+180 401 W
+2.62 0 32 (be included into other document makeup systems as an illustration,\
+ and the screen) 
+180 390 W
+4.55 0 32 (representation is intended to aid in page composition. The bitmap\
+ is normally) 
+180 379 W
+3.31 0 32 (discarded when printing, and the PostScript language segment of\
+ the file is used) 
+180 368 W
+2.7 0 32 (instead.  Typically any manipulation of the screen image that is\
+ performed by the) 
+180 357 W
+3.02 0 32 (user \(such as scaling, translating, or rotation on screen\)\
+ should be tracked by the) 
+180 346 W
+3.12 0 32 (page layout application and an appropriate transformation should\
+ precede the EPS) 
+180 335 W
+(file when it is sent to the printer.) 180 324 T
+F2 F
+20.432 0 8 (1.\bEPS FILE FORMAT GUIDELINES)144 270 W
+F5 F
+4.45 0 32 (An EPS file should conform to at least Version 2.0 of the Adobe\
+ Document) 180 244 W
+3.74 0 32 (Structuring Conventions.  This does not explicitly require any of\
+ the structuring) 
+180 233 W
+3.74 0 32 (comments to be employed, but if used, they should be in accordance\
+ with that) 
+180 222 W
+2.15 0 32 (specification.  Additionally, an EPS file is required to contain\
+ the %%BoundingBox) 
+180 211 W
+2.4 0 32 (comment, and is required to be "well-behaved" \(see pages 3-4\). \
+ An EPS file may) 
+180 200 W
+5.09 0 32 (optionally contain a bitmap image suitable for WYSIWYG screen\
+ display, as) 180 189 W
+(discussed herein.) 180 178 T
+2.02 0 32 (The structure of an EPS file is marked by PostScript language\
+ comments, according) 
+180 153 W
+1.82 0 32 (to the ) 180 142 W
+F6 F
+1.82 0 32 (PostScript Document Structuring Conventions) 208.65 142 W
+F5 F
+1.82 0 32 (.  These are covered briefly here) 399.95 142 W
+3.71 0 32 (for reference.   Structuring comment lines must begin with "%!" or\
+ "%%" and) 180 131 W
+2.25 0 32 (terminate with a ) 180 120 W
+F6 F
+2.25 0 32 (newline) 254.24 120 W
+F5 F
+2.25 0 32 ( \(either return or linefeed\) character.  EPS file conventions)
+ 285.35 120 W
+2.07 0 32 (require that a comment line be no longer than 256 bytes.  A\
+ comment line may be) 
+180 109 W
+2.79 0 32 (continued by beginning the continuation line with ) 180 97 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F7 /Times-BoldR 10 DF
+2.79 0 32 ("%%+") 401.47 97 W
+F5 F
+2.79 0 32 (.  The EPS file should) 438.27 97 W
+5.51 0 32 (begin with a header of structuring comments, as specified in the\
+ PostScript) 180 86 W
+(Structuring Conventions.) 180 75 T
+1.268 w
+4 setmiterlimit
+[] 0 d
+109.698 714.182 m
+111.525 713.672 112.472 713.234 113.624 712.431 c
+-22.3128 -25.8381 r
+97.4019 682.652 103.794 672.84 100.329 664.844 c
+102.034 675.687 90.7436 683.82 84.1099 684.842 c
+25.588 29.3407 r
+f
+1.0361 w
+f
+f
+91.8805 654.468 m
+96.0255 654.285 100.155 654.188 104.481 654.188 c
+113.804 654.188 122.752 654.636 131.141 655.44 c
+134.222 655.737 136.724 658.133 137.108 661.279 c
+137.79 666.855 138.107 672.696 138.107 678.705 c
+138.107 684.714 137.79 690.555 137.108 696.131 c
+136.724 699.277 134.222 701.674 131.141 701.97 c
+127.476 702.321 123.704 702.604 119.84 702.813 c
+119.84 702.813 103.842 668.373 102.231 664.827 c
+99.8549 659.595 96.601 655.765 91.8805 654.468 c
+f
+0.7851 w
+77.8202 655.44 m
+74.7171 655.948 72.2887 657.716 71.8525 661.279 c
+71.1725 666.855 70.8549 672.696 70.8549 678.705 c
+70.8549 684.714 71.1725 690.555 71.8525 696.131 c
+72.2381 699.277 74.7417 701.674 77.8202 701.97 c
+82.1335 702.383 86.5932 702.702 91.1764 702.916 c
+8.16241 9.07727 r
+99.2863 711.98 101.266 712.345 102.996 711.921 c
+-28.4564 -32.9334 r
+80.6983 681.906 98.7446 677.354 98.7446 666.708 c
+98.7446 655.332 86.3243 654.054 77.8202 655.44 c
+f
+stdvec /Times-BoldR /Times-Bold  REMAP
+/Times-BoldR [12.4145 0 0 13.7154 0 0 ] MF
+(S) 98.2019 637.828 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(C) 104.482 637.834 T
+0.0843 w
+139.67 644.154 m
+140.194 644.154 140.619 644.576 140.619 645.098 c
+140.619 645.619 140.194 646.042 139.67 646.042 c
+139.146 646.042 138.721 645.619 138.721 645.098 c
+138.721 644.576 139.146 644.154 139.67 644.154 c
+cp s
+s
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F8 /Times-RomanR 1.32667 DF
+(R) 139.234 644.677 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(RIPT) 111.816 637.799 T
+/Times-BoldR [11.083 0 0 12.2444 0 0 ] MF
+(T) 91.1855 637.796 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(S) 85.467 637.798 T
+/Times-BoldR [11.0839 0 0 12.2454 0 0 ] MF
+(O) 77.4887 637.818 T
+/Times-BoldR [12.4145 0 0 13.7154 0 0 ] MF
+(P) 70.3947 637.831 T
+3 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Helvetica-Oblique Times-Roman
+%%+  Times-Italic Times-Bold 
+%%PageBoundingBox: 14 15 540 714 
+%%Page: 4 4 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+4 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b4)255.26 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 14 DF
+20.432 0 8 (2.\bREQUIRED PARTICIPATION)72 691 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+3.59 0 32 (In order to support Encapsulated PostScript files effectively,\
+ some cooperation is) 
+108 665 W
+2.24 0 32 (required on the parts of those who produce EPS files and those who\
+ use EPS files) 
+108 654 W
+(\(typically by including them into other documents\).) 108 643 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F4 /Helvetica-BoldR 12 DF
+15.984 0 8 (2.1\bWHEN PRODUCING EPS FILES)72 604 W
+F3 F
+3.06 0 32 (There are certain required comments and several recommended ones\
+ that must be) 
+108 585 W
+2.5 0 32 (provided in the EPS file. These are detailed in Section 3. The file\
+ must also be a) 
+108 574 W
+3.26 0 32 (single page \(not a multiple-page document\) and must be a ) 108
+ 563 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F5 /Times-ItalicR 10 DF
+3.26 0 32 (conforming) 375.01 563 W
+F3 F
+3.26 0 32 ( PostScript) 421.12 563 W
+2.29 0 32 (language document. Conformance requirements are mostly detailed\
+ here, but for the) 
+108 552 W
+2.09 0 32 (full specification, please refer to the ) 108 541 W
+F5 F
+2.09 0 32 (Document Structuring Conventions) 266.88 541 W
+F3 F
+2.09 0 32 ( from Adobe) 412.72 541 W
+(Systems.) 108 530 T
+F4 F
+15.984 0 8 (2.2\bWHEN READING AND USING EPS FILES)72 491 W
+F3 F
+2.22 0 32 (When including an EPS file into your document, you should\
+ basically think of that) 
+108 472 W
+2.1 0 32 (piece of code as having been generated by your program. After all,\
+ that is what all) 
+108 461 W
+3.38 0 32 (programs \(and users\) who encounter your print file will think.\
+ In particular, you) 
+108 450 W
+2.28 0 32 (must find out enough about the file to intelligently make it part\
+ of your document.) 
+108 439 W
+3.19 0 32 (The only tricky part of this relates to font usage. This is also\
+ the most difficult) 
+108 428 W
+2.46 0 32 (part of this specification to understand. Basically, you just have\
+ to figure out what) 
+108 417 W
+5.53 0 32 (the requirements of the illustration are and incorporate them into\
+ your own) 108 406 W
+4.53 0 32 (requirements \(pass them downstream\). Then all issues of font\
+ management are) 108 395 W
+4.13 0 32 (essentially the same as they were before you included the\
+ illustration \(and are) 
+108 384 W
+(beyond the scope of this document\).) 108 373 T
+2.41 0 32 (As long as you don\325t remove relevant information from a file,\
+ and as long as you) 
+108 348 W
+3.2 0 32 (update your global view of font usage and resource requirements to\
+ reflect those) 
+108 337 W
+5.71 0 32 (that you just imported, the rest is fairly easy. The intent behind\
+ the EPS) 108 326 W
+3.39 0 32 (specification, in fact, is to make the most of cooperation between\
+ producers and) 
+108 315 W
+3.81 0 32 (consumers of PostScript language files so that neither has to do\
+ much, but the) 
+108 304 W
+(combined advantage is great.) 108 293 T
+F2 F
+20.432 0 8 (3.\bREQUIRED COMMENTS)72 240 W
+F3 F
+1.81 0 32 (The first comment in the header \(and the first line in the file\)\
+ should be the version) 
+108 215 W
+(comment:) 108 204 T
+F4 F
+(%!PS-Adobe-2.0  EPSF-2.0) 108 171 T
+F3 F
+3.1 0 32 (This indicates to an application that the PostScript language file\
+ conforms to this) 
+108 157 W
+2.39 0 32 (standard.  The version number following the word ) 108 145 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F6 /Times-BoldR 10 DF
+2.39 0 32 ("Adobe-") 330.69 145 W
+F3 F
+2.39 0 32 ( indicates the level of) 372.9 145 W
+5.19 0 32 (adherence to the standard PostScript Document Structuring\
+ Conventions.  The) 108 134 W
+3.5 0 32 (version number following the word ) 108 122 W
+F6 F
+3.5 0 32 ("EPSF") 269.67 122 W
+F3 F
+3.5 0 32 ( indicates the level of EPSF-specific) 305.22 122 W
+(comments.) 108 111 T
+2.47 0 32 (The following comment must be present in the header; if it is not\
+ present then an) 
+108 86 W
+(importing application may issue an error message and abort the import:) 108
+ 75 T
+4 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Italic Times-Bold 
+%%PageBoundingBox: 72 36 468 691 
+%%Page: 5 5 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+5 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+177.428 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b5)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+(%%BoundingBox: LLx LLy URx URy) 180 693 T
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+1.61 0 32 (The values are in the PostScript default user coordinate system,\
+ in points \(1/72 of an) 
+180 681 W
+3.02 0 32 (inch, or 0.3527 mm\), with the origin at the lower left corner.\
+ The bounding box) 
+180 670 W
+1.93 0 32 (must be expressed in default user coordinate space. This seems to\
+ be a big question) 
+180 659 W
+3.42 0 32 (among implementors of this specification. Regardless of the\
+ coordinate system in) 
+180 648 W
+2.3 0 32 (which your application operates, here is a foolproof way of\
+ determining the correct) 
+180 637 W
+2.05 0 32 (bounding box:  ) 180 626 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F4 /Times-ItalicR 10 DF
+2.05 0 32 (print) 249.21 626 W
+F3 F
+2.05 0 32 ( the page, get out a point ruler, and ) 268.66 626 W
+F4 F
+2.05 0 32 (measure) 429.03 626 W
+F3 F
+2.05 0 32 ( first to the lower) 462.91 626 W
+4.6 0 32 (left corner, then to the upper right corner, using the lower-left\
+ corner of the) 
+180 615 W
+2.91 0 32 (physical paper as your origin. This works because it measures the\
+ end result \(the) 
+180 604 W
+(marks on the page\), and none of the computation matters.) 180 593 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F5 /Helvetica-BoldR 14 DF
+20.432 0 8 (4.\bOPTIONAL COMMENTS)144 542 W
+F3 F
+4.59 0 32 (The following header comments are strongly recommended in EPS\
+ files. They) 180 519 W
+2.23 0 32 (provide extra information about the file that can be used to\
+ identify it on-screen or) 
+180 508 W
+(when printing.) 180 497 T
+F2 F
+(%%Title:  included_document_title) 180 466 T
+(%%Creator:  creator_name) 180 453 T
+(%%CreationDate:  date_and_time) 180 440 T
+F3 F
+2.28 0 32 (The ) 180 427 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F6 /Times-BoldR 10 DF
+2.28 0 32 (%%Creator) 200.33 427 W
+F3 F
+2.28 0 32 (, ) 254.2 427 W
+F6 F
+2.28 0 32 (%%Title) 261.49 427 W
+F3 F
+2.28 0 32 (, and ) 301.49 427 W
+F6 F
+2.28 0 32 (%%CreationDate) 328 427 W
+F3 F
+2.28 0 32 ( comments may be used by an) 405.76 427 W
+2.59 0 32 (application or spooler to provide human-readable information about\
+ a document, or) 
+180 416 W
+5.37 0 32 (to display the file name and creator on the screen if no bitmapped\
+ screen) 180 405 W
+(representation was included in the EPS file.) 180 394 T
+F2 F
+(%%EndComments) 180 363 T
+F3 F
+2.18 0 32 (This comment indicates an explicit end to the header comments, as\
+ specified in the) 
+180 351 W
+(structuring conventions.) 180 340 T
+F2 F
+15.984 0 8 (4.1\bHOW TO USE THESE COMMENTS \(PHILOSOPHY\))144 303 W
+F3 F
+3.68 0 32 (All of the comments in EPS files provide information of some sort\
+ or another.) 
+180 286 W
+2.41 0 32 (Exactly how you use this information is up to you, but you are\
+ encouraged not to) 
+180 275 W
+2.85 0 32 (reduce the amount of information in a file \(when you import it or\
+ include it, for) 
+180 264 W
+3.92 0 32 (example\) by removing or altering comments. In general, the\
+ comments tell you) 
+180 253 W
+2.66 0 32 (what fonts and files are used, and where. Not everybody cares\
+ about these things,) 
+180 242 W
+(but if you do care, then the information is available.) 180 231 T
+2.38 0 32 (The whole issue of Encapsulated PostScript files is that they are\
+ \322final form\323 print) 
+180 208 W
+2.31 0 32 (files that may be far from the printer that they will actually be\
+ imaged on. If they) 
+180 197 W
+4.73 0 32 (have specific needs, particularly in terms of font usage, these\
+ needs must be) 
+180 186 W
+2.33 0 32 (carefully preserved and passed on downstream, and the program that\
+ actually prints) 
+180 175 W
+1.59 0 32 (the composite document must take pains to make sure the fonts are\
+ available at print) 
+180 164 W
+(time.) 180 153 T
+2.37 0 32 (Any piece of software that generates PostScript language code is\
+ potentially both a) 
+180 130 W
+2.05 0 32 (consumer and a producer of Encapsulated PostScript files. It is\
+ probably best not to) 
+180 119 W
+4.28 0 32 (think that you are at either end of the chain. In particular, if\
+ you import an) 
+180 108 W
+2.35 0 32 (Encapsulated PostScript file, integrate it into your document\
+ somehow, and then go) 
+180 97 W
+1.54 0 32 (to print your document, you are responsible for reading and\
+ understanding any of the) 
+180 86 W
+1.6 0 32 (font needs of the EPS file you imported. These should then be\
+ reflected in your ) 
+180 75 W
+F4 F
+1.6 0 32 (own) 523.33 75 W
+5 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Italic Times-Bold 
+%%PageBoundingBox: 144 36 540 693 
+%%Page: 6 6 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+6 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b6)255.26 36 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F2 /Times-RomanR 10 DF
+1.96 0 32 (font usage comments. If the illustration on page ) 108 695 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F3 /Times-ItalicR 10 DF
+1.96 0 32 (3 ) 317.3 695 W
+F2 F
+1.96 0 32 (uses the Bodoni font but the rest) 326.77 695 W
+1.41 0 32 (of your document is set in Times, suddenly your document now also\
+ uses the Bodoni) 
+108 684 W
+5 0 32 (font \(you included the illustration, after all\). This should be\
+ reflected in the) 
+108 673 W
+(outermost ) 108 661 T
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F4 /Times-BoldR 10 DF
+(%%DocumentFonts) 150.5 661 T
+F2 F
+( comments and any other appropriate ones.) 238.27 661 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F5 /Helvetica-BoldR 12 DF
+15.984 0 8 (4.2\bFONT MANAGEMENT COMMENTS)72 622 W
+F2 F
+2.15 0 32 (If fonts are used, the following two comments \(which are defined\
+ in version 2.0 of) 
+108 603 W
+2.39 0 32 (the PostScript Document Structuring Conventions\) should be\
+ included in the header) 
+108 592 W
+4.76 0 32 (of the EPS file. The ) 108 580 W
+F4 F
+4.76 0 32 (%%IncludeFont) 213.43 580 W
+F2 F
+4.76 0 32 ( and ) 285.66 580 W
+F4 F
+4.76 0 32 (%%Begin/%%EndFont) 314.62 580 W
+F2 F
+4.76 0 32 ( comments) 419.64 580 W
+4.01 0 32 (should be thought of as inverses of one another. That is, if you\
+ encounter an) 
+108 569 W
+F4 F
+4.85 0 32 (%%IncludeFont) 108 557 W
+F2 F
+4.85 0 32 ( comment and actually include a font file at that point, you)
+ 180.23 557 W
+8.37 0 32 (should enclose the font in ) 108 545 W
+F4 F
+8.37 0 32 (%%BeginFont) 255.1 545 W
+F2 F
+8.37 0 32 ( and ) 319.55 545 W
+F4 F
+8.37 0 32 (%%EndFont) 355.73 545 W
+F2 F
+8.37 0 32 ( comments.) 413.52 545 W
+2.52 0 32 (Conversely, if you see fit to remove a font from a print file\
+ \(one that presumably) 
+108 534 W
+5.96 0 32 (had been delimited with comments\), you should always replace it\
+ with an) 108 523 W
+F4 F
+2.97 0 32 (%%IncludeFont) 108 511 W
+F2 F
+2.97 0 32 ( comment rather than completely stripping it. This guarantees the)
+ 180.23 511 W
+(reversibility of your actions.) 108 500 T
+F5 F
+(%%DocumentFonts:  font1  font2  ....) 108 468 T
+(%%+  font3  font4) 108 455 T
+F2 F
+3.98 0 32 (The ) 108 441 W
+F4 F
+3.98 0 32 (%%DocumentFonts) 130.03 441 W
+F2 F
+3.98 0 32 ( comment provides a full list of all fonts used in the) 217.8 441
+ W
+2.74 0 32 (file.  Font names should refer to ) 108 430 W
+F3 F
+2.74 0 32 (non-reencoded) 257.71 430 W
+F2 F
+2.74 0 32 ( printer font names and should be) 317.69 430 W
+3.36 0 32 (the valid PostScript language names \(without the leading\
+ slashes\). An application) 
+108 419 W
+2.13 0 32 (that imports an EPS file should be responsible for satisfying\
+ these font needs, or at) 
+108 408 W
+(least updating its own ) 108 396 T
+F4 F
+(%%DocumentFonts) 198 396 T
+F2 F
+( list to reflect any new fonts.) 285.77 396 T
+F5 F
+(%%DocumentNeededFonts:  font1  font2  ....) 108 364 T
+F2 F
+2.55 0 32 (The ) 108 350 W
+F4 F
+2.55 0 32 (%%DocumentNeededFonts) 128.6 350 W
+F2 F
+2.55 0 32 ( comment lists all fonts that are to be included at) 248.03 350 W
+3.22 0 32 (specific points within the EPS file as a result of the ) 108 338 W
+F4 F
+3.22 0 32 (%%IncludeFont) 350.33 338 W
+F2 F
+3.22 0 32 ( comment.) 422.56 338 W
+4.75 0 32 (These fonts must also be listed in the ) 108 326 W
+F4 F
+4.75 0 32 (%%DocumentFonts) 296.54 326 W
+F2 F
+4.75 0 32 ( comment, but an) 384.31 326 W
+4.31 0 32 (application may or may not pre-load these at the beginning of the\
+ job.  The) 108 315 W
+3.06 0 32 (responsibility should be taken, however, by any program that\
+ thinks it is actually) 
+108 304 W
+2.08 0 32 (printing the file, to make sure the fonts requested will be\
+ available when the file is) 
+108 293 W
+3.97 0 32 (printed. This may mean that the individual ) 108 281 W
+F4 F
+3.97 0 32 (%%IncludeFont) 308.58 281 W
+F2 F
+3.97 0 32 ( comments may be) 380.81 281 W
+1.65 0 32 (satisfied and the fonts placed in-line, or they may simply be\
+ ignored, if the fonts are) 
+108 270 W
+2.5 0 32 (determined to be already available on the printer. As a third\
+ possibility, there may) 
+108 259 W
+4.72 0 32 (be enough memory to download all the fonts in front of the job and\
+ avoid) 108 248 W
+6.63 0 32 (processing the individual requests. This ) 108 236 W
+F4 F
+6.63 0 32 (%%DocumentNeededFonts) 302.23 236 W
+F2 F
+6.63 0 32 ( comment) 421.65 236 W
+5.37 0 32 (provides foreshadowing of the ) 108 224 W
+F4 F
+5.37 0 32 (%%IncludeFont) 253.91 224 W
+F2 F
+5.37 0 32 ( comments to follow, to give) 326.14 224 W
+(printing managers enough information to make these choices intelligently.)
+ 108 213 T
+F5 F
+(%%IncludeFont:  fontname) 108 181 T
+F2 F
+2.91 0 32 (The ) 108 167 W
+F4 F
+2.91 0 32 (%%IncludeFont) 128.95 167 W
+F2 F
+2.91 0 32 ( comment signals to an application that the specified font is)
+ 201.18 167 W
+3.67 0 32 (to be loaded at that precise location in the file. It is analogous\
+ to the familiar) 
+108 156 W
+F4 F
+3.13 0 32 (#include) 108 144 W
+F2 F
+3.13 0 32 ( syntax in the C language. An application should load the\
+ specified font) 144.12 144 W
+3.48 0 32 (regardless of whether the same font has been loaded already by\
+ other preceding) 
+108 133 W
+F4 F
+4.42 0 32 (%%IncludeFont) 108 121 W
+F2 F
+4.42 0 32 ( comments, since the font may have been embedded within a) 180.23
+ 121 W
+2.14 0 32 (PostScript language ) 108 109 W
+F4 F
+2.14 0 32 (save) 194.49 109 W
+F2 F
+2.14 0 32 ( and ) 212.82 109 W
+F4 F
+2.14 0 32 (restore) 236.53 109 W
+F2 F
+2.14 0 32 ( construct.  However, if the font is determined) 266.51 109 W
+1.58 0 32 (to be available ) 108 98 W
+F3 F
+1.58 0 32 (prior) 173.56 98 W
+F2 F
+1.58 0 32 ( to the entire included EPS file \(for instance, it may be in ROM)
+ 194.12 98 W
+3.61 0 32 (in the printer or might have been downloaded prior to the entire\
+ print job\) the) 
+108 87 W
+F4 F
+(%%IncludeFont) 108 75 T
+F2 F
+( comment may be ignored by printing manager software.) 180.23 75 T
+6 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Times-Roman Times-Italic Times-Bold Helvetica-Bold 
+%%PageBoundingBox: 72 36 468 695 
+%%Page: 7 7 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+7 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+177.428 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b7)180 36 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F2 /Times-RomanR 10 DF
+2.25 0 32 (When an application satisfies an ) 180 694 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F3 /Times-BoldR 10 DF
+2.25 0 32 (%%IncludeFont) 323.18 694 W
+F2 F
+2.25 0 32 ( request, it should ) 395.41 694 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F4 /Times-ItalicR 10 DF
+2.25 0 32 (always) 478.04 694 W
+F2 F
+2.25 0 32 ( bracket) 505.82 694 W
+(the font itself with the ) 180 682 T
+F3 F
+(%%BeginFont) 270.83 682 T
+F2 F
+( and ) 335.28 682 T
+F3 F
+(%%EndFont) 354.72 682 T
+F2 F
+( comments.) 412.51 682 T
+5.54 0 32 (A font that is wholly contained, defined, and used within the EPS\
+ file \(a) 180 657 W
+3.53 0 32 (downloaded font\) should be noted in the ) 180 645 W
+F3 F
+3.53 0 32 (%%DocumentFonts) 368.86 645 W
+F2 F
+3.53 0 32 ( comment, but ) 456.63 645 W
+F4 F
+3.53 0 32 (not) 527.22 645 W
+F2 F
+4.48 0 32 (the ) 180 633 W
+F3 F
+4.48 0 32 (%%DocumentNeededFonts) 199.2 633 W
+F2 F
+4.48 0 32 ( comment.  The font should follow conventions) 318.63 633 W
+2.45 0 32 (listed in the Document Structuring Conventions in order to retain\
+ full compatibility) 
+180 622 W
+(with print spoolers.) 180 611 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F5 /Helvetica-BoldR 12 DF
+(%%BeginFont: fontname) 180 578 T
+(%%EndFont) 180 565 T
+F2 F
+2.16 0 32 (The ) 180 550 W
+F3 F
+2.16 0 32 (%%BeginFont) 200.21 550 W
+F2 F
+2.16 0 32 ( and ) 264.66 550 W
+F3 F
+2.16 0 32 (%%EndFont) 288.41 550 W
+F2 F
+2.16 0 32 ( comments bracket an included downloadable) 346.2 550 W
+3.71 0 32 (font. The ) 180 538 W
+F3 F
+3.71 0 32 (fontname) 226.57 538 W
+F2 F
+3.71 0 32 ( is the simple PostScript language name for the font. These)
+ 267.12 538 W
+2.35 0 32 (fonts may be stripped from the included file if they are\
+ determined to be available) 
+180 527 W
+(\(but should be replaced by an ) 180 515 T
+F3 F
+(%%IncludeFont) 300.53 515 T
+F2 F
+( comment\). ) 372.76 515 T
+F5 F
+15.984 0 8 (4.3\bFILE MANAGEMENT COMMENTS)144 476 W
+(%%IncludeFile:  filename) 180 450 T
+F2 F
+2.17 0 32 (This comment, which can occur only in the body of an EPS file,\
+ allows a separate) 
+180 437 W
+1.93 0 32 (file to be inserted at any point within the EPS file.  The file\
+ might not be searched) 
+180 426 W
+2.68 0 32 (for or inserted until printing actually occurs, so user care is\
+ required to ensure its) 
+180 415 W
+2.35 0 32 (availability.  If it is used, the %%DocumentFiles comment should\
+ be used as well.) 
+180 404 W
+(See the Structuring Conventions for more information.) 180 393 T
+F5 F
+(%%BeginFile:  filename) 180 361 T
+(%%EndFile) 180 348 T
+F2 F
+2.75 0 32 (The ) 180 334 W
+F3 F
+2.75 0 32 (%%BeginFile) 200.8 334 W
+F2 F
+2.75 0 32 ( and ) 261.36 334 W
+F3 F
+2.75 0 32 (%%EndFile) 286.31 334 W
+F2 F
+2.75 0 32 ( comments bracket an included file. They are) 340.21 334 W
+3.34 0 32 (the \322inverse\323 of the ) 180 322 W
+F3 F
+3.34 0 32 (%%IncludeFile) 273.88 322 W
+F2 F
+3.34 0 32 ( comment. The ) 342.22 322 W
+F3 F
+3.34 0 32 (filename) 415 322 W
+F2 F
+3.34 0 32 ( is evaluated in the) 451.66 322 W
+2.36 0 32 (context of the local file system. These files may ) 180 311 W
+F4 F
+2.36 0 32 (not) 395.14 311 W
+F2 F
+2.36 0 32 ( be stripped from the included) 407.92 311 W
+2.18 0 32 (file at print time, because they undoubtedly contain executable\
+ code. However, they) 
+180 300 W
+2.55 0 32 (may be temporarily removed, or \322factored out\323 to save space\
+ during storage. They) 
+180 289 W
+(should always be replaced by the) 180 277 T
+F3 F
+( %%IncludeFile) 312.47 277 T
+F2 F
+( comment) 383.31 277 T
+F3 F
+(.) 423.03 277 T
+F5 F
+15.984 0 8 (4.4\bCOLOR COMMENTS)144 239 W
+(%%DocumentProcessColors: keyword keyword ...) 180 213 T
+F2 F
+2.3 0 32 (This comment marks the use of process colors within the document.\
+ Process colors) 
+180 200 W
+1.32 0 32 (are defined to be ) 180 189 W
+F4 F
+1.32 0 32 (cyan) 254.68 189 W
+F2 F
+1.32 0 32 (, ) 273.56 189 W
+F4 F
+1.32 0 32 (magenta) 279.88 189 W
+F2 F
+1.32 0 32 (, ) 314.32 189 W
+F4 F
+1.32 0 32 (yellow) 320.63 189 W
+F2 F
+1.32 0 32 (, and ) 346.74 189 W
+F4 F
+1.32 0 32 (black.) 371.31 189 W
+F2 F
+1.32 0 32 ( These four colors are indicated in) 395.47 189 W
+2.35 0 32 (this comment by the keywords ) 180 177 W
+F3 F
+2.35 0 32 (Cyan) 317.02 177 W
+F2 F
+2.35 0 32 (, ) 339.8 177 W
+F3 F
+2.35 0 32 (Magenta) 347.15 177 W
+F2 F
+2.35 0 32 (, ) 384.92 177 W
+F3 F
+2.35 0 32 (Yellow) 392.27 177 W
+F2 F
+2.35 0 32 (, and ) 421.71 177 W
+F3 F
+2.35 0 32 (Black) 448.35 177 W
+F2 F
+2.35 0 32 (. This comment) 472.8 177 W
+4.14 0 32 (is used primarily when producing color separations. The ) 180 165
+ W
+F3 F
+4.14 0 32 (\(atend\)) 441.16 165 W
+F2 F
+4.14 0 32 ( conventions is) 471.71 165 W
+(allowed.) 180 154 T
+F5 F
+(%%DocumentCustomColors: name name ...) 180 122 T
+F2 F
+4.75 0 32 (This indicates the use of custom colors within a document. These\
+ colors are) 180 109 W
+3.03 0 32 (arbitrarily named by an application, and their CMYK or RGB\
+ approximations are) 
+180 98 W
+10.28 0 32 (provided through the ) 180 86 W
+F3 F
+10.28 0 32 (%%CMYKCustomColor) 297.23 86 W
+F2 F
+10.28 0 32 ( or ) 406.66 86 W
+F3 F
+10.28 0 32 (%%RGBCustomColor) 440.56 86 W
+F2 F
+3.47 0 32 (comments within the body of the document. The names are specified\
+ to be any) 180 75 W
+7 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Times-Roman Times-Bold Times-Italic Helvetica-Bold 
+%%PageBoundingBox: 144 36 540 694 
+%%Page: 8 8 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+8 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b8)255.26 36 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F2 /Times-RomanR 10 DF
+5.49 0 32 (arbitrary PostScript language string except \(Process Cyan\),\
+ \(Process Magenta\),) 
+108 695 W
+2.32 0 32 (\(Process Yellow\), and \(Process Black\), which need to be\
+ reserved for custom color) 
+108 684 W
+(implementation by applications. The ) 108 672 T
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F3 /Times-BoldR 10 DF
+(\(atend\)) 257.16 672 T
+F2 F
+( specification is permitted.) 287.71 672 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F4 /Helvetica-BoldR 12 DF
+(%%BeginProcessColor: keyword) 108 640 T
+( %%EndProcessColor) 108 627 T
+F2 F
+4.68 0 32 (The ) 108 613 W
+F3 F
+4.68 0 32 (keyword) 130.73 613 W
+F2 F
+4.68 0 32 ( here is either ) 167.94 613 W
+F3 F
+4.68 0 32 (Cyan) 243.29 613 W
+F2 F
+4.68 0 32 (, ) 266.07 613 W
+F3 F
+4.68 0 32 (Magenta) 275.75 613 W
+F2 F
+4.68 0 32 (, ) 313.52 613 W
+F3 F
+4.68 0 32 (Yellow) 323.2 613 W
+F2 F
+4.68 0 32 (, or ) 352.63 613 W
+F3 F
+4.68 0 32 (Black) 377.82 613 W
+F2 F
+4.68 0 32 (. During color) 402.27 613 W
+1.97 0 32 (separation, the code between these comments should only be\
+ downloaded during the) 
+108 602 W
+4.98 0 32 (appropriate pass for that process color. Intelligent printing\
+ managers can save) 
+108 591 W
+2.65 0 32 (considerable time by omitting code within these bracketing\
+ comments on the other) 
+108 580 W
+5.53 0 32 (three separations. Extreme care must be taken by the document\
+ composition) 108 569 W
+3.51 0 32 (software to correctly control overprinting and \322knockouts\323\
+ if these comments are) 
+108 558 W
+(employed, since the code may or may not actually be executed.) 108 547 T
+F4 F
+(%%BeginCustomColor: keyword) 108 515 T
+( %%EndCustomColor) 108 502 T
+F2 F
+1.51 0 32 (The  ) 108 488 W
+F3 F
+1.51 0 32 (keyword) 131.57 488 W
+F2 F
+1.51 0 32 ( here is any PostScript language string except \(Process Cyan\),\
+ \(Process) 168.79 488 W
+2.4 0 32 (Magenta\), \(Process Yellow\), and \(Process Black\). During color\
+ separation, the code) 
+108 477 W
+2 0 32 (between these comments should only be downloaded during the\
+ appropriate pass for) 
+108 466 W
+4.7 0 32 (that custom color. Intelligent printing managers can save\
+ considerable time by) 
+108 455 W
+4.25 0 32 (omitting code within these bracketing comments on the other three\
+ separations.) 
+108 444 W
+3.87 0 32 (Extreme care must be taken by the document composition software to\
+ correctly) 
+108 433 W
+2.33 0 32 (control overprinting and knockouts if these comments are employed,\
+ since the code) 
+108 422 W
+(may or may not be executed.) 108 411 T
+F4 F
+(%%CMYKCustomColor: cyan magenta yellow black ) 108 379 T
+stdvec /Helvetica-BoldObliqueR /Helvetica-BoldOblique  REMAP
+/F5 /Helvetica-BoldObliqueR 12 DF
+(keyword) 405.4 379 T
+F2 F
+2.06 0 32 (This provides an ) 108 366 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F6 /Times-ItalicR 10 DF
+2.06 0 32 (approximation) 183.35 366 W
+F2 F
+2.06 0 32 ( to the custom color specified by ) 242.24 366 W
+stdvec /Times-BoldItalicR /Times-BoldItalic  REMAP
+/F7 /Times-BoldItalicR 10 DF
+2.06 0 32 (keyword) 389.72 366 W
+F2 F
+2.06 0 32 (. The four) 424.16 366 W
+1.42 0 32 (components of ) 108 354 W
+F3 F
+1.42 0 32 (cyan) 172.49 354 W
+F2 F
+1.42 0 32 (, ) 192.49 354 W
+F3 F
+1.42 0 32 (magenta) 198.9 354 W
+F2 F
+1.42 0 32 (, ) 235.57 354 W
+F3 F
+1.42 0 32 (yellow) 241.98 354 W
+F2 F
+1.42 0 32 (, and ) 269.2 354 W
+F3 F
+1.42 0 32 (black) 293.97 354 W
+F2 F
+1.42 0 32 ( must be specified as numbers from) 317.31 354 W
+2.23 0 32 (0 to 1 representing the percentage of that process color. These\
+ numbers are exactly) 
+108 343 W
+2.76 0 32 (analogous to the arguments to the ) 108 331 W
+F3 F
+2.76 0 32 (setcmykcolor) 261.74 331 W
+F2 F
+2.76 0 32 ( PostScript language operator. The) 318.39 331 W
+F7 F
+9.85 0 32 (keyword) 108 320 W
+F2 F
+9.85 0 32 ( follows the same custom color naming conventions for the) 142.44
+ 320 W
+F3 F
+(%%DocumentCustomColors) 108 308 T
+F2 F
+( comment.) 233.54 308 T
+F4 F
+(%%RGBCustomColor: red green blue ) 108 276 T
+F5 F
+(keyword) 325.36 276 T
+F2 F
+1.79 0 32 (This provides an ) 108 263 W
+F6 F
+1.79 0 32 (approximation) 182.51 263 W
+F2 F
+1.79 0 32 ( to the custom color specified by ) 241.4 263 W
+F7 F
+1.79 0 32 (keyword) 386.94 263 W
+F2 F
+1.79 0 32 (. The three) 421.38 263 W
+3.38 0 32 (components of ) 108 251 W
+F3 F
+3.38 0 32 (red) 176.41 251 W
+F2 F
+3.38 0 32 (, ) 190.85 251 W
+F3 F
+3.38 0 32 (green) 199.22 251 W
+F2 F
+3.38 0 32 (, and ) 223.11 251 W
+F3 F
+3.38 0 32 (blue) 251.79 251 W
+F2 F
+3.38 0 32 ( must be specified as numbers from 0 to 1) 270.13 251 W
+5.43 0 32 (representing the percentage of that process color. These numbers\
+ are exactly) 
+108 240 W
+3.59 0 32 (analogous to the arguments to the ) 108 228 W
+F3 F
+3.59 0 32 (setrgbcolor) 266.74 228 W
+F2 F
+3.59 0 32 ( PostScript language operator. The) 315.06 228 W
+F7 F
+9.85 0 32 (keyword) 108 217 W
+F2 F
+9.85 0 32 ( follows the same custom color naming conventions for the) 142.44
+ 217 W
+F3 F
+(%%DocumentCustomColors) 108 205 T
+F2 F
+( comment.) 233.54 205 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F8 /Helvetica-BoldR 14 DF
+20.432 0 8 (5.\b\322WELL-BEHAVED\323 RULES)72 153 W
+F2 F
+4.63 0 32 (An application should encapsulate the imported EPS code in a save\
+ / restore) 108 130 W
+4.57 0 32 (construct, which will allow all printer VM \(memory\) to be\
+ recovered and all) 108 119 W
+2.29 0 32 (graphics state restored.  Since the code in the imported EPS file\
+ will be embedded) 
+108 108 W
+4.27 0 32 (within the PostScript language that an application will generate\
+ for the current) 
+108 97 W
+4.61 0 32 (page, it is necessary that it obey the following rules, in order\
+ to keep from) 
+108 86 W
+(disrupting the enclosing document:) 108 75 T
+8 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Times-Roman Times-Bold Helvetica-Bold
+%%+  Helvetica-BoldOblique Times-Italic Times-BoldItalic 
+%%PageBoundingBox: 72 36 468 695 
+%%Page: 9 9 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+9 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+177.428 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b9)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+15.984 0 8 (5.1\bOPERATORS TO AVOID)144 693 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+2.45 0 32 (The following PostScript operators should not be included in a\
+ PostScript language) 
+180 673 W
+3.85 0 32 (file for import; the result of executing any of these is not\
+ guaranteed \(see the) 
+180 662 W
+(PostScript Document Structuring Conventions for more on this\):) 180 651 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F4 /HelveticaR 9 DF
+24.486 0 8 (grestoreall\binitgraphics)180 620 W
+40.4981 0 8 (initmatrix\binitclip)315 620 W
+23.973 0 8 (erasepage\bcopypage)180 609 W
+30.472 0 8 (banddevice\bframedevice)315 609 W
+26.484 0 8 (nulldevice\brenderbands)180 598 W
+14.47 0 8 (setpageparams\bnote)315 598 W
+27.492 0 8 (exitserver\bsetscreen*)180 587 W
+(settransfer*) 315 587 T
+F2 F
+15.984 0 8 (5.2\bTHE \324SETSCREEN\325 AND \324SETTRANSFER\325 OPERATORS)144
+ 548 W
+F3 F
+3.64 0 32 (The ) 180 528 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F5 /Times-BoldR 10 DF
+3.64 0 32 (setscreen) 201.69 528 W
+F3 F
+3.64 0 32 ( operator is troublesome when one file is included within
+ another.) 240.56 528 W
+F5 F
+2.91 0 32 (setscreen) 180 516 W
+F3 F
+2.91 0 32 ( is a system-level command that is appropriate for changing the\
+ halftone) 218.87 516 W
+2.03 0 32 (machinery to compensate for marking engine tendencies, but when\
+ used for \322special) 
+180 505 W
+2.36 0 32 (effects\323 can cause problems. For EPS files, the ) 180 493 W
+F5 F
+2.36 0 32 (setscreen) 388.82 493 W
+F3 F
+2.36 0 32 ( and ) 427.69 493 W
+F5 F
+2.36 0 32 (settransfer) 451.84 493 W
+F3 F
+2.36 0 32 ( operators) 497.93 493 W
+(are permitted only under restricted terms.) 180 482 T
+F2 F
+(THE \324SETTRANSFER\325 AND \324SETCOLORTRANSFER\325 ) 180 449 T
+(OPERATORS) 180 436 T
+F3 F
+2.41 0 32 (The ) 180 421 W
+F5 F
+2.41 0 32 (settransfer) 200.46 421 W
+F3 F
+2.41 0 32 ( operator changes the gray-level and color response curves over\
+ the) 246.55 421 W
+2.59 0 32 (interval from ) 180 409 W
+F5 F
+2.59 0 32 (0) 240.17 409 W
+F3 F
+2.59 0 32 ( to ) 245.17 409 W
+F5 F
+2.59 0 32 (1) 263.13 409 W
+F3 F
+2.59 0 32 (. There are two basic uses of it: to invert an image \(typically)
+ 268.13 409 W
+2.39 0 32 (flipping blacks and whites, less often colors\), or to adjust the\
+ response curve for a) 
+180 398 W
+(particular output device.) 180 387 T
+2.28 0 32 (The best \(and required\) approach for using ) 180 361 W
+F5 F
+2.28 0 32 (settransfer) 369.49 361 W
+F3 F
+2.28 0 32 ( is to combine your function) 415.57 361 W
+(with the existing one. Here is the recommended way to do this:) 180 350 T
+F4 F
+({ dummy exec  1 exch sub } dup 0 currentransfer put settransfer) 180 319 T
+F3 F
+2.34 0 32 (In this example, the desired transfer function is the code ) 180
+ 293 W
+F5 F
+2.34 0 32 (1 exch sub) 430.34 293 W
+F3 F
+2.34 0 32 (. The ) 479.48 293 W
+F5 F
+2.34 0 32 (dummy) 507.22 293 W
+3.9 0 32 (exec) 180 281 W
+F3 F
+3.9 0 32 ( essentially executes the existing transfer function before\
+ executing the new) 
+198.32 281 W
+2.01 0 32 (code. The name ) 180 269 W
+F5 F
+2.01 0 32 (dummy) 252.13 269 W
+F3 F
+2.01 0 32 ( is replaced by the actual procedure body from the existing)
+ 284.91 269 W
+3.09 0 32 (transfer function through the ) 180 257 W
+F5 F
+3.09 0 32 (put) 309.55 257 W
+F3 F
+3.09 0 32 ( instruction. The result is conceptually equivalent) 324 257 W
+(to this:) 180 246 T
+F4 F
+({ { original proc } exec 1 exch sub } settransfer) 180 215 T
+F3 F
+2.41 0 32 (This approach is better than \322concatenating\323 procedures\
+ because it does not require) 
+180 190 W
+(the existing transfer function to be duplicated \(consuming memory\).) 180
+ 179 T
+F2 F
+15.984 0 8 (5.3\bTHE \324SHOWPAGE\325 OPERATOR)144 140 W
+F3 F
+1.47 0 32 (The ) 180 120 W
+F5 F
+1.47 0 32 (showpage) 199.52 120 W
+F3 F
+1.47 0 32 ( operator is permitted in EPS files primarily because it is\
+ present in so) 241.19 120 W
+1.69 0 32 (many PostScript language files. It is reasonable for an EPS file\
+ to use the ) 
+180 108 W
+F5 F
+1.69 0 32 (showpage) 498.32 108 W
+F3 F
+3.3 0 32 (operator if needed \(although it is not necessary if the file is\
+ truly imported into) 
+180 97 W
+6.3 0 32 (another document\). It is the including application\325s\
+ responsibility to ) 180 86 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F6 /Times-ItalicR 10 DF
+6.3 0 32 (disable) 511.1 86 W
+F3 F
+(showpage if needed.  The recommended method to accomplish this is as\
+ follows:) 
+180 75 T
+9 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Bold Times-Italic 
+%%PageBoundingBox: 144 36 540 693 
+%%Page: 10 10 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+10 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b10)255.26 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+(TEMPORARILY DISABLING \324SHOWPAGE\325) 108 693 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F3 /HelveticaR 9 DF
+(/BEGINEPSFILE { %def) 108 675 T
+(/EPSFsave save def) 135 664 T
+(0 setgray 0 setlinecap 1 setlinewidth 0 setlinejoin 10 setmiterlimit [] 0\
+ setdash) 
+135 653 T
+(newpath) 135 642 T
+(/showpage { } def) 135 631 T
+(} bind def) 108 620 T
+(/ENDEPSFILE { %def) 108 609 T
+(EPSFsave restore) 135 598 T
+(} bind def) 108 587 T
+(BEGINEPSFILE) 108 558 T
+(  100 300 translate) 108 547 T
+(  .5 .5 scale) 108 536 T
+(  %  include the EPS file here, which may execute showpage with no effect)
+ 108 525 T
+(ENDEPSFILE         % restore state and continue) 108 502 T
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F4 /Times-RomanR 10 DF
+2.97 0 32 (This method will only disable the ) 108 478 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F5 /Times-BoldR 10 DF
+2.97 0 32 (showpage) 262.46 478 W
+F4 F
+2.97 0 32 ( operator during the execution of the) 304.13 478 W
+2.72 0 32 (EPS file, and will restore the previous semantics of ) 108 466 W
+F5 F
+2.72 0 32 (showpage) 339.65 466 W
+F4 F
+2.72 0 32 ( afterward. It is the) 381.32 466 W
+3.57 0 32 (responsibility of the EPS file itself to avoid the operators\
+ listed in the previous) 
+108 455 W
+3.74 0 32 (section that might cause unexpected behavior when imported. They\
+ need not be) 
+108 444 W
+(redefined along with ) 108 432 T
+F5 F
+(showpage) 193.26 432 T
+F4 F
+(, although it is permissible to do so.) 234.93 432 T
+F2 F
+15.984 0 8 (5.4\bSTACKS AND DICTIONARIES)72 395 W
+F4 F
+2.81 0 32 (All of the PostScript interpreter\325s stacks \(including the\
+ dictionary stack\) should be) 
+108 378 W
+2.03 0 32 (left in the state that they were in before the imported PostScript\
+ language code was) 
+108 367 W
+2.89 0 32 (executed. This is normally the case for well-written PostScript\
+ language programs,) 
+108 356 W
+1.69 0 32 (and this is still the best way to keep unanticipated side-effects\
+ to a minimum. Please) 
+108 345 W
+4.62 0 32 (avoid unnecessary ) 108 333 W
+F5 F
+4.62 0 32 (clear) 193.32 333 W
+F4 F
+4.62 0 32 ( and ) 214.42 333 W
+F5 F
+4.62 0 32 ("countdictstack 2 sub { end } repeat" ) 243.1 333 W
+F4 F
+4.62 0 32 (cleanup) 436.9 333 W
+1.69 0 32 (techniques. If you have accidentally left something on one of the\
+ stacks, it is best to) 
+108 322 W
+4.92 0 32 (understand your program well enough to get rid of it, rather than\
+ issuing a) 108 311 W
+2.94 0 32 (wholesale cleanup instruction at the end, which will not only\
+ clear your operands) 
+108 300 W
+(from the stack, but perhaps will clear other objects as well.) 108 289 T
+2.8 0 32 (It is recommended that the imported EPS file create its own\
+ dictionary instead of) 
+108 266 W
+5.3 0 32 (writing into whatever the current dictionary might be.  Make sure\
+ that this) 108 255 W
+2.4 0 32 (dictionary is removed from the dictionary stack when through\
+ \(using the PostScript) 
+108 244 W
+2.27 0 32 (language ) 108 232 W
+F5 F
+2.27 0 32 (end) 148.87 232 W
+F4 F
+2.27 0 32 ( operator\) to avoid the possibility of an ) 164.43 232 W
+F5 F
+2.27 0 32 (invalidrestore) 340.92 232 W
+F4 F
+2.27 0 32 ( error. Also, no) 400.36 232 W
+(global string bodies should be changed \(with either ) 108 220 T
+F5 F
+(put) 315.2 220 T
+F4 F
+( or ) 329.65 220 T
+F5 F
+(putinterval) 342.98 220 T
+F4 F
+(\).) 390.76 220 T
+4.91 0 32 (If a special dictionary \(like ) 108 196 W
+F5 F
+4.91 0 32 (statusdict) 242.81 196 W
+F4 F
+4.91 0 32 (\) is required in order for the imported) 283.92 196 W
+2.4 0 32 (PostScript language code to execute properly, then it should be\
+ included as part of) 
+108 185 W
+1.35 0 32 (the EPS file.  However, it should be enclosed in very specific )
+ 108 173 W
+F5 F
+1.35 0 32 (%%BeginFeature) 371.94 173 W
+F4 F
+1.35 0 32 ( and) 449.71 173 W
+F5 F
+2.95 0 32 (%%EndFeature) 108 161 W
+F4 F
+2.95 0 32 ( comments as specified in the Document Structuring Conventions.)
+ 179.11 161 W
+2.56 0 32 (No dictionary should be assumed to be present in the printer, and\
+ fonts should be) 
+108 150 W
+(reencoded as needed by the EPS file itself.) 108 139 T
+10 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Bold 
+%%PageBoundingBox: 72 36 468 693 
+%%Page: 11 11 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+11 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+173.538 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b11)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+15.984 0 8 (5.5\bTHE GRAPHICS STATE)144 693 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+5.13 0 32 (When a PostScript language program is imported into the middle of\
+ another) 180 673 W
+3.55 0 32 (executing program, the state of the interpreter may not be exactly\
+ in its default) 
+180 662 W
+1.91 0 32 (state. The EPS file should assume that the graphics state is in\
+ its default state, even) 
+180 651 W
+2.22 0 32 (though it may not be. An importing application may choose to scale\
+ the coordinate) 
+180 640 W
+3.02 0 32 (system or to change the transfer function to change the behavior\
+ of the EPS file) 
+180 629 W
+3.78 0 32 (somewhat. If the EPS file makes assumptions about the graphics\
+ state \(like the) 
+180 618 W
+7.07 0 32 (clipping path\) or explicitly sets something it shouldn\325t \(the\
+ transformation) 
+180 607 W
+(matrix\), the results may not be what were expected.) 180 596 T
+3.64 0 32 (The importing application is responsible for returning the color\
+ to be black, the) 
+180 571 W
+2.91 0 32 (current dash pattern, line endings, and other miscellaneous\
+ aspects of the graphics) 
+180 560 W
+3.06 0 32 (state to their default condition \(as specified in the PostScript\
+ Language Reference) 
+180 549 W
+2.49 0 32 (Manual\). This can be done in either of two ways: the initial\
+ graphics state can be) 
+180 538 W
+(restored from variables, or the state can be explicitly set:) 180 527 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F4 /HelveticaR 9 DF
+(/BEGINEPSFILE { %def) 180 496 T
+(/EPSFsave save def) 207 485 T
+(0 setgray 0 setlinecap 1 setlinewidth 0 setlinejoin 10 setmiterlimit [] 0\
+ setdash) 
+207 474 T
+(newpath) 207 463 T
+(/showpage { } def) 207 452 T
+(} bind def) 180 441 T
+(/ENDEPSFILE { %def) 180 419 T
+(EPSFsave restore) 207 408 T
+(} bind def) 180 397 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F5 /Helvetica-BoldR 14 DF
+20.432 0 8 (6.\bFILE TYPES AND FILE NAMING)144 344 W
+F2 F
+(APPLE MACINTOSH FILES) 180 311 T
+F3 F
+3.03 0 32 (The Macintosh file type for application-created PostScript\
+ language files is ) 
+180 296 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F6 /Times-BoldR 10 DF
+3.03 0 32 (EPSF) 513.05 296 W
+F3 F
+3.03 0 32 (.) 537.5 296 W
+2.71 0 32 (Files of type ) 180 284 W
+F6 F
+2.71 0 32 (TEXT) 240.62 284 W
+F3 F
+2.71 0 32 ( will also be allowed, so that users can create EPS files with)
+ 267.85 284 W
+6.6 0 32 (standard editors, although the Structuring Conventions must still\
+ be strictly) 
+180 273 W
+1.93 0 32 (followed.  A file of type EPSF should contain a PICT resource in\
+ the resource fork) 
+180 262 W
+2.71 0 32 (of the file containing a screen representation of the PostScript\
+ language code. The) 
+180 251 W
+1.63 0 32 (file name itself may follow any naming convention as long as the\
+ file type is ) 
+180 239 W
+F6 F
+1.63 0 32 (EPSF) 513.05 239 W
+F3 F
+1.63 0 32 (.) 537.49 239 W
+1.69 0 32 (If the file type is ) 180 227 W
+F6 F
+1.69 0 32 (TEXT) 257.04 227 W
+F3 F
+1.69 0 32 (, the extensions ) 284.27 227 W
+F6 F
+1.69 0 32 (.epsf) 353.77 227 W
+F3 F
+1.69 0 32 ( and ) 373.49 227 W
+F6 F
+1.69 0 32 (.epsi) 396.31 227 W
+F3 F
+1.69 0 32 (, respectively, should be used) 415.48 227 W
+(for the Macintosh-specific format and EPSI interchange format.) 180 216 T
+F2 F
+(MS-DOS AND PC-DOS FILES) 180 183 T
+F3 F
+2.52 0 32 (The recommended file extension is ) 180 168 W
+F6 F
+2.52 0 32 (.EPS) 335.65 168 W
+F3 F
+2.52 0 32 (.  For EPSI files, the extension should be) 356.49 168 W
+F6 F
+2.11 0 32 (.EPI) 180 156 W
+F3 F
+2.11 0 32 (. Other file extensions also can be used, but it will be assumed\
+ that these files) 
+199.17 156 W
+(are text-only files with no screen metafile included in them.) 180 145 T
+F2 F
+(OTHER FILE SYSTEMS) 180 112 T
+F3 F
+2.28 0 32 (In general, the extension ) 180 97 W
+F6 F
+2.28 0 32 (.epsf) 289.94 97 W
+F3 F
+2.28 0 32 ( is the preferred way to name an EPS file, and ) 309.66 97 W
+F6 F
+2.28 0 32 (.epsi) 520.83 97 W
+F3 F
+2.89 0 32 (for the interchange format. In systems where lower-case letters\
+ are not recognized) 
+180 86 W
+(or are not significant, all upper-case can be used.) 180 75 T
+11 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Bold 
+%%PageBoundingBox: 144 36 540 693 
+%%Page: 12 12 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+12 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b12)255.26 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 14 DF
+20.432 0 8 (7.\bSCREEN REPRESENTATIONS)72 691 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+3.3 0 32 (The EPS file will usually have a graphic screen representation so\
+ that it can be) 
+108 664 W
+1.54 0 32 (manipulated and displayed on a workstation\325s screen prior to\
+ printing.  The user may) 
+108 653 W
+2.03 0 32 (position, scale, crop or rotate this screen representation, and\
+ the composing software) 
+108 642 W
+1.81 0 32 (should keep track of these manipulations and reflect them in the\
+ PostScript language) 
+108 631 W
+(code that is ultimately sent to the printing device.) 108 620 T
+3.72 0 32 (The exact format of this screen representation is\
+ machine-specific. That is, each) 
+108 593 W
+4.25 0 32 (computing environment may have its own preferred bitmap format,\
+ and that is) 108 582 W
+2.66 0 32 (typically the appropriate screen representation for that\
+ environment. An interchange) 
+108 571 W
+5.42 0 32 (representation is specified that should be implemented by\
+ everyone, and any) 108 560 W
+(environment-specific formats can be supported in addition, as deemed\
+ appropriate.) 
+108 549 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F4 /Helvetica-BoldR 12 DF
+15.984 0 8 (7.1\bAPPLE MACINTOSH: PICT RESOURCE)72 509 W
+F3 F
+3.13 0 32 (A QuickDraw\252 representation of the PostScript language file can\
+ be created and) 
+108 489 W
+1.34 0 32 (stored as a PICT in the resource fork of the file.  It should be\
+ given resource number) 
+108 478 W
+1.83 0 32 (256.  If the PICT exists, the importing application may use it for\
+ screen display.  If) 
+108 467 W
+2.23 0 32 (the ) 108 456 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F5 /Times-ItalicR 10 DF
+2.23 0 32 (picframe ) 124.94 456 W
+F3 F
+2.23 0 32 (is transformed to PostScript language coordinates, it should agree\
+ with) 165.22 456 W
+(the ) 108 444 T
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F6 /Times-BoldR 10 DF
+(%%BoundingBox ) 122.72 444 T
+F3 F
+(comment.) 203.58 444 T
+3.42 0 32 (Given the size limitations on PICT images, this may not always\
+ agree for large) 
+108 418 W
+3.66 0 32 (illustrations.  If there is a discrepancy, the ) 108 406 W
+F6 F
+3.66 0 32 (%%BoundingBox ) 307.27 406 W
+F3 F
+3.66 0 32 (always should be) 391.79 406 W
+1.72 0 32 (taken as the "truth", since it accurately describes the area that\
+ will be imaged by the) 
+108 395 W
+2.28 0 32 (PostScript language code itself. In this situation, applications )
+ 108 384 W
+F5 F
+2.28 0 32 (producing) 372.9 384 W
+F3 F
+2.28 0 32 ( the preview) 414.01 384 W
+1.91 0 32 (PICT must all take the same action so that the importing\
+ application knows what to) 
+108 373 W
+(do.) 108 362 T
+2.09 0 32 (Since it is more important to have a reasonable facsimile of the\
+ image than it is to) 
+108 336 W
+2.41 0 32 (have any particular part of it be high quality, the PICT image\
+ should be ) 108 325 W
+F5 F
+2.41 0 32 (scaled) 429.76 325 W
+F3 F
+2.41 0 32 ( to) 455.31 325 W
+2.58 0 32 (fit within the constraints of the PICT format. That is, the\
+ picture will all be there) 
+108 314 W
+3.06 0 32 (\(it will not be cropped\), but it will actually be ) 108 303 W
+F5 F
+3.06 0 32 (smaller) 323.29 303 W
+F3 F
+3.06 0 32 ( than the real image. The) 353.29 303 W
+4.26 0 32 (importing application should then scale the PICT to a size which\
+ matches the) 
+108 292 W
+(bounding box as expressed in the ) 108 280 T
+F6 F
+(%%BoundingBox) 243.54 280 T
+F3 F
+( comment.) 321.9 280 T
+F4 F
+15.984 0 8 (7.2\bPC/DOS:  WINDOWS METAFILE OR TIFF FILE)72 240 W
+F3 F
+2.38 0 32 (Either a Microsoft\250 Windows Metafile or a TIFF \(Tag Image File\
+ Format\) section) 
+108 220 W
+(can be included as the screen representation of an EPS file.) 108 209 T
+1.43 0 32 (The EPS file itself has a binary header added to the beginning\
+ that provides a sort of) 
+108 183 W
+2.38 0 32 (\322table of contents\323 to the file. This is necessary since\
+ there is not a second \322fork\323) 
+108 172 W
+(within the file system as there is in the Macintosh file system.) 108 161 T
+F5 F
+(NOTE:) 108 135 T
+1.53 0 32 (It is always permissible to have a pure ASCII PostScript language\
+ file as an) 
+108 125 W
+1.5 0 32 (EPS file in the DOS environment, as long as it does not contain the\
+ preview) 108 115 W
+2.44 0 32 (section. The importing application should check the first three\
+ bytes of the) 
+108 105 W
+2 0 32 (file. If they match the header as shown below, the binary header\
+ should be) 108 95 W
+3.46 0 32 (expected. If the first two match ) 108 85 W
+stdvec /Times-BoldItalicR /Times-BoldItalic  REMAP
+/F7 /Times-BoldItalicR 10 DF
+3.46 0 32 (%!) 254.59 85 W
+F5 F
+3.46 0 32 (, it should be taken to be an ASCII) 266.81 85 W
+(PostScript language file.) 108 75 T
+12 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Times-Italic Times-Bold
+%%+  Times-BoldItalic 
+%%PageBoundingBox: 72 36 468 691 
+%%Page: 13 13 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+13 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+173.538 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b13)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+(DOS EPS Binary File Header) 180 693 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F3 /Helvetica-BoldR 10 DF
+52.99 0 8 (Bytes\bDescription)180 671 W
+stdvec /HelveticaR /Helvetica  REMAP
+/F4 /HelveticaR 10 DF
+65.77 0 8 (0-3\bMust be hex C5D0D3C6 \(byte 0=C5\))180 659 W
+65.77 0 8 (4-7\bByte position in file for start of)180 647 W
+(PostScript language code section.) 263 635 T
+60.21 0 8 (8-11\bByte length of PostScript language section)180 623 W
+54.65 0 8 (12-15\bByte position in file for start of Metafile)180 611 W
+(screen representation.) 263 599 T
+54.65 0 8 (16-19\bByte length of Metafile section \(PSize\))180 587 W
+54.65 0 8 (20-23\bByte position of TIFF representation)180 575 W
+54.65 0 8 (24-27\bByte length of TIFF section)180 563 W
+54.65 0 8 (28-29\bChecksum of header \(XOR of bytes 0-27\))180 551 W
+(NOTE:  if Checksum is FFFF then it is to be ignored.) 263 539 T
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F5 /Times-ItalicR 10 DF
+(Note:) 180 513 T
+1.82 0 32 (It is assumed that either the Metafile or the TIFF position and\
+ length fields) 
+180 503 W
+2.12 0 32 (are zero; that is, only one or the other of these two formats is\
+ included in) 
+180 493 W
+(the EPS file.) 180 483 T
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F6 /Times-RomanR 10 DF
+2.93 0 32 (The Metafile should follow the guidelines set forth by the Windows\
+ specification.) 
+180 460 W
+2.09 0 32 (In particular, it should not set the viewport or mapping mode, and\
+ it should set the) 
+180 449 W
+2.22 0 32 (window origin and extent. The application should scale the picture\
+ to fit within the) 
+180 438 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F7 /Times-BoldR 10 DF
+(%%BoundingBox ) 180 426 T
+F6 F
+(comment specified in the PostScript language file.) 260.86 426 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F8 /Helvetica-BoldR 14 DF
+20.432 0 8 (8.\bDEVICE-INDEPENDENT INTERCHANGE FORMAT)144 372 W
+F6 F
+2.36 0 32 (This last screen representation is intended as an interchange\
+ format between widely) 
+180 346 W
+2.59 0 32 (varied systems. In particular, the bitmap preview section of the\
+ file is very simple) 
+180 335 W
+2.76 0 32 (and is represented as ASCII hexadecimal in order to be more easily\
+ transportable.) 
+180 324 W
+(This format is dubbed Encapsulated PostScript Interchange format, or\
+ \322EPSI.\323) 
+180 313 T
+3.42 0 32 (This format wins no prizes for compactness, but it should be truly\
+ portable and) 
+180 287 W
+3.06 0 32 (requires no special code for decompressing or otherwise\
+ understanding the bitmap) 
+180 276 W
+(portion, other than the ability to understand hexadecimal notation.) 180 265
+ T
+4.83 0 32 (It is expected that applications that support EPSF will gradually\
+ head toward) 
+180 239 W
+3.29 0 32 (supporting only two formats: the first is the \322native\323\
+ format for the environment) 
+180 228 W
+3.71 0 32 (in which the application runs \(where the preview section is\
+ Macintosh PICT or) 
+180 217 W
+3.7 0 32 (TIFF or Sun raster files or whatever\); the second format should\
+ simply be this) 
+180 206 W
+2.37 0 32 (interchange format. Then files can be interchanged between widely\
+ varying systems) 
+180 195 W
+(without each having to know the preferred bitmap representation of the\
+ others.) 
+180 184 T
+F2 F
+(%%BeginPreview: width height depth  lines) 180 150 T
+(%%EndPreview) 180 137 T
+F6 F
+2.74 0 32 (These comments bracket the preview section of an EPS file in\
+ Interchange format) 
+180 122 W
+2.34 0 32 (\(EPSI\). The ) 180 110 W
+F7 F
+2.34 0 32 (width) 234.95 110 W
+F6 F
+2.34 0 32 ( and ) 259.4 110 W
+F7 F
+2.34 0 32 (height) 283.52 110 W
+F6 F
+2.34 0 32 ( fields provide the number of image samples \(pixels\)) 310.19 110
+ W
+4.03 0 32 (for the preview. The ) 180 98 W
+F7 F
+4.03 0 32 (depth) 280.26 98 W
+F6 F
+4.03 0 32 ( field provides how many bits of data are used to) 304.71 98 W
+2.61 0 32 (establish one sample pixel of the preview \(1, 2, 4, or 8\). An\
+ image which is 100) 
+180 87 W
+2.28 0 32 (pixels wide will always have 100 in the ) 180 75 W
+F7 F
+2.28 0 32 (width) 358.8 75 W
+F6 F
+2.28 0 32 ( field, although the number of bytes) 383.25 75 W
+13 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Italic Times-Roman Times-Bold 
+%%PageBoundingBox: 144 36 540 693 
+%%Page: 14 14 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+14 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+-361.942 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b14)255.26 36 W
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F2 /Times-RomanR 10 DF
+2.56 0 32 (of hexadecimal needed to build that line will vary if ) 108 694 W
+stdvec /Times-BoldR /Times-Bold  REMAP
+/F3 /Times-BoldR 10 DF
+2.56 0 32 (depth) 343.59 694 W
+F2 F
+2.56 0 32 ( varies. The ) 368.04 694 W
+F3 F
+2.56 0 32 (lines) 425.16 694 W
+F2 F
+2.56 0 32 ( field) 444.61 694 W
+1.93 0 32 (tells how many lines of hexadecimal are contained in the preview,\
+ so that they may) 
+108 683 W
+(be easily skipped by an application that doesn\325t care. All the arguments\
+ are integers.) 
+108 672 T
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F4 /Helvetica-BoldR 12 DF
+15.984 0 8 (8.1\bSOME RULES AND GUIDELINES FOR \322EPSI\323 FILES)72 635 W
+F2 F
+2.18 0 32 (The following guidelines attempt to clarify a few basic\
+ assumptions about the EPSI) 
+108 618 W
+2.7 0 32 (format. It is intended to be extremely simple, since its purpose is\
+ interchange. No) 
+108 607 W
+1.63 0 32 (system should have to do much work to decipher one of these files,\
+ and the preview) 
+108 596 W
+4.19 0 32 (section is mostly just a convenience to begin with. This format is\
+ accordingly) 
+108 585 W
+(deliberately kept simple and option-free.) 108 574 T
+3.09 0 32 (\245  The preview section must be after the header comment section\
+ but before the) 
+108 551 W
+6.46 0 32 (document prologue definitions. That is, it should immediately\
+ follow the) 119 540 W
+F3 F
+(%%EndComments) 119 528 T
+F2 F
+( line in the EPS file.) 202.89 528 T
+2.54 0 32 (\245  In the preview section, ) 108 506 W
+F3 F
+2.54 0 32 (0) 225.34 506 W
+F2 F
+2.54 0 32 ( is white and ) 230.34 506 W
+F3 F
+2.54 0 32 (1) 293.84 506 W
+F2 F
+2.54 0 32 ( is black, in deference to the majority.) 298.84 506 W
+(Arbitrary transfer functions and \322flipping\323 black and white are not\
+ supported.) 
+119 495 T
+1.71 0 32 (\245  The Preview image can be of ) 108 474 W
+stdvec /Times-ItalicR /Times-Italic  REMAP
+/F5 /Times-ItalicR 10 DF
+1.71 0 32 (any) 249.61 474 W
+F2 F
+1.71 0 32 ( resolution. The size of the image is determined) 264.05 474 W
+3.4 0 32 (solely by its ) 119 463 W
+F5 F
+3.4 0 32 (bounding box) 180.05 463 W
+F2 F
+3.4 0 32 (, and the preview data should be scaled to fit that) 238.17 463 W
+3.76 0 32 (rectangle. Thus, the ) 119 451 W
+F3 F
+3.76 0 32 (width) 211.66 451 W
+F2 F
+3.76 0 32 ( and ) 236.11 451 W
+F3 F
+3.76 0 32 (height) 263.07 451 W
+F2 F
+3.76 0 32 ( parameters from the image are ) 289.74 451 W
+F5 F
+3.76 0 32 (not) 439.5 451 W
+F2 F
+3.76 0 32 ( its) 452.28 451 W
+3.35 0 32 (measured dimensions, but simply describe the amount of data\
+ supplied for the) 
+119 440 W
+(preview. The dimensions are described only by the bounding rectangle.) 119
+ 429 T
+1.81 0 32 (\245  The hexadecimal lines must never exceed 255 bytes in length.\
+ In cases where the) 
+108 408 W
+1.05 0 32 (preview is very wide, the lines must be broken. The line breaks\
+ can be made at any) 
+119 397 W
+3.88 0 32 (even number of hex digits, since the dimensions of the finished\
+ preview are) 119 386 W
+(established by the ) 119 374 T
+F3 F
+(width) 193.16 374 T
+F2 F
+(, ) 217.61 374 T
+F3 F
+(height) 222.61 374 T
+F2 F
+(, and ) 249.28 374 T
+F3 F
+(depth ) 271.22 374 T
+F2 F
+(values.) 298.17 374 T
+3 0 32 (\245  All non-hexadecimal characters should be ignored when\
+ collecting the data for) 
+108 353 W
+2.71 0 32 (the preview, including tabs, spaces, newlines, percent characters,\
+ and other stray) 
+119 342 W
+3.97 0 32 (ASCII characters. This is analogous to the PostScript language )
+ 119 330 W
+F3 F
+3.97 0 32 (readhexstring) 408.55 330 W
+F2 F
+(operator.) 119 319 T
+2.51 0 32 (\245  Each line of hexadecimal will begin with a percent sign\
+ \(\324) 108 297 W
+F3 F
+2.51 0 32 (%) 378.25 297 W
+F2 F
+2.51 0 32 (\325\). This makes the) 388.25 297 W
+1.81 0 32 (entire preview section into a PostScript language comment, so that\
+ the file can be) 
+119 286 W
+(printed without modification.) 119 275 T
+2.07 0 32 (\245  If the ) 108 253 W
+F3 F
+2.07 0 32 (%%IncludeFile) 148.66 253 W
+F2 F
+2.07 0 32 ( or ) 217 253 W
+F3 F
+2.07 0 32 (%%BeginFile / %%EndFile) 234.47 253 W
+F2 F
+2.07 0 32 ( comments are ever used) 360.85 253 W
+2.49 0 32 (to extract the preview section from the EPS file, then the ) 119
+ 241 W
+F3 F
+2.49 0 32 (lines) 375.8 241 W
+F2 F
+2.49 0 32 ( argument to the) 395.25 241 W
+F3 F
+5.54 0 32 (%%BeginPreview) 119 229 W
+F2 F
+5.54 0 32 ( comment must be adjusted accordingly. The ) 197.88 229 W
+F3 F
+5.54 0 32 (lines) 418.85 229 W
+F2 F
+5.54 0 32 ( value) 438.3 229 W
+(specifies only the number of lines to ) 119 218 T
+F5 F
+(skip) 267.04 218 T
+F2 F
+( if you\325re not the least bit interested.) 283.15 218 T
+2.14 0 32 (\245  If the ) 108 196 W
+F3 F
+2.14 0 32 (width) 148.93 196 W
+F2 F
+2.14 0 32 ( of the image is not a multiple of 8 bits, the hexadecimal digits\
+ are) 173.38 196 W
+(padded out to the next highest multiple of 8 bits.) 119 185 T
+14 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Times-Roman Times-Bold Helvetica-Bold Times-Italic 
+%%PageBoundingBox: 72 36 468 694 
+%%Page: 15 15 
+%%PageFonts: (atend)
+%%PageBoundingBox: (atend)
+15 BEGINPAGE
+0 g
+stdvec /HelveticaR /Helvetica  REMAP
+/F1 /HelveticaR 7 DF
+173.538 0 8 (\2511988 Adobe Systems Incorporated.  All rights
+ reserved.\b15)180 36 W
+stdvec /Helvetica-BoldR /Helvetica-Bold  REMAP
+/F2 /Helvetica-BoldR 12 DF
+(EXAMPLE \322EPSI\323 FILE) 180 693 T
+stdvec /Times-RomanR /Times-Roman  REMAP
+/F3 /Times-RomanR 10 DF
+3.12 0 32 (Here is a sample file showing the EPS Interchange \(EPSI\) format.\
+  The preview) 
+180 670 W
+1.7 0 32 (section is expressed in user space and the correct comments are\
+ included. Remember) 
+180 659 W
+2 0 32 (that there are 8 bits to a byte, and that it requires 2 hexadecimal\
+ digits to represent) 
+180 648 W
+3.34 0 32 (one binary byte. Therefore the 80-pixel width of the image\
+ requires 20 bytes of) 
+180 637 W
+3.36 0 32 (hexadecimal data, which is \(80 / 8\) * 2. The PostScript language\
+ segment itself) 
+180 626 W
+(simply draws a box, as can be seen in the last few lines.) 180 615 T
+stdvec /HelveticaR /Helvetica  REMAP
+/F4 /HelveticaR 9 DF
+(%!  PS-Adobe-2.0 EPSF-2.0) 180 592 T
+(%%BoundingBox: 0 0 80 24) 180 582 T
+(%%Pages: 0) 180 572 T
+(%%Creator: Glenn Reid) 180 562 T
+(%%CreationDate: September 19, 1988) 180 552 T
+(%%EndComments) 180 542 T
+(%%BeginPreview:  80  24  1  24) 180 532 T
+stdvec /CourierR /Courier  REMAP
+/F5 /CourierR 10 DF
+(% FFFFFFFFFFFFFFFFFFFF) 180 522 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 511 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 500 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 489 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 478 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 467 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 456 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 445 T
+(% FF0000000000000000FF) 180 434 T
+(% FF0000000000000000FF) 180 423 T
+(% FF0000000000000000FF) 180 412 T
+(% FF0000000000000000FF) 180 401 T
+(% FF0000000000000000FF) 180 390 T
+(% FF0000000000000000FF) 180 379 T
+(% FF0000000000000000FF) 180 368 T
+(% FF0000000000000000FF) 180 357 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 346 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 335 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 324 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 313 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 302 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 291 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 280 T
+(% FFFFFFFFFFFFFFFFFFFF) 180 269 T
+F4 F
+(%%EndPreview) 180 258 T
+(%%EndProlog) 180 248 T
+(%%Page: "one" 1) 180 238 T
+(  4 4 moveto 72 0 rlineto 0 16 rlineto -72 0 rlineto closepath) 180 228 T
+(  8 setlinewidth stroke) 180 218 T
+(%%Trailer) 180 208 T
+15 ENDPAGE
+%%PageTrailer
+%%PageFonts: Helvetica Helvetica-Bold Times-Roman Courier 
+%%PageBoundingBox: 180 36 540 693 
+%%Trailer
+end %PROLOGUE
+%%Pages: 15 
+%%BoundingBox: 0 0 612 792
+%%DocumentFonts: Helvetica Helvetica-Bold Times-Bold Times-Roman
+%%+  Helvetica-Oblique Times-Italic Helvetica-BoldOblique Times-BoldItalic
+%%+  Courier 
+%%EOF
+

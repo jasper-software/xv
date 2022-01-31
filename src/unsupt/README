@@ -1,0 +1,43 @@
+FITS:  There are two different sets of modifications that allow XV to 
+read/write 'FITS' files.  I have no comment on the merits of either set.
+Take your pick.  (Note: At least one of the sets (FITS.rite) makes assumptions 
+about 'int's being 4 bytes long.  This will fail miserably on a 64-bit 
+machine.)  I'm unlikely to incorporate either set into a future version of XV,
+as FITS looks like a dinosaur format that should've gone away a decade ago.
+(It makes PDS/VICAR look streamlined and modern!)  Anyway, if you need FITS
+support, and you can get this stuff to work for you, have a blast.  Distribute
+it to all your friends.
+
+--jhb, 7/29/94
+
+-------------
+
+getweather is a shell script that goes out and gets the latest weather map
+of the US from this anonymous ftp site.  It should probably be run in your
+crontab.
+
+getweather.ksh is a much-enhanced Korn shell version of said script written
+by Marc Evans.
+
+--jhb, 4/30/92
+
+------------------
+This directory contains various things that folks have sent me that
+may be of interest to various other folks out there.  *NONE* of the stuff
+in this directory has been made to work with the current release of XV.
+If it had, it would be part of the program, instead.  
+
+Rather than put off releasing XV, because I'm too busy adding formats that
+don't particularly interest me (personally), I've decided to just put all
+of these things in this directory.  Anyone who actually wants to use one
+of these formats shouldn't have much trouble taking what is given here and
+tweaking it so that it follows the specs in Appendix G of the (PostScript)
+XV Docs (not the 'man' page).  
+
+Also, please don't ask *me* anything about the code in this directory,
+other than to find out if I've put out a newer release that officially
+included the desired format.  The code in this directory is completely
+unsupported (by me).  Please refer any querys to the author(s) of the
+code in question.
+
+--jhb, 2/12/93

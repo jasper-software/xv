@@ -1,0 +1,272 @@
+/*
+ * be sure to check 'config.h' for a couple other configuration options
+ */
+
+
+/* if, for whatever reason, you're unable to get the JPEG library to compile
+ * on your machine, *COMMENT OUT* the following line
+ */
+#define HaveJpeg
+
+
+/* if, for whatever reason, you're unable to get the TIFF library to compile
+ * on your machine, *COMMENT OUT* the following line
+ */
+#define HaveTiff
+
+
+/* if, for whatever reason, you're unable to get the PDS/VICAR support
+ * to compile (xvpds.c, and vdcomp.c), *COMMENT OUT* the following line
+ */
+#define HavePDS
+
+
+/*
+ * if you are running on a SysV-based machine, such as HP, Silicon Graphics,
+ * etc, uncomment one of the following lines to get you *most* of the way
+ * there.  SYSV means System V R3.  One of these may be defined through your
+ * X11 config files anyway.
+ */
+/* UNIX = -DSVR4 */
+/* UNIX = -DSYSV */
+
+
+
+/* If your machine has the 'usleep()' function, uncomment the following
+ * line.  If it doesn't, or you're not sure, don't uncomment the line
+ */
+/* TIMERS = -DUSLEEP */
+
+/* if XV locks up whenever you click any button in the controls window,
+ * the Timer() function in xvmisc.c is going out-to-lunch.  A simple
+ * workaround is to uncomment the following line:
+ */
+/* TIMERS = -DNOTIMER */
+
+
+
+/* if you are running under DXWM, I pity you.  XV doesn't work correctly
+ * under DXWM.  You should probably be running MWM.  However, if such is
+ * not a valid option for you, try uncommenting the following line.  The
+ * behavior won't be 'right', but it will be less 'wrong'.
+ */
+/* DXWM = -DDXWM */
+
+
+
+/* if your system doesn't have u_long, u_short ... typedefined  
+ * uncomment the following line:
+ */
+/* BSDTYPES = -DBSDTYPES */
+
+
+
+/* if your system *doesn't* have /usr/include/dirent.h, (ie, isn't POSIX
+ * compliant, then you may have to uncomment the following line to use the
+ * 'old-style' directory-handling structures
+ */
+/* NODIRENT = -DNODIRENT */
+
+
+
+/* If your machine doesn't have the 'random()' function, and only
+ * has 'rand()', uncomment the following line:
+ */
+/* RAND= -DNO_RANDOM */
+
+
+
+/* if your machine doesn't have 'vprintf()' or 'vsprintf()'
+ *   see vprintf.c for more information, if needed.
+ */
+#if defined(VaxArchitecture) && !defined(UltrixArchitecture)
+VPRINTF=	-DNEED_VPRINTF -DINTSPRINTF -DLONGINT -DNOVOID
+#else 
+#  if defined(RtArchitecture) && !defined(AIXArchitecture)
+VPRINTF=	-DNEED_VPRINTF -DINTSPRINTF -DLONGINT -DNOSTDHDRS -U__STDC__
+#  else
+#    if defined(SequentArchitecture)
+VPRINTF= -DNEED_VPRINTF -DLONGINT -DNOSTDHDRS
+#    endif
+#  endif
+#endif
+
+
+
+/* If you are using an HP running HPUX 7.0, the following should be active */
+#if defined(HPArchitecture) && (OSMajorVersion == 7)
+HPUX7 = -DSYSV +Ns4000 -DHPUX7
+#endif
+
+
+/* If you are using an SGI machine, the following should be active */
+#ifdef SGIArchitecture
+SGI = -Dsgi
+#endif
+
+
+
+
+
+
+/* This marks the end of the configuration parameters */
+
+
+
+
+
+#ifdef HaveJpeg
+JPEG = -DDOJPEG
+JPEGDIR = jpeg
+LIBJPEG = $(JPEGDIR)/libjpeg.a
+JPEGINCLUDE = -I$(JPEGDIR)
+#endif
+
+#ifdef HaveTiff
+TIFF = -DDOTIFF
+TIFFDIR = tiff
+LIBTIFF = $(TIFFDIR)/libtiff.a
+TIFFINCLUDE = -I$(TIFFDIR)
+#endif
+
+#ifdef HavePDS
+PDS = -DDOPDS
+#endif
+
+
+#if defined(SCOArchitecture)
+SCO= -Dsco -DPOSIX -DNO_RANDOM 
+SYS_LIBRARIES=        -lm -lc -lx 
+#else
+SYS_LIBRARIES=        -lm
+#endif
+
+
+DEPLIBS = $(LIBJPEG) $(LIBTIFF)
+LOCAL_LIBRARIES = $(XLIB) $(DEPLIBS)
+
+DEFINES= $(SCO) $(UNIX) $(NODIRENT) $(VPRINTF) $(TIMERS) \
+	$(HPUX7) $(JPEG) $(TIFF) $(PDS) $(DXWM) $(RAND) \
+	$(BACKING_STORE) $(BSDTYPES) $(SGI)
+
+INCLUDES = $(JPEGINCLUDE) $(TIFFINCLUDE)
+
+SRCS1 =	xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c \
+	xv24to8.c xvgif.c xvpm.c xvinfo.c xvctrl.c xvscrl.c xvalg.c \
+	xvgifwr.c xvdir.c xvbutt.c xvpbm.c xvxbm.c xvgam.c xvbmp.c \
+	xvdial.c xvgraf.c xvsunras.c xvjpeg.c xvps.c xvpopup.c xvdflt.c \
+	xvtiff.c xvtiffwr.c xvpds.c xvrle.c xviris.c xvgrab.c vprintf.c \
+	xvbrowse.c xvtext.c xvpcx.c xviff.c xvtarga.c xvxpm.c xvcut.c \
+	xvxwd.c xvfits.c
+
+OBJS1 =	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
+	xv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+	xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvgam.o xvbmp.o \
+	xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
+	xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
+	xvbrowse.o xvtext.o xvpcx.o xviff.o xvtarga.o xvxpm.o xvcut.o \
+	xvxwd.o xvfits.o
+
+SRCS2=	bggen.c
+OBJS2=	bggen.o
+
+#ifdef HavePDS
+SRCS3=	vdcomp.c
+OBJS3=	vdcomp.o
+#endif
+
+SRCS4=	xcmap.c
+OBJS4=	xcmap.o
+
+SRCS5=	xvpictoppm.c
+OBJS5=	xvpictoppm.o
+
+PROGRAMS= xv bggen vdcomp xcmap xvpictoppm
+
+all::
+	@echo ""
+	@echo "  Did you remember to 'make depend' first?"
+	@echo ""
+
+
+#if defined(HaveJpeg) || defined(HaveTiff)
+#  ifdef HaveJpeg
+#    ifdef HaveTiff
+       SUBDIRS = tiff
+#    else
+       SUBDIRS = 
+#    endif
+#  else
+     SUBDIRS = tiff
+#  endif
+#  define PassCDebugFlags
+#  define IHaveSubdirs
+#endif
+
+
+all::
+	@echo "  building xv ..."
+	@echo ""
+
+
+#ifdef HaveJpeg
+$(LIBJPEG):
+	cd $(JPEGDIR); $(MAKE) libjpeg.a
+
+clean::
+	@echo ""
+	@echo "  cleaning in $(JPEGDIR) ..."
+	@echo ""
+	( cd $(JPEGDIR) ; $(MAKE) clean )
+	@echo ""
+#endif
+
+#ifdef HaveTiff
+$(LIBTIFF):
+	cd $(TIFFDIR); $(MAKE) libtiff.a
+ 
+clean::
+	@echo "  cleaning in $(TIFFDIR) ..."
+	@echo ""
+	( cd $(TIFFDIR) ; $(MAKE) clean )
+	@echo ""
+#endif
+
+
+
+SRCS = $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS4)
+  
+AllTarget($(PROGRAMS))
+DependTarget()
+#ifdef IHaveSubdirs
+  DependSubdirs($(SUBDIRS))
+#endif
+
+
+NormalProgramTarget(xv,$(OBJS1),$(DEPLIBS),$(LOCAL_LIBRARIES),)
+NormalProgramTarget(bggen,$(OBJS2),$(DEPLIBS),$(LOCAL_LIBRARIES),)
+NormalProgramTarget(xcmap,$(OBJS4),$(DEPLIBS),$(LOCAL_LIBRARIES),)
+NormalProgramTarget(xvpictoppm,$(OBJS5),$(DEPLIBS),$(LOCAL_LIBRARIES),)
+
+ 
+InstallProgram(xv,$(BINDIR))
+InstallProgram(bggen,$(BINDIR))
+InstallProgram(xcmap,$(BINDIR))
+InstallProgram(xvpictoppm,$(BINDIR))
+
+#ifdef HavePDS
+NormalProgramTarget(vdcomp,$(OBJS3),$(DEPLIBS),$(LOCAL_LIBRARIES),)
+InstallProgram(vdcomp,$(BINDIR))
+#endif
+
+ 
+InstallManPageLong(docs/xv,$(MANDIR),xv)
+InstallManPageLong(docs/bggen,$(MANDIR),bggen)
+InstallManPageLong(docs/xcmap,$(MANDIR),xcmap)
+InstallManPageLong(docs/xvp2p,$(MANDIR),xvpictoppm)
+InstallManPageLong(docs/vdcomp,$(MANDIR),vdcomp)
+
+tar:
+	tar cf xv.tar Makefile* Imakefile *.c *.h bits docs \
+		 docs unsupt vms $(JPEGDIR) $(TIFFDIR) $(MISC)
+

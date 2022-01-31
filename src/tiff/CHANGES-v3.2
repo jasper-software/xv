@@ -1,0 +1,72 @@
+$Header: /usr/people/sam/tiff/RCS/CHANGES-v3.2,v 1.1 1992/10/29 15:51:28 sam Exp $
+
+TIFF Software "Release" 3.20 (changes since 3.10 release)
+----------------------------------------------------------
+Changes in libtiff:
+    o default configuration definitions can now be placed in the file
+      tiffconf.h; this makes it easier to build the software on systems
+      that do not support make (e.g. the Mac and MS-DOS); the Makefiles
+      have been updated to reflect this by keeping only those global
+      configuration definitions that are needed to override the default
+      configuration in tiffconf.h
+    o tiffcompat.h has been renamed tiffcomp.h for systems with filename
+      length restrictions
+    o the prototypes.h file has been deleted and its contents merged into
+      tiffcomp.h
+    o many uses of const that were wrong or missing have been corrected
+    o all uses of bzero, bcmp, and bcopy have been replaced by uses of
+      memset, memcmp, and memcpy, respectively
+    o tif_apple.c has been rewritten to use only the Toolbox and File
+      Manager traps; it no longer uses calls to the "UNIX compatibility"
+      library
+    o the library now uniformly uses the DECLARE macros for function
+      definitions to insure ANSI C compilers will be more happy
+    o the handling of the TransferFunction tag has been corrected so that
+      it now accepts only 1 or 3 transfer tables (per the spec)
+    o the ReferenceBlackWhite tag is now checked to make sure only 6
+      values are present
+    o a number of missing and incorrect function prototypes in tiffio.h
+      have been corrected
+    o a problem where the library could dump core if the StripOffsets tag
+      was not present has been fixed
+    o a DotRange tag with BYTE values is now accepted (per the spec)
+    o a new check for bogus StripByteCount tags has been added
+    o a problem in the processing of certain SHORT tags on 16-bit architectures
+      has been corrected
+    o the global (static) dataoff variable in tif_dirwrite.c is now in
+      the TIFF structure; this simplifies the construction of shared libraries
+    o files that include <assert.h> now also explicitly include <stdio.h>
+      to avoid portability problems
+    o the global data structures TIFFBitRevTable and TIFFNoBitRevTable are
+      no longer public; a new function TIFFGetBitRevTable should be used
+      to gain access to them (this is for shared libraries)
+    o the Group 3 fax code has been corrected to write RTC as 6 1D EOL codes;
+      it previously would write EOL codes together with tag bits if the data
+      was 2D-encoded
+    o the Group 4 fax code has been corrected to write EOFB correctly (it had
+      been writing tag bits)
+    o portability problems in the TIFFReadRGBAImage code have been corrected
+    o tif_msdos.c has been updated and tested
+    o all library interfaces where strip sizes are passed in have been changed
+      from int or u_int parameters to long or u_long parameters; this insures
+      that 32-bit strip sizes can be passed into the library on 16-bit
+      architectures
+    o the global data variable TIFFVersion has been replaced by the function
+      TIFFGetVersion (to simplify the construction of shared libraries)
+    o tif_vms.c has been updated and tested
+    o tiffioP.h has been renamed tiffiop.h to improve portability
+
+Changes in the tools:
+    o the Makefiles no longer have configuration definitions in them (they
+      are not needed)
+    o fax2tiff has been fixed
+    o tiff2ps now prints PostScript if a -p option; Encapsulated PostScript
+      is still the default (it can also explictly be requested with a -e flag);
+      a new -a option has been added to get all images in a multi-page file
+    o tiffcp still does not know how to deal with tiled images (I've got a
+      version, but didn't have time to incorporate the modifications)
+    o a bug in the -d option to tiffinfo has been fixed
+
+Changes in the contrib software:
+    o the fax2ps software has been updated
+    o the vms support has been updated

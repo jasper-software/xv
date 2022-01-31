@@ -1,0 +1,2663 @@
+Revision History
+----------------
+
+XV 3.10a bug-fix release  12/29/94
+----------------------------------
+Bug Fix:  Problems loading JPEG files in 8-bit mode on some systems.
+				(Rick Richardson (rick@digibd.com))
+				(Chad R. Larson  (chad@anasazi.com))
+
+Bug Fix:  Added '-pkludge' command line option and 'popupKludge' boolean 
+	resource.  If true, selects the 'old-style' pop-up window positioning
+	code.  The various popup windows should appear with the Ok button
+	(or whatever) centered around the cursor.  If the windows routinely
+	pop up slightly off-center from the cursor, try turning this on.
+
+Bug Fix:  '3' and 'Q' characters in the Text Annotation character set were
+	boogered up...		(Sidik Isani (si@acpub.duke.edu))
+
+Bug Fix:  '-iconic' option wasn't working.
+				(David Pesetsky  (iedsp@agt.gmeds.com))
+
+Bug Fix:  Didn't properly read greyscale RLE files.
+				(Robert Cunningham  (rkc@xn.ll.mit.edu))
+
+Bug Fix:  'AutoCrop' on 24-bit images could produce 0x0 images.  A problem!
+				(Leon Shaner  (leon@mtu.edu))
+
+Bug Fix:  GIF reader would blow up if there were multiple comments.
+				(Markus Gyger  (mgyger@itr.ch))
+
+Bug Fix:  Behavior under virtual window managers may be improved.
+				(steveg@pa.dec.com)
+
+Enhancement:  Text in 'temperature gauge' (during slow operations) is now
+	XOR'd on, so it isn't obscured by the filled area of the gauge.
+				(Jerry Whelan  (jerryw@bnl.gov))
+
+Enhancement:  man page for vdcomp written
+				(James Ralston Crawford  (qralston+@pitt.edu))
+
+Enhancement:  PCX code can now read 24-bit PCX files.
+				(Dave Cohrs  (cohrs@legato.com))
+
+Portability:  Patch for Linux	(David Hankins  (dhankins@oz.net))
+
+Portability:  Patches for ISC 4.0 Interactive/SunSoft Unix
+				(Jack Bailey  (jjb@jagware.bcc.com))
+
+Portability:  Compiler noise (from Sun's Professional C compiler) cleaned up.
+				(John Fritz  (jfritz@bpo-ess.ceco.com))
+
+Portability:  Many nits picked by Pyramid compiler
+				(Chad R. Larson  (chad@anasazi.com))
+
+Portability:  Some malloc's in xvfits.c needed casting.
+				(Bill Silvert  (sysop@biome.bio.ns.ca))
+
+Portability:  Further VMS problems solved.
+				(Rick Dyson (dyson@sunfish.physics.uiowa.edu))
+
+Portability:  select() on HP-UX 9.x expects (int *) instead of (fd_set *)
+				(Richard Allen  (ra@os.is))
+
+Portability:  Removed 'const' from second parameter in decl. for decode_run()
+	in tif_fax3.c.		(Glenn Spargo  (gspargo@ctron.com))
+
+Portability:  Added 'fcntl.h' to xv.h, as some systems may not have O_RDONLY
+	declared elsewhere.	(Mitchell Blank  (blankm@cae.wisc.edu))
+
+Portability:  Font selection strings in xv.c didn't have enough '*'s in them.
+	Would fail on some X servers.
+				(Rick Richardson  (rick@digibd.com))
+
+Second XV 3.10 Public Release  12/22/94
+----------------------------------------
+Bug Fix:  Make_xv.com in vms directory wouldn't build xvxpm.c or xvfits.c 
+	(and thus, XV!)		(Rick Dyson  (dyson@sunfish.Physics.UIowa.Edu))
+
+
+Initial XV 3.10 Public Release  12/21/94
+----------------------------------------
+Bug Fix:  Greyscale downsampling bug in JPEG code fixed.
+				(Tom Lane  (tgl@sss.pgh.pa.us))
+
+Enhancement:  Made Grab command trap 'BadMatch' errors and display an
+	appropriate error message (rather than exiting with a fatal error).
+				(Eric Demerling (x450b05@rdsrv2.goodyear.com))
+
+Enhancement:  Cleaned up/reorganized Makefile
+				(Tom Lane  (tgl@sss.pgh.pa.us))
+
+Portability: BSDI doesn't have malloc.h.  Fixed xv.h and vdcomp.c
+				(Chris Ross (cross@eng.umd.edu))
+
+Bug Fix:  Additional VMS schnauzer fixes.	
+				(Rick Dyson  (dyson@sunfish.Physics.UIowa.Edu))
+
+
+Second XV 3.10 Beta Release
+----------------------------
+Portability:  xvxpm.c module rewritten to include its own hash-table 
+	routines, as 'hsearch()' is not available on all systems.
+				(Chris Ross (cross@eng.umd.edu))
+
+Bug Fix:  Big stupid mistake in xvtiff.c module.  Too embarrassing to mention.
+				(Michael Weller (eowmob@exp-math.uni-essen.de))
+
+Bug Fix:  failing to store clipboard contents in an X property was 
+	(incorrectly) exiting the program as a fatal error, rather than 
+	falling back to using a '.xvclip' file in your home directory.
+				(Eric Demerling (x450b05@rdsrv2.goodyear.com))
+
+Docs:  Mentioned 'FITS' format, removed claim that rotate 90-degree commands 
+	will rotate selected area, added additional credits.
+
+Bug Fix:  Cleaned up xvxpm.c - potential for infinite loops on broken
+	images.  Also, now handles 'None' better, and mentions when it can't
+	parse colorspecs.
+
+Bug Fix:  When viewing large images, a rotate may not have properly redrawn
+	the image.  Also, it could lose the proper aspect ratio.
+				(Michael Weller (eowmob@exp-math.uni-essen.de))
+
+Bug Fix:  'Expansion' and 'Resolution' fields in xv info window weren't
+	getting updated when image was rotated.
+
+Bug Fix:  If you were in Perfect or OwnCmap color modes, and switched to a 
+	root display mode, it didn't (correctly) switch to Normal colors.
+				(Michael Weller (eowmob@exp-math.uni-essen.de))
+
+Added Feature:  XV can now read and write greyscale FITS images
+				(David Robinson  (drtr@mail.ast.cam.ac.uk))
+
+Enhancement:  XV can now read old Windows and OS/2 BMP files
+				(Eric Dumas (dumas@daubasse.emi.u-bordeaux.fr))
+
+Portability:  now uses the Dec 8 re-release of IJG jpeg software (ver. 5a)
+				(Tom Lane  (tgl@sss.pgh.pa.us))
+
+Portability:  need to include <sys/select.h> on aix systems ('_AIX')
+				(Eric Demerling (x450b05@rdsrv2.goodyear.com))
+
+Portability:  NetBSD objects to 'extern char *sys_errlist[];'
+				(Chris Ross (cross@eng.umd.edu))
+
+Portability:  CBSIZE (in xvbutt.c) is defined on some systems in param.h.
+	Changed to XVCBSIZE.	(Chris Ross (cross@eng.umd.edu))
+
+Portability:  'Makefile' in TIFF directory assumed 'ar' lived in /bin.  This
+	isn't necessarily so.  It'll now just search the path.
+			(Michael Weller (eowmob@exp-math.uni-essen.de))
+
+Bug Fix:  recursive update on VMS didn't work right
+			(Rick Dyson  (dyson@sunfish.physics.uiowa.edu))
+
+
+Initial XV 3.10 Beta Release
+----------------------------
+Added Feature:  XV now comes with 'xvpictoppm' program, which reads XV 
+	thumbnail files and converts them to standard PPM format.
+
+Added Feature:  XV can now read the XWD format.  Whether or not this will
+	still be an issue, given the whizzo new 'Grab' command, I don't
+	know.  XV does *not* write XWD files, as XWD is not a format to be
+	encouraged.  	(Markus Baur (mbaur@ira.uka.de))
+
+Bug Fix:  'xv -poll -root <filename>' would thrash wildly if the file didn't
+	exist, or wasn't loadable.  Now behaves better.
+
+Added Feature:  'Recursive Update' command in visual schnauzer.  Does an 
+	'update' command in the current directory, and recursively down into
+	all subdirectories.  Keyboard Equivalent:  ^e
+
+Bug Fix:  Potential problem when allocating colors for std colormap.
+			(Yasuhiro Imoto  (tomo@sonytek.co.jp))
+
+Bug Fix:  Cropping a large area while zoomed in could result in enormous,
+	potentially off-screen images.  A bad thing.
+
+Added Feature:  Added a 'Select Files' command in the visual schnauzer, 
+	which lets you select files by name.  The wildcard character '*'
+	(which matches any arbitrary char sequence) is supported.  This 
+	gives you an easy way to select all the JPEG files ('*.jpg'), for
+	example.  Keyboard Equiv:  ^f
+
+Bug Fix:  Added support for 15-bit-per-pixel displays, and probably fixed
+	support for 15/16-bit LSBFirst displays.  At least on 80x86-based
+	machines, which is where nearly all 15/16-bit displays have to be.
+			(Michael Weller (eowmob@exp-math.uni-essen.de))
+
+Bug Fix:  Somewhere along the line, the file name list (in the controls window)
+	was getting redrawn at least one time too many, when you loaded
+	files from the schnauzer.
+
+Added Feature:  Added a 'despeckle' algorithm (median filter).
+			(Colin Plumb  (colin@nyx10.cs.du.edu))
+
+Added Feature:  XV now can read and write the XPM format.  It can read XPM
+	images with any number of colors, though it only writes XPM images
+	with a maximum of 256 colors.  (If your image has more than 256
+	colors, it is automatically quantized.)  While the XPM format lets 
+	you do arbitrary-depth images, it's not really well suited for 
+	images with more than a small number of colors, so the 256 color 
+	limitation shouldn't be a big problem.
+			(Chris P. Ross (cross@eng.umd.edu))
+
+Added Feature:  Added a 'Origin' button the the 'Save Postscript...' window.
+	Positions the image aligned at the bottom-left corner of the page,
+	which is the origin (0,0) in the Postscript world.  May make certain
+	desktop-publishing operations easier if you're using XV to generate
+	EPS files for incorporation into page-layout software.
+			(Michael Lipscomb  (lipscomb@vision1.engr.utk.edu))
+
+Enhancement:  Added 'xv.pspaper', 'xv.psorient', and 'xv.psres' options to
+	set default behavior in the 'Save Postscript..." window.  
+	
+	pspaper sets the default paper type, and can be any of the following:
+	        8.5x11 A4 B5 A3 8.5x14 11x17 4x5 35mm
+
+	psorient sets the default paper orientation, can can be either
+        'portrait' or 'landscape'
+
+	psres sets the default resolution (dpi) and can be an integer 
+        between 10 and 720, though not all values are attainable, as the
+	resolution is controlled by the 'scale' dials, which must take on
+	integral values.  All the common resolutions are available, however
+	(72dpi, 75dpi, 100dpi, 300dpi, 600dpi, etc.)
+
+
+Added Feature:  Added a '-nodecor' option (and boolean 'xv.nodecor' resource)
+	that lets you turn off the window 'decorations' (title bar, menu box,
+	minimize and maximize buttons) on the XV image window, in MWM.  
+	When these things are on (by default), the prevent the image window
+	from being made smaller than some MWM-specified minimum width, which
+	can be a real pain when working with tiny (< 100 pixels wide) images.
+	Turning this option on disables these decorations, and lets the image
+	window be any size whatsoever.  (This only works for MWM.  TWM doesn't
+	have this problem, and OLWM doesn't appear capable of doing this
+	on the fly, on a per-window basis.  For OLWM, use the 
+	'owlm.MinimalDecor: xv' resource.  Note this affects *all* xv windows.)
+
+Bug Fix: Input focus wasn't working out correctly under OLWM.
+
+Bug Fix: "-rotate" command line option was only applied to the first image
+	loaded.		(Osama (neiroukh@vision1.engr.utk.edu))
+
+Enhancement:  The 'slow' 24->8 algorithm now uses code derived from the IJG
+	jpeg distribution, which is a considerably better implementation of
+	the median-cut algorithm than XV was using before.
+
+Enhancement:  Version 5 of the jpeg library (which XV now uses) supports
+	a quick image subsampling 'thing' which XV now uses when generating
+	Visual Schnauzer icons.  Practical upshot:  creating icons from jpeg
+	files is now many times faster.
+
+Bug Fix:  'xv -hist -expand <x>' would crash.  Doesn't do that any more.
+			(Ulf Cahn von Seelen  (cahn@grip.cis.upenn.edu))
+
+Enhancment:  XV can now read 16-bit per pixel 'raw' PGM and PPM files.
+			(David A. Clunie (dclunie@flash.us.com))
+
+Enhancment:  In the Schnauzer, if you hold 'shift' while hitting the spacebar,
+	it will select (and load) the next file, while keeping the previous
+	file selected.  This lets you (somewhat more easily) build groups
+	of files to be moved or deleted, as you can just hold shift, and
+	space your way through all the files.  Shift click to de-select 
+	files that should be skipped.
+
+Added Feature:  Added an 'annotate' command that lets you put text on an
+	image.  Keyboard Equivalent: 'A'.  To use it, select a drawing color
+	using the 'dropper' (middle click on image), and press the 'A' button.
+	Enter a string and hit Ok (or return).  If there is a current 
+	selection, the text will be scaled to fit the selection.  Otherwise,
+	a selection box the size of the text will be created in the middle
+	of the image window.  In this case, position and resize the selection,
+	as you see fit, and issue a 'Paste' command (meta-v) to place the
+	text on the image.  Note:  if you want to change the color of the
+	text, choose a new color and do the annotate command again.
+
+	It's somewhat awkward, but it's time for a new release.  It'll probably
+	get polished in the next release...
+
+Change:  'AutoCrop' keyboard equivalent is now 'C' instead of 'A'.
+
+Added Feature: Added 'smudging'.  Shift-right click (and drag) on the
+	image (it's best if you zoom in first), and you can do a localized 
+	blur around the cursor.  Note that this only works on 24-bit images.
+	If the current image is a 8 bits deep, it will be converted into 
+	a 24-bit image first, automagically.
+
+Added Feature:  Added rudimentary image painting.  You can now paint
+	arbitrary curves (or straight lines) by doing a shift-middle click
+	(and drag) on the image window.  The pen will draw in whatever the
+	last color picked up by the 'dropper' (middle click on image) was,
+	(just like the 'clear' command).  Shift-middle will draw curves.
+	Shift-ctrl-middle will draw a connected series of line segments.  
+	Release and press ctrl to draw unconnected line segments.
+
+	Note: there's no direct way to paint in any arbitrary color.  The paint
+	color must exist in the image *first*.  One way of adding colors to
+	an image is via the 'Pad' command.  Try padding with 'bggen', using
+	the 'Color Assortment' default to get a reasonable collection of
+	different colors added to the image.  Later you can pad the image 
+	back to its original size to get rid of the colorful borders.  BE SURE
+	to switch to 24-bit first...
+
+Change:  Changed 'Standard Colormap' (used whenever viewing 24-bit images on
+	a non-TrueColor/DirectColor display) from a 6*6*6 colormap to a 4*8*4
+	colormap.  It uses fewer colors (128 instead of 216), and produces
+	better looking images (as the 2 extra green values more than make up
+	for the 2 fewer red and blue values).  It also looks somewhat better
+	when you use '-stdcmap' with '+vsperfect' (ie, have the schnauzer
+	share the stdcmap), as the 4*8*4 maps closer to the 8*8*4 used 
+	internally by the schnauzer than the 6*6*6 did.
+
+Enhancement:  Added a 'trashcan' to the Visual Schnauzer.  You can now (also)
+	delete files by dragging them to a trashcan.  You'll be asked for
+	confirmation, the same as the 'Delete' command.
+
+Change: 'unknown' files in the browser are now shown as 'plain' files.
+
+Change: Moved a couple of keyboard equivs.  'p' now pops up the 'go to page'
+	dialog (when viewing a multi-page document) (was ^P).  
+	^P is the keyboard equiv for the Print command.
+	Meta-a is the keyboard equiv for the Apply command (in the color
+	editor).  (was ^P)
+
+Added Feature:  Added a 'Print' command.  ("Finally!", I hear many of you
+	saying.)  Keyboard equiv '^P'.  Quicker and easier to use than
+	the previous method (ie, saving PostScript to "| lpr"), even though
+	that's how it still does the trick.  Much more intuitive for 
+	Joe User, who wouldn't know a pipe if you hit him over the head with
+	one...
+
+Enhancement:  When tracking pixel values (dragging the middle button
+	around on the image window), it now displays the distance of the
+	current point from where you originally clicked in a pair of
+	square brackets (ie, '[ -5, 37]') at the end of the line.  Handy
+	for measuring image features.
+
+Bug Fix:  XV now supports both the 'cut buffer' and the 'selection' methods
+	of doing text cut-and-paste.  (ie, the 'CutRes' command, and 
+	tracking pixel values).  Prior to this, pasting either of those
+	things into an xterm may or may not have worked, depending on
+	whether another xterm had a current selection.
+
+Bug Fix:  (Sort of).  Now that XV tries to grab a good visual, rather than
+	just using the default, it may now pick a 24-bit visual on machines
+	where the root window can only hold an 8-bit image.  In these cases,
+	it will disable the 'root' choices, unless you start XV with
+	the '-root' option, in which case it will choose a root-compatible
+	visual.  Not optimal, but better than it was...
+
+Enhancement:  XV now displays a 'working' icon when the image window (or 
+	the control window, if there is no image window) is iconified and
+	XV is in the middle of a long operation (smoothing, loading a jpeg,
+	running an algorithm, etc.)  The icon changes back to the normal
+	icon when the operation completes.
+			(Idea: Bob Boag <BOAG@marshall.wvnet.edu>)
+
+Enhancement:  It now displays what mode (8-bit or 24-bit) it's currently
+	in, in the controls window and the info window.
+
+Added Feature:  Changed PadImage command to allow 'blended padding' (ie,
+	not-fully-opaque), in several modes (RGB, Hue, Sat., Int.,).  
+	In the HSV modes, it only pastes/blends the specified component
+	of the background fill.  You can get a variety of weird effects.
+	Ferinstance, take a grayscale pic, and pad it with a bggen'd
+	RGB rainbow, using Hue mode and Opaque=0.
+
+Added Feature:  Added a 'Smear' algorithm.  Keyboard equiv 'meta-S'.  
+
+Added Feature:  Added a 'Sharpen' algorithm.  Keyboard equiv 'meta-s'.
+
+Bug Fix:  Substantially improved performance on DirectColor displays.
+	(Read: 'it works at all')  It's been tested on a 24-bit DirectColor,
+	and an 8-bit DirectColor visual.  It works on those, at least.
+	(TrueColor is still the recommended visual type, though since XV now
+	sniffs around for a TrueColor visual, it'll probably Do The Right
+	Thing by default.  Certainly that's the design.)
+
+Added Feature:  Added a 'PadImage' command (keyboard equiv: 'P').  Lets you
+	make an image larger *without* rescaling it, by creating a new 
+	image of the specified size and pasting the original image onto the
+	center of the new image.  
+
+	Currently, the new background can either be a solid color, the 
+	result of running 'bggen', or an image file in any of the supported
+	(loadable) image formats.  The resulting image will be the same 8/24
+	bit mode as the original image.  As such, it's generally recommended
+	that you switch to 24-bit mode before doing the Pad command, for best
+	results.
+
+	Also, there are associated X resources:  'xv.pad.TYPE.val[0-9]'
+	and 'xv.pad.TYPE.name[0-9]', that let you specify the values
+	and names of additional entries in the 'Default' menu in the 
+	Pad dialog box.  'TYPE' can be either 'color', 'bggen', or 'load',
+	depending on which 'method' of background generation you're using.
+
+Added Feature:  In 'bggen', you can now specify colornames as with other
+	X programs (ie, by name ('red'), or by value ('#ff00ff')).  Note
+	that the '#' character is treated specially in some shells, and
+	probably need to be escaped with a '\' (or wrap single-quotes around
+	the whole value)
+
+Added Feature:  In 'bggen', added '-G geom' option to specify a 'repeat'
+	geometry.  If given, the program generates its gradient into a 
+	small (-G geom) image, which is 'center-tiled' into the 
+	main (-g geom) image.
+
+Change:  In 'bggen', change '-s' option to '-h'.  Screw backward compatibility,
+	it makes more sense.
+
+Enhancement:  Massive reorganization of the 'xv controls' window.  Made room
+	for new command buttons (cut, copy , paste, clear, PadImage, About XV,
+	etc. simplified appearance by tossing many buttons into new 'menu'
+	buttons ('Root', 'Windows', 'Image Size').
+
+Added Feature:  Added a 'show/hide hidden files' toggle in the schnauzer
+	windows.  (When enabled (as it is by default), it hides all files 
+	beginning with a '.'.  As such, it's Unix-centric, but so is the 
+	rest of the program...)
+
+Bug Fix:  When 'dragging' files in the schnauzer windows, the window could
+	scroll entirely too quickly (on a fast machine).  Added a limit.
+
+Bug Fix:  Fixed 'window-centering' code (that which pops up windows with
+	an appropriate button centered under the mouse, such as the save 
+	window), so that it correctly positions the window.  It works on
+	a DEC Alpha running OSF 2.0, under Mwm, Olwm, and Twm.  Hopefully,
+	it'll work for you!
+
+Enhancement:  Added code to display keyboard equivalents in the various 
+	menu buttons.
+
+Enhancement:  Added keyboard equivalents for remaining algorithms, just to be
+	consistent.  The equivs are listed in the algorithms menu, and
+	all use the meta key.
+
+Enhancement:  Got rid of the 'Blur*' choices on the Algorithms menu,
+	and replaced it with a single 'Blur' routine that prompts for a value,
+	making it cleaner, and more versatile, with only a slight convenience
+	trade-off.  Keyboard equivalent:  'meta-l'
+
+Added Feature:  Added a nifty 'Pixelize' algorithm.  (Keyboard equivalent:
+	'meta-p').  Again, operates on the current selection, if any, 
+	otherwise it operates on the whole picture.  Now you too can make 
+	photos look like their from those 'real-life cop shows'.  
+	(Non-U.S. folks can just ignore that cultural reference.)  Anyhow,
+	one neat feature is that it the pixels don't have to be square.  
+	Try something like '16x1' for a neat effect.
+
+Added Feature:  A 'save selected area' checkbox in the save window.  Lets you
+	easily save portions of an image (without cropping, etc).  Two notes:
+	if you save 'at displayed size' (the default), only the area of the
+	selection that is visible in the image window will be saved.
+	Alternately, if you save 'at normal size', you *can* have the selection
+	go off the edges of the displayed image (or subimage).
+
+Enhancement:  You can now enter negative values for the Gamma command in
+	the graphs in the color editor.  Negative values produce the same
+	curve as their corresponding positive values, except that they are
+	horizontally flipped.  (ie, the curve starts at the top and goes
+	down).		(Alan Blanchard  (alan@abraxas.mbt.washington.edu))
+
+Bug Fix: Memory leak if '-ncols 0' on a > 1-bit display
+
+Change:  In the Save window, moved 'File list' checkbox into the Format	menu.
+
+Enhancement:  You can now type TAB key in Load/Save window to do automatic
+	filename completion.  It only for 'simple' filenames (ie, no '/'
+	chars, no pipes, no '~', etc.), but it's still a very handy thing.
+
+New Feature:  Added 'Rotate (Copy)' and 'Rotate (Clear)' algorithms (keyboard
+	equivalents 'shift-meta-t' and 'meta-t' respectively) that let
+	you rotate the image (or the current selection) by any arbitrary
+	amount.  The only difference between the algorithms is that the
+	second one clears the old selected area first (equivalent to:
+	'cut, rotate, paste'), whereas the first algorithm is equivalent
+	to 'copy, rotate, paste')
+
+Enhancment:  Added 'meta-u' keyboard equivalent for 'Undo all' algorithm.
+
+Enhancement:  'Flip Horizontal' and 'Flip Vertical' commands now operate on
+	selected area, if any.  (Otherwise, they do the whole picture.)
+
+Enhancement:  Put a 'progress meter' into most of the potentially 
+	time-consuming functions (algorithms, smooth, resize, etc.)
+
+Bug Fix:  The 'Oil Paint' algorithm now does the Right Thing on color 
+	images.  (Simply running the grayscale algorithm on the red, green,
+	and blue planes separately was the Wrong Thing, as it introduces
+	goofy fringe effects in colors that weren't originally in the image).
+
+Added Feature:  New 'blend' algorithm (keyboard equivalent: Meta-b).  Takes
+	the current selection (or the whole pic, if no selection), and clears
+	the rectangle such that the edges remain the same color, the center
+	becomes the average color of all the edge pixels, and all other 
+	pixels get an appropriate color based on their distance from the edge
+	and their distance from the center.
+
+Enhancement:  Algorithms (selected from the 'Algorithms' menu) now will only
+	affect the selected area, assuming there is a selection.  Otherwise,
+	they will affect the entire image, same as they used to.
+
+Change:  After deleting the last file in the 'xv controls' list, it will
+	go back to displaying the XV logo.
+			(Tom Hinds  (rocker@cs.bu.edu))
+
+Bug Fix:  Writing GIF files in the B/W Dithered color mode would result in
+	black & white getting reversed.
+			(Thomas Braeunl  (Braeunl@informatik.uni-stuttgart.de))
+
+Enhancement:  If you accidentally start tracking a 'zoom in' or 'pan'
+	rectangle, releasing the Ctrl key will abort the operation.
+
+Enhancement:  'Meta-8' now toggles between the 8 and 24 bit modes.
+
+Change:  If you specify '<xvlogo>' as the filename in the load window, it will
+	re-load the XV title image.
+
+Bug Fix:  If the last file in a list was broken in some way and was either 
+	shown as Text, or not shown at all, the Next/Prev buttons weren't 
+	getting enabled/disabled appropriately.
+				(R.P. Rodgers  (rodgers@nlm.nih.gov))
+
+Enhancement:  Used to be, when you saved a GIF (or other 'simple' format with 
+	no format-specific dialog box), XV would stick the 'saved' filename at
+	the end of the 'xv controls' list.  However, if you were in the 
+	middle of a bunch of files, this would cause you to 'lose your
+	place'.  Folks complained.  XV now does the Right Thing (tm).  When
+	you save (in *any* format) it adds an entry to the end of the list,
+	but does not move your selection.  When you *load* a new file (via
+	the load or schnauzer windows), the name also gets stuck at the end 
+	of the list *and* the selection is moved.
+
+Change:  As the default cursor in the image window is now the 'arrow' cursor,
+	the cursor affected by the '-cursor' option/resource is now the arrow
+	cursor used in all windows.
+
+Enhancement:  XV now comes with version 3.30 of the libtiff TIFF library.
+	This version should run correctly on 64-bit machines.  Note, however
+	that there the TIFF library no longer has any non-ANSI C support,
+	meaning you *must* have an ANSI C compiler (ie, gcc) to compile it.
+	This should *not* be a big problem in 1994...
+
+Enhancement:  Load and Save 'windows' now point to separate directories.  Such
+	a simple, obvious misfeature, I don't know how it's survived this long.
+	(Big Hint:  The author doesn't actually *use* the program very much!)
+
+Enhancement:  Modified/improved 'selection' rectangle handling (formerly
+	called the 'crop rectangle').  It now flashes, making it much
+	easier to find.  It also stays around when you zoom, unzoom,
+	pan, or resize the image.  This lets you draw a selection, and
+	zoom in on the corners (or whatever), and get the selection positioned
+	perfectly before doing the crop (or whatever).
+
+Added Feature:  XV now can read and write uncompressed 24-bit Targa files,
+	interlaced or non-interlaced, with the origin in the
+	bottom-left or top-left   (by Derek Dongray  (dongray@genrad.com))
+
+Change:  Redesigned the load and save windows (okay, so it's really only
+	one window...).  The number of radio buttons for different 
+	image formats was getting out of hand, and taking up a lot of
+	valuable screen real estate.  The new load/save window is smaller
+	(well, the save is smaller, the load is now the same size as the
+	save), cleaner, has room for 6 more lines in the directory window,
+	and has a fish in it.  A win, by my book.
+
+Bug Fix:  Found (and killed) memory leak in the Schnauzer, which would
+	occur during icon generation
+
+Bug Fix:  IRIS RGB i/o code didn't work on 64-bit machines.
+
+Added Feature:  '-RM' command line option (no X resource equivalent).
+	When specified, upon exit XV will delete *all* files listed on 
+	the command line.  Handy if you're writing a program, and you
+	want to use XV to display graphics automatically.  You write your
+	image(s) out, fork off a background XV to display the image(s),
+	and when the user quits XV, the image files will be removed, saving
+	you the trouble of cleaning up the files yourself.
+
+Added Feature:  Nifty new 'Grab' dialog box whenever you issue the Grab
+	command.  You can now specify a grabDelay from within XV, and you
+	can also automagically hide all XV windows during the grab.
+	Also, now supports 'autograb' command, which waits the specified
+	delay time, and then grabs whatever window the cursor happens
+	to be in at the time.  This gives you a way to capture popup menus,
+	rubber-band selections, and other things that require the mouse 
+	button to be held down.  (Note: AutoGrab searches upward and grabs
+	the 'top-level' window that the cursor is in, rather than just the
+	immediate child window, as it's far easier to take too much and 
+	throw away the extra than to take too little...)
+
+	One note: between the time a Grab or AutoGrab command is issued, 
+	from the dialog box, and the time that the command complets, all
+	'image file changing' commands ('Next', 'Prev', 'Load', etc.) are
+	disabled, (as is Grab), for perfectly good reasons.
+
+Enhancement:  The '-expand' option (and the 'xv.expand' resource) now takes
+	either a single value (as it used to), or a pair of values 
+	separated by a colon.  This lets you set different horizontal and
+	vertical expansion/compression factors.  (eg, '-expand 3:-4' will
+	make the displayed width 3 times the image width, and the displayed
+	height 1/4th the image height.)
+
+Change:  'Relaxed' floyd-steinberg dithering when displaying 24-bit images
+	(in 24-bit mode) on non-truecolor displays.  Fewer goofy artifacts.
+
+Enhancement:  Now (unless '-nostat' is specified) stats filenames specified
+	on the command line.  Only 'plain' files will be added to the 
+	list of filenames.  This lets you type 'xv *' in a directory
+	with subdirectories, and not have the subdirs added as (unloadable)
+	files.
+
+Change:  Change 'static char' in all bitmap files to 'static unsigned char',
+	as some compilers object to values > 0x7f being assigned to signed
+	char's.  
+
+Change:  Added 'click right button to open menu' string in the XV logo 
+	image, just to make things a little more obvious.
+
+Added Feature:  Changed command-line argument handling.  All of the
+	'flag' options (-perfect, -smooth, etc.) now take '+' or '-' as
+	the first char of the option name.  If you use '-' (ie, '-perfect')
+	it *forces* on the option (it used to toggle the option on or off).
+	Similarly, if you use '+' as the first char of the option ('+perfect')
+	it forces *off* the option.  This lets you put the program in a known
+	state (regardless of what X resource settings you may have set up).
+	Handy for sysadmins who want scripts using XV to behave the same
+	no matter what X defaults the users may have set up.
+			(idea: Peder Langlo  (respl@mi.uib.no))
+
+Change:  XV no longer looks in '.Xdefaults-machinename' as a place to find
+	your X resources.  The 'gethostname()' call was leading to 
+	portability problems, and in any event, you should load up your
+	resources into the resource database (via 'xrdb') when you log in,
+	the way God intended...
+
+Added Feature:  When cropped (or zoomed), ctrl-Middle in the image window
+	will let you pan the visible region of the image around, which is
+	much cooler than zooming out and zooming back in on a different
+	area.		(idea: Peder Langlo  (respl@mi.uib.no))
+
+Enhancement:  There's now a '..' entry in the load/save window file list,
+	to make maneuvering slightly easier.
+
+Added Feature:  XV now can read and write uncompressed 24-bit Targa files
+			(by Derek Dongray  (dongray@genrad.com))
+
+Enhancement:  XV can now handle 16-bit greyscale TIFF files.
+			(Leon Avery  (leon@eatworms.swmed.edu))
+
+Bug Fix:  Memory leak in 24-to-8 bit conversion routines found and removed.
+			(Scott D. Heavner  (sdh@po.cwru.edu))
+
+Enhancement:  XV now has a 'chdir' button (and menu item) in the Schnauzer
+	window.  It lets you directly chdir to some other directory without
+	going through the old 'up to the root and then down one dir at a time'
+	process.
+
+Change:  Typing '^C' in schnauzer windows now does a 'chdir' command, rather
+	than opening/closing the 'xv comments' window.  To get the comment
+	window, type '^C' in the image window.
+
+Change:  XV now eats BadWindow errors on the X_GetProperty request.
+	These happen on certain SGI X servers after the 'snapshot' program
+	has been run.  The window hierarchy gets trashed by snapshot.
+	(Run 'xlswins' if you want to see this.)
+			(Ben Simons  (ben@lewis.vislab.su.edu.au))
+
+Bug Fix:  The 'edge detection' algorithm wouldn't detect edges along the \
+	direction.  Better edge detection algorithm has been added.  (Though
+	the old is still there for the 'embossing' effect.
+			(David Robinson  (drtr@mail.ast.cam.ac.uk))
+
+Bug Fix:  A4 and B5 paper sizes in PostScript save dialog were slightly wrong.
+
+Enhancement:  XV now supports 'gzipped' files, as well as 'compressed' files.
+	Needless to say, you need to have the 'gunzip' program installed
+	on your system for this to work.
+				(Jean Liddle  (jliddle@mrcnext.cso.uiuc.edu))
+
+Enhancement:  Added 'A3' paper size in 'save as PostScript' dialog box.
+
+Bug Fix:  BMP file reading wasn't working on files created by ImageMagick.
+			(Roy Johnson  (rjohnson@shell.com))
+
+Enhancement:  XV now sniffs out whether or not you have a 24/32 bit 
+	TrueColor or DirectColor visual, and if so, uses it by default
+	(rather than always using the 'Default Visual' of the display,
+	which is generally an 8-bit PseudoColor visual, even on 24-bit
+	systems).  
+
+	Also, both the '-visual' option and the 'xv.visual' X resource now
+	also take 'default' as a value, which means 'use the default 
+	visual of the display', for folks who want 'the old behavior'.
+
+Change:  Modified the 'Timer()' function in xvmisc.c to use select() instead
+	of 'setitimer()', which let me get rid of all the FOO_SIG macros
+	and such in xv.h, and basically get rid of one of the primary
+	portability annoyance.
+
+Bug Fix:  In the Schnauzer, when generating icons, if it decides a file
+	is potentially an XBM file, loads it, finds out it isn't, it will
+	be displayed as an UNKNOWN icon (?), instead of an ERROR icon.
+
+Change:  When tracking pixel values in the image window, it now displays
+	the color of the pixel in Hex, as well as in decimal, so that you
+	can use this value directly in X color specifications, without
+	needing to do the dec->hex conversion by hand.
+
+Bug Fix:  In the 'xv load' window, if you clicked below the 'Load All' button,
+	you could get a 'Prev Name' button to appear.
+				(Erwan Moysan  (Erwan.Moysan@irisa.fr))
+
+Bug Fix:  .xvpics subdirectories are now created with the same permissions
+	as their parent directories.  Likewise, thumbnail files (in .xvpics
+	dirs) are now written with the same permissions as the original
+	files.
+
+Bug Fix:  In XV 3.00, the PDS/VICAR module got screwed up somehow, and 
+	no longer worked correctly.  Fixed.
+
+Change:  Stuck SysV-style signal handler definitions and rand/srand defs in
+	xv.h, for better compatibility	(David Brooks (dbrooks@osf.org))
+
+Bug Fix:  'Pass 2 color allocation' could potentially be performed on a
+	visual type with no colormap, which would be a bad thing, believe me.
+
+Bug Fix:  '-loadclear' wasn't working correctly
+
+Bug Fix:  Potential segmentation fault when Uncompressing files fixed.
+		(Dana Jacobsen  (jacobsd@solar.cor2.epa.gov))
+
+Bug Fix:  If printing XV-generated Color PS files on a Grey/BW PS printer,
+	the printer may have run out of memory, due to a memory leak in the
+	color->gray PS code.	(Klaus Schnepper  (df40@master.df.op.dlr.de))
+
+Bug Fix:  The '-hist' and '-norm' options weren't actually working.
+
+Bug Fix:  If you loaded a GIF89 file with a lot of ignored-by-xv extensions,
+	and you didn't have the info or controls windows up, the constant
+	popping up of 'warning' messages was real annoying.  They don't
+	do that anymore.
+
+Enhancement:  If you specify the '-quit' option, XV turns off any '*map' 
+	options (-cmtmap, -cemap, -imap, etc.) you may have turned on,
+	as you won't have an opportunity to *use* any of the windows before
+	the program exits.  No need to map them.
+
+Bug Fix:  XV now correctly positions the window on initial load (ie, 
+	'xv -max' will now work again)
+
+Bug Fix:  When you loaded a new image, if XV felt a need to move the window,
+	it would draw the new image at the old window size, and then draw
+	it again at the new image size.  This was a major inefficiency with
+	24-bit images.
+
+Enhancement:  'Remove' key on DEC keyboards now functions like '^D', so it
+	can be used to delete files, etc.
+
+Added Feature:  XV can now read a variety of Amiga IFF ILBM formats.
+			(Thomas Meyer  (i03a.zfn.uni-bremen.de)
+
+Change:  XV should now recognize PS files that start with '%!' (as it did) and 
+	with '^D%!' (as generated by MS-Windows 3.1)
+
+Bug Fix:  If you use '-poll' and '-maxpect', only the first image would be
+	shown 'big'.   (Bruce Labow  (labow@itd.nrl.navy.mil))
+
+Change:  'Relaxed' getwd handling.  You can now maneuver through directories
+	even if you can't read the contents of one of the parent 
+	directories (ie, mode 'rwx--x--x').  All parent directories must
+	have execute permission, however.
+		(Andrew Brooks  (arb@comp.lancs.ac.uk))
+
+Change:  Cleaned up 'file type' handling code in source, which should make
+	it easier to build XV on 'non-standard' platforms.
+			(Cameron Simpson  (cameron@cse.unsw.edu.au))
+
+Enhancement:  XV previously only recognized files that began with '#define'
+	as being (potentially) XBM files.  It now also will treat files
+	that start with '/*' as potential XBM files, which should cover 
+	nearly all the XBM files out there.
+
+Bug Fix:  If you moved or copied files from one schnauzer window to another,
+	and for some reason the files failed (ie, 'moving' from a write-
+	protected directory), the icons that failed to move would still be
+	lit (as they should be), but they didn't *think* they were lit!
+
+Bug Fix:  When moving/copying files via the schnauzer, it would always 
+	create '.xvpics' subdirectories in the destination folder, instead
+	of "only when the source folder has a .xvpics subdirectory", as
+	was intended.
+
+Enhancement:  'relaxed' the AutoCrop algorithm for 24-bit images.  Since
+	24-bit images (JPEG, in particular) tend to have some noise in
+	them, the 'everything must be equal' criteria of the normal autocrop
+	algorithm would prevent any cropping from happening.  The new 
+	algorithm (which only affects 24-bit images) crops lines if all
+	the pixels are within a certain percentage of one and other.
+			(Paul Close  (pdc@sgi.com))
+
+Bug Fix:  BMP file i/o fixed.  24-bit files weren't done correctly, and
+	certain files would blow up that Windows-based programs would 
+	handle correctly.  (Pesky vague format specifications...)
+			(John Walker  (kelvin@autodesk.com))
+
+Bug Fix:  Unified 'cursor keys' into one function.  Certain keyboards 
+	generate an interesting variety of keysyms when you hit the 'pageup'
+	'pagedown', 'home', and 'end' keys (and shifted arrow keys), and 
+	I had code to deal with that problem scattered around the source.
+	Practical upshot:  'pageup/down' might work in certain controls/
+	windows, and not others.
+
+Bug Fix:  XV would crash if you tried to grab a rectangular region of the
+	root window (and both the starting and ending points of the rect
+	were in the root window).
+
+Bug Fix:  Memory leak in xvpbm.c	(Joe Peterson (joe@avs.com))
+
+Bug Fix:  XV would crash if you used '-nopos'
+			(Nick Sayer  (mrapple@quack.kfu.com))
+
+Change:  All files in the distribution should be 14 chars or less (to
+	avoid SysV name-length limitations on some systems)
+
+Change:  Broke up exceedingly large functions in xv.c and xvevent.c,
+	as they tended to annoy compilers and optimizers...
+
+Bug Fix:  Use of GS_LIB in Makefile broke if folks had it defined in their
+	environment already.
+
+Bug Fix:  XV assumed that 24-bit deep visuals had 32 bits per pixel.  While
+	this is generally true, apparently there are some servers that only
+	want 24-bit pixel values.
+			(Steven Schoch  (schoch@starnet.com))
+
+Bug Fix:  It would crash if it tried to draw an MenuButton that had no menu
+	associated with it yet.  (A timing issue that occurred on some 
+	systems)
+
+Bug Fix:  If you tried to use '-root' and '-gamma' simultaneously, it'd
+	crash.  Now it doesn't.
+
+Bug Fix:  On some systems, XV would crash when clearing an old root image
+	and installing a new one.  
+
+Added Feature:  Additional options to 'bggen'.  You can now specify the
+	size of the generated image with '-g geometry'.  The generated
+	images are now by default in PPMRAW format.  You can generate
+	'ascii' images by using the '-a' flag.  You can now ROTATE the
+	generated image by any arbitrary amount with the '-r rot' flag,
+	where rot as a (counter-clockwise) rotation, in degrees.
+
+Enhancement:  'bggen' has been fixed.  It now automatically senses
+	the display size, and by default, generates an image of that
+	size.	(PeterVG (pvgunm@polaris.unm.edu))
+
+Change: In XV 3.00, I went to a somewhat faster (serpentine) color dithering
+	algorithm (used in conjunction with Smoothing on non-TrueColor
+	displays, when in 8-bit mode).  No one much noticed the speed 
+	improvement, and several people complained that images now looked 
+	worse than they used to, so I've put it back the way it was.
+		(Kenny Zalewski (zalewk@rpi.edu))
+
+Enhancement:  If you are running XV in 'locked 8-bit mode', and you load a
+	JPEG image, XV will now use the JPEG quantizer, which produces better
+	results than the normal XV quantizers.  This makes XV 3.00 behave 
+	like it did in XV 2.21.
+		(Jim Lick  (jim@pi-chan.ucsb.edu))
+
+Bug Fix:  xvsunras.c still had some problems on 64-bit machines.
+		(Dave Hill  (ddhill@zk3.dec.com))
+
+Change:  Twiddled code in xvsmooth.c.  Certain compilers complained about a
+	potential divide-by-zero (not that it could ever happen, but try
+	telling the compiler that...)
+
+Change:  Twiddled code in xvps.c.  Optimizer in IRIX-4.0.5 broke a 
+	calculation.  Expression has been simplified.
+
+Bug Fix:  YCbCr->RGB conversion in xvtiff.c wasn't being done correctly,
+	according to the TIFF 6.0 standard.
+			(Karsten Spang  (krs@kampsax.dk))
+
+Portability:  Added explicit typecasting to a few lines of xvtiff.c (HP 
+	compilers objected.)
+
+Portability:  Changed intances of '#ifdef macII' in xv.h to '#ifdef aux'
+			(Declan A. Rieb  (darieb@sandia.gov))
+
+Bug Fix:  XV wouldn't correctly read XBM files with 1-digit-long values
+	(ie, '0x9' instead of '0x09').  Fixed.
+	(spotted by: Berthold Dettlaff  (dettlaff@informatik.uni-stuttgart.de))
+
+Bug Fix:  xvtiffwr.c now writes out XRESOLUTION and YRESOLUTION flags, which
+	are apparently required by some other tiff-readers
+			(Larry W. Virden  (lwv26@cas.org))
+
+
+XV 3.00a intermediate bug-fix release
+-------------------------------------
+Bug Fix:  core dumps in schnauzer fixed.  (br->lit wasn't getting zeroed 
+	when you moved files to another directory)
+
+Bug Fix:  To vdcomp.c.  Strings buffers to hold filenames were too short.
+		(Anthony A. Datri <aad@lovecraft.siemens.com>)
+
+Bug Fix:  If you put an image using the Std. Colormap into the root window
+	(ie, a 24-bit image on an 8-bit display), and exited XV, the colors
+	were freed (and would get overwritten)
+
+Bug Fix:  'Update' command in Schnauzer now checks both 'mtime' and 'ctime'
+	fields when comparing dates of a file and its thumbfile.
+
+Bug Fix:  XV load window didn't correctly handle 1-character top level 
+	directory names (ie, '/u').
+
+
+
+XV 3.00 Release
+---------------
+Enhancement:  Faster 332 dither algorithm when displaying 24-bit images on
+	non-TrueColor/DirectColor displays.
+
+Added Feature:  'trimming keys'.  You can now easily trim off one pixel from
+	any edge of an image by pressing Ctrl and one of the arrow keys while
+	inside the main window.  Now you can use the cropping rectangle for a 
+	first 'rough cut', and do the precision work with the trimming keys.
+
+Enhancement:  Added '-grabdelay' command line option (no resource), which
+	lets you specify a delay between the time the 'Grab' command is issued,
+	and the time that the cursor changes becomes owned by XV, regardless of
+	what window it's in.  This lets you hide the XV windows (or whatever)
+	before the actual screen grab takes place.  The delay can be set 
+	to 0 (the default) up to 15 seconds.
+				(Jason Berri  (berri@aero.org))
+
+Bug Fix:  Was crashing if you handed it a gif with multiple images in it.
+
+Change:  Switched it back so that when you Delete a file in the xv controls
+	list, the next file in the list (if any) is automagically loaded.
+
+Change:  Broke huge series of 'else if's in xv.c into two halves.  Broke some
+	compilers (on VMS and some PC Unixes)	
+			(Rick Dyson  (dyson@iowasp.physics.uiowa.edu))
+
+Change:  Improved resource-handling code.  No longer necessary to 
+	define X11R5, and should work on certain HP/Apollo workstations
+	where it didn't used to.
+
+Change:  Modifications to make XV somewhat more POSIX compliant.
+			(Mark W. Snitily (mark@zok.sgcs.com))
+
+Bug Fix:  Changes to xvgrab.c to make it work on 64-bit machines.
+			(Matt Thomas  (thomas@netrix.lkg.dec.com))
+
+Change:  migrated all memcpy(), memcmp(), memset(), and bcopy(),
+	bcmp(), bzero() calls to xvbcopy(), xvbcmp(), and xvbzero()
+	functions in xvmisc.c.  Necessary because the b*() routines
+	don't exist in Solaris, and not everyone has the mem*() routines
+	(and besides, memcpy() doesn't even work correctly)
+
+Added Feature: Added '-icgeometry' cmd-line option (and 'iconGeometry' 
+	resource) to specify initial position of the icon when you 
+	start XV in '-iconic' mode
+
+Added Feature:  XV can now display multi-page (currently only PostScript)
+	files.  If you are viewing a multi-page file, the title of the image
+	window will show 'page 1 of 37' (or whatever) as an indication.
+	You can use the PageUp and PageDown keys (Next and Prev on some)
+	on your keyboard to do page through the file, and you can type ctrl-P
+	to pop-up a 'go to page #' dialog box.  These keys must be typed in
+	the image window.
+
+Enhancement:  Added '-name' command line option (no corresponding resource)
+	that lets you specify the string to be displayed in the image window's
+	titlebar.  Useful if you're calling XV from some other program,
+	and you don't want the titlebar to say 'xv /tmp/prog2315a' or something
+	like that.	(Idea from:  Bill Silvert (silvert@biome.bio.ns.ca))
+
+Added Feature:  XV can now read and display PostScript files, as long as you
+	have the 'Ghostscript' package installed.  
+	Added '-gsdev str', '-gsgeom geom' and '-gsres int' command-line
+	options (and gsDevice, gsGeometry, and gsResolution X resources).
+	Thanks to Michael Gleicher (mkg@stealth.plk.af.mil) for the idea, 
+	and thanks to Harald Hanche-Olsen (hanche@ams.sunysb.edu) 
+	and L. Peter Deutsch (ghost@aladdin.com) for PostScript help.
+
+Bug Fix:  Minor memory leak in xvgrab.c fixed.
+			(Tony Sweeney  (sweeney@ingres.com))
+
+Added Feature:  Added '-drift dx dy' option (and 'driftKludge' resource)
+	for the benefit of folks who experience a 'drifting' of the
+	image window whenever it's resized, etc.  If the window drifts down
+	and to the right, use negative values to compensate.  If the window
+	drifts up and to the left, use positive values to compensate...
+
+Change:  Changed 'schauzer' cmd-line opts and resources to:
+	'-vsdisable' '-vsgeometry' '-vsmap', '-vsperfect' and
+	vsDisable, vsGeometry, vsMap, vsPerfect
+
+Added Feature:  XV now reads some of the more common types of PCX files
+	(1-bit-per pixel, 1-8 planes and 8-bits-per-pixel, 1-plane).
+	(thanks to Eckhard Rueggeberg  (Eckhard.Rueggeberg@ts.go.dlr.de))
+
+Added Feature:  Added a 'file list' check box in the Save window.  When
+	selected, XV will write out the list of file names currently
+	loaded into the 'xv controls' window, for use with the '-flist'
+	option described below.
+
+Added Feature:  Added the '-flist' option and 'fileList' resource.  Both
+	let you hand XV a textfile that contains a list of image filenames,
+	one per line.  When using the fileList resource, be sure to specify
+	the complete pathname to the filelist file, so that XV will be able
+	find it no matter what directory you start XV from.
+				(Brian Gregory  (bgregory@megatest.com))
+				
+Enhancement:  When '-quit' option specified, and you *aren't* using
+	the root window, *any* button press or key press inside the 
+	main image window will exit the program.  Use this if you're 
+	calling XV from some other program, and only wish to view a 
+	single image, and be donw with it...
+				(Stephen Mautner (stephen@cs.utexas.edu))
+
+Enhancement:  Added semi-useful '-nofreecols' option.  Only has an effect
+	when running a slideshow (with the '-wait' option).  Prevents
+	the freeing of colors between images, thereby avoiding ugly
+	effects on PseudoColor displays.  Of dubious merit, as later images
+	will look worse (if they use different colors than the first 
+	images), and XV *REALLY* isn't meant for doing animation.  For low-
+	speed slideshows, you're best off *not* using this option, because
+	every image will get the 'right' colors.  See the '-loadclear' option
+	to avoid nasty color-reallocation effects...
+
+Bug Fix:  When polling, if the file doesn't exist, XV will wait for it to
+	be created.
+
+Bug Fix:  Auto-apply while dragging didn't work the 'first' time you tried
+	to use it.
+
+Change:  When running XV in -ncols 0 mode (or, running on a 1-bit display),
+	the default image (the XV logo) is generated differently, so as to
+	be easier to read.
+
+Enhancement:  New version of JPEG library (version 4a) hooked into XV.  JPEG
+	Save dialog now has a 'smoothing' dial.  JPEG files now
+	support comments.
+
+Enhancement:  New version of TIFF library (version 3.2) hooked into XV.
+
+Bug Fix:  When you're doing a slideshow (with the '-wait' option), XV will
+	now determine if the image window is iconified.  If it is, it *won't*
+	wait for the window to be drawn before starting the 'wait' period.
+	Previously, if the window was iconified, XV would sit there (and not
+	move on) until you deiconified it.  Needless to say, I'm sure *someone*
+	perferred the previous behavior...  Oh well!
+
+Added Feature:  Added '-mfn' and 'monoFont' string resource.  Lets the user
+	specify what font to use for TextView windows, and other places where
+	the mono-spaced font is used.
+
+Enhancement: GIF, and PBM should now have slightly more informative info 
+	when you build icons in the schnauzer 
+	(ie, GIF87/89 and Raw/Ascii PBM/PGM/PPM)
+
+Added Feature:  'License' button now hooked up.  Gives you the current
+	licensing info on XV.
+
+Enhancement:  When opening up a schnauzer window that will be displaying the
+	same data as an already existing schnauzer window (ie, when using
+	the Open Win command in the schnauzer), the icon data and such
+	is just copied, rather then being re-read from disk.  MUCH faster.
+
+Enhancement:  Comments are now written in formats that support comments
+	(GIF, TIFF, PBM, PM)
+
+Added Feature:  Two new 'root' display modes, symmetrical tiled, and
+	symmetrical mirrored.		(Dave Lampe  (djl@ptc.timeplex.com))
+
+Change:	You can now TextView a compressed file, and it'll display the
+	uncompressed data.
+
+Bug Fix: TextView windows now show correct # of lines (in ASCII mode) for
+	files/comments/whatever that end with a \n character
+
+Enhancement:  XV should now work on 5-bit displays.  Not that there should
+	*be* 5-bit displays, but that's not my problem...
+
+Change: 'Expansion' field in info window is now shown in terms of 
+	percentages, rather than factors, in keeping with the SetSize
+	command.
+
+Change:  Stopped making the pop-up dialog windows be transient windows
+	of some other XV window, as (what with the keyboard equivalents
+	and such), it's very difficult to determine which is the
+	appropriate 'parent' window.  Given the mwm restacks windows
+	so that the parent is right below the pop-up, this is very
+	annoying when you issue a command in some window, and some other
+	window leaps in front of you.  
+
+Added Feature:  Added 'SetSize' command ('S' shortcut).  Pops up a dialog
+	box that asks you what the displayed image size should be
+	(in pixels, or expansion percentages)
+
+Enhancement:  Whenever you create or delete a file the browser and 
+	Load/Save windows will automatically rescan (if necessary)
+
+Added Feature:  Added '-cmtgeometry' option and 'commentGeometry' resource
+	to specify size/position of 'comments' window.  Added '-cmtmap' 
+	option and boolean 'commentMap' resource to specify whether comment
+	window should be mapped when XV is started.
+
+Added Feature:  Added a 'comments' window to display any comments that might
+	be found in the current loaded image file 
+
+Added Feature:  Added '-tgeometry' and 'textviewGeometry' resource to control
+	size and positioning of textview window(s)
+
+Enhancement:  'compress'ed file handling improved somewhat.  Can now deal
+	with piped-in compressed files, or compressed files that don't 
+	end with '.Z'
+
+Enhancement:  You can now (probably) use shift-up-arrow and shift-down-arrow
+	on keyboards that don't have 'PgUp' and 'PgDn' keys, and use
+	shift-PgUp and shift-PgDn on keyboards that don't have 'Home' and
+	'End' keys.
+
+
+Rev: 12/7/92	(version 2.36)
+------------------------------
+Bug Fix:  Bug found in GIF file output, involving suboptimal hash tables,
+	or something like that.		(Tom Lane  (tom_lane@g.gp.cs.cmu.edu))
+
+Bug Fix:  If a failure occurred while writing a GIF file, XV would exit with
+	a fatal error.  It'll now just complain, but continue to run.
+			(Spotted by Chris Newman (chrisn+@cmu.edu))
+
+Added Feature:  Now reads and writes both Grayscale and TrueColor IRIS 'rgb'
+	files.  Can read both normal and rle-encoded images, always writes
+	rle-encoded images.	
+		(Thanks, Paul Haeberli  (paul@manray.asd.sgi.com)
+
+Change:  Deleteing a file from the control window now no longer loads the
+	next image in the list.  As a result, '-keeparound' (and the 
+	resource) has been removed, no longer having an effect.
+
+Bug Fix:  '-polled' was occasionally loading a 'blank' image.
+
+Bug Fix:  saving 'smoothed' or 'dithered' images was saving 'raw' images 
+	instead.
+
+Bug Fix:  fixed insidious little color freeing problem that would occur
+	whenever XV loaded a 'failed' picture (and hence, brought up the
+	default pic...
+
+Bug Fix:  Various things were depending on the 'current working directory',
+	which is now a fairly vague concept, what with a load/save window
+	and several schnauzers, all of which can be pointing at different
+	directories...
+
+Enhancement:  When dragging a selection rectangle in the schnauzer, if you
+	move the cursor far enough above or below the icon window, the window
+	will start scrolling in 'pages' rather than a line at a time.
+
+
+Rev: 11/9/92    (version 2.33)
+------------------------------
+Enhancement:  The Update button in the Schnauzer now calls 'scanDir()' first,
+	and also displays new icons as it generates them.
+
+Bug Fix:  Smoothing wasn't automatically happening if the image was
+	initially displayed shrunk/expanded (for whatever reason).
+
+Change:  Let the titles in the Schnauzer get a little longer before '...'ing
+	them.
+
+Enhancment:  Much improved 'Grab' command handling.  You can now grab windows
+	that have a private colormap, and it also works with windows of
+	varying depths (handy if you have one of those X servers (like an
+	Iris) that is normally in 8-bit pseudocolor mode, but *can* open
+	24-bit windows simultaneously.)
+
+Bug fix:  '<stdio>' was getting put in the control window's name list, which
+	was sort of pointless, since it can never be reloaded or anything.
+
+Change:  Now, displays both the filename and the parent directory's name on
+	the image window and icon to help you differentiate between two images
+	with the same name.  (ie, you're comparing the images
+	"/my_archives/gif/naughty.gif" and "/tmp/incoming/naughty.gif".  
+	XV will now display 'gif/naughty.gif' and 'incoming/naughty.gif' in
+	the two window's titlebars.  Assuming, of course, that your WM *does*
+	titlebars...)
+
+Change:  Put back the 'auto-install' colormap on load behavior when running
+	in '-perfect' or '-owncmap' modes.
+
+Bug fix:  it was apparently possible to get double-slashes in the control
+	window name list.  Hopefully less so now.
+
+Bug Fix:  xv now fills in the 'WM_COMMAND' property of the main window,
+	in accordance with the ICCCM.  (Eric Rescorla  (erk@eitech.com))
+
+Added Feature:  Added '-bperfect' and boolean 'browsePerfect' resource to
+	control whether or not the visual browser should install it's own,
+	private colormap.  By default, it *does*.
+
+Added Feature:  Added a 'Load All' button to the Load window.  Copies the names
+	of all 'regular' files in the current directory into the control window
+	list, for e-z viewing.
+
+Added Feature:  Multiple browser windows.
+
+Added Feature:  Added a cool 'auto-apply while dragging' check button in
+	the color editor.  It can only be turned on while you're in
+	'read/write' color mode, and is by default.  When enabled, image
+	colors are twiddled *while* you operate the various controls in the
+	color editor window, not just after you release the controls.
+
+	There's a 'dragApply' boolean resource that lets you turn off such
+	behavior (if, for whatever, it's *still* too slow on your machine).
+		(Major League Thanks to Chris Weikart  (weikart@prl.dec.com)
+		
+Enhancement:  In the visual browser, now attempts to load executable files
+	as well, when generating icons.  If the file is a known format that
+	just happens to have it's executable bit turned on, an icon is
+	generated.  Otherwise, the icon is left the default 'application'
+	icon.
+
+Bug Fix:  Loading '~/whatever' in the Load window was putting a bogus
+	(un-globified) string in the Control window list
+
+Enhancement:  Whenever you successfully 'save' a file (in the Save window),
+	the written file's name is added to the Control window list, for 
+	e-z reloading...
+
+Enhancement:  The infamous (to me, at least) 'purple problem' on HP's and
+	some other things has probably been fixed.  I can't test it, so
+	I can't verify this.  If you don't know what the problem was, don't
+	worry, you didn't have it.
+
+Change:	Added 'version #' string to image window titlebar.
+
+Enhancement:  Pop-Up warning/confirmation windows are now 'attached' to the
+	correct windows, for the most part.
+
+Added feature:  Dopey 'warning message' pops up when you switch from 24 to 8
+	and subsequently from 8 to 24.
+
+Added feature:  When allocating colors in 'stdcmap' modes, it now tries a
+	little harder...
+
+Added feature:  You can now specify a specific visual to use by using
+	'-visual <vid>' where vid is the hexadecimal visual ID.  You
+	can get visualID's by running 'xdpyinfo'.  (Formerly, you could
+	only specify a class of visual (eg, TrueColor), and XV would pick
+	the 'deepest' one of those available.)
+
+	Note: If your root window and specified visual have different
+	depths, you will *not* be able to display images in the root
+	window.
+
+Bug Fix:  'Landscape' postscript had its preview incorrectly generated.
+
+Bug Fix:  Grayscale compressed postscript wasn't quite correct.
+				(John P. Nelson  (jpn@genrad.com))
+
+Bug Fix:  Postscript 'bounding box' comment was incorrect when writing in
+	landscape mode.		(John Amanatides (amana@cs.yorku.ca))
+
+Added:	'-8' and '-24' options (and boolean 'force8' and 'force24' resources)
+	to force XV to remain in either 8- or 24-bit mode.
+
+Bug Fix:  Patches two 2-bit X support for NeXT machines.
+		(Werner Randolf  (evol@brian.uni-koblenz.de))
+
+
+Rev: 10/8/92   (unreleased version 2.29)
+----------------------------------------
+Added:  '-dir' (and 'searchDirectory' string resource) to specify a
+	default place to look for files.  When you start XV, it will 'cd' to
+	this directory, so it will be the default directory for the Load,
+	Save, and Visual Browser windows.  Also, you can (on the command line)
+	specify 'simple' names.  It will first look for the file in the 
+	directory that you were in when you started XV, and (if not found
+	there) it will look for the file in the specified search directory.
+
+Added:  '-hist' and '-norm' options (and boolean 'autoHistEq' and 'autoNorm'
+	resources) to automatically perform Histogram Equalization and
+	Normalization whenever an image is loaded.
+
+Added:  A '-viewonly' option that disables *ALL* user input, and as a
+	consequence, prevents the user from opening any of the various
+	XV windows.  They'll only see the image window, and they won't
+	be able to do anything with it.  Useful in the case that you
+	may want to use XV in some sort of canned demo (or other 
+	environment in which you don't want people to have access to the
+	file system (the load/save window) and such.)
+
+	Note that it isn't possible for the user to Quit the program, either,
+	so you'll almost certainly always want to use the '-wait' option to
+	make the program exit after some amount of time.  (Or, alternately,
+	you can just kill the XV process from whatever program started it.)
+				(idea from Larry W. Virden (lwv26@cas.org))
+		
+Added:	When using XV for format conversion, it can be darned annoying that
+	whenever you load a file, it sets the format/colors controls in
+	the Save window to appropriate values for the loaded image.
+	Likewise, if you're printing images, or piping them to some program,
+	it's annoying that everytime you load an image, the default 'save as'
+	filename gets put back to the loaded image's filename.
+
+	The fix:  two new buttons in the Save window, 'Prev Set' which
+	restores the format/color settings that were used on the last save
+	operation, and 'Prev Name', which restores the name that was used
+	on the last save operation.
+
+Change:	IntSize button now shrinks things to integer compressions, as
+	well as integer expansions.  For example, if the current 
+	expansion ratios were .70 x .80, and you hit IntSize, the new
+	ratios would be .50 x 1.00 (as .70 is closer to 1/2 than it is to 1,
+	and .80 is closer to 1).  Likewise, it will shrink things to 1/3,
+	1/4, 1/5, and so on.
+
+Added '-rotate deg' and 'autoRotate: int' options to automatically rotate
+	images (in 90-degree steps) when they are loaded.  Valid values
+	are 0, +-90, +-180, and +-270.
+
+Added '-hflip' and '-vflip' (and boolean 'autoHFlip' and 'autoVFlip' 
+	resources) to automatically flip images horizontally and vertically
+	when loaded.
+
+Change:  Now, when 'large' images (larger than the screen) are loaded, 
+	they are shown at 'MaxPect' size, rather than being halved or
+	quartered.
+
+Added a new '-crop x y w h' option that lets you automatically crop to some
+	specified rectangle when an image is loaded.  Note that the entire
+	image is still loaded, and available, and you can hit 'UnCrop' to 
+	display the whole image.  Mainly useful to view a small section of
+	the weather maps, or something like that.  Note that there is no 
+	corresponding resource for this option.
+
+Renamed the old '-crop' option (which automatically did an 'AutoCrop' 
+	operation) to '-acrop'.  The boolean resource 'xv.autoCrop' still
+	specifies whether or not to automatically do an AutoCrop.
+
+Added a '-raw' option (and 'autoRaw' boolean resource) basically to complete
+	the '-dith' and '-smooth' options.  Can be used to turn off the 
+	default automatic dithering that takes place when you're using 
+	the 'standard colormap'
+	
+Added '-4x3' option (and 'auto4x3' boolean resource) to automatically do a 4x3
+	command on any loaded pictures.
+
+Added '-preset' option and 'defaultPreset: int' resource that lets you
+	make one of the four presets in the color editor window temporarily
+	be the 'default' preset.  Useful if you set the presets up to 
+	correct the colors for various monitors that you use, or alternately,
+	if you set the presets up to 'do' something useful...
+			(idea from Ricky KeangPo Ho (kpho@sabina.berkeley.edu))
+
+Bug Fix:  Whenever you load a file, its name gets put into the Control
+	Window's list.  XV now checks to see if the name is already *in*
+	the list, and thus avoids putting duplicate names in the list.
+				(Rod Summers  (rsummers@ard.fbi.GOV))
+
+Added stuff to the Display Modes button.  You can now turn on/off these 
+	options, interactively,  while running the program:
+		-perfect, -owncmap, -stdcmap, -rw
+
+	It's pretty cool, since if you're like me, you just normally run
+	XV in its default mode (read-only color cells, no colormap 
+	installation).  If you suddenly decide you want to extensively
+	putz around in the color editor, you can, on-the-fly, turn on
+	read-write colorcells, which makes things *much* faster.
+
+Added '-stdcmap' option and 'useStdCmap' resource.  Instead of allocating a 
+	custom set of colors for each image, it will instead allocate a 
+	general set of colors once, and display all subsequent images using
+	these colors.  
+
+	The images don't look as good as if they used image-specific colors,
+	but it avoids the ugly rainbow effects between images, since all
+	images use the same colors.  Important if you're doing 'animations'
+	using '-wait'.  Also, it speeds things up slightly.
+
+	Note:  normally when you load images while using the StdCmap, they
+	will be automatically dithered for you, as they look pretty nasty
+	when they aren't dithered.  The exception:  If you're viewing an
+	animation (which is one of the main reasons for the '-stdcmap'
+	option), and you've said '-wait 0' (which means 'display as fast
+	as possible), the auto dithering is turned off, to increase the
+	speed of the animation.  You can still manually turn it on in this
+	case by using the '-dith' option, or just using '-wait 1'.
+
+	Note:  There are a couple different sizes of 'standard' colormaps.
+	If you're on a TrueColor/DirectColor display, it will use a 3/3/2
+	colormap.  Otherwise, it will try to use a 6*6*6 colormap, a 2/2/2
+	colormap, or a 1/1/1 colormap, based on '-ncols' (or the depth of
+	your display, if it's less than 8 bits).  You can manually force
+	it to use a smaller colormap than it would normally use by setting
+	'-ncols'.  (ncols < 216 will keep it from using the 6*6*6 cmap, and
+	ncols < 64 will keep it from using the 2/2/2 cmap...)
+
+	Other note:  normally, the use of the -stdcmap option will *not*
+	affect how the image is saved (should you decide to Save an image).
+	You can, however, write out images using the standard cmap by 
+	selecting the 'Reduced Color' option in the Save box.
+
+Deleted '-nglobal' option and resource.
+
+Bug fix:  'Maxpect' button in PostScript window wasn't working correctly
+	in landscape mode.  (Jim Belonis  (belonis@dirac.phys.washington.edu))
+
+Turned off 'ceditColorMap'.  Now, by default, the color editor will be shown
+	in the 'normal' colormap, rather than the image's colormap (when using
+	'-perfect' or '-owncmap).  This can be confusing when using the 
+	colormap editor, as the cells will *not* be shown in their correct
+	colors, but it gets around the problem of not being able to *use*
+	the color editor because it's being displayed in non-contrasting
+	colors.
+
+Added feature:  Now, when you save a file, it prints the # of bytes written.
+		Useful, if you want to know how well your image was compressed.
+
+Bug fix:	Wasn't correctly displaying on LSBFirst 16-bit displays
+		(Stardent)   (Arman Rivard (frog!arman@eddie.mit.edu))
+
+Added some 'useful' default settings for the Color Editor presets (1-4).
+	#1 is a 2-intensity setting.  Image will be shown in black and fully-
+		intense colors.  Sort of makes pictures look like the 
+		credits to 'Saturday Night Live' did at some point in the
+		past.
+	#2 is a 8-color setting.  Image will be shown in black, blue, green,
+		cyan, red, magenta, yellow, and white
+	#3 is a 'temperature' pseudo-color mapping for grayscale images.
+	#4 is a 'geographic map' pseudo-color mapping for grayscale images.
+
+Added '-bdisable' option (and browseDisable resource).
+
+Turned off the 'autoClose' behavior, by default.  Iconifying the image window
+	will *not* affect the other windows.  To get the old behavior (where
+	iconfiying the image window iconified everything else), just specify
+	the '-close' option, or set the 'xv.autoClose' resource to 'True'.
+
+Change:  Changed '-browse' option to '-lbrowse' (and '.browseMode' resource
+	to '.loadBrowse'), so as not to conflict with new 'visual browser
+	related options/resources. ('-bmap' and '-bgeom' options and
+	'.browseMap' and '.browseGeometry' resources)
+
+Added Feature:  a '-poll' option.  If turned on, XV will (attempt) to 
+	recognize when (if) the currently displayed file changes, and if
+	so, it will reload it.  This should let you easily use XV to monitor
+	ALL SORTS OF THINGS, such as the progress of slow ftp transfers,
+	the weather map (assuming you have the thing installed to 
+	automagically download the things and put the latest one in some
+	standard place, say "current_weather.gif" or whatever...).
+
+	You could even use XV as a sort of framebuffer, to allow otherwise
+	non-X programs to display graphics.  Just have your program draw on
+	its own internal 'frame buffer' (just a hunk of memory), and 
+	periodically write it out to a file.  (As I've mentioned to
+	anyone who'd let me, "The PBM/PGM/PPM file formats are *trivial* to
+	write.  Any program that manipulates images should be able to
+	write a PBM/PGM/PPM file...").  Anyhow, periodically write stuff
+	to a file, and have XV display the file with the '-poll' option
+	turned on, and voila!, an output-only framebuffer for X workstations.
+
+Added Feature:  Added an 'oilpaint' function to the 'Algorithms' menu.
+	I got the basic idea from 'pgmoil.c', written by Wilson Bent', who
+	in turn got it from this book called "Beyond Photography", written
+	by some dude named 'Holzmann'.  
+
+Bug fix:  if your image only had two colors in it, and you wrote it out as
+	a Sun Rasterfile, it would turn out in black and white, regardless
+	of the 'FullColor/Greyscale/B&W Dither' setting.
+
+Added Feature:	'Algorithms' menu.  Now you can run blurring algorithms,
+	edge detection, 'tinfoil' effect, and such on an image.  Note that
+	these algorithms generate a new 'image', rather than just playing
+	around with the way that the image is displayed.
+
+Enhancement:  Timer() function should work better on SGI machines.
+			(Fernando D. Mato Mira  (matomira@ligsg13.epfl.ch))
+
+Added Feature:  '-gamma gval' option and '-cgamma rval gval bval' for 
+	setting gamma values in the Color Editor graphs from the command
+	line.
+
+Added Feature:  'IntExpnd' button (keyboard equivalent 'I') rounds the 
+	width and height expansion factors to the nearest integer.  
+
+Bug Fix:  GIF87 files with an aspect ratio in them weren't being parsed 
+	properly.
+
+Enhancement:  Many cleanups and the Imakefiles for the JPEG and TIFF subdirs
+				(Jonathan I. Kamens  (jik@pit-manager.mit.edu))
+
+Enhancement:  Modifications for compiling on ODT 2.0 systems.
+				(Mike Patnode  (mikep@sco.com))
+
+Enhancment:  If using '-root -maxpect' you can now use '-rmode' to specify
+	how it will be displayed (though it will still default to the
+	'root, centered' style).
+				(Ted Grzesik  (tedg@apollo.hp.com))
+
+Enhancement:  Modifications to get XV to compile on the Interactive Unix System
+				(Eam Lo  (eam@netcom.com))
+
+Feature:  Added '-random' command line option.  Mainly used in conjunction
+	with '-wait' to produce 'random' slideshows.  Rather than running
+	through the files in the order that they were specified on the
+	command line, it will order them into a random sequence.  Each file
+	will only be displayed once.  (Unless '-wloop' is also turned on,
+	in which case each file will be displayed once per 'loop'.)
+
+	If used without '-wait', it will randomly pick one of the specified
+	files to be displayed first.
+				(Tim Ayers  (ayers@mermaid.micro.umn.edu))
+
+Bug Fix:  Wasn't properly truncating leading path off of names displayed
+	in control panel (after 'Load'ing a new file).
+				(Elaine Chen  (eychen@Athena.MIT.EDU))
+
+Fixed bug in writing compressed PostScript.
+				(Bill Hess  (hess@tethys.apl.washington.edu))
+
+Fixed bug that would crash on certain systems when trying to display a root
+	image.			(Eam Lo  (eam@netcom.com))
+
+Fixed bug that caused XV 2.21 (in 'root' modes) to eventually crash 
+	the OpenWindows	X Server.
+			(thanks to Jeremy Lawrence (jeremy@snrc.uow.edu.au)
+			 for his help in tracking the problem down)
+
+Added BMP (Microsoft Windows 3.x) format, for both reading and writing.
+	Note:  while it reads RLE4 and RLE8 compressed formats, it only
+	writes in the uncompressed format.  Given how few RLE4/RLE8 
+	BMP files I've seen out there (read: 'none'), this shouldn't be a big
+	problem.
+
+Certain warning messages are now printed to stderr if neither the control or
+	info windows are open.
+
+RLE file reading was busted.  Wouldn't read colormapped RLE files, nor
+	would it read RLE files that didn't have a background color
+	specified.	(reported by Peter Miller (pmiller@topaz.bmr.gov.au))
+
+added window classes 'XVps', 'XVjpeg', 'XVtiff', 'XVconfirm'
+	for the postscript, jpeg, tiff, and popup windows, respectively,
+	so Motif users can do things like this:
+
+	Mwm*XVroot*clientDecoration:            none
+	Mwm*XVcontrols*clientDecoration:        -resizeh
+
+XV should stop 'homing' windows into the top-left corner of virtual root
+	windows.		(Daren W. Latham  (dwl@mentat.udev.cdc.com))
+
+Support for 2-bit MSBFirst machines.
+				(Dale Luck  (dale@ntg.com)
+
+1-bit Sun Rasterfiles weren't being written correctly.
+				(Lars Bo Nielsen  (lbn@hugin.dk))
+
+Image colors are now preserved 'as long as possible' when in '-perfect' or
+	'-owncmap' modes and changing images, thus minimizing the amount of
+	time the image is shown with the 'rainbow effect' and maximizing the
+	amount of time the image is shown with the correct colors.
+
+Image was being unnecessarily cleared when in '-perfect' or '-owncmap' modes.
+
+When saving images in B/W stippled format, *and* the image only has two colors
+	in it, XV no longer does an explicit (and unnecessary) call to the
+	the Floyd-Steinberg ditherizing routine.  Not only will saved images
+	be *exactly* what was on the screen (which wasn't necessarily the
+	case, before), but it also saves a tremendous amount of work if you're
+	huge b/w scanned image, which more and more folks seem to be
+	doing.		(Thanks to Lester Ingber (ingber@umiacs.umd.edu)
+			 for complaining about this misfeature)
+
+Added '-iconic' option, to start program with image window iconified.
+
+Gratuitous three-d-ification of most of the doo-dads, at least on color 
+	systems.
+
+Changed mouse button usage in Grab command.  Button1 grabs a window,
+	Button2 grabs an arbitrary rectangle, and Button3 cancels.
+	(To be consistent with 'Button2' dragging a cropping rectangle in
+	the image.)
+
+Bug fix:  Shifted-arrow keys didn't work in Postscript window on OpenWindows
+	servers.		(Lester Ingber  (ingber@umiacs.umd.edu))
+
+Bug fix:  Cleaned up some potential memory leaks.
+
+Bug fix:  "xv -rw -mono" was coming out somewhat more colorful than might be
+	desired.
+
+The Load/Save window file list now automagically positions itself so that
+the filename is 'centered' in the file list region.
+
+Also, there's a new icon for executable files (in the Load/Save window)
+
+Now the 'Zoom In' rectangle is tracked until you release the mouse button.
+
+Fixed 'Timer()' function to use 'sginap()' on SGI machines.
+				(James Nugent  (james@ironbark.bcae.oz.au))
+
+Improved Expose event handling (groups multiple exposes, and requests
+	BackingStore on the ctrl, coledit, and image windows)
+				(Robert Forsman  (thoth@raybans.cis.ufl.edu))
+
+YCBCR-encoded TIFF images didn't work
+				(Bill Barabash  (barabash@rachel.enet.dec.com))
+
+If you entered a directory name and pressed 'Ok' in the load/save
+	windows, XV would try to treat it as a plain file.
+				(Bill Barabash  (barabash@rachel.enet.dec.com))
+
+Postscript 'previews' were generated 'inverted' (white-on-black instead of
+	black-on-white)		(Vivek Khera  (khera@cs.duke.edu))
+
+Minor memory leak in ColorDither()
+
+Configuration fix for 386's running SVR4
+				(Andy Michael  (eesrajm@brunel.ac.uk))
+
+Bug Fix:  If you opened the ColEdit Window, clicked on 'Norm', then
+	clicked on 'Gam' in the Intensity graph, you'd get a nice random
+	string of uninitialized data...
+				(Michael Pall  (pall@rz.uni-karlsruhe.de))
+
+It'll now pop up a nice, friendly "Can't CD to that directory" dialog box 
+	if you try to cd to a directory that you don't have proper permissions
+	to read.		(idea:  Peder Langlo  (respl@mi.uib.no))
+
+The selection and position of the directory list (in the Load/Save window) is
+	now remembered, instead of being cleared each time you open the
+	window.			(idea:  Peder Langlo  (respl@mi.uib.no))
+
+You can now switch color editor 'presets' by typing Meta-1, Meta-2, Meta-3,
+	or Meta-4 in any XV window.  Handy if you have a couple of 'standard
+	modifications', and you don't want to bring up the big ol' 
+	color editor window just to click a single button.  Also, just to be
+	convenient, you can also press Meta-R (or Meta-0) to Reset the 
+	color editor.
+				(idea:  Phil Richards  (pgr@prg.oxford.ac.uk))
+
+Tweaks to xv.h to make it compile without modification on an HP running
+	HPUX 8.*, in theory anyhow.
+				(thanks:  Tony Clark (tclark@hptc.mentorg.com))
+
+
+Rev: 4/28/92    (version 2.21)
+------------------------------
+Since XDestroyImage() seems to fail to destroy the actual image data on
+	some systems, I've replaced all calls to XDestroyImage() with
+	xvDestroyImage(), which explicitly kills both the image data and
+	the image structure.
+
+Added '-close' option (and 'autoClose' boolean resource) to toggle the
+	"automatically close all windows when you iconify the image window"
+	behavior.  By default, this behavior is turned *on*.
+
+You can now specify just a width *or* a height in the '-geometry' spec.
+	The other dimension will be calculated to preserve the aspect ratio.
+
+Makefile.std was *not* up to date.
+
+Various prototype fixes, Imakefile changed, etc.
+				(David Brooks  (dbrooks@osf.org))
+
+Conflict with constant 'BITS' (defined in xvgifwr.c) on some systems.
+			(Bernd Mohr (mohr@immd7.informatik.uni-erlangen.de))
+
+'xwd.c' seems to have snuck into the 2.20 distribution.  It has been excised.
+
+The '-expand' option didn't work with negative numbers, as it should.  Also,
+	'-e' didn't work, even though there are no other '-e*' options.
+				(Marcel Wijkstra  (wijkstra@fwi.uva.nl))
+
+Minor AIX tweakage
+
+Some calls to rd_str() should have been rd_str_cl(), and other minor probs.
+				(Andreas Stolcke  (stolcke@icsi.berkeley.edu))
+
+
+Rev: 4/24/92    (version 2.20)
+-----------------------------
+Enhancement:  In the color editor, you can now 'Set' the 'Reset' button,
+	as well as presets 1-4.  This is useful if you've like to temporarily
+	set your 'default' settings for the remainder of the current XV
+	session, without having to play around with 'xrdb'.  For example,
+	you might temporarily be using XV on a monitor with different 
+	color characteristics than the one you normally use.  You could 
+	deal with this problem by playing with the r,g,b graphs, and then,
+	once the image looks 'right' again, setting the 'Reset' button, so
+	that all subsequent images will have this same modification applied 
+	to them.
+
+Enhancement:  The '-wait' option works better.  It now waits until the
+	image has been fully drawn before starting the timer.  Now, you're
+	guaranteed that your images will be up at least as long as you
+	specify with the '-wait' option (plus whatever time it takes to
+	load and prepare the next image for display).
+
+	Also, you can now specify '-wait 0' to mean 'as fast as possible'.
+	Handy if you're doing the weather map trick described below.
+
+Enhancement:  The '-visual' option seems to actually *work* now.  It only
+	'theoretically' worked before (read: "didn't work at all"), as my 
+	X server only supports one visual, making testing impossible.
+	Since then I've gotten my hands on a DecStation, which has an X 
+	server that supports several different 8-bit visuals.  It should
+	work with visuals of different depths, as well, but it might
+	not.
+
+Enhancement:  All places in the code that were hard-coded to use the directory
+	"/tmp" (when creating temp files) now use the value of the environment
+	variable TMPDIR, if defined, and "/tmp" if not.
+
+Added Feature: '-loadclear' command-line option (and 'clearOnLoad' boolean
+	resource) lets you turn on the clearing of the image window
+	(or root window) done whenever you load an image on a PseudoColor
+	(or Grayscale) display.  This clearing USED to be done by default, 
+	to hide	the temporary 'rainbow' effect caused when colormap 
+	entries are freed and reallocated.  This is no longer the case.
+	I've decided that I find the effect vaguely entertaining (something
+	to look at while waiting for the next image to load), and more 
+	importantly, if you have a series of images that use the same 
+	colors, you can now use	XV to animate them (albeit no faster than 
+	a frame every 1-2 seconds).
+
+	Ferinstance, get the satallite radar images from vmd.cso.uiuc.edu,
+	(in the directory 'phil.515'), and run 'xv -wait 0 -wloop SA*'.
+	Just like the evening news!
+
+Added Feature: There's now a 'compressed' checkbox in the Postscript window.
+	When enabled, XV will generate RLE-compressed Postscript files.  Also,
+	the images will be written as 8-bit data with a colormap.  The
+	practical upshot is that color PS files can now be *much* smaller.
+	(Resource name: 'pscompress', type: boolean)
+
+	One note:  Compressed images may take considerably longer to print
+	than uncompressed images.  As an example, the default XV pic took
+	(on a LaserWriter II NTX):
+		Color, Compressed:	(87k)	4:00  (4 minutes, not hours!)
+		Color, Uncompressed:	(391k)	2:30
+		Gray,  Compressed:	(85k)	1:40
+		Gray,  Uncompressed:	(130k)	 :20
+
+	The lesson is: unless you're printing to a color printer, you're
+	probably best off sending uncompressed grayscale Postscript.
+
+Added Feature: whizzo new 'Grab' command.  Lets you grab any
+	rectangular section of the screen into XV.  To use, click on
+	the Grab button (or type ctrl-G).  The display will beep, and
+	the cursor will change.  Press the LEFT mouse button and draw
+	a rectangle, or press the RIGHT mouse button to abort the
+	grab.  The grabbed portion of screen will be automatically
+	loaded into XV for manipulation.
+
+	Alternately, you can click the MIDDLE mouse button on a window.
+	The window (and its frame) will be snarfed into XV.
+
+	Used in conjunction with XV's extensive color manipulation thingys,
+	you can now figure out the 'perfect' colors for your xterms, icons,
+	xclocks, or any other thing you can get up on your X display.  Finally,
+	a replacement for the program 'pikapix' from the ol' X10 days!
+
+	For what it's worth, the Grab command doesn't work on Mac's
+	running MacX in a 'rootless' mode, for semi-obvious reasons.
+		(idea from: Arvind Sabharwal (arvind@brutus.ct.gmr.com))
+
+Added Feature:  XV can now read RLE files (Utah Raster Toolkit format).
+
+Added Feature:  'HistEQ' button in Color Editor window.  Performs 
+	intensity histogram equalization on the CURRENTLY VIEWED
+	PORTION OF THE IMAGE.  Occurs between the colormap editor and the 
+	HSV modifier (in terms of the color editor data flow).  This
+	command has the general effect of balancing the overall contrast
+	of the image (increasing contrast on washed-out images, and 
+	decreasing the contrast	on overly-sharp images, so to speak...)  
+	It works best on grayscale images.  
+
+	The keyboard equivalent is 'H' (capital 'h').
+
+Change:	The 'MaxCn' (maximum contrast) button has been changed to a 
+	'Norm' (normalize) button.  It expands the intensity range of
+	an image so that the darkest pixels will be have an intensity
+	of '0' and the brightest pixels will have an intensity of '255'.
+	
+	This is *almost*, but not quite, what it used to do.
+	The keyboard equivalent is now 'N' (capital 'n').
+
+Added Feature: You can now Load files from a pipe by having the first 
+	character in the Load box filename thingy be a '!' (or a '|').
+	For example, you can Load "! bggen -s 400 -w 400 0 0 255".  
+	XV will run the	specified command, saving its standard output to 
+	a file, and then load this file.  (The stdout produced must still 
+	be in one of the recognized image formats.)  You could use this get 
+	an image from a	video digitizer or scanner, assuming you have the 
+	appropriate filter program written.
+
+	You can pipe multiple commands together, as well.  For example, 
+	you can Load "! xwd | xwdtopnm" to take a snapshot of a window
+	and display it, though given the new Grab command, this isn't
+	such a great example...
+			(idea:  Marty Leisner  (leisner@eso.mc.xerox.com))
+
+Change:	The 'Save to pipe' feature is now specified by starting the 
+	filename with *either* a '!' or a '|' character, to 
+	be consistent with the 'Load from pipe' command.
+
+
+Added Feature: exciting new 'zoom' and 'unzoom' commands!  To use
+	them, hold down the 'control' key, and move the mouse into the
+	image window.  A Left click will zoom in by a factor of two,
+	centered on the mouse position.  A right click will zoom out
+	by a factor of two (if possible), centered around the
+	currently displayed subimage.  These commands can easily
+	replace the Crop/UnCrop commands for casual users.
+			(idea from: Dan Zehme  (dan@mordor.webo.dg.com))
+
+Added Feature:  'include preview' check box added to postscript dialog
+	box.  Let's you write ps files without the preview, to save
+	some space.  (resource name: 'pspreview', type boolean)
+	
+Added Feature:  all xv windows are closed if you iconify the image window
+	(or the controls window if you're in a 'root' display mode).
+	All closed windows will be reopened when you deiconify the image
+	window (or controls window).  One misfeature:  only the 'main'
+	xv windows (image, controls, info and color editor) will retain their
+	screen position.  The various 'pop-up' windows will not.  To be
+	dealt with at a later time.
+
+Enhancement: Support for 4" x 5" and 35mm postscript film recorders added
+
+Enhancement: Increased size of control window to make room for 
+	'24-bit conversion' menu button.  List now displays 11 names
+	instead of 9.
+
+Enhancement: Hooked in the new version (3.0) of the TIFF library.
+
+Bug fix:  more bug fixes to the 'slow' 24-to-8 algorithm
+
+Bug fix:  if loading a truncated interlaced GIF file (not that I recommend it),
+	XV will no longer clear from the 'current line' to the bottom of the
+	image, which would overwrite valid image data
+				(Dean Elhard  (elhard@system-m.za05.bull.com))
+
+Bug fix:  memory leak in the '-slow24' code discovered and fixed.
+				(Dean Elhard  (elhard@system-m.za05.bull.com))
+
+
+
+Rev: 3/17/92    (version 2.12)
+-----------------------------
+Added Feature: 'save at normal size' checkbox in save window.  When
+	turned on, images will be saved at their normal, unexpanded
+	(and *unshrunk*) size, subject to the current cropping and
+	rotation.  Note: The Dither and Smooth commands operate on
+	expanded images.  (In fact running Smooth on a 1:1 image
+	should have no effect.)  AS SUCH, images saved at 'normal size' 
+	will be saved 'Raw'.  (Resource name: saveNormal  type: boolean)
+
+Added Feature:  You can now change 24-to-8-bit algorithms 
+	(ie, quick24, slow24, best24) while running the program 
+	(via a pop-up menu button).
+
+Added Feature: '-nolimits' option (and 'nolimits' resource).  If set, there 
+	are no limits on the size of the image (beyond the X-imposed 64K 
+	by 64K).  WARNING:  Be *very* careful when using this option and 
+	playing	with cropping, as it's dangerously easy to accidentally 
+	generate a HUGE image, and crash XV, the host machine, your X server, 
+	or all three.  USE AT YOUR OWN RISK!
+				(Tero Kivinen  (kivinen@joker.cs.hut.fi))
+
+Enhancement: X images (on 8-bit displays) are now generated so that
+	scanlines are a multiple of 32 bits long.  This should avoid 
+	problems with certain broken X libraries and/or servers that 
+	weren't doing the image format translation correctly.
+		 		(Jeff Coffler  (coffler@jeck.amherst.nh.us))
+
+Enhancement: Changed scrollbar behavior: Now, when you drag the
+	indicator, the list that the scrollbar controls is updated
+	while you drag.
+
+Enhancement: when choosing a new directory (in the save menu), xv now remembers
+	the 'suggested' filename to save under, instead of clearing the 
+	text entry doodad.
+
+Enhancement: Upped maximum number of files in control window list (and
+	therefore, on the command line) to 4096 (from 1024).
+
+Enhancement: Hooked in the new version (3.0) of the JPEG libraries.  Most
+	relevant change: when loading JPEG files ONLY, the 'quick' and
+	'slow' 24-to-8	algorithms are now performed by the JPEG
+	software.  They seem to be every bit as good or better than
+	the XV algorithms.  The 'best' algorithm still falls through
+	to using the ppmquant-based algorithm in XV.
+				(Tom Lane	 (Tom.Lane@g.gp.cs.cmu.edu))
+				
+
+Change:	by default, the 'keepAround' flag is now set to 'true'.
+	Now, xv will hang around if you delete the last file in the
+	controls list.  (-keeparound toggles this flag on and off, and
+	the keepAround resource still behaves the same way.)
+
+
+Bug fix:  Compound resources (eg 'xv.preset1.satval') weren't getting properly
+	set on certain systems.
+				(Dean Elhard  (elhard@system-m.za05.bull.com))
+				
+Bug fix: XV will now (potentially) run 'better' under DXWM.
+
+Bug fix: 'Reduced Color' images weren't saving as such in either the
+	PPM or TIFF formats.  (They won't in JPEG, either, but trust
+	me, you don't want to save reduced color images in the JPEG
+	format...)
+
+Bug Fix:  numerical inaccuracies in HSV modification part of color
+	editor were causing certain colors to be lost  (eg, an input of
+	(254,254,254) was coming out (253,253,253), even when everything 
+	was set up to do a 1:1 mapping.)
+
+Bug Fix:  minor memory leak in KillOldRootInfo() fixed.
+
+
+
+Rev: 3/4/92    (version 2.11)
+-----------------------------
+Problems with Imakefile fixed.		(David Brooks  (dbrooks@osf.org))
+
+Problems with SetISTR() function declaration fixed.
+					(David Brooks  (dbrooks@osf.org))
+
+Compiler noise shut up		(Phil Karlton  (karlton@fudge.asd.sgi.com))
+
+
+Rev: 2/26/92   (version 2.10)
+-----------------------------
+Generate updated documentation, this time on a Mac running System 7.  The
+	generated postscript *may* be cleaner.  I hope...
+
+Incorporated Anthony Datri's PDS/VICAR file reading code
+
+Added '-rv' option (and 'reverse' resource).  Displays 'negative' images
+	(white becomes black, black becomes white, and colors do 
+	interesting things).  
+
+Bug fix:  shifted arrow keys (for adjusting cropping rectangle size) didn't
+	work on Sparcstations running OpenWindows.
+
+
+
+Rev: 2/22/92   (version 2.06)
+-----------------------------
+Added whizzo new colormap editing feature.  Click on a color cell with the 
+	left mouse button.  Now click on another color cell with the middle
+	mouse button.  All colorcells in between these two colorcells will
+	be interpolated between these two colors.
+
+	For example, view the 'default' image by just running 'xv' without
+	any options.  Open the color editor window, left-click on the first
+	colorcell, and turn it 'red'.  Left-click on the 64th colorcell
+	(the rightmost cell on the last complete line of the colorcell grid),
+	and turn this colorcell yellow.  Now, middle click on the first
+	colorcell.  Voila!  Niftily interpolated reddish yellows.  Neato!
+
+Added 'reload on signal' feature.  If you send the XV process a 'QUIT' signal
+	('kill -QUIT <pid>', or 'kill -3 <pid>' on most systems), the program
+	will reload the currently selected file.  (The one that is currently
+	highlighted in the xv controls window filename list.)  This behavior
+	is exactly the same as hitting '<return>' in the xv controls window.
+	If XV is currently in a state where hitting '<return>' in the 
+	controls window won't load an image (ie, some pop-up dialog box is
+	grabbing all such events), then sending this signal won't work either.
+
+	Note:  it also won't work if the current file was read from <stdin>
+
+Changed way 'uncrop' works to limit 'drifting' of windows when cropping and
+	uncropping.  Also, puts window back where it belongs when you load
+	a new image.
+
+When cropping, Raw/Dithered/Smooth status of image will remain the same.
+	When uncropping, however, it will revert to 'raw', given how long
+	the dither/smooth operations can take on a potentially large image.
+
+Now tracks x,y coordinates of handles in the 'graph' windows of the color
+	editor window, for precise placement.  Also, you can now move a
+	handle through all 256 x and y positions, not just the 'even' values.
+
+Bug fix to 24-to-8 code.  (Would crash on a 1-bit display.)
+
+
+
+
+Rev: 2/13/92   (version 2.04)
+-----------------------------
+tracked pixel values strings are now put in the 'cut buffer' with a trailing 
+	'\n' character
+
+'-black' and '-white' options now affect how all 1-bit b/w images are 
+	displayed, no longer just used in conjunction with '-ncols 0'
+
+Added command line options '-quick24', '-slow24', and '-best24' to select
+	different 24-to-8 conversion algorithms.  'slow24' is the default.
+	(Also, 'quick24' and 'best24' boolean resources)
+
+Added the 'ppmquant' 24-to-8 bit algorithm ('-best24' option).  Note that 
+	this algorithm is *much* slower than the so-called '-slow24' algorithm.
+	The major difference is that this algorithm will produce good-looking
+	undithered images, whereas the 'slow24' algorithm dithers.
+
+Fixed various bugs in the '-slow24' 24-to-8 bit algorithm.
+
+Added '-cecmap' option (and 'ceditColorMap' resource) to specify whether or 
+	not to install the image's colormap in the color editor window
+
+TIFF i/o routines added		(Sam Leffler  (sam@sgi.com))
+
+Added a 'browse' button in the Load window.  Lets you change the 'browse mode'
+	interactively, while the program is running.  (See '-browse' option
+	below.)
+
+Added 'autoApply', 'displayMods' and 'autoReset' resources to control initial
+	settings of respective checkboxes in the color editor window.
+
+Program is less likely to gratuitously clear the image/root window if you are
+	on a non-PseudoColor/GrayScale display
+
+increased size of 'OutCode[]' array in gif reader.
+				(Rolf Mayer  (rz90@rz.uni-karlsruhe.de))
+
+load/save window used to crash if you had a directory with 'too many' files
+				(Craig McGregor (CRAIG@csdvax.csd.unsw.EDU.AU))
+
+
+Rev: 1/24/92  (version 2.01)
+-----------------------------
+Added '-crop' option (and 'autoCrop' resource) to do the 'autocrop' command
+	automatically whenever an image is loaded.
+
+Added '-browse' option (and browseMode resource).  Keeps the Load window
+	from being closed after succesfully loading a file.  
+
+Added '-nostat' option (and 'nostat' resource) to speed up Load/Save
+	windows.  Prevents the program from doing 'stat()' calls when you
+	change directories.  (Useful for systems with a lot of remote
+	files, where doing the stat() calls takes 'too long')
+	Downside:  it won't be able to mark directories with a 'folder'
+	icon, as it won't *know* that they're directories.
+
+added '-noresetroot' option (and 'resetroot' resource).  Let you turn off
+	the 'clear the root when switching from a root mode back to 
+	window mode in the display modes menu' behavior.  Useful for checking
+	your cropping, if you're working on a 'mirrored' root background
+	(or something)		(David Elliot  (dce@smsc.sony.com))
+
+added a 'rescan' button in the Load and Save windows.  Rescans the current
+	directory.
+
+fixed up GIF89 parsing somewhat.
+
+fixed bugs in xvAllocColor() that would show up if running XV on a TrueColor
+	display.
+
+PostScript files written in B/W Stipple weren't correct
+			(Peter Glassenbury  (pete@cosc.canterbury.ac.nz))
+
+SortColormap() function in xvcolor.c sped up 
+			(Dave Jones  (jonesd@kcgl1.eng.ohio-state.edu))
+
+fixed problem with 'cropping rectangle' not being drawn correctly.
+
+Loads current directory only when opening the Load/Save windows, not 
+	when the program starts up.  This is to improve startup time.
+
+Reloads current directory when you do a 'Delete file' command, just in
+	case you deleted a file in the current directory.
+
+'hints' handling improved.  When controls/info/coledit windows are closed
+	and reopened, they reappear where they *were*, not where the 
+	original geometry spec put them.
+
+FREAD and FWRITE macros in jinclude.h renamed, to avoid conflicts.
+
+problems with 'XLookupString()' on VMS and AIX fixed
+				(Dave Jones  (jonesd@kcgl1.eng.ohio-state.edu))
+
+patches for Sequent machines	(Scott Erickson (sources@sherlock.ics.uci.edu))
+
+Added 'fsQuick' code.  Dithers (on 1-bit displays) 2 to 3 times faster
+	than the old code.  Looks about as good.
+				(David B. Rosen  (rosen@cns.bu.edu))
+
+code for 2-bit displays (so to speak :-) added
+				(Marc Kossa  (M.Kossa@frec.bull.fr))
+
+bug in parsing '-dither'/'-display' fixed
+				(Nigel Pearson  (nigel@socs.uts.edu.au))
+
+Fixed crash if you hit 'return' while xv was running with no file names.
+
+fixed potential memory leak on systems where XDestroyImage() doesn't
+	free the image data, only the structure.
+
+fixed '-fixed' option
+
+fixed bogus Macintosh prolog file in PS documentation.
+
+8-bit characters in PS documentation turned into properly-escaped
+	7-bit characters.	(Reg Clemens  (clemens@plk.af.mil))
+
+minor mods for RS6000		(Tom McConnel  (tmcconne@sedona.intel.com))
+
+new (still unsupported) version of VICAR/PDS file handler added to 
+	unsupt/ directory	(Anthony Datri  (datri@concave.convex.com)
+
+fixed segmentation fault in openPic()	(Jimmy Aitken  (jimmy@pyra.co.uk))
+
+fixes for Pyramid BSD machines		(Jimmy Aitken  (jimmy@pyra.co.uk))
+
+fixed 'tolower' bug in lower_str function (Rich Thomson (rthomson@dsd.es.com))
+
+patches for AUX systems
+
+some ANSI C complaints quieted 	   	(Jamie Zawinski (jwz@lucid.com))
+
+fixed WM_DELETE property problems  	(Jamie Zawinski (jwz@lucid.com))
+
+Changed occurrences of string 'basename' to 'basefname' to avoid conflict on
+	certain systems, and fixed a bug in rd_int()
+					(David Elliot  (dce@smsc.sony.com))
+
+fixed bug that could cause window to move bizarrely on a 'Max Size' command
+
+make 'clean' dependancy added to Imakefile  
+			(Rainer Klute (klute@irb.informatik.uni-dortmund.de))
+
+
+
+
+Rev: 1/2/92  (version 2.00)
+-----------------------------
+*** SUN Rasterfile support         (Dave Heath  (heath@cs.jhu.edu))
+
+fixed unclosed comment in xv.h	   (Paul Close (pdc@sgi.com))
+
+fixed infinite loop in Imakefile   (Kjetil Jorgensen  (jorgens@lise.unit.no)
+
+fixed problems in Imakefile (bitmaps.h wasn't being rebuilt)
+				(Jonathan Kamens  (jik@pit-manager.mit.edu))
+
+additional bug fixes/workarounds for 24/32-bit TrueColor displays
+				(Dave Gregorich (dtg@csula-ps.calstatela.edu))
+
+include string.h or strings.h based on 'SYSV' flag
+				(Kevin Brown  (brown@hpbsm15.boi.hp.com))
+
+bogus command line parsing ('-autogamma' wouldn't work)
+				(Doug Washburn  (washburn@hpmpea2.cup.hp.com))
+
+fixed 4-bit X code to work on MSBFirst machines
+				(Stefan Esser  (se@ikp.Uni-Koeln.DE))
+
+mods for HPUX 7.0		(Jan D.  (jhd@irfu.se))
+
+added window classes 'XVroot', 'XVcontrols', 'XVdir', 'XVinfo', and 'XVcedit',
+	so Motif users can do things like this:
+
+	Mwm*XVroot*clientDecoration:            none
+	Mwm*XVcontrols*clientDecoration:        -resizeh
+	Mwm*XVdir*clientDecoration:            -resizeh -maximize
+	Mwm*XVcedit*clientDecoration:           -resizeh -maximize
+	Mwm*XVinfo*clientDecoration:            -resizeh -maximize
+
+	Also, WM_DELETE_WINDOW is now set up in the WM_PROTOCOLS 
+	property, allowing the 'close' menu selection under MWM to
+	close an XV window without terminating the application.
+				(Jan D.  (jhd@irfu.se))
+
+slow 24-to-8 conversion was moving the image down 1 scan-line
+				(Satoshi Asami  (asami@is.s.u-tokyo.ac.jp))
+
+mods for MIPS machines	  (David Boulware  (dgb@landau.phys.washington.edu))
+
+Ability to LOAD pictures that weren't specified on the command line
+
+fixed bug in CheckForConfig()
+
+twm workaround from patchlevel 2 now only turned on if '-twmkludge' option is
+	specified.  Was causing problems on OpenLook 2.0 systems
+
+directories and symbolic links are now sorted together at the top of
+	the 'xv directory' list
+
+fixed crashes when 'AutoCropping' in conjunction with '-root' option
+
+file format/color buttons in Directory window are now set whenever an image
+	is loaded.  (Set to the format/color of the loaded image.)
+
+clicking anywhere inside the Info box will now close it
+
+added support for up/down arrows, page up/down, home, and end keys when
+	mouse is in control window or directory window (for operating
+	the scrollable list thingy)
+
+changed 'Return' key binding to mean 'display currently selected picture'
+	rather than 'Next'
+
+added binding of Tab key to 'Next' function
+
+'-wait' now waits until picture is fully up on screen before starting timer
+
+'-wloop' option added.  Causes '-wait' slideshow to loop at end
+
+added 'hagan-style' tiling on the root window.  '-root', '-center', and
+	'-rpat 0'  (the default) will now draw an image centered on the
+	root window, with images going off the screen in all 4 directions
+
+	(Unlike 'normal' ('-root' only) tiling, which has one image
+	pinned in the top-left corner of the screen, and subsequent
+	images going off the screen ONLY on the bottom and right sides)
+
+added '-maxpect' option.  (An abbreviation for '-center -fixed -max')
+	makes the image as large as possible, without changing the
+	aspect ratio.  Only relevant when used in conjunction with 
+	'-root'.  (When not using '-root', both '-max' and '-maxpect' do
+	the same thing (as large as possible without changing the aspect).
+	When USING '-root', '-max' makes the image the size of the screen,
+	in all likelyhood changing the aspect ratio)
+
+added '-olwm' option (and xv.olwm resource) for people using Sun's OpenLook
+	window manager.  Makes the window behave correctly when resized via
+	any of the xv resizing commands.
+
+added new, slicker-looking icon.  The old one was outside Motif's accepted
+	range of icon sizes.
+
+SMOOTHING controls (Smooth, Dither, and Raw buttons) added
+
+added '-cursor' option (and xv.cursor resource).  Allows you to pick a 
+	different cursor for the image window (instead of the 
+	default crosshair cursor)
+
+various modifications to work somewhat better with tvtwm (or other
+	virtual window managers)
+		Hitoshi Saji	saji@is.s.u-tokyo.ac.jp
+		Tetsuya Ikeda	tetsuya@is.s.u-tokyo.ac.jp
+		Satoshi Asami	asami@is.s.u-tokyo.ac.jp
+
+fixed up some multiple-redraw bugs, for improved speed
+
+Added spiffy 'hue' and 'saturation' dials to cedit box
+
+New format for '-GAMMA' command line option and gamma resources.  Fully
+	specifies state of gamma controls, including 'lines/spline' and
+	'rgb/hsv' modes
+
+Improved 'undo' handling in Gamma box.
+
+Added 'reduced' color save.  Used in conjunction with the '-nc' command
+	line option.  Saves the image more-or-less 'as shown', rather than
+	"as it's supposed to be".  For example, you can now save bizarrely
+	stippled pictures by doing something like '-nc 0 -wh red -bl blue'
+	on the command line, and then saving the image in 'reduced color'.
+
+
+added '-adither', '-asmooth' options (and 'xv.autoDither', 'xv.autoSmooth'
+	resources) to automatically dither or smooth the image upon 
+	loading it.  Mainly for use the case where you want XV to 
+	load an image onto the root window and go away without any user
+	intervention.  (Like you might put in a startup script.)
+
+added some X error handling so that XV doesn't blow up (ungraciously) when
+	you're using '-root' on an X terminal that doesn't have enough
+	memory to do a full-screen root image
+
+code reorganization:  xv.c and xvmisc.c have been split into (xv.c, xvevent.c,
+	xvroot.c) and (xvmisc.c, xvimage.c, xvcolor.c, xvsmooth.c) 
+	respectively.  The files were getting annoyingly large.
+
+added colormap editing capabilities to the gamma box
+	Colors can be edited in either HSV mode or RGB mode
+	You are modifying the original colormap of the image, BEFORE
+		the '-mono' or '-rv' options are applied, BEFORE
+		any GAMMA correction is applied, and before it's
+		determined how to get the image on the screen.
+		As a result, it's best to edit colors when the GAMMA
+		controls are set to 'Linear'
+	You can select the color to be edited by clicking in the colormap
+		area of the GAMMA box, or by clicking in the image window
+		(in which case the color selected will match the last pixel
+		value you displayed)
+	Using '-rw' mode will generally speed things up, but isn't
+		necessary.
+
+added colormap 'grouping'.  Use Button3 to add/delete color cells from the
+		current group.  Hold shift key down and the image regeneration
+		will be delayed until you let go of the shift key.  (normally
+		the image would be redrawn every time you released Button3.)
+		This allows you you quickly group multiple pixels.
+
+added 'cut buffer' usage.  Whenever you track pixel values (by clicking the
+	left button in the image window), the last pixel values are put in 
+	the X cut buffer, so that you can paste them into your own program,
+	an xterm window, or whatever.  Useful if you're using XV to choose
+	'points-of-interest' to be used as input to another program.
+
+	Also, if you click on the gamma values (above the graph in the 
+	gamma window), those values will be put in the cut buffer as well.
+	(Handy for setting default values for the Gamma resources.)
+
+added a slightly-improved 'cropping' rectangle.  Should show up better on some
+	pictures.
+
+added hsv pixel display.  When tracking pixel values in the image window
+	(with the left mouse button), the values will either be displayed
+	as R,G,B components (0-255), or as HSV components (0-359, 0-100, 0-100)
+	This is based on the setting of the HSV/RGB switch in the Gamma box.
+
+added a 'Randomize Colors' button.  (keyboard equiv: 'R').
+	Causes the entire colormap of the current picture to be
+	randomized.  Groupings *will* be respected, however.  (ie, all pixels
+	in a group will still have the same color, albeit a new one).  For
+	amusing effects, do some by-hand color reduction (by grouping all
+	similar colors), then do the randomize function.  
+
+added an 'Undo All' button in the Gamma box.  Undoes all changes made to the
+	image's colormap and clears all groupings.
+
+added '-hsv' and '-rgb' switches (and xv.hsvmode resource (boolean)) to
+	allow user to set initial hsv/rgb mode.  By default, program uses
+	RGB.
+
+fixed 'shift key' bug with regards to entering filenames in dir window
+
+'enter' in file i/o window now opens the currently selected directory
+
+fixed bugs on 1-bit displays (fish cursor didn't flap during re-ditherization,
+	CMap wasn't properly refreshed after loading new pic)
+
+Smooth/Dither now sets 'Current Size' RButt in file i/o box.  (Need to save
+	at current size to save 'smoothed' picture.)
+
+BadAccess errors cause by XFreeColors are now ignored, as this is simply a 
+	sign of a busted X server, and happens when multiply-allocated 
+	colors are freed more than once.  (like they're supposed to be)
+	Should make '-bfc' option obsolete.
+
+Current Size RButt ripped out.  (Always saves at current size)
+
+flapping fish cursor added during PBM/PGM/PPM file i/o
+
+created GRAF type
+
+MASSIVE modifications to GAMMA box
+
+Gamma box renamed 'Color Editor' box ('cedit')
+
+Added direct numeric gamma input to GRAF boxes
+
+Created HDIAL controls
+
+Changed non-range HDIAL to be a hue/saturation control
+
+Created CBUTT check boxes
+
+Added 'drag the whole range around' feature in range HDIALs
+
+Added -nopos, -fgeom, and -fmap command line options (and resources)
+
+Fixed 'crop near corner' graphics bug
+
+Fixed multiple redraw bug, with any luck.
+
+Added '-2xlimit' option and resource.  Allows the image window to be larger
+	than the screen (up to 2x).  *NOT* recommended unless your WM
+	is capable of operating windows without visible borders.  (ie, you'll
+	need some meta-mouse-button action, ala twm/uwm...)
+
+Added rudimentary GIF89 reading.  (Jon Brinkmann, jvb7u@astro.Virginia.Edu)
+
+Changed ISTR_INFO to be more to Hagan's liking.  
+	(eg  "320x200 GIF87.  Got all 37 colors.")
+
+Fixed some probs in xvsunras.c
+	(didn't understand RT_FORMAT_RGB, and RT_BYTE_ENCODED 8-bit
+	 rasterfiles didn't load correctly, nor did it handle odd-width
+	 24-bit images correctly)
+
+Added POSTSCRIPT OUTPUT and PostScript Box  (7/6/91)
+	Drag the image window around on the page with the mouse.  The scale
+	controls are used for stretching.  Note:  if you use the arrow keys
+	(regular and shifted), you can get precise positioning control.
+
+Added GIF89 aspect ratio handling, warning message about skipped extensions,
+	PlainText block handling (doesn't do anything with it)
+
+Ripped out the '-fish' option and related code.  Never worked right anyway.
+
+Added ability to type long strings in 'filename' field of dir box.
+
+Split 'file i/o' button into two buttons 'Load' and 'Save'.  Directory box
+	is now either a 'Load box' or a 'Save box', depending.  (^L and ^S
+	are the accelerators).
+
+Added ability to type pathnames in 'filename' field.  And 'cd-ing' to different
+	directories directly without going through pesky UI.
+
+Added 'popup' windows.  (The computer seems to be on fire.  <Ok> )
+
+Stretched ctrlW so that 'helvetica' font would still fit (Ultrix 4.2 doesn't
+	include 'lucida' still...)
+
+Added 'close' (via mwm menu) handling to PostScript window and PopUp window.
+
+Added wait cursor during directory-reading (whenever you change directories)
+
+Fixed PostScript file output (to have correct comments)
+
+Added 'maxpect' button in PS window.
+
+Hooked up remaining buttons in ColEdit window  (undo, redo, 
+	brite, dim, sharp, dull)
+
+Got rid of 'recolor' operations when non-visible changes made to Graf's
+	(changes of less than '2' aren't visible due to coordinate halving)
+
+Added 'max contrast' button to gamma window
+
+Added 'C' and 'R' keyboard equivs for 'MaxCnt' and 'Reset' respectively
+
+Added 'default' picture (xvdflt.c)
+
+Added 'Flip H' and 'Flip V' buttons ('h' and 'v' keyboard equivs)
+
+Redesigned ctrl window somewhat
+
+When you 'Load' files (via the Load dialog box), the file names are stuck
+	in the 'ctrlW' list for E-Z Re-Viewing...
+
+Added ability to 'reload' current picture (by double clicking on its entry
+	int the ctrl window list)
+
+Added 'Delete' command.  ('^D' keyboard equiv)
+
+Mods to work (better) on Apollo systems
+				(Robert Goodwill (robert@earth.cs.jcu.edu.au))
+
+Added support for 16-bit displays
+				(David Elliot    (dce@smsc.sony.com))
+
+Improved 24-to-8 color compression routines
+				(Tom Lane	 (Tom.Lane@g.gp.cs.cmu.edu))
+
+Improved color selection algorithm
+				(Tom Lane	 (Tom.Lane@g.gp.cs.cmu.edu))
+
+Flag resources now accept 'on', '1', 'true', 'yes' in either u/l case
+				(Chris Weikart   (weikart@prl.dec.com))
+
+Fixed potential overflow bug in linear interpolation code
+				(Chris Weikart   (weikart@prl.dec.com))
+
+Added Motif-Style 3-d buttons
+
+Added 'Auto-Reset' check box in ColEdit window
+
+Optimization to ColEdit:  if changing a control hasn't actually
+	affected the 'desired colormap', don't bother applying the change
+
+Changed 'graf' controls:  you can now hold down the shift key and modify them
+	to your hearts content.  The image is not actually recomputed until
+	you let go of the shift key.
+
+Added '-hi' and '-lo' options ('highcolor' and 'lowcolor' resources) for 
+	setting the 'other' two colors on the buttons.
+
+Added '-v' option ('visual' resource) to allow the user to force XV to use a
+	specific visual type, rather than the server default.
+
+Added gamma resources.  Hooked up 'Get Resources' button (copies current
+	gamma settings into the cut buffer)
+
+Ripped out '-tile', '-center', and '-rpat' options.  Replaced them with 
+	'-rmode' option ('rootMode' resource)
+
+Added mirrored tiling and integer mirrored tiling root modes.
+
+PopUp window now pops up with the right-most button centered under the mouse,
+	rather than in the middle of the screen.
+
+Added '^D' accellerator key (for 'Disk File') in the 'Delete What' PopUp box.
+
+Changed '-asmooth' and '-adither' to '-smooth' and '-dither', respectively.
+
+Added stricter command line argument matching.  '-snausage' no longer would
+	match the '-s' flag.
+
+Changed way '-expand' (and 'expand' resource) works.  Now takes floating
+	point number.  For backwards compatibility, negative numbers are 
+	still treated as reciprocals.  (ie, both '-2' and '.5' will halve 
+	the image)
+
+Created 'MBUTT' pop-up menu widget.
+
+Added 'Display Modes' popup button.
+
+Fixed bug when using '-perfect'.  The XCopyColormapAndFree() function had the
+	rather undesirable side effect of getting rid of the allocated
+	colors used for the various windows, etc. (ie, more than the
+	image colors)
+
+Made 'Hagan-Style' tiling (aka, Centered Tiling) much more efficient
+				(Robert Potter  (rpotter@grip.cis.upenn.edu))
+
+Made the 'directory' listing in the load/save box use an MBUTT.
+
+Added JPEG support.		(Markus Baur  (s_baur@iravcl.ira.uka.de))
+				(and, of course, the Independent JPEG Group)
+
+Added '-keeparound' flag (and 'keepAround' resource).  By default, if you
+	'delete' the last file remaining in the ctrl window list, 
+	the program will auto-exit.  This option overrides that behavior.
+
+Ripped out '-fgeom' and '-fmap' options (and 'fileGeometry' resource).
+	Load/Save boxes now come up wherever the mouse is.
+
+Wrote OpenOutFile() and CloseOutFile() routines to unify redundant code
+	in 'DoSave()' and 'writePS()'
+
+Added 'piped' output.  (ie, save file "| lpr")
+
+Added 'Alert' boxes (button-less PopUp's)
+
+Bug fixes when loading/saving '~' files
+
+Fixed PS output to be Encapsulated PostScript compatible
+
+Added a faked 'colorimage' procedure for grayscale PS printers.
+	(Color postscript files will print on non-color printers, albeit in
+	 grayscale.)
+
+New Window positioning code.  Should work for (nearly) all WMs.
+				(Matthew Stier  (matthew@sunpix.East.Sun.COM))
+
+Automatically smooths images that were 'shrunk' (2x, 4x, etc...)
+
+Bug fixes to the JPEG i/o code.	(Tom Lane  (Tom_Lane@G.GP.CS.CMU.EDU))
+
+Fixed problem in xv24to8.c with the Floyd-Steinberg dithering code.
+				(Charles Hannum  (mycroft@gnu.ai.mit.edu))
+
+Modified 'Delete' behavior.  Only loads an image if you deleted the
+	currently-viewed image.
+
+Changes the suffix of the filename in the 'save window' when you change 
+	file formats.
+
+Got rid of 'Quit XV' buttons in load and save windows
+
+Added extra verbiage to JPEG save window.
+
+Dicked around some more with window positioning code.  Seems to work
+	correctly in TWM and MWM.  Hopefully, it'll work in OLWM as well.
+
+Added Makefile options and xv.h #ifdefs for Encore's UMAX 
+	version of Unix System V.	(Drew Watson  (dwatson@encore.com))
+
+Added '-owncmap' option (and 'ownCmap' resource) to make XV *always*
+	use/install its own colormap.	(Bill Turner  (bturner@cv.hp.com))
+
+
+Rev: 11/29/90  (version 1, patchlevel 3)
+-----------------------------
+
+Changed 'CCOPTIONS' to 'DEFINES' in Imakefile
+
+Fixes for use with virtual root window managers (ie, tvtwm)
+	(only cares about virtual root when using '-root' option,
+	 negative geometry's correctly handled.)
+			(Andreas Stolcke   (stolcke@ICSI.Berkeley.EDU))
+
+Modifications for Sequent machines (no 'mem*() routines)
+			(Daniel Pommert    (daniel@ux1.cso.uiuc.edu))
+
+Modifications to avoid bug in certain optimizers, most notably the default
+optimization (-O) in Sun's C compiler.  (Incorrectly handles lines of the
+sort "*p = array[*p]")
+
+Modification to get around 'when I shift my arrow keys (to adjust the
+cropping rectangle), my keyboard generates numbers instead' problem
+			(Mark Horstman     (mh2620@sarek.sbc.com)
+
+Modification to allow 'xsetroot' and 'xloadimage' to cleanup any
+xv-displayed images in the root window, and vice-versa.
+			(Richard Bingle    (bingle@cs.purdue.edu))
+
+
+
+Rev: 11/26/90  (version 1, patchlevel 2)
+-----------------------------
+added workaround for 'X Protocol Errors' on broken servers (XFreeColors())
+	(see the '-bfc' option)
+fixed core dump when cropping on certain displays
+misc. #ifdefs for HPs
+fixed problem with fish cursor remaining around too long
+more SVR4 #ifdefs			(David Elliott,  dce@smsc.sony.com)
+fixed bug in tracking pixel values	(Bob Finch,      bob@gli.com)
+misc #ifdefs for ISC 386/ix 2.0.2	(Mark Snitily    mark@zok.uucp)
+misc #ifdefs for AT&T machines	 	(Eric Raymond   eric@snark.thyrsus.com)
+misc #ifdefs for Silicon Graphics       (Paul Close     pdc@lunch.wpd.sgi.com)
+Added POSIX signal handling		(Mike Patnode   (mikep@sco.com))
+Port to SCO UNIX/ODT			(Mike Patnode   (mikep@sco.com))
+
+fixed problem with using '-max' and '-fixed' at same time
+			(Greg Spencer   greg@longs.lance.colostate.edu)
+modification to work with Virtual Root Windows (ala swm and tvtwm)
+			(Bill Kucharski  kucharsk@solbourne.com)
+
+the 'save-as' filename is now set to the 'current' filename
+
+Also, if you double click on 'plain' files in the directory box,
+	it will set the 'save-as' filename accordingly.
+
+Added ability to view images centered on the root window, without
+	any tiling.  Added associated options ('-center', '-rfg', '-rbg',
+	and '-rpat')
+
+Workaround for twm 'No title bars' bug  
+			 (Steve Swales  steve@bat.lle.rochester.edu)
+
+Bidirectional Rotate commands added
+
+Maxpect command added:  (Maximum size, but preserve aspect ratio)
+
+AutoCrop command added:  (Crops out solid borders.)
+
+Potential support for 32-bit displays.  (Hasn't been tested.  Don't have one.)
+
+
+Rev: 10/17/90   (version 1, patchlevel 1)
+------------------------------
+Imakefile added			(David Elliot    (dce@smsc.sony.com))
+System V release 4 mods		(David Elliot    (dce@smsc.sony.com))
+Bug in 'quick check' fixed	(Arthur Olson    (ado@elsie.nci.nih.gov))
+Mods for Convex machines	(Anthony Datri   (datri@convex.com))
+'vprintf' module added 		(Jonathan Kamens (jik@pit-manager.mit.edu))
+window creation bug fixed
+added icon
+fixed 'Input Focus' probs
+added '-w' flag to bggen
+various cleanups to shut up 'noisy' compilers
+
+
+Rev: 10/9/90    (version 1, patchlevel 0  -  initial release)
+

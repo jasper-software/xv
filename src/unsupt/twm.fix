@@ -1,0 +1,27 @@
+Here's that simple 'one-line' fix to twm & tvtwm that I mention in the XV 
+documentation (somewhere).  It fixes a problem that occurs if you use twm
+and display the XV image window without a titlebar.  
+
+--jhb,  11/23/93
+
+
+*** events.c	Tue Nov 19 03:41:53 1991
+--- events.c.old	Thu Mar 29 16:08:53 1990
+***************
+*** 2198,2205 ****
+  	width = cre->width;
+      }
+      if (cre->value_mask & CWHeight) {
+!       /* height = cre->height + Scr->TitleHeight + bw; */   /* OLD, WRONG! */
+!       height = cre->height + Tmp_win->title_height;
+      }
+  
+      if (width != Tmp_win->frame_width || height != Tmp_win->frame_height)
+--- 2198,2204 ----
+  	width = cre->width;
+      }
+      if (cre->value_mask & CWHeight) {
+! 	height = cre->height + Scr->TitleHeight + bw;
+      }
+  
+      if (width != Tmp_win->frame_width || height != Tmp_win->frame_height)

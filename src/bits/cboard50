@@ -1,0 +1,4 @@
+#define cboard50_width 8
+#define cboard50_height 8
+static unsigned char cboard50_bits[] = {
+   0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa};

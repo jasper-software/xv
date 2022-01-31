@@ -1,0 +1,72 @@
+$Header: /usr/people/sam/tiff/RCS/HOWTO,v 1.14 1994/07/26 17:11:05 sam Exp $
+
+How To Obtain This Software (in case all you get is this file)
+
+The software is available for public ftp on
+    sgi.com			graphics/tiff/v3.3.src.tar.Z
+	(192.48.153.1)
+
+For example,
+    % ftp -n sgi.com
+    ....
+    ftp> user anonymous
+    ... <type in password>
+    ftp> cd graphics/tiff
+    ftp> binary
+    ftp> get v3.3.src.tar.Z
+
+In general, the latest version of the 3.3 release of the software is
+always available as "v3.3.src.tar.Z" in the ftp directory.  This file
+is a link to the appropriate released version (so don't waste your time
+retrieving the linked file as well!) Any files of the form v3.3.patch*
+are shell scripts that can be used to patch older versions of the
+source code.  For example, the file v3.3.patch-1 would contain patches
+to update v3.3.src.tar.Z.  Patch files only work to go between
+consecutive versions, so if you are multiple versions behind the latest
+release, you will need to apply each patch file between your current
+version and the latest.
+
+
+Obtaining the Software by Electronic Mail
+-----------------------------------------
+Do not send me requests for the software; they will be ignored (without
+response).  If you cannot use FTP at all, there is a service called
+"ftpmail" available from decwrl.dec.com:  you can send e-mail to
+this machine and it will use FTP to retrieve files for you and send you
+the files back again via e-mail.  To find out more about the ftpmail
+service, send a message to "ftpmail@decwrl.dec.com" whose body
+consists of the single line "help".
+
+
+What to do Once You've Retrieved Stuff
+--------------------------------------
+The software comes in a compressed tar file.  To extract the
+information:
+
+    zcat v3.3.src.tar.Z | tar xf -
+
+(uncompress and extract individual files in current directory).
+
+There is also a companion compressed tar file, v3.0pics.tar.Z
+that has sample TIFF image files.  These are mostly useful in
+testing the software if/when you port it to an unsupported system.
+
+
+TIFF Mailing List
+-----------------
+A mailing list for users of this software is located on sgi.com.
+If you want to join this mailing list or have a list-related request
+such as getting your name removed from it, send a request to
+
+    tiff-request@sgi.com
+
+For example, to subscribe, send the line "subscribe" in the body of
+your message.  The line "help" will return a list of the commands
+understood by the mailing list management software.
+
+Submissions (including bug reports) should be directed to:
+
+    tiff@sgi.com
+
+When corresponding about this software please always specify what
+version you have and what system you're running on.

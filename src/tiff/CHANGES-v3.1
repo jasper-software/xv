@@ -1,0 +1,58 @@
+$Header: /usr/people/sam/tiff/RCS/CHANGES-v3.1,v 1.1 1992/09/03 14:25:30 sam Exp $
+
+TIFF Software "Release" 3.10 (changes since 3.00 release)
+----------------------------------------------------------
+Changes in libtiff:
+    o operating system (OS)-dependent code is now isolated in separate
+      source files: tif_unix.c, tif_apple.c, tif_msdos.c, and tif_vms.c;
+      much of the muck previously located in tiffcompat.h is no longer needed
+    o all memory management in the library is now done through three
+      internal interfaces: _TIFFmalloc, _TIFFrealloc, and _TIFFfree;
+      these routines are intended to be defined in the os-specific code
+    o all I/O and I/O-related operations in the library are now done through
+      function pointers maintained in each TIFF data structure; this was
+      done to better isolate os-dependent code and to make it possible for
+      clients of the library to override, on a per-file basis, how I/O is done
+    o the mapped file support is no longer conditionally compiled into
+      the majority of the library; instead it is now isolated through
+      internal interfaces so that only the os-dependent code need be
+      concerned with support/non-support
+    o a mistake in the use of const in tif_compress.c has been corrected
+    o more function prototype definitions have been added for ANSI C
+      compilers that are fussy about mixing old and new style declarations
+    o the values of the TileWidth and TileLength tags are now required to
+      be multiples of 16 (instead of 8) as specified in the final 6.0 spec
+    o the G3 decoding routine now treats a premature EOL or bad code as
+      a non-fatal error, white-filling the remainder of a scanline
+    o TIFFReadRGBAImage can now read CYMK images (using a very simple
+      algorithm to convert CMYK->RGB)
+    o the LZW code has been updated to use the faster version distributed
+      after the v3.0 release
+    o a new library interface, TIFFClientOpen, was introduced; this
+      routine permits a client of the library to manage all I/O and
+      file-related operations (read, write, lseek, close, mmap, umap,
+      getfilesize)--this interface is used internally to isolate
+      os-dependent functionality
+    o a bug where the library calculated the wrong expected size of a
+      "short strip" has been fixed
+    o a bug in the parameter ordering of TIFFComputeTile has been corrected
+    o the numeric values of SAMPLEFORMAT_INT and SAMPLEFORMAT_UINT have
+      been changed to reflect the values defined in the final 6.0 spec
+    o the SGI build is now done with the ANSI C compilers
+
+Changes in the tools:
+    o pal2rgb now correctly converts 16-bit colormap entries to 8-bit values
+    o sgigt now handles 8-bit separated (CMYK) images
+    o a bug in tiff2ps where resolution scaling was done incorrectly
+      has been fixed
+    o a bug in tiffdump where non-byte data values were incorrectly
+      byte-swapped has been fixed
+
+Changes in the documentation:
+    o doc/TIFF6.ps (the 6.0 specification from Aldus) has been updated to
+      the "final version" of 6-8-1992.
+
+Changes in the contrib software:
+    o the palette test image generator can generate a 1-bit test image;
+      also a change was made to the color scaling algorithm
+    o the vms support has been updated

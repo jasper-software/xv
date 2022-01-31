@@ -1,0 +1,9 @@
+#!/bin/csh -f
+# cleandir: if called with an argument, cd's there and does a 'make clean'
+#
+
+if ( x$1 != x ) then
+  echo "cleaning $1 subdirectory"
+  cd $1
+  make clean
+endif

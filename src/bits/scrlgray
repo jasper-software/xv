@@ -1,0 +1,4 @@
+#define scrlgray_width 8
+#define scrlgray_height 8
+static unsigned char scrlgray_bits[] = {
+   0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44};

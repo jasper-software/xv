@@ -1,0 +1,1090 @@
+(Message /usr/users/bradley/Mail/inbox:9)
+Return-Path: rite@obsn.on.br
+Posted-Date: Fri, 29 Jul 94 15:40:02 EST
+Received-Date: Fri, 29 Jul 1994 14:42:06 -0400
+Received: by obsn.on.br (4.1/SMI-4.1)
+	id AA01425; Fri, 29 Jul 94 15:40:02 EST
+Date: Fri, 29 Jul 94 15:40:02 EST
+From: rite@obsn.on.br (Charles Rite' - Network Manager)
+Message-Id: <9407291840.AA01425@obsn.on.br>
+To: xvtech@devo.dccs.upenn.edu
+Subject: XV
+
+Dear John Bradley,
+
+I have executed the "diff -c" in order to get the differences
+between the standard code (xv-3.01) and the modified code
+(I called the directory as xv-3.01-fits).
+
+The modified modules are: xv.c, xv.h, xvdir.c, xvbrowse.c, and
+the Makefile.
+
+In order to avoid confusion, there is a header before each
+file in the form: " ======== CUT THIS - MODULE NAME ==========="
+
+The last file is the source code for xvfits.c that contains
+the read and write routines to handle the FITS format.
+
+Let me know if you need some more information.
+
+With best regards,
+CHarles Rite'
+
+
+=================== CUT THIS - MODIFICATIONS IN MAKEFILE =================
+
+*** xv-3.01/Makefile    Fri Jul 29 15:06:12 1994
+--- xv-3.01-fits/Makefile       Tue Jul 26 13:34:36 1994
+***************
+*** 269,275 ****
+          bitmaps/p10 bitmaps/m10
+
+  SRCS1 =       xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c !
+ ggen.o xv24to8.c xvgif.c xvpm.c xvinfo.c xvctrl.c xvscrl.c xvalg.c \
+        xvgifwr.c xvdir.c xvbutt.c xvpbm.c xvxbm.c xvxpm.c xvgam.c xvbmp.c \
+        xvdial.c xvgraf.c xvsunras.c xvjpeg.c xvps.c xvpopup.c xvdflt.c \
+        xvtiff.c xvtiffwr.c xvpds.c xvrle.c xviris.c xvgrab.c vprintf.c \
+--- 269,275 ----
+          bitmaps/p10 bitmaps/m10
+
+  SRCS1 =       xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c !
+ dcomp* xv24to8.c xvgif.c xvpm.c xvfits.c xvinfo.c xvctrl.c xvscrl.c xvalg.c \
+        xvgifwr.c xvdir.c xvbutt.c xvpbm.c xvxbm.c xvxpm.c xvgam.c xvbmp.c \
+        xvdial.c xvgraf.c xvsunras.c xvjpeg.c xvps.c xvpopup.c xvdflt.c \
+        xvtiff.c xvtiffwr.c xvpds.c xvrle.c xviris.c xvgrab.c vprintf.c \
+***************
+*** 276,282 ****
+        xvbrowse.c xvtext.c xvpcx.c
+
+  OBJS1 =       xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o !
+ bsn> caxv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+        xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvxpm.o xvgam.o xvbmp.o \
+        xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
+        xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
+--- 276,282 ----
+        xvbrowse.c xvtext.c xvpcx.c
+
+  OBJS1 =       xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o !
+ bsn> lsxv24to8.o xvgif.o xvpm.o xvfits.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+        xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvxpm.o xvgam.o xvbmp.o \
+        xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
+        xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
+
+=================== CUT THIS - MODIFICATIONS IN XV.C =====================
+
+*** xv-3.01/xv.c	Tue Apr 12 15:25:00 1994
+--- xv-3.01-fits/xv.c	Thu Jul 28 12:44:07 1994
+***************
+*** 92,98 ****
+  extern Window pseudo_root();
+  #endif
+  
+- 
+  /* program needs one of the following fonts.  Trys them in ascending order */
+  
+  #define FONT1 "-*-lucida-medium-r-*-*-12-*"
+--- 92,97 ----
+***************
+*** 2414,2419 ****
+--- 2413,2420 ----
+  
+    else if (!strncmp((char *) magicno,"/* XPM */",8)) rv = RFT_XPM;
+  
++   else if (strncmp((char *) magicno, "SIMPLE  ", 8)==0) rv = RFT_FITS;
++ 
+  #ifdef HAVE_JPEG
+    else if (magicno[0]==0xff && magicno[1]==0xd8 && 
+  	   magicno[2]==0xff) rv = RFT_JFIF;
+***************
+*** 2433,2438 ****
+--- 2434,2440 ----
+        rv = RFT_PDSVICAR;
+  #endif
+  
++ 
+  #ifdef GS_PATH
+    else if (magicno[0] == '%' && magicno[1] == '!') rv = RFT_PS;
+  #endif
+***************
+*** 2470,2475 ****
+--- 2472,2478 ----
+    case RFT_IRIS:    rv = LoadIRIS  (fname, pinfo);  break;
+    case RFT_PCX:     rv = LoadPCX   (fname, pinfo);  break;
+    case RFT_XPM:     rv = LoadXPM   (fname, pinfo);  break;
++   case RFT_FITS:    rv = LoadFITS  (fname, pinfo);  break;
+  
+  #ifdef HAVE_JPEG
+    case RFT_JFIF:    rv = LoadJFIF  (fname, pinfo);  break;
+
+=================== CUT THIS - MODIFICATIONS IN XV.H =====================
+
+*** xv-3.01/xv.h	Fri Apr 15 22:27:44 1994
+--- xv-3.01-fits/xv.h	Thu Jul 28 11:37:32 1994
+***************
+*** 136,142 ****
+  #include <stdlib.h>
+  #endif
+  
+- 
+  /* include the appropriate string header file */ 
+  #if defined(SVR4) || defined(__convex__) || defined(VMS)
+  #include <string.h>
+--- 136,141 ----
+***************
+*** 454,478 ****
+  #define F_BMP       6
+  #define F_PS        7
+  #define F_IRIS      8
+  
+  #ifdef HAVE_JPEG
+!  #define F_JPEG      9
+!  #ifdef HAVE_TIFF
+!   #define F_TIFF      10
+!   #define F_XPM       11
+!  #else
+!   #define F_XPM       10
+!  #endif
+  #else
+!  #ifdef HAVE_TIFF
+!   #define F_TIFF      9
+!   #define F_XPM       10
+!  #else
+!   #define F_XPM       9
+!  #endif
+  #endif
+  
+- 
+  /* return values from ReadFileType()
+   * positive values are *definitely* readable formats (HAVE_*** is defined)
+   * negative values are random files that XV can't read, but display as
+--- 453,477 ----
+  #define F_BMP       6
+  #define F_PS        7
+  #define F_IRIS      8
++ #define F_FITS      9
+  
+  #ifdef HAVE_JPEG
+! #define F_JPEG      10
+! #ifdef HAVE_TIFF
+! #define F_TIFF      11
+! #define F_XPM       12
+  #else
+! #define F_XPM       11
+  #endif
++ #else
++ #ifdef HAVE_TIFF
++ #define F_TIFF      10
++ #define F_XPM       11
++ #else
++ #define F_XPM       10
++ #endif
++ #endif
+  
+  /* return values from ReadFileType()
+   * positive values are *definitely* readable formats (HAVE_*** is defined)
+   * negative values are random files that XV can't read, but display as
+***************
+*** 495,500 ****
+--- 494,500 ----
+  #define RFT_COMPRESS 13
+  #define RFT_PS       14
+  #define RFT_XPM      15
++ #define RFT_FITS     16
+  
+  /* definitions for page up/down, arrow up/down list control */
+  #define LS_PAGEUP   0
+***************
+*** 1344,1349 ****
+--- 1344,1352 ----
+  void   InitSpline(int *, int *, int, double *);
+  double EvalSpline(int *, int *, double *, int, double);
+  
++ /**************************** XVFITS.C ***************************/
++ int LoadFITS(char *, int);
++ int WriteFITS(FILE *, byte *, int, int, byte *, byte *, byte *, int, int);
+  
+  /**************************** XVGIF.C ***************************/
+  int LoadGIF(char *, PICINFO *);
+***************
+*** 1601,1606 ****
+--- 1604,1612 ----
+  int    ClickGraf(), GrafKey(), Str2Graf(), SetGrafState();
+  double EvalSpline();
+  
++ /**************************** XVFITS.C ***************************/
++ int LoadFITS();
++ int WriteFITS();
+  
+  /**************************** XVGIF.C ***************************/
+  int LoadGIF();
+
+=================== CUT THIS - MODIFICATIONS IN XVDIR.C ==================
+
+*** xv-3.01/xvdir.c	Tue Apr 12 10:49:59 1994
+--- xv-3.01-fits/xvdir.c	Thu Jul 28 10:01:03 1994
+***************
+*** 83,89 ****
+  #define LISTW  237
+  
+  #define DIRWIDE  350               /* (fixed) size of directory window */
+! #define DIRHIGH  480
+  
+  #define BUTTW   60
+  #define BUTTH   24
+--- 83,89 ----
+  #define LISTW  237
+  
+  #define DIRWIDE  350               /* (fixed) size of directory window */
+! #define DIRHIGH  500
+  
+  #define BUTTW   60
+  #define BUTTH   24
+***************
+*** 220,226 ****
+  	   infofg, infobg,hicol,locol);
+    RBCreate(formatRB, dirW, 26, y+144, "IRIS",
+  	   infofg, infobg,hicol,locol);
+!   y = y + 162;
+  
+  #ifdef HAVE_JPEG
+    RBCreate(formatRB, dirW, 26, y, "JPEG", infofg, infobg,hicol,locol);
+--- 220,228 ----
+  	   infofg, infobg,hicol,locol);
+    RBCreate(formatRB, dirW, 26, y+144, "IRIS",
+  	   infofg, infobg,hicol,locol);
+!   RBCreate(formatRB, dirW, 26, y+162, "FITS",
+!            infofg, infobg,hicol,locol);
+!   y = y + 180;
+  
+  #ifdef HAVE_JPEG
+    RBCreate(formatRB, dirW, 26, y, "JPEG", infofg, infobg,hicol,locol);
+***************
+*** 231,236 ****
+--- 233,239 ----
+    RBCreate(formatRB, dirW, 26, y, "TIFF", infofg, infobg,hicol,locol);
+    y += 18;
+  #endif
++ 
+    RBCreate(formatRB, dirW, 26, y, "XPM", infofg, infobg,hicol,locol);
+    y += 18;
+  
+***************
+*** 363,382 ****
+  int x,y;
+  {
+    BUTT  *bp;
+!   int    bnum,i;
+    char   buf[1024];
+  
+  
+    /* check the RBUTTS first, since they don't DO anything */
+    if ( (bnum=RBClick(formatRB, x,y)) >= 0) { 
+      if (RBTrack(formatRB, bnum)) {
+!       if (RBWhich(formatRB)==4) {  /* turn off all but B/W dithered */
+  	RBSetActive(colorRB,0,0);
+  	RBSetActive(colorRB,1,0);
+  	RBSetActive(colorRB,3,0);
+  	RBSelect(colorRB,2);
+!       }
+!       else {                       /* turn on all but B/W dithered */
+  	RBSetActive(colorRB,0,1);
+  	RBSetActive(colorRB,1,1);
+  	RBSetActive(colorRB,3,(picType==PIC8) ? 1 : 0);
+--- 366,391 ----
+  int x,y;
+  {
+    BUTT  *bp;
+!   int    bnum,i,fmt;
+    char   buf[1024];
+  
+  
+    /* check the RBUTTS first, since they don't DO anything */
+    if ( (bnum=RBClick(formatRB, x,y)) >= 0) { 
++     i = RBTrack(formatRB, bnum);
++     fmt = RBWhich(formatRB);
+      if (RBTrack(formatRB, bnum)) {
+!       if (fmt==4) {  /* turn off all but B/W dithered */
+  	RBSetActive(colorRB,0,0);
+  	RBSetActive(colorRB,1,0);
+  	RBSetActive(colorRB,3,0);
+  	RBSelect(colorRB,2);
+!       } else if (fmt == F_FITS) {
+!         RBSetActive(colorRB,0,0);
+!         RBSetActive(colorRB,1,1);
+!         RBSetActive(colorRB,3,0);
+!         RBSelect(colorRB,1);
+!       } else {
+  	RBSetActive(colorRB,0,1);
+  	RBSetActive(colorRB,1,1);
+  	RBSetActive(colorRB,3,(picType==PIC8) ? 1 : 0);
+***************
+*** 1126,1131 ****
+--- 1135,1143 ----
+  
+    case F_IRIS:
+      rv = WriteIRIS(fp, thepic, ptype, w, h, rp, gp, bp, nc, col);  break;
++ 
++   case F_FITS:
++     rv = WriteFITS(fp, thepic, w, h, rp, gp, bp, nc, col); break;
+    }
+  
+    if (CloseOutFile(fp, fullname, rv) == 0) {
+***************
+*** 1294,1300 ****
+        (strcmp(lowsuf,"jfif")==0) ||
+        (strcmp(lowsuf,"tif" )==0) ||
+        (strcmp(lowsuf,"tiff")==0) ||
+!       (strcmp(lowsuf,"xpm" )==0)) {
+  
+      /* found one.  set lowsuf = to the new suffix, and tack on to filename */
+  
+--- 1306,1313 ----
+        (strcmp(lowsuf,"jfif")==0) ||
+        (strcmp(lowsuf,"tif" )==0) ||
+        (strcmp(lowsuf,"tiff")==0) ||
+!       (strcmp(lowsuf,"xpm" )==0) ||
+!       (strcmp(lowsuf,"fits" )==0)) {
+  
+      /* found one.  set lowsuf = to the new suffix, and tack on to filename */
+  
+***************
+*** 1317,1322 ****
+--- 1330,1336 ----
+      case F_BMP:      strcpy(lowsuf,"bmp");  break;
+      case F_PS:       strcpy(lowsuf,"ps");   break;
+      case F_IRIS:     strcpy(lowsuf,"rgb");  break;
++     case F_FITS:     strcpy(lowsuf,"fits"); break;
+  
+  #ifdef HAVE_JPEG
+      case F_JPEG:     strcpy(lowsuf,"jpg");  break;
+
+=================== CUT THIS - MODIFICATIONS IN XVBROWSE.C ===============
+
+*** xv-3.01/xvbrowse.c	Fri Apr 15 02:27:27 1994
+--- xv-3.01-fits/xvbrowse.c	Wed Jul 27 11:18:32 1994
+***************
+*** 98,105 ****
+  #include "bitmaps/br_tiff.xbm"
+  #include "bitmaps/br_pds.xbm"
+  #include "bitmaps/br_ps.xbm"
+  
+- 
+  #include "bitmaps/fcurs.xbm"
+  #include "bitmaps/fccurs.xbm"
+  #include "bitmaps/fcursm.xbm"
+--- 98,105 ----
+  #include "bitmaps/br_tiff.xbm"
+  #include "bitmaps/br_pds.xbm"
+  #include "bitmaps/br_ps.xbm"
++ #include "bitmaps/br_fits.xbm"
+  
+  #include "bitmaps/fcurs.xbm"
+  #include "bitmaps/fccurs.xbm"
+  #include "bitmaps/fcursm.xbm"
+***************
+*** 132,138 ****
+  #define BF_COMPRESS 21
+  #define BF_PS       22
+  #define BF_XPM      23
+! #define BF_MAX      24    /* # of built-in icons */
+  
+  #define ISLOADABLE(ftyp) (ftyp!=BF_DIR  && ftyp!=BF_CHR && ftyp!=BF_BLK && \
+  			  ftyp!=BF_SOCK && ftyp!=BF_FIFO) 
+--- 132,139 ----
+  #define BF_COMPRESS 21
+  #define BF_PS       22
+  #define BF_XPM      23
+! #define BF_FITS     24
+! #define BF_MAX      25    /* # of built-in icons */
+  
+  #define ISLOADABLE(ftyp) (ftyp!=BF_DIR  && ftyp!=BF_CHR && ftyp!=BF_BLK && \
+  			  ftyp!=BF_SOCK && ftyp!=BF_FIFO) 
+***************
+*** 606,612 ****
+--- 607,617 ----
+  			br_ps_bits,br_ps_width,
+  			br_ps_height, 1,0,1);
+  
++   bfIcons[BF_FITS] = XCreatePixmapFromBitmapData(theDisp, br->win, 
++ 			br_fits_bits,br_fits_width,
++ 			br_fits_height, 1,0,1);
+  
++ 
+    /* check that they all got built */
+    for (i=0; i<BF_MAX && bfIcons[i]; i++);
+    if (i<BF_MAX) 
+***************
+*** 2909,2914 ****
+--- 2914,2920 ----
+      case RFT_PDSVICAR: bf->ftype = BF_PDS;      break;
+      case RFT_COMPRESS: bf->ftype = BF_COMPRESS; break;
+      case RFT_PS:       bf->ftype = BF_PS;       break;
++     case RFT_FITS:     bf->ftype = BF_FITS;     break;
+      }
+    }
+  }
+***************
+*** 3413,3418 ****
+--- 3419,3425 ----
+    case RFT_TIFF:     strcat(str,"TIFF file");             break;
+    case RFT_PDSVICAR: strcat(str,"PDS/VICAR file");        break;
+    case RFT_PS:       strcat(str,"PostScript file");       break;
++   case RFT_FITS:     strcat(str,"Fits file");             break;
+    default:           strcat(str,"file of unknown type");  break;
+    }
+    
+=================== CUT THIS - XVFITS.C CODE ===============
+
+/*
+ * xvfits.c - load/save routines for 'fits' format images
+ *
+ * LoadFITS(fname, pinfo)  -  loads a FITS file
+ * WriteFITS(fp, pic, w, h, rmap, gmap, bmap, numcols, style)
+ */
+
+/*
+ * Copyright 1992 by David Robinson.
+ * Modified  1994 by Charles Rite'
+ * The software may be modified for your own purposes.
+ */
+#include "xv.h"
+
+#define NCARDS (36)
+#define BLOCKSIZE (2880)
+
+/* data types */
+enum datatype { T_INT, T_LOG, T_NOVAL };
+
+typedef struct {
+   FILE *fp;             /* file pointer */
+   int bitpix, size;     /* number of bits per pixel, sizeof(unit) */
+   int naxis;            /* number of axes */
+   long int axes[2];     /* size of each axis */
+   long int ndata;       /* number of elements in data */
+   long int cpos;        /* current position in data file */
+} FITS;
+
+
+/* Function prototypes */
+#ifndef __STDC__
+#define __(x) ()
+#else
+#define __(x) x
+#endif
+
+static char *ftopen2d __((FITS *fs, char *file, int *nx, int *ny,
+    int *bitpix));
+static void ftclose __((FITS *fs));
+static char *ftgbyte __((FITS *fs, unsigned char *buffer, int nelem));
+static char *rdheader __((FITS *fs));
+static char *wrheader __((FILE *fp, int nx, int ny));
+static char *rdcard __((char *card, char *name, enum datatype dtype,
+    long int *kvalue));
+static void wrcard __((char *card, char *name, enum datatype dtype,
+    int kvalue));
+static char *ftgdata __((FITS *fs, void *buffer, int nelem));
+static char *ftfixdata __((FITS *fs, void *buffer, int nelem));
+static void flip __((byte *buffer, int nx, int ny));
+
+#undef __
+
+/*******************************************/
+int LoadFITS(fname,pinfo)
+     char *fname;
+     PICINFO *pinfo;
+/*******************************************/
+{
+  FITS fs;
+  int i, nx, ny, bitpix, np;
+  byte  r[256],g[256],b[256];
+  byte *image;
+  char *error;
+
+  pinfo->pic     = (byte *) NULL;
+  pinfo->comment = (char *) NULL;
+
+  error = ftopen2d(&fs, fname, &nx, &ny, &bitpix);
+  if (error != NULL)
+  {
+      SetISTR(ISTR_WARNING, "%s", error);
+      return 0;
+  }
+
+  sprintf(formatStr, "%dx%d FITS", nx, ny);
+  SetDirRButt(F_FORMAT, F_FITS);
+  SetISTR(ISTR_FORMAT,"FITS, bitpix: %d", bitpix);
+
+  np = nx*ny;
+/* allocate memory for image and read it in */
+  image = (byte *)malloc(np);
+
+  if (image == NULL) FatalError("Insufficient memory");
+
+  error = ftgbyte(&fs, image, np);
+  ftclose(&fs);
+
+  if (error != NULL)
+  {
+      free(image);
+      SetISTR(ISTR_WARNING, "%s", error);
+      return 0;
+  }
+
+/* There seems to be a convention that fits files be displayed using
+ * a cartesian coordinate system. Thus the first pixel is in the lower left
+ * corner. Fix this by reflecting in the line y=ny/2.
+ */
+  flip(image, nx, ny);
+
+/* sucess ! */
+  pinfo->pic = image;
+  pinfo->frmType = F_FITS;
+  pinfo->type = PIC8;
+  pinfo->w = nx;
+  pinfo->h = ny;
+  pWIDE = nx;
+  pHIGH = ny;
+  for (i=0; i < 256; i++) {
+  r[i] = g[i] = b[i] = i;
+  pinfo->r[i] = i;
+  pinfo->g[i] = i;
+  pinfo->b[i] = i; 
+  }
+  return 1;
+}
+
+/*******************************************/
+int WriteFITS(fp, image, w, h, rmap, gmap, bmap, numcols, colorstyle)
+     FILE *fp;
+     byte *image;
+     int   w, h;
+     byte *rmap, *gmap, *bmap;
+     int   numcols, colorstyle;
+/*******************************************/
+{
+    register int i, j, np, nend;
+    register byte *ptr;
+    char *error;
+    byte rgb[256];
+
+    error = wrheader(fp, w, h);
+    if (error != NULL)
+    {
+	SetISTR(ISTR_WARNING, "%s", error);
+	return 1;
+    }
+
+    for (i=0; i < numcols; i++)
+	rgb[i] = MONO(rmap[i], gmap[i], bmap[i]);
+
+/* flip line ordering when writing out */
+    for (i=h-1; i >= 0; i--)
+    {
+	ptr = &image[i*w];
+	for (j=0; j < w; j++, ptr++)
+	    putc(rgb[*ptr], fp);
+    }
+
+    np = w*h;
+/* nend is the number of padding characters at the end of the last block */
+    nend = ((np+BLOCKSIZE-1)/BLOCKSIZE)*BLOCKSIZE - np;
+
+    if (nend) for (i=0; i < nend; i++) putc('\0', fp);
+
+    return 0;
+}
+
+
+/* Writes a minimalist FITS file header */
+static char *wrheader(fp, nx, ny)
+FILE *fp;
+int nx, ny;
+{
+    char *block;
+    int i;
+
+    block = malloc(BLOCKSIZE);
+    if (block == NULL) return "Insufficient memory for workspace";
+    memset(block, ' ', BLOCKSIZE);
+
+    i = 0;
+    wrcard(&block[80*i++], "SIMPLE", T_LOG, 1);   /* write SIMPLE keyword */
+    wrcard(&block[80*i++], "BITPIX", T_INT, 8);   /* write BITPIX keyword */
+    wrcard(&block[80*i++], "NAXIS", T_INT, 2);    /* write NAXIS keyword */
+    wrcard(&block[80*i++], "NAXIS1", T_INT, nx);  /* write NAXIS1 keyword */
+    wrcard(&block[80*i++], "NAXIS2", T_INT, ny);  /* write NAXIS2 keyword */
+    wrcard(&block[80*i++], "END", T_NOVAL, 0);    /* write END keyword */
+    i = fwrite(block, sizeof(char), BLOCKSIZE, fp);
+    if (i != BLOCKSIZE) return "Error writing FITS file";
+    return NULL;
+}
+
+/* open a 2-dimensional fits file.
+ * Stores the dimensions of the file in nx and ny, and updates the FITS
+ * structure passed in fs.
+ * If successful, returns NULL otherwise returns an error message.
+ * Will return an error message if the primary data unit is not a 2-dimensional
+ * array.
+ */
+static char *ftopen2d(fs, file, nx, ny, bitpix)
+FITS *fs;
+char *file;
+int *nx, *ny, *bitpix;
+{
+    FILE *fp;
+    int naxis, i;
+    char *error;
+    
+    fp = fopen(file, "rb");
+    if (fp == NULL) return "Unable to open FITS file";
+
+    fs->fp = fp;
+    fs->bitpix = 0;
+    fs->naxis = 0;
+    fs->cpos = 0;
+
+/* read header */
+    error = rdheader(fs);
+
+    if (error != NULL)
+    {
+	ftclose(fs);
+	return error;
+    }
+
+/* get number of data */
+    fs->ndata = 1;
+    for (i=0; i < fs->naxis; i++) fs->ndata = fs->ndata*fs->axes[i];
+    
+    naxis = fs->naxis;
+
+    *nx = fs->axes[0];
+    *ny = fs->axes[1];
+    *bitpix = fs->bitpix;
+
+    return error;
+}
+
+/* closes a fits file */
+static void ftclose(fs)
+FITS *fs;
+{
+    if (fs == NULL) return;
+    if (fs->fp != NULL) fclose(fs->fp);
+}
+
+/* reads the fits header, and updates the FITS structure fs.
+ * Returns NULL on success, or an error message otherwise.
+ */
+static char *rdheader(fs)
+FITS *fs;
+{
+    int i, j, res;
+    char name[9];
+    char *block;
+    char *error;
+    long int val;         /* the value */
+
+    block = malloc(BLOCKSIZE);
+    if (block == NULL) return "Insufficient memory for workspace";
+
+    res = fread(block, sizeof(char), BLOCKSIZE, fs->fp);
+    if (res != BLOCKSIZE) return "Error reading FITS file";
+    i = 0;
+
+/* read SIMPLE key */
+    error = rdcard(block, "SIMPLE", T_LOG, &val);
+    if (error != NULL) return error;
+    if (val == 0) return "Not a SIMPLE FITS file";
+    i++;
+
+/* read BITPIX key */
+    error = rdcard(&block[80], "BITPIX", T_INT, &val);
+    if (error != NULL) return error;
+    if (val != 8 && val != 16 && val != 32 && val != 64 && val != -32 &&
+	val != -64)
+	   return "Bad BITPIX value in FITS file";
+    fs->bitpix = val;
+    j = fs->bitpix;
+    if (j < 0) j = -j;
+    fs->size = j/8;
+    i++;
+
+/* read NAXIS key */
+    error = rdcard(&block[2*80], "NAXIS", T_INT, &val);
+    if (error != NULL) return error;
+    if (val < 0 || val > 999)
+	return "Bad NAXIS value in FITS file";
+    if (val < 2) return "FITS file is not a two-dimensional image";
+    fs->naxis = val;
+    i++;
+
+/* read NAXISnnn keys.
+ * We allow NAXIS to be > 2 iff the dimensions of the extra axes are 1
+ */
+    for (j=0; j < fs->naxis; j++)
+    {
+	if (i == NCARDS)
+	{
+	    res = fread(block, sizeof(char), BLOCKSIZE, fs->fp);
+	    if (res != BLOCKSIZE) return "Error reading FITS file";
+	    i = 0;
+	}
+
+	sprintf(name, "NAXIS%d", j+1);
+	error = rdcard(&block[i*80], name, T_INT, &val);
+	if (error != NULL) return error;
+	if (val < 0) return "Bad NAXISn value in FITS file";
+	if (j < 2) fs->axes[j] = val;
+	else if (val != 1) return "FITS file is not a two-dimensional image";
+	i++;
+    }
+    fs->naxis = 2;
+
+/* do remainder */
+    for (;;)
+    {
+	if (i == NCARDS)
+	{
+	    res = fread(block, sizeof(char), BLOCKSIZE, fs->fp);
+	    if (res != BLOCKSIZE) return "Unexpected eof in FITS file";
+	    i = 0;
+	}
+	if (strncmp(&block[i*80], "END     ", 8) == 0) break;
+	i++;
+    }
+    free(block);
+    return NULL;
+}
+
+/* write a header record into the 80 byte buffer card.
+ * The keyword name is passed in name. The value type is in dtype; this
+ * can have the following values:
+ *    dtype = T_NOVAL
+ *         no keyword value is written
+ *    dtype = T_LOG
+ *         a logical value, either 'T' or 'F' in column 30 is written
+ *    dtype = T_INT
+ *         an integer is written, right justified in columns 11-30
+ */
+static void wrcard(card, name, dtype, kvalue)
+char *card, *name;
+enum datatype dtype;   /* type of value */
+int kvalue;
+{
+    int l;
+    memset(card, ' ', 80);
+    l = strlen(name);
+    if (l) memcpy(card, name, l);   /* copy name */
+
+    if (dtype == T_NOVAL) return;
+
+    card[8] = '=';
+
+    if (dtype == T_LOG)
+	card[29] = kvalue ? 'T' : 'F';
+    else /* an integer */
+    {
+	sprintf(&card[10], "%20d", kvalue);
+	card[30] = ' ';
+    }
+
+}
+
+/* Read a header record, from the 80 byte buffer card.
+ * the keyword name must match 'name'; and parse its value according to
+ * dtype. This can have the following values:
+ *    dtype = T_LOG
+ *        value is logical, either 'T' or 'F' in column 30.
+ *    dtype = T_INT
+ *        value is an integer, right justified in columns 11-30.
+ *
+ * The value is stored in kvalue.
+ * It returns NULL on success, or an error message otherwise.
+ */
+static char *rdcard(card, name, dtype, kvalue)
+char *card, *name;
+enum datatype dtype;   /* type of value */
+long int *kvalue;
+{
+    int i, ptr;
+    char namestr[9];
+    static char error[45];
+
+    memcpy(namestr, card, 8);
+    i = 8;
+    do i--; while (i >= 0 && namestr[i] == ' ');
+    namestr[i+1] = '\0';
+
+    if (strcmp(namestr, name) != 0)
+    {
+	sprintf(error, "Keyword %s not found in FITS file", name);
+	return error;
+    }
+
+/* get start of value */
+    ptr = 10;
+    while (ptr < 80 && card[ptr] == ' ') ptr++;
+    if (ptr == 80) return "FITS file has missing keyword value"; /* no value */
+
+    if (dtype == T_LOG)
+    {
+	if (ptr != 29 || (card[29] != 'T' && card[29] != 'F'))
+	    return "Keyword has bad logical value in FITS file";
+	*kvalue = (card[29] == 'T');
+    } else /* an integer */
+    {
+	int j;
+	long int ival;
+	char num[21];
+
+	if (ptr > 29) return "Keyword has bad integer value in FITS file";
+	memcpy(num, &card[ptr], 30-ptr);
+	num[30-ptr] = '\0';
+	j = sscanf(num, "%ld", &ival);
+	if (j != 1) return "Keyword has bad integer value in FITS file";
+	*kvalue = ival;
+    }
+
+    return NULL;
+}
+
+/* reads nelem values into the buffer.
+ * returns NULL for success or an error message.
+ * Copes with the fact that the last 2880 byte record of the FITS file
+ * may be truncated, and should be padded out with zeros.
+ */
+static char *ftgdata(fs, buffer, nelem)
+FITS *fs;
+void *buffer;
+int nelem;
+{
+    int res;
+
+    if (nelem == 0) return NULL;
+
+    res = fread(buffer, fs->size, nelem, fs->fp);
+/* if failed to read all the data */
+    if (res != nelem)
+    {
+/* nblock is the number of elements in a record. size is always a factor of
+   BLOCKSIZE */
+	int loffs, nblock=BLOCKSIZE/fs->size;
+
+	if (!feof(fs->fp)) return "I/O error reading FITS file";
+
+/*
+ * the last record might be short; check this.
+ * loffs is the offset of the start of the last record from the current
+ * position.
+ */
+	loffs = ((fs->ndata+nblock-1)/nblock - 1)*nblock - fs->cpos;
+/* if we didn't read to the end of the penultimate record */
+	if (res < loffs) return "Unexpected eof reading FITS file";
+/* pad with zeros */
+	memset((char *)buffer+res*fs->size, '\0', (nelem-res)*fs->size);
+    }
+    fs->cpos += res;
+    return ftfixdata(fs, buffer, nelem);
+}
+
+/* convert the raw data, as stored in the FITS file, to the format
+ * appropiate for the data representation of the host computer.
+ * Assumes that
+ *  short int = 2 byte integer
+ *  int       = 4 byte integer
+ */
+static char *ftfixdata(fs, buffer, nelem)
+FITS *fs;
+void *buffer;
+int nelem;
+{
+    register int i, n=nelem;
+    register unsigned char *ptr=buffer;
+
+/* conversions. Although the data may be signed, reverse using unsigned 
+   variables */
+/* convert from big-endian two-byte signed integer to native form */
+    if (fs->bitpix == 16)
+	for (i=0; i < n; i++, ptr+=2)
+	    *(unsigned short int *)ptr = (((int)*ptr) << 8) | (int)(ptr[1]);
+/* convert from big-endian four-byte signed integer to native form */
+    else if (fs->bitpix == 32)
+	for (i=0; i < n; i++, ptr+=4)
+	    *(unsigned int *)ptr = (((unsigned int)*ptr) << 24) |
+		                   ((unsigned int)ptr[1] << 16) |
+				   ((unsigned int)ptr[2] << 8)  |
+				   (unsigned int)ptr[3];
+/* convert from IEE 754 single precision to native form */
+    else if (fs->bitpix == -32)
+    {
+	register int j, k, expo;
+	static float *exps=NULL;
+
+	if (exps == NULL)
+	{
+	    exps = (float *)calloc(256, sizeof(float));
+	    if (exps == NULL) return "Insufficient memory for workspace";
+	    exps[150] = 1.;
+	    for (i=151; i < 256; i++) exps[i] = 2.*exps[i-1];
+	    for (i=149; i >= 0; i--) exps[i] = 0.5*exps[i+1];
+	}
+	      
+
+	for (i=0; i < n; i++, ptr+=4)
+	{
+	    k = (int)*ptr;
+	    j = ((int)ptr[1] << 16) | ((int)ptr[2] << 8) | (int)ptr[3];
+	    expo = ((k & 127) << 1) | (j >> 23);
+	    if ((expo | j) == 0) *(float *)ptr = 0.;
+	    else 
+		*(float *)ptr = exps[expo]*(float)(j | 0x800000);
+	    if (k & 128) *(float *)ptr = - *(float *)ptr;
+	}
+/* convert from IEE 754 double precision to native form */
+    } else if (fs->bitpix == -64)
+    {
+	register int expo, k, l;
+	register unsigned int j;
+	static double *exps=NULL;
+
+	if (exps == NULL)
+	{
+	    exps = (double *)calloc(2048, sizeof(double));
+	    if (exps == NULL) return "Insufficient memory for workspace";
+	    exps[1075] = 1.;
+	    for (i=1076; i < 2048; i++) exps[i] = 2.*exps[i-1];
+	    for (i=1074; i >= 0; i--) exps[i] = 0.5*exps[i+1];
+	}
+	      
+	for (i=0; i < n; i++, ptr+=8)
+	{
+	    k = (int)*ptr;
+	    j = ((unsigned int)ptr[1] << 24) | ((unsigned int)ptr[2] << 16) |
+		((unsigned int)ptr[3] << 8) | (unsigned int)ptr[4];
+	    l = ((int)ptr[5] << 16) | ((int)ptr[6] << 8) | (int)ptr[7];
+	    expo = ((k & 127) << 4) | (j >> 28);
+	    if ((expo | j | l) == 0) *(double *)ptr = 0.;
+	    else 
+		*(double *)ptr = exps[expo] * (16777216. *
+			    (double)((j&0x0FFFFFFF)|0x10000000) + (double)l);
+	    if (k & 128) *(double *)ptr = - *(double *)ptr;
+	}
+    }
+    return NULL;
+}
+
+#define maxmin(x, max, min) {\
+ maxmin_t=x; if(maxmin_t > max) max=maxmin_t; if (maxmin_t<min) min=maxmin_t;}
+
+/* Reads a byte image from the FITS file fs. The image contains nelem pixels.
+ * If bitpix = 8, then the image is loaded as stored in the file.
+ * Otherwise, it is rescaled so that the minimum value is stored as 0, and
+ * the maximum is stored as 255
+ */
+static char *ftgbyte(fs, cbuff, nelem)
+FITS *fs;
+unsigned char *cbuff;
+int nelem;
+{
+    void *voidbuff;
+    register int i, n=nelem;
+    char *error;
+
+/* if the data is unsigned char, then read it directly */
+    if (fs->bitpix == 8) return ftgdata(fs, cbuff, nelem);
+
+/* allocate a buffer to store the image */
+    voidbuff = (void *)malloc(nelem*fs->size);
+    if (voidbuff == NULL) return "Insufficient memory for workspace";
+    error = ftgdata(fs, voidbuff, nelem);
+    if (error != NULL) return error;
+
+/* convert short int to unsigned char */
+    if (fs->bitpix == 16)
+    {
+	register short int *buffer=voidbuff;
+	register int max, min, maxmin_t;
+	register float scale;
+
+	min = max = buffer[0];
+	for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
+	scale = (max == min) ? 0. : 255./(float)(max-min);
+
+/* rescale and convert */
+	for (i=0, buffer=voidbuff; i < n; i++)
+	    cbuff[i] = (unsigned char)(scale*(float)((int)buffer[i]-min));
+
+/* convert long int to unsigned char */
+    } else if (fs->bitpix == 32)
+    {
+	register int *buffer=voidbuff;
+	register int max, min, maxmin_t;
+	register float scale;
+
+	min = max = buffer[0];
+	for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
+	scale = (max == min) ? 0. : 255./(float)(max-min);
+
+/* rescale and convert */
+	for (i=0, buffer=voidbuff; i < n; i++)
+	    cbuff[i] = (unsigned char)(scale*(float)(buffer[i]-min));
+
+/* convert float to unsigned char */
+    } else if (fs->bitpix == -32)
+    {
+	register float *buffer=voidbuff;
+	register float max, min, maxmin_t, scale;
+
+	min = max = buffer[0];
+	for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
+	scale = (max == min) ? 0. : 255./(max-min);
+
+/* rescale and convert */
+	for (i=0, buffer=voidbuff; i < n; i++)
+	    cbuff[i] = (unsigned char)(scale*(buffer[i]-min));
+
+/* convert double to unsigned char */
+    } else if (fs->bitpix == -64)
+    {
+	register double *buffer=voidbuff;
+	register double max, min, maxmin_t, scale;
+
+	min = max = buffer[0];
+	for (i=1; i < n; i++, buffer++) maxmin(*buffer, max, min);
+	scale = (max == min) ? 0. : 255./(max-min);
+
+/* rescale and convert */
+	for (i=0, buffer=voidbuff; i < n; i++)
+	    cbuff[i] = (unsigned char)(scale*(buffer[i]-min));
+    }
+
+    free(voidbuff);
+    return NULL;
+}
+
+#undef maxmin
+
+/* reverse order of lines in image */
+static void flip(buffer, nx, ny)
+byte *buffer;
+int nx;
+int ny;
+{
+    int i;
+    register int j, v;
+    register byte *buff1, *buff2;
+
+    for (i=0; i < ny/2; i++)
+    {
+	buff1 = &buffer[i*nx];
+	buff2 = &buffer[(ny-1-i)*nx];
+	for (j=0; j < nx; j++)
+	{
+	    v = *buff1;
+	    *(buff1++) = *buff2;
+	    *(buff2++) = v;
+	}
+    }
+}
+==================== CUT HERE ======= END OF CODE ========================

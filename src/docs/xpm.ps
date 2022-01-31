@@ -1,0 +1,6982 @@
+%!PS-Adobe-3.0
+%%BoundingBox: (atend)
+%%Pages: (atend)
+%%PageOrder: (atend)
+%%DocumentFonts: (atend)
+%%Creator: Frame 4.0
+%%DocumentData: Clean7Bit
+%%EndComments
+%%BeginProlog
+%
+% Frame ps_prolog 4.0, for use with Frame 4.0 products
+% This ps_prolog file is Copyright (c) 1986-1993 Frame Technology
+% Corporation.  All rights reserved.  This ps_prolog file may be
+% freely copied and distributed in conjunction with documents created
+% using FrameMaker, FrameBuilder and FrameViewer as long as this 
+% copyright notice is preserved.
+%
+% Frame products normally print colors as their true color on a color printer
+% or as shades of gray, based on luminance, on a black-and white printer. The
+% following flag, if set to True, forces all non-white colors to print as pure
+% black. This has no effect on bitmap images.
+/FMPrintAllColorsAsBlack             false def
+%
+% Frame products can either set their own line screens or use a printer's 
+% default settings. Three flags below control this separately for no 
+% separations, spot separations and process separations. If a flag
+% is true, then the default printer settings will not be changed. If it is
+% false, Frame products will use their own settings from a table based on
+% the printer's resolution.
+/FMUseDefaultNoSeparationScreen      true  def
+/FMUseDefaultSpotSeparationScreen    true  def
+/FMUseDefaultProcessSeparationScreen false def
+%
+% For any given PostScript printer resolution, Frame products have two sets of 
+% screen angles and frequencies for printing process separations, which are 
+% recomended by Adobe. The following variable chooses the higher frequencies
+% when set to true or the lower frequencies when set to false. This is only
+% effective if the appropriate FMUseDefault...SeparationScreen flag is false.
+/FMUseHighFrequencyScreens true def
+%
+% PostScript Level 2 printers contain an "Accurate Screens" feature which can
+% improve process separation rendering at the expense of compute time. This 
+% flag is ignored by PostScript Level 1 printers.
+/FMUseAcccurateScreens true def
+%
+% The following PostScript procedure defines the spot function that Frame
+% products will use for process separations. You may un-comment-out one of
+% the alternative functions below, or use your own.
+%
+% Dot function
+/FMSpotFunction {abs exch abs 2 copy add 1 gt 
+		{1 sub dup mul exch 1 sub dup mul add 1 sub }
+		{dup mul exch dup mul add 1 exch sub }ifelse } def
+%
+% Line function
+% /FMSpotFunction { pop } def
+%
+% Elipse function
+% /FMSpotFunction { dup 5 mul 8 div mul exch dup mul exch add 
+%		sqrt 1 exch sub } def
+%
+%
+/FMversion (4.0) def 
+/FMLevel1 /languagelevel where {pop languagelevel} {1} ifelse 2 lt def
+/FMPColor
+	FMLevel1 {
+		false
+		/colorimage where {pop pop true} if
+	} {
+		true
+	} ifelse
+def
+/FrameDict 400 dict def 
+systemdict /errordict known not {/errordict 10 dict def
+		errordict /rangecheck {stop} put} if
+% The readline in PS 23.0 doesn't recognize cr's as nl's on AppleTalk
+FrameDict /tmprangecheck errordict /rangecheck get put 
+errordict /rangecheck {FrameDict /bug true put} put 
+FrameDict /bug false put 
+mark 
+% Some PS machines read past the CR, so keep the following 3 lines together!
+currentfile 5 string readline
+00
+0000000000
+cleartomark 
+errordict /rangecheck FrameDict /tmprangecheck get put 
+FrameDict /bug get { 
+	/readline {
+		/gstring exch def
+		/gfile exch def
+		/gindex 0 def
+		{
+			gfile read pop 
+			dup 10 eq {exit} if 
+			dup 13 eq {exit} if 
+			gstring exch gindex exch put 
+			/gindex gindex 1 add def 
+		} loop
+		pop 
+		gstring 0 gindex getinterval true 
+		} bind def
+	} if
+/FMshowpage /showpage load def
+/FMquit /quit load def
+/FMFAILURE { 
+	dup = flush 
+	FMshowpage 
+	/Helvetica findfont 12 scalefont setfont
+	72 200 moveto
+	show FMshowpage 
+	FMquit 
+	} def 
+/FMVERSION {
+	FMversion ne {
+		(Frame product version does not match ps_prolog!) FMFAILURE
+		} if
+	} def 
+/FMBADEPSF { 
+	(PostScript Lang. Ref. Man., 2nd Ed., H.2.4 says EPS must not call X              )
+	dup dup (X) search pop exch pop exch pop length 
+	4 -1 roll 
+	putinterval 
+	FMFAILURE
+	} def
+/FMLOCAL {
+	FrameDict begin
+	0 def 
+	end 
+	} def 
+/concatprocs
+	{
+	/proc2 exch cvlit def/proc1 exch cvlit def/newproc proc1 length proc2 length add array def
+	newproc 0 proc1 putinterval newproc proc1 length proc2 putinterval newproc cvx
+}def
+FrameDict begin 
+/FMnone 0 def
+/FMcyan 1 def
+/FMmagenta 2 def
+/FMyellow 3 def
+/FMblack 4 def
+/FMcustom 5 def
+/FrameNegative false def 
+/FrameSepIs FMnone def 
+/FrameSepBlack 0 def
+/FrameSepYellow 0 def
+/FrameSepMagenta 0 def
+/FrameSepCyan 0 def
+/FrameSepRed 1 def
+/FrameSepGreen 1 def
+/FrameSepBlue 1 def
+/FrameCurGray 1 def
+/FrameCurPat null def
+/FrameCurColors [ 0 0 0 1 0 0 0 ] def 
+/FrameColorEpsilon .001 def	
+/eqepsilon {		
+	sub dup 0 lt {neg} if
+	FrameColorEpsilon le
+} bind def
+/FrameCmpColorsCMYK { 
+	2 copy 0 get exch 0 get eqepsilon {
+		2 copy 1 get exch 1 get eqepsilon {
+			2 copy 2 get exch 2 get eqepsilon {
+				3 get exch 3 get eqepsilon
+			} {pop pop false} ifelse
+		}{pop pop false} ifelse
+	} {pop pop false} ifelse
+} bind def
+/FrameCmpColorsRGB { 
+	2 copy 4 get exch 0 get eqepsilon {
+		2 copy 5 get exch 1 get eqepsilon {
+			6 get exch 2 get eqepsilon
+		}{pop pop false} ifelse
+	} {pop pop false} ifelse
+} bind def
+/RGBtoCMYK { 
+	1 exch sub 
+	3 1 roll 
+	1 exch sub 
+	3 1 roll 
+	1 exch sub 
+	3 1 roll 
+	3 copy 
+	2 copy 
+	le { pop } { exch pop } ifelse 
+	2 copy 
+	le { pop } { exch pop } ifelse 
+	dup dup dup 
+	6 1 roll 
+	4 1 roll 
+	7 1 roll 
+	sub 
+	6 1 roll 
+	sub 
+	5 1 roll 
+	sub 
+	4 1 roll 
+} bind def
+/CMYKtoRGB { 
+	dup dup 4 -1 roll add 						  
+	5 1 roll 3 -1 roll add 						  
+	4 1 roll add 								  
+	1 exch sub dup 0 lt {pop 0} if 3 1 roll 	  
+	1 exch sub dup 0 lt {pop 0} if exch 	      
+	1 exch sub dup 0 lt {pop 0} if exch	  		  
+} bind def
+/FrameSepInit {
+	1.0 RealSetgray
+} bind def
+/FrameSetSepColor { 
+	/FrameSepBlue exch def
+	/FrameSepGreen exch def
+	/FrameSepRed exch def
+	/FrameSepBlack exch def
+	/FrameSepYellow exch def
+	/FrameSepMagenta exch def
+	/FrameSepCyan exch def
+	/FrameSepIs FMcustom def
+	setCurrentScreen	
+} bind def
+/FrameSetCyan {
+	/FrameSepBlue 1.0 def
+	/FrameSepGreen 1.0 def
+	/FrameSepRed 0.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 1.0 def
+	/FrameSepIs FMcyan def
+	setCurrentScreen	
+} bind def
+ 
+/FrameSetMagenta {
+	/FrameSepBlue 1.0 def
+	/FrameSepGreen 0.0 def
+	/FrameSepRed 1.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 1.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMmagenta def
+	setCurrentScreen
+} bind def
+ 
+/FrameSetYellow {
+	/FrameSepBlue 0.0 def
+	/FrameSepGreen 1.0 def
+	/FrameSepRed 1.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 1.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMyellow def
+	setCurrentScreen
+} bind def
+ 
+/FrameSetBlack {
+	/FrameSepBlue 0.0 def
+	/FrameSepGreen 0.0 def
+	/FrameSepRed 0.0 def
+	/FrameSepBlack 1.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMblack def
+	setCurrentScreen
+} bind def
+ 
+/FrameNoSep { 
+	/FrameSepIs FMnone def
+	setCurrentScreen
+} bind def
+/FrameSetSepColors { 
+	FrameDict begin
+	[ exch 1 add 1 roll ]
+	/FrameSepColors  
+	exch def end
+	} bind def
+/FrameColorInSepListCMYK { 
+	FrameSepColors {  
+       		exch dup 3 -1 roll 
+       		FrameCmpColorsCMYK 
+       		{ pop true exit } if
+    	} forall 
+	dup true ne {pop false} if
+	} bind def
+/FrameColorInSepListRGB { 
+	FrameSepColors {  
+       		exch dup 3 -1 roll 
+       		FrameCmpColorsRGB 
+       		{ pop true exit } if
+    	} forall 
+	dup true ne {pop false} if
+	} bind def
+/RealSetgray /setgray load def
+/RealSetrgbcolor /setrgbcolor load def
+/RealSethsbcolor /sethsbcolor load def
+end 
+/setgray { 
+	FrameDict begin
+	FrameSepIs FMnone eq
+		{ RealSetgray } 
+		{ 
+		FrameSepIs FMblack eq 
+			{ RealSetgray } 
+			{ FrameSepIs FMcustom eq 
+			  FrameSepRed 0 eq and
+			  FrameSepGreen 0 eq and
+			  FrameSepBlue 0 eq and {
+			  	RealSetgray
+			  } {
+				1 RealSetgray pop 
+			  } ifelse
+			} ifelse
+		} ifelse
+	end
+} bind def
+/setrgbcolor { 
+	FrameDict begin
+	FrameSepIs FMnone eq
+	{  RealSetrgbcolor }
+	{
+		3 copy [ 4 1 roll ] 
+		FrameColorInSepListRGB
+		{
+				FrameSepBlue eq exch 
+			 	FrameSepGreen eq and exch 
+			 	FrameSepRed eq and
+			 	{ 0 } { 1 } ifelse
+		}
+		{
+			FMPColor {
+				RealSetrgbcolor
+				currentcmykcolor
+			} {
+				RGBtoCMYK
+			} ifelse
+			FrameSepIs FMblack eq
+			{1.0 exch sub 4 1 roll pop pop pop} {
+			FrameSepIs FMyellow eq
+			{pop 1.0 exch sub 3 1 roll pop pop} {
+			FrameSepIs FMmagenta eq
+			{pop pop 1.0 exch sub exch pop } {
+			FrameSepIs FMcyan eq
+			{pop pop pop 1.0 exch sub } 
+			{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+		} ifelse
+		RealSetgray
+	} 
+	ifelse
+	end
+} bind def
+/sethsbcolor {
+	FrameDict begin
+	FrameSepIs FMnone eq 
+	{ RealSethsbcolor } 
+	{
+		RealSethsbcolor 
+		currentrgbcolor  
+		setrgbcolor 
+	} 
+	ifelse
+	end
+} bind def
+FrameDict begin
+/setcmykcolor where {
+	pop /RealSetcmykcolor /setcmykcolor load def
+} {
+	/RealSetcmykcolor {
+		4 1 roll
+		3 { 3 index add 0 max 1 min 1 exch sub 3 1 roll} repeat 
+		setrgbcolor pop
+	} bind def
+} ifelse
+userdict /setcmykcolor { 
+		FrameDict begin
+		FrameSepIs FMnone eq
+		{ RealSetcmykcolor } 
+		{
+			4 copy [ 5 1 roll ]
+			FrameColorInSepListCMYK
+			{
+				FrameSepBlack eq exch 
+				FrameSepYellow eq and exch 
+				FrameSepMagenta eq and exch 
+				FrameSepCyan eq and 
+				{ 0 } { 1 } ifelse
+			}
+			{
+				FrameSepIs FMblack eq
+				{1.0 exch sub 4 1 roll pop pop pop} {
+				FrameSepIs FMyellow eq
+				{pop 1.0 exch sub 3 1 roll pop pop} {
+				FrameSepIs FMmagenta eq
+				{pop pop 1.0 exch sub exch pop } {
+				FrameSepIs FMcyan eq
+				{pop pop pop 1.0 exch sub } 
+				{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+			} ifelse
+			RealSetgray
+		}
+		ifelse
+		end
+	} bind put
+FMLevel1 not { 
+	
+	/patProcDict 5 dict dup begin
+		<0f1e3c78f0e1c387> { 3 setlinewidth -1 -1 moveto 9 9 lineto stroke 
+											4 -4 moveto 12 4 lineto stroke
+											-4 4 moveto 4 12 lineto stroke} bind def
+		<0f87c3e1f0783c1e> { 3 setlinewidth -1 9 moveto 9 -1 lineto stroke 
+											-4 4 moveto 4 -4 lineto stroke
+											4 12 moveto 12 4 lineto stroke} bind def
+		<8142241818244281> { 1 setlinewidth -1 9 moveto 9 -1 lineto stroke
+											-1 -1 moveto 9 9 lineto stroke } bind def
+		<03060c183060c081> { 1 setlinewidth -1 -1 moveto 9 9 lineto stroke 
+											4 -4 moveto 12 4 lineto stroke
+											-4 4 moveto 4 12 lineto stroke} bind def
+		<8040201008040201> { 1 setlinewidth -1 9 moveto 9 -1 lineto stroke 
+											-4 4 moveto 4 -4 lineto stroke
+											4 12 moveto 12 4 lineto stroke} bind def
+	end def
+	/patDict 15 dict dup begin
+		/PatternType 1 def		
+		/PaintType 2 def		
+		/TilingType 3 def		
+		/BBox [ 0 0 8 8 ] def 	
+		/XStep 8 def			
+		/YStep 8 def			
+		/PaintProc {
+			begin
+			patProcDict bstring known {
+				patProcDict bstring get exec
+			} {
+				8 8 true [1 0 0 -1 0 8] bstring imagemask
+			} ifelse
+			end
+		} bind def
+	end def
+} if
+/combineColor {
+    FrameSepIs FMnone eq
+	{
+		graymode FMLevel1 or not {
+			
+			[/Pattern [/DeviceCMYK]] setcolorspace
+			FrameCurColors 0 4 getinterval aload pop FrameCurPat setcolor
+		} {
+			FrameCurColors 3 get 1.0 ge {
+				FrameCurGray RealSetgray
+			} {
+				FMPColor graymode and {
+					0 1 3 { 
+						FrameCurColors exch get
+						1 FrameCurGray sub mul
+					} for
+					RealSetcmykcolor
+				} {
+					4 1 6 {
+						FrameCurColors exch get
+						graymode {
+							1 exch sub 1 FrameCurGray sub mul 1 exch sub
+						} {
+							1.0 lt {FrameCurGray} {1} ifelse
+						} ifelse
+					} for
+					RealSetrgbcolor
+				} ifelse
+			} ifelse
+		} ifelse
+	} { 
+		FrameCurColors 0 4 getinterval aload
+		FrameColorInSepListCMYK {
+			FrameSepBlack eq exch 
+			FrameSepYellow eq and exch 
+			FrameSepMagenta eq and exch 
+			FrameSepCyan eq and
+			FrameSepIs FMcustom eq and
+			{ FrameCurGray } { 1 } ifelse
+		} {
+			FrameSepIs FMblack eq
+			{FrameCurGray 1.0 exch sub mul 1.0 exch sub 4 1 roll pop pop pop} {
+			FrameSepIs FMyellow eq
+			{pop FrameCurGray 1.0 exch sub mul 1.0 exch sub 3 1 roll pop pop} {
+			FrameSepIs FMmagenta eq
+			{pop pop FrameCurGray 1.0 exch sub mul 1.0 exch sub exch pop } {
+			FrameSepIs FMcyan eq
+			{pop pop pop FrameCurGray 1.0 exch sub mul 1.0 exch sub } 
+			{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+		} ifelse
+		graymode FMLevel1 or not {
+			
+			[/Pattern [/DeviceGray]] setcolorspace
+			FrameCurPat setcolor
+		} { 
+			graymode not FMLevel1 and {
+				
+				dup 1 lt {pop FrameCurGray} if
+			} if
+			RealSetgray
+		} ifelse
+	} ifelse
+} bind def
+/savematrix {
+	orgmatrix currentmatrix pop
+	} bind def
+/restorematrix {
+	orgmatrix setmatrix
+	} bind def
+/dmatrix matrix def
+/dpi    72 0 dmatrix defaultmatrix dtransform
+    dup mul exch   dup mul add   sqrt def
+	
+/freq dpi dup 72 div round dup 0 eq {pop 1} if 8 mul div def
+/sangle 1 0 dmatrix defaultmatrix dtransform exch atan def
+/dpiranges   [  2540    2400    1693     1270    1200     635      600      0      ] def
+/CMLowFreqs  [ 100.402  94.8683 89.2289 100.402  94.8683  66.9349  63.2456 47.4342 ] def
+/YLowFreqs   [  95.25   90.0    84.65    95.25   90.0     70.5556  66.6667 50.0    ] def
+/KLowFreqs   [  89.8026 84.8528 79.8088  89.8026 84.8528  74.8355  70.7107 53.033  ] def
+/CLowAngles  [  71.5651 71.5651 71.5651 71.5651  71.5651  71.5651  71.5651 71.5651 ] def
+/MLowAngles  [  18.4349 18.4349 18.4349 18.4349  18.4349  18.4349  18.4349 18.4349 ] def
+/YLowTDot    [  true    true    false    true    true     false    false   false   ] def
+/CMHighFreqs [ 133.87  126.491 133.843  108.503 102.523  100.402   94.8683 63.2456 ] def
+/YHighFreqs  [ 127.0   120.0   126.975  115.455 109.091   95.25    90.0    60.0    ] def
+/KHighFreqs  [ 119.737 113.137 119.713  128.289 121.218   89.8026  84.8528 63.6395 ] def
+/CHighAngles [  71.5651 71.5651 71.5651  70.0169 70.0169  71.5651  71.5651 71.5651 ] def
+/MHighAngles [  18.4349 18.4349 18.4349  19.9831 19.9831  18.4349  18.4349 18.4349 ] def
+/YHighTDot   [  false   false   true     false   false    true     true    false   ] def
+/PatFreq     [	10.5833 10.0     9.4055  10.5833 10.0	  10.5833  10.0	   9.375   ] def
+/screenIndex {
+	0 1 dpiranges length 1 sub { dup dpiranges exch get 1 sub dpi le {exit} {pop} ifelse } for
+} bind def
+/getCyanScreen {
+	FMUseHighFrequencyScreens { CHighAngles CMHighFreqs} {CLowAngles CMLowFreqs} ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get /FMSpotFunction load
+} bind def
+/getMagentaScreen {
+	FMUseHighFrequencyScreens { MHighAngles CMHighFreqs } {MLowAngles CMLowFreqs} ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get /FMSpotFunction load
+} bind def
+/getYellowScreen {
+	FMUseHighFrequencyScreens { YHighTDot YHighFreqs} { YLowTDot YLowFreqs } ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get { 3 div
+			{2 { 1 add 2 div 3 mul dup floor sub 2 mul 1 sub exch} repeat
+			FMSpotFunction } } {/FMSpotFunction load } ifelse
+			0.0 exch
+} bind def
+/getBlackScreen  {
+	FMUseHighFrequencyScreens { KHighFreqs } { KLowFreqs } ifelse
+		screenIndex get 45.0 /FMSpotFunction load 
+} bind def
+/getSpotScreen {
+	getBlackScreen
+} bind def
+/getCompositeScreen {
+	getBlackScreen
+} bind def
+/FMSetScreen 
+	FMLevel1 { /setscreen load 
+	}{ {
+		8 dict begin
+		/HalftoneType 1 def
+		/SpotFunction exch def
+		/Angle exch def
+		/Frequency exch def
+		/AccurateScreens FMUseAcccurateScreens def
+		currentdict end sethalftone
+	} bind } ifelse
+def
+/setDefaultScreen {
+	FMPColor {
+		orgrxfer cvx orggxfer cvx orgbxfer cvx orgxfer cvx setcolortransfer
+	}
+	{
+		orgxfer cvx settransfer
+	} ifelse
+	orgfreq organgle orgproc cvx setscreen
+} bind def
+/setCurrentScreen {
+	FrameSepIs FMnone eq {
+		FMUseDefaultNoSeparationScreen {
+			setDefaultScreen
+		} {
+			getCompositeScreen FMSetScreen
+		} ifelse
+	} {
+		FrameSepIs FMcustom eq {
+			FMUseDefaultSpotSeparationScreen {
+				setDefaultScreen
+			} {
+				getSpotScreen FMSetScreen
+			} ifelse
+		} {
+			FMUseDefaultProcessSeparationScreen {
+				setDefaultScreen
+			} {
+				FrameSepIs FMcyan eq {
+					getCyanScreen FMSetScreen
+				} {
+					FrameSepIs FMmagenta eq {
+						getMagentaScreen FMSetScreen
+					} {
+						FrameSepIs FMyellow eq {
+							getYellowScreen FMSetScreen
+						} {
+							getBlackScreen FMSetScreen
+						} ifelse
+					} ifelse
+				} ifelse
+			} ifelse
+		} ifelse
+	} ifelse 
+} bind def
+end
+	/gstring FMLOCAL
+	/gfile FMLOCAL
+	/gindex FMLOCAL
+	/orgrxfer FMLOCAL
+	/orggxfer FMLOCAL
+	/orgbxfer FMLOCAL
+	/orgxfer FMLOCAL
+	/orgproc FMLOCAL
+	/orgrproc FMLOCAL
+	/orggproc FMLOCAL
+	/orgbproc FMLOCAL
+	/organgle FMLOCAL
+	/orgrangle FMLOCAL
+	/orggangle FMLOCAL
+	/orgbangle FMLOCAL
+	/orgfreq FMLOCAL
+	/orgrfreq FMLOCAL
+	/orggfreq FMLOCAL
+	/orgbfreq FMLOCAL
+	/yscale FMLOCAL
+	/xscale FMLOCAL
+	/edown FMLOCAL
+	/manualfeed FMLOCAL
+	/paperheight FMLOCAL
+	/paperwidth FMLOCAL
+/FMDOCUMENT { 
+	array /FMfonts exch def 
+	/#copies exch def
+	FrameDict begin
+	0 ne /manualfeed exch def
+	/paperheight exch def
+	/paperwidth exch def
+	0 ne /FrameNegative exch def 
+	0 ne /edown exch def 
+	/yscale exch def
+	/xscale exch def
+	FMLevel1 {
+		manualfeed {setmanualfeed} if
+		/FMdicttop countdictstack 1 add def 
+		/FMoptop count def 
+		setpapername 
+		manualfeed {true} {papersize} ifelse 
+		{manualpapersize} {false} ifelse 
+		{desperatepapersize} {false} ifelse 
+		{ (Can't select requested paper size for Frame print job!) FMFAILURE } if
+		count -1 FMoptop {pop pop} for
+		countdictstack -1 FMdicttop {pop end} for 
+		}
+		{{1 dict dup /PageSize [paperwidth paperheight]put setpagedevice}stopped
+		{ (Can't select requested paper size for Frame print job!) FMFAILURE } if
+		 {1 dict dup /ManualFeed manualfeed put setpagedevice } stopped pop }
+	ifelse 
+	
+	FMPColor {
+		currentcolorscreen
+			cvlit /orgproc exch def
+				  /organgle exch def 
+				  /orgfreq exch def
+			cvlit /orgbproc exch def
+				  /orgbangle exch def 
+				  /orgbfreq exch def
+			cvlit /orggproc exch def
+				  /orggangle exch def 
+				  /orggfreq exch def
+			cvlit /orgrproc exch def
+				  /orgrangle exch def 
+				  /orgrfreq exch def
+			currentcolortransfer 
+			FrameNegative {
+				1 1 4 { 
+					pop { 1 exch sub } concatprocs 4 1 roll
+				} for
+				4 copy
+				setcolortransfer
+			} if
+			cvlit /orgxfer exch def
+			cvlit /orgbxfer exch def
+			cvlit /orggxfer exch def
+			cvlit /orgrxfer exch def
+	} {
+		currentscreen 
+			cvlit /orgproc exch def
+				  /organgle exch def 
+				  /orgfreq exch def
+				  
+		currenttransfer 
+		FrameNegative {
+			{ 1 exch sub } concatprocs
+			dup settransfer
+		} if 
+		cvlit /orgxfer exch def
+	} ifelse
+	end 
+} def 
+/pagesave FMLOCAL
+/orgmatrix FMLOCAL
+/landscape FMLOCAL
+/pwid FMLOCAL
+/FMBEGINPAGE { 
+	FrameDict begin 
+	/pagesave save def
+	3.86 setmiterlimit
+	/landscape exch 0 ne def
+	landscape { 
+		90 rotate 0 exch dup /pwid exch def neg translate pop 
+	}{
+		pop /pwid exch def
+	} ifelse
+	edown { [-1 0 0 1 pwid 0] concat } if
+	0 0 moveto paperwidth 0 lineto paperwidth paperheight lineto 
+	0 paperheight lineto 0 0 lineto 1 setgray fill
+	xscale yscale scale
+	/orgmatrix matrix def
+	gsave 
+} def 
+/FMENDPAGE {
+	grestore 
+	pagesave restore
+	end 
+	showpage
+	} def 
+/FMFONTDEFINE { 
+	FrameDict begin
+	findfont 
+	ReEncode 
+	1 index exch 
+	definefont 
+	FMfonts 3 1 roll 
+	put
+	end 
+	} def 
+/FMFILLS {
+	FrameDict begin dup
+	array /fillvals exch def
+	dict /patCache exch def
+	end 
+	} def 
+/FMFILL {
+	FrameDict begin
+	 fillvals 3 1 roll put
+	end 
+	} def 
+/FMNORMALIZEGRAPHICS { 
+	newpath
+	0.0 0.0 moveto
+	1 setlinewidth
+	0 setlinecap
+	0 0 0 sethsbcolor
+	0 setgray 
+	} bind def
+	/fx FMLOCAL
+	/fy FMLOCAL
+	/fh FMLOCAL
+	/fw FMLOCAL
+	/llx FMLOCAL
+	/lly FMLOCAL
+	/urx FMLOCAL
+	/ury FMLOCAL
+/FMBEGINEPSF { 
+	end 
+	/FMEPSF save def 
+	/showpage {} def 
+% See Adobe's "PostScript Language Reference Manual, 2nd Edition", page 714.
+% "...the following operators MUST NOT be used in an EPS file:" (emphasis ours)
+	/banddevice {(banddevice) FMBADEPSF} def
+	/clear {(clear) FMBADEPSF} def
+	/cleardictstack {(cleardictstack) FMBADEPSF} def 
+	/copypage {(copypage) FMBADEPSF} def
+	/erasepage {(erasepage) FMBADEPSF} def
+	/exitserver {(exitserver) FMBADEPSF} def
+	/framedevice {(framedevice) FMBADEPSF} def
+	/grestoreall {(grestoreall) FMBADEPSF} def
+	/initclip {(initclip) FMBADEPSF} def
+	/initgraphics {(initgraphics) FMBADEPSF} def
+	/initmatrix {(initmatrix) FMBADEPSF} def
+	/quit {(quit) FMBADEPSF} def
+	/renderbands {(renderbands) FMBADEPSF} def
+	/setglobal {(setglobal) FMBADEPSF} def
+	/setpagedevice {(setpagedevice) FMBADEPSF} def
+	/setshared {(setshared) FMBADEPSF} def
+	/startjob {(startjob) FMBADEPSF} def
+	/lettertray {(lettertray) FMBADEPSF} def
+	/letter {(letter) FMBADEPSF} def
+	/lettersmall {(lettersmall) FMBADEPSF} def
+	/11x17tray {(11x17tray) FMBADEPSF} def
+	/11x17 {(11x17) FMBADEPSF} def
+	/ledgertray {(ledgertray) FMBADEPSF} def
+	/ledger {(ledger) FMBADEPSF} def
+	/legaltray {(legaltray) FMBADEPSF} def
+	/legal {(legal) FMBADEPSF} def
+	/statementtray {(statementtray) FMBADEPSF} def
+	/statement {(statement) FMBADEPSF} def
+	/executivetray {(executivetray) FMBADEPSF} def
+	/executive {(executive) FMBADEPSF} def
+	/a3tray {(a3tray) FMBADEPSF} def
+	/a3 {(a3) FMBADEPSF} def
+	/a4tray {(a4tray) FMBADEPSF} def
+	/a4 {(a4) FMBADEPSF} def
+	/a4small {(a4small) FMBADEPSF} def
+	/b4tray {(b4tray) FMBADEPSF} def
+	/b4 {(b4) FMBADEPSF} def
+	/b5tray {(b5tray) FMBADEPSF} def
+	/b5 {(b5) FMBADEPSF} def
+	FMNORMALIZEGRAPHICS 
+	[/fy /fx /fh /fw /ury /urx /lly /llx] {exch def} forall 
+	fx fw 2 div add fy fh 2 div add  translate
+	rotate
+	fw 2 div neg fh 2 div neg translate
+	fw urx llx sub div fh ury lly sub div scale 
+	llx neg lly neg translate 
+	/FMdicttop countdictstack 1 add def 
+	/FMoptop count def 
+	} bind def
+/FMENDEPSF {
+	count -1 FMoptop {pop pop} for 
+	countdictstack -1 FMdicttop {pop end} for 
+	FMEPSF restore
+	FrameDict begin 
+	} bind def
+FrameDict begin 
+/setmanualfeed {
+%%BeginFeature *ManualFeed True
+	 statusdict /manualfeed true put
+%%EndFeature
+	} bind def
+/max {2 copy lt {exch} if pop} bind def
+/min {2 copy gt {exch} if pop} bind def
+/inch {72 mul} def
+/pagedimen { 
+	paperheight sub abs 16 lt exch 
+	paperwidth sub abs 16 lt and
+	{/papername exch def} {pop} ifelse
+	} bind def
+	/papersizedict FMLOCAL
+/setpapername { 
+	/papersizedict 14 dict def 
+	papersizedict begin
+	/papername /unknown def 
+		/Letter 8.5 inch 11.0 inch pagedimen
+		/LetterSmall 7.68 inch 10.16 inch pagedimen
+		/Tabloid 11.0 inch 17.0 inch pagedimen
+		/Ledger 17.0 inch 11.0 inch pagedimen
+		/Legal 8.5 inch 14.0 inch pagedimen
+		/Statement 5.5 inch 8.5 inch pagedimen
+		/Executive 7.5 inch 10.0 inch pagedimen
+		/A3 11.69 inch 16.5 inch pagedimen
+		/A4 8.26 inch 11.69 inch pagedimen
+		/A4Small 7.47 inch 10.85 inch pagedimen
+		/B4 10.125 inch 14.33 inch pagedimen
+		/B5 7.16 inch 10.125 inch pagedimen
+	end
+	} bind def
+/papersize {
+	papersizedict begin
+		/Letter {lettertray letter} def
+		/LetterSmall {lettertray lettersmall} def
+		/Tabloid {11x17tray 11x17} def
+		/Ledger {ledgertray ledger} def
+		/Legal {legaltray legal} def
+		/Statement {statementtray statement} def
+		/Executive {executivetray executive} def
+		/A3 {a3tray a3} def
+		/A4 {a4tray a4} def
+		/A4Small {a4tray a4small} def
+		/B4 {b4tray b4} def
+		/B5 {b5tray b5} def
+		/unknown {unknown} def
+	papersizedict dup papername known {papername} {/unknown} ifelse get
+	end
+	statusdict begin stopped end 
+	} bind def
+/manualpapersize {
+	papersizedict begin
+		/Letter {letter} def
+		/LetterSmall {lettersmall} def
+		/Tabloid {11x17} def
+		/Ledger {ledger} def
+		/Legal {legal} def
+		/Statement {statement} def
+		/Executive {executive} def
+		/A3 {a3} def
+		/A4 {a4} def
+		/A4Small {a4small} def
+		/B4 {b4} def
+		/B5 {b5} def
+		/unknown {unknown} def
+	papersizedict dup papername known {papername} {/unknown} ifelse get
+	end
+	stopped 
+	} bind def
+/desperatepapersize {
+	statusdict /setpageparams known
+		{
+		paperwidth paperheight 0 1 
+		statusdict begin
+		{setpageparams} stopped 
+		end
+		} {true} ifelse 
+	} bind def
+/DiacriticEncoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /space /exclam /quotedbl
+/numbersign /dollar /percent /ampersand /quotesingle /parenleft
+/parenright /asterisk /plus /comma /hyphen /period /slash /zero /one
+/two /three /four /five /six /seven /eight /nine /colon /semicolon
+/less /equal /greater /question /at /A /B /C /D /E /F /G /H /I /J /K
+/L /M /N /O /P /Q /R /S /T /U /V /W /X /Y /Z /bracketleft /backslash
+/bracketright /asciicircum /underscore /grave /a /b /c /d /e /f /g /h
+/i /j /k /l /m /n /o /p /q /r /s /t /u /v /w /x /y /z /braceleft /bar
+/braceright /asciitilde /.notdef /Adieresis /Aring /Ccedilla /Eacute
+/Ntilde /Odieresis /Udieresis /aacute /agrave /acircumflex /adieresis
+/atilde /aring /ccedilla /eacute /egrave /ecircumflex /edieresis
+/iacute /igrave /icircumflex /idieresis /ntilde /oacute /ograve
+/ocircumflex /odieresis /otilde /uacute /ugrave /ucircumflex
+/udieresis /dagger /.notdef /cent /sterling /section /bullet
+/paragraph /germandbls /registered /copyright /trademark /acute
+/dieresis /.notdef /AE /Oslash /.notdef /.notdef /.notdef /.notdef
+/yen /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/ordfeminine /ordmasculine /.notdef /ae /oslash /questiondown
+/exclamdown /logicalnot /.notdef /florin /.notdef /.notdef
+/guillemotleft /guillemotright /ellipsis /.notdef /Agrave /Atilde
+/Otilde /OE /oe /endash /emdash /quotedblleft /quotedblright
+/quoteleft /quoteright /.notdef /.notdef /ydieresis /Ydieresis
+/fraction /currency /guilsinglleft /guilsinglright /fi /fl /daggerdbl
+/periodcentered /quotesinglbase /quotedblbase /perthousand
+/Acircumflex /Ecircumflex /Aacute /Edieresis /Egrave /Iacute
+/Icircumflex /Idieresis /Igrave /Oacute /Ocircumflex /.notdef /Ograve
+/Uacute /Ucircumflex /Ugrave /dotlessi /circumflex /tilde /macron
+/breve /dotaccent /ring /cedilla /hungarumlaut /ogonek /caron
+] def
+/ReEncode { 
+	dup 
+	length 
+	dict begin 
+	{
+	1 index /FID ne 
+		{def} 
+		{pop pop} ifelse 
+	} forall 
+	0 eq {/Encoding DiacriticEncoding def} if 
+	currentdict 
+	end 
+	} bind def
+FMPColor 
+	
+	{
+	/BEGINBITMAPCOLOR { 
+		BITMAPCOLOR} def
+	/BEGINBITMAPCOLORc { 
+		BITMAPCOLORc} def
+	/BEGINBITMAPTRUECOLOR { 
+		BITMAPTRUECOLOR } def
+	/BEGINBITMAPTRUECOLORc { 
+		BITMAPTRUECOLORc } def
+	}
+	
+	{
+	/BEGINBITMAPCOLOR { 
+		BITMAPGRAY} def
+	/BEGINBITMAPCOLORc { 
+		BITMAPGRAYc} def
+	/BEGINBITMAPTRUECOLOR { 
+		BITMAPTRUEGRAY } def
+	/BEGINBITMAPTRUECOLORc { 
+		BITMAPTRUEGRAYc } def
+	}
+ifelse
+/K { 
+	FMPrintAllColorsAsBlack {
+		dup 1 eq 2 index 1 eq and 3 index 1 eq and not
+			{7 {pop} repeat 0 0 0 1 0 0 0} if
+	} if 
+	FrameCurColors astore 
+	pop combineColor
+} bind def
+/graymode true def
+	/bwidth FMLOCAL
+	/bpside FMLOCAL
+	/bstring FMLOCAL
+	/onbits FMLOCAL
+	/offbits FMLOCAL
+	/xindex FMLOCAL
+	/yindex FMLOCAL
+	/x FMLOCAL
+	/y FMLOCAL
+/setPatternMode {
+	FMLevel1 {
+		/bwidth  exch def
+		/bpside  exch def
+		/bstring exch def
+		/onbits 0 def  /offbits 0 def
+		freq sangle landscape {90 add} if 
+			{/y exch def
+			 /x exch def
+			 /xindex x 1 add 2 div bpside mul cvi def
+			 /yindex y 1 add 2 div bpside mul cvi def
+			 bstring yindex bwidth mul xindex 8 idiv add get
+			 1 7 xindex 8 mod sub bitshift and 0 ne FrameNegative {not} if
+			 {/onbits  onbits  1 add def 1}
+			 {/offbits offbits 1 add def 0}
+			 ifelse
+			}
+			setscreen
+		offbits offbits onbits add div FrameNegative {1.0 exch sub} if
+		/FrameCurGray exch def
+	} { 
+		pop pop
+		dup patCache exch known {
+			patCache exch get
+		} { 
+			dup
+			patDict /bstring 3 -1 roll put
+			patDict 
+			9 PatFreq screenIndex get div dup matrix scale
+			makepattern
+			dup 
+			patCache 4 -1 roll 3 -1 roll put
+		} ifelse
+		/FrameCurGray 0 def
+		/FrameCurPat exch def
+	} ifelse
+	/graymode false def
+	combineColor
+} bind def
+/setGrayScaleMode {
+	graymode not {
+		/graymode true def
+		FMLevel1 {
+			setCurrentScreen
+		} if
+	} if
+	/FrameCurGray exch def
+	combineColor
+} bind def
+/normalize {
+	transform round exch round exch itransform
+	} bind def
+/dnormalize {
+	dtransform round exch round exch idtransform
+	} bind def
+/lnormalize { 
+	0 dtransform exch cvi 2 idiv 2 mul 1 add exch idtransform pop
+	} bind def
+/H { 
+	lnormalize setlinewidth
+	} bind def
+/Z {
+	setlinecap
+	} bind def
+	
+/PFill {
+	graymode FMLevel1 or not {
+		gsave 1 setgray eofill grestore
+	} if
+} bind def
+/PStroke {
+	graymode FMLevel1 or not {
+		gsave 1 setgray stroke grestore
+	} if
+	stroke
+} bind def
+	/fillvals FMLOCAL
+/X { 
+	fillvals exch get
+	dup type /stringtype eq
+	{8 1 setPatternMode} 
+	{setGrayScaleMode}
+	ifelse
+	} bind def
+/V { 
+	PFill gsave eofill grestore
+	} bind def
+/Vclip {
+	clip
+	} bind def
+/Vstrk {
+	currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/N { 
+	PStroke
+	} bind def
+/Nclip {
+	strokepath clip newpath
+	} bind def
+/Nstrk {
+	currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/M {newpath moveto} bind def
+/E {lineto} bind def
+/D {curveto} bind def
+/O {closepath} bind def
+	/n FMLOCAL
+/L { 
+ 	/n exch def
+	newpath
+	normalize
+	moveto 
+	2 1 n {pop normalize lineto} for
+	} bind def
+/Y { 
+	L 
+	closepath
+	} bind def
+	/x1 FMLOCAL
+	/x2 FMLOCAL
+	/y1 FMLOCAL
+	/y2 FMLOCAL
+/R { 
+	/y2 exch def
+	/x2 exch def
+	/y1 exch def
+	/x1 exch def
+	x1 y1
+	x2 y1
+	x2 y2
+	x1 y2
+	4 Y 
+	} bind def
+	/rad FMLOCAL
+/rarc 
+	{rad 
+	 arcto
+	} bind def
+/RR { 
+	/rad exch def
+	normalize
+	/y2 exch def
+	/x2 exch def
+	normalize
+	/y1 exch def
+	/x1 exch def
+	mark
+	newpath
+	{
+	x1 y1 rad add moveto
+	x1 y2 x2 y2 rarc
+	x2 y2 x2 y1 rarc
+	x2 y1 x1 y1 rarc
+	x1 y1 x1 y2 rarc
+	closepath
+	} stopped {x1 y1 x2 y2 R} if 
+	cleartomark
+	} bind def
+/RRR { 
+	/rad exch def
+	normalize /y4 exch def /x4 exch def
+	normalize /y3 exch def /x3 exch def
+	normalize /y2 exch def /x2 exch def
+	normalize /y1 exch def /x1 exch def
+	newpath
+	normalize moveto 
+	mark
+	{
+	x2 y2 x3 y3 rarc
+	x3 y3 x4 y4 rarc
+	x4 y4 x1 y1 rarc
+	x1 y1 x2 y2 rarc
+	closepath
+	} stopped
+	 {x1 y1 x2 y2 x3 y3 x4 y4 newpath moveto lineto lineto lineto closepath} if
+	cleartomark
+	} bind def
+/C { 
+	grestore
+	gsave
+	R 
+	clip
+	setCurrentScreen
+} bind def
+/CP { 
+	grestore
+	gsave
+	Y 
+	clip
+	setCurrentScreen
+} bind def
+	/FMpointsize FMLOCAL
+/F { 
+	FMfonts exch get
+	FMpointsize scalefont
+	setfont
+	} bind def
+/Q { 
+	/FMpointsize exch def
+	F 
+	} bind def
+/T { 
+	moveto show
+	} bind def
+/RF { 
+	rotate
+	0 ne {-1 1 scale} if
+	} bind def
+/TF { 
+	gsave
+	moveto 
+	RF
+	show
+	grestore
+	} bind def
+/P { 
+	moveto
+	0 32 3 2 roll widthshow
+	} bind def
+/PF { 
+	gsave
+	moveto 
+	RF
+	0 32 3 2 roll widthshow
+	grestore
+	} bind def
+/S { 
+	moveto
+	0 exch ashow
+	} bind def
+/SF { 
+	gsave
+	moveto
+	RF
+	0 exch ashow
+	grestore
+	} bind def
+/B { 
+	moveto
+	0 32 4 2 roll 0 exch awidthshow
+	} bind def
+/BF { 
+	gsave
+	moveto
+	RF
+	0 32 4 2 roll 0 exch awidthshow
+	grestore
+	} bind def
+/G { 
+	gsave
+	newpath
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	PFill fill
+	grestore
+	} bind def
+/Gstrk {
+	savematrix
+    newpath
+    2 index 2 div add exch 3 index 2 div sub exch 
+    normalize 2 index 2 div sub exch 3 index 2 div add exch 
+    translate
+    scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    restorematrix
+    currentlinewidth exch setlinewidth PStroke setlinewidth
+    } bind def
+/Gclip { 
+	newpath
+	savematrix
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	clip newpath
+	restorematrix
+	} bind def
+/GG { 
+	gsave
+	newpath
+	normalize translate 0.0 0.0 moveto 
+	rotate 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath
+	PFill
+	fill
+	grestore
+	} bind def
+/GGclip { 
+	savematrix
+	newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath
+	clip newpath
+	restorematrix
+	} bind def
+/GGstrk { 
+	savematrix
+    newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath 
+	restorematrix
+    currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/A { 
+	gsave
+	savematrix
+	newpath
+	2 index 2 div add exch 3 index 2 div sub exch 
+	normalize 2 index 2 div sub exch 3 index 2 div add exch 
+	translate 
+	scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	restorematrix
+	PStroke
+	grestore
+	} bind def
+/Aclip {
+	newpath
+	savematrix
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	strokepath clip newpath
+	restorematrix
+} bind def
+/Astrk {
+	Gstrk
+} bind def
+/AA { 
+	gsave
+	savematrix
+	newpath
+	
+	3 index 2 div add exch 4 index 2 div sub exch 
+	
+	normalize 3 index 2 div sub exch 4 index 2 div add exch
+	translate 
+	rotate 
+	scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	restorematrix
+	PStroke
+	grestore
+	} bind def
+/AAclip {
+	savematrix
+	newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath
+	strokepath clip newpath
+	restorematrix
+} bind def
+/AAstrk {
+	GGstrk
+} bind def
+	/x FMLOCAL
+	/y FMLOCAL
+	/w FMLOCAL
+	/h FMLOCAL
+	/xx FMLOCAL
+	/yy FMLOCAL
+	/ww FMLOCAL
+	/hh FMLOCAL
+	/FMsaveobject FMLOCAL
+	/FMoptop FMLOCAL
+	/FMdicttop FMLOCAL
+/BEGINPRINTCODE { 
+	/FMdicttop countdictstack 1 add def 
+	/FMoptop count 7 sub def 
+	/FMsaveobject save def
+	userdict begin 
+	/showpage {} def 
+	FMNORMALIZEGRAPHICS 
+	3 index neg 3 index neg translate
+	} bind def
+/ENDPRINTCODE {
+	count -1 FMoptop {pop pop} for 
+	countdictstack -1 FMdicttop {pop end} for 
+	FMsaveobject restore 
+	} bind def
+/gn { 
+	0 
+	{	46 mul 
+		cf read pop 
+		32 sub 
+		dup 46 lt {exit} if 
+		46 sub add 
+		} loop
+	add 
+	} bind def
+	/str FMLOCAL
+/cfs { 
+	/str sl string def 
+	0 1 sl 1 sub {str exch val put} for 
+	str def 
+	} bind def
+/ic [ 
+	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0223
+	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0223
+	0
+	{0 hx} {1 hx} {2 hx} {3 hx} {4 hx} {5 hx} {6 hx} {7 hx} {8 hx} {9 hx}
+	{10 hx} {11 hx} {12 hx} {13 hx} {14 hx} {15 hx} {16 hx} {17 hx} {18 hx}
+	{19 hx} {gn hx} {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12}
+	{13} {14} {15} {16} {17} {18} {19} {gn} {0 wh} {1 wh} {2 wh} {3 wh}
+	{4 wh} {5 wh} {6 wh} {7 wh} {8 wh} {9 wh} {10 wh} {11 wh} {12 wh}
+	{13 wh} {14 wh} {gn wh} {0 bl} {1 bl} {2 bl} {3 bl} {4 bl} {5 bl} {6 bl}
+	{7 bl} {8 bl} {9 bl} {10 bl} {11 bl} {12 bl} {13 bl} {14 bl} {gn bl}
+	{0 fl} {1 fl} {2 fl} {3 fl} {4 fl} {5 fl} {6 fl} {7 fl} {8 fl} {9 fl}
+	{10 fl} {11 fl} {12 fl} {13 fl} {14 fl} {gn fl}
+	] def
+	/sl FMLOCAL
+	/val FMLOCAL
+	/ws FMLOCAL
+	/im FMLOCAL
+	/bs FMLOCAL
+	/cs FMLOCAL
+	/len FMLOCAL
+	/pos FMLOCAL
+/ms { 
+	/sl exch def 
+	/val 255 def 
+	/ws cfs 
+	/im cfs 
+	/val 0 def 
+	/bs cfs 
+	/cs cfs 
+	} bind def
+400 ms 
+/ip { 
+	is 
+	0 
+	cf cs readline pop 
+	{	ic exch get exec 
+		add 
+		} forall 
+	pop 
+	
+	} bind def
+/rip { 
+	   
+	  
+	  bis ris copy pop 
+      is
+      0
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop 
+	  ris gis copy pop 
+	  dup is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop
+	  gis bis copy pop 
+	  dup add is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+      pop 
+      
+      } bind def
+/wh { 
+	/len exch def 
+	/pos exch def 
+	ws 0 len getinterval im pos len getinterval copy pop
+	pos len 
+	} bind def
+/bl { 
+	/len exch def 
+	/pos exch def 
+	bs 0 len getinterval im pos len getinterval copy pop
+	pos len 
+	} bind def
+/s1 1 string def
+/fl { 
+	/len exch def 
+	/pos exch def 
+	/val cf s1 readhexstring pop 0 get def
+	pos 1 pos len add 1 sub {im exch val put} for
+	pos len 
+	} bind def
+/hx { 
+	3 copy getinterval 
+	cf exch readhexstring pop pop 
+	} bind def
+	/h FMLOCAL
+	/w FMLOCAL
+	/d FMLOCAL
+	/lb FMLOCAL
+	/bitmapsave FMLOCAL
+	/is FMLOCAL
+	/cf FMLOCAL
+/wbytes { 
+      dup dup
+      24 eq { pop pop 3 mul }
+      { 8 eq {pop} {1 eq {7 add 8 idiv} {3 add 4 idiv} ifelse} ifelse } ifelse
+	} bind def
+/BEGINBITMAPBWc { 
+	1 {} COMMONBITMAPc
+	} bind def
+/BEGINBITMAPGRAYc { 
+	8 {} COMMONBITMAPc
+	} bind def
+/BEGINBITMAP2BITc { 
+	2 {} COMMONBITMAPc
+	} bind def
+/COMMONBITMAPc { 
+		 
+	/r exch def
+	/d exch def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/lb w d wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+	r                    
+	/is im 0 lb getinterval def 
+	ws 0 lb getinterval is copy pop 
+	/cf currentfile def 
+	w h d [w 0 0 h neg 0 h] 
+	{ip} image 
+	bitmapsave restore 
+	grestore
+	} bind def
+/BEGINBITMAPBW { 
+	1 {} COMMONBITMAP
+	} bind def
+/BEGINBITMAPGRAY { 
+	8 {} COMMONBITMAP
+	} bind def
+/BEGINBITMAP2BIT { 
+	2 {} COMMONBITMAP
+	} bind def
+/COMMONBITMAP { 
+	/r exch def
+	/d exch def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/bitmapsave save def 
+	r                    
+	/is w d wbytes string def
+	/cf currentfile def 
+	w h d [w 0 0 h neg 0 h] 
+	{cf is readhexstring pop} image
+	bitmapsave restore 
+	grestore
+	} bind def
+/ngrayt 256 array def
+/nredt 256 array def
+/nbluet 256 array def
+/ngreent 256 array def
+	/gryt FMLOCAL
+	/blut FMLOCAL
+	/grnt FMLOCAL
+	/redt FMLOCAL
+	/indx FMLOCAL
+	/cynu FMLOCAL
+	/magu FMLOCAL
+	/yelu FMLOCAL
+	/k FMLOCAL
+	/u FMLOCAL
+FMLevel1 {
+/colorsetup {
+	currentcolortransfer
+	/gryt exch def
+	/blut exch def
+	/grnt exch def
+	/redt exch def
+	0 1 255 {
+		/indx exch def
+		/cynu 1 red indx get 255 div sub def
+		/magu 1 green indx get 255 div sub def
+		/yelu 1 blue indx get 255 div sub def
+		/k cynu magu min yelu min def
+		/u k currentundercolorremoval exec def
+%		/u 0 def
+		nredt indx 1 0 cynu u sub max sub redt exec put
+		ngreent indx 1 0 magu u sub max sub grnt exec put
+		nbluet indx 1 0 yelu u sub max sub blut exec put
+		ngrayt indx 1 k currentblackgeneration exec sub gryt exec put
+	} for
+	{255 mul cvi nredt exch get}
+	{255 mul cvi ngreent exch get}
+	{255 mul cvi nbluet exch get}
+	{255 mul cvi ngrayt exch get}
+	setcolortransfer
+	{pop 0} setundercolorremoval
+	{} setblackgeneration
+	} bind def
+}
+{
+/colorSetup2 {
+	[ /Indexed /DeviceRGB 255 
+		{dup red exch get 255 div 
+		 exch dup green exch get 255 div 
+		 exch blue exch get 255 div}
+	] setcolorspace
+} bind def
+} ifelse
+	/tran FMLOCAL
+/fakecolorsetup {
+	/tran 256 string def
+	0 1 255 {/indx exch def 
+		tran indx
+		red indx get 77 mul
+		green indx get 151 mul
+		blue indx get 28 mul
+		add add 256 idiv put} for
+	currenttransfer
+	{255 mul cvi tran exch get 255.0 div}
+	exch concatprocs settransfer
+} bind def
+/BITMAPCOLOR { 
+	/d 8 def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/bitmapsave save def
+	FMLevel1 {	
+		colorsetup
+		/is w d wbytes string def
+		/cf currentfile def 
+		w h d [w 0 0 h neg 0 h] 
+		{cf is readhexstring pop} {is} {is} true 3 colorimage 
+	} {
+		colorSetup2
+		/is w d wbytes string def
+		/cf currentfile def 
+		7 dict dup begin
+			/ImageType 1 def
+			/Width w def
+			/Height h def
+			/ImageMatrix [w 0 0 h neg 0 h] def
+			/DataSource {cf is readhexstring pop} bind def
+			/BitsPerComponent d def
+			/Decode [0 255] def
+		end image	
+	} ifelse
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPCOLORc { 
+	/d 8 def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/lb w d wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+	FMLevel1 {	
+		colorsetup
+		/is im 0 lb getinterval def 
+		ws 0 lb getinterval is copy pop 
+		/cf currentfile def 
+		w h d [w 0 0 h neg 0 h] 
+		{ip} {is} {is} true 3 colorimage
+	} {
+		colorSetup2
+		/is im 0 lb getinterval def 
+		ws 0 lb getinterval is copy pop 
+		/cf currentfile def 
+		7 dict dup begin
+			/ImageType 1 def
+			/Width w def
+			/Height h def
+			/ImageMatrix [w 0 0 h neg 0 h] def
+			/DataSource {ip} bind def
+			/BitsPerComponent d def
+			/Decode [0 255] def
+		end image	
+	} ifelse
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPTRUECOLORc { 
+	/d 24 def
+        gsave
+ 	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/lb w d wbytes def 
+	sl lb lt {lb ms} if 
+        /bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/ris im 0 w getinterval def	
+	/gis im w w getinterval def	
+	/bis im w 2 mul w getinterval def 
+        
+        ws 0 lb getinterval is copy pop 
+        /cf currentfile def 
+        w h 8 [w 0 0 h neg 0 h] 
+        {w rip pop ris} {gis} {bis} true 3 colorimage
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPTRUECOLOR { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/h exch def /w exch def
+        /bitmapsave save def 
+        /is w string def
+        /gis w string def
+        /bis w string def
+        /cf currentfile def 
+        w h 8 [w 0 0 h neg 0 h] 
+        { cf is readhexstring pop } 
+        { cf gis readhexstring pop } 
+        { cf bis readhexstring pop } 
+        true 3 colorimage 
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPTRUEGRAYc { 
+	/d 24 def
+        gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/h exch def /w exch def
+	/lb w d wbytes def 
+	sl lb lt {lb ms} if 
+        /bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/ris im 0 w getinterval def	
+	/gis im w w getinterval def	
+	/bis im w 2 mul w getinterval def 
+        ws 0 lb getinterval is copy pop 
+        /cf currentfile def 
+        w h 8 [w 0 0 h neg 0 h] 
+        {w rip pop ris gis bis w gray} image
+        bitmapsave restore 
+        grestore
+        } bind def
+/ww FMLOCAL
+/r FMLOCAL
+/g FMLOCAL
+/b FMLOCAL
+/i FMLOCAL
+/gray { 
+        /ww exch def
+        /b exch def
+        /g exch def
+        /r exch def
+        0 1 ww 1 sub { /i exch def r i get .299 mul g i get .587 mul
+			b i get .114 mul add add r i 3 -1 roll floor cvi put } for
+        r
+        } bind def
+/BITMAPTRUEGRAY { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/h exch def /w exch def
+        /bitmapsave save def 
+        /is w string def
+        /gis w string def
+        /bis w string def
+        /cf currentfile def 
+        w h 8 [w 0 0 h neg 0 h] 
+        { cf is readhexstring pop 
+          cf gis readhexstring pop 
+          cf bis readhexstring pop w gray}  image
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPGRAY { 
+	8 {fakecolorsetup} COMMONBITMAP
+	} bind def
+/BITMAPGRAYc { 
+	8 {fakecolorsetup} COMMONBITMAPc
+	} bind def
+/ENDBITMAP {
+	} bind def
+end 
+	/ALDsave FMLOCAL
+	/ALDmatrix matrix def ALDmatrix currentmatrix pop
+/StartALD {
+	/ALDsave save def
+	 savematrix
+	 ALDmatrix setmatrix
+	} bind def
+/InALD {
+	 restorematrix
+	} bind def
+/DoneALD {
+	 ALDsave restore
+	} bind def
+/I { setdash } bind def
+/J { [] 0 setdash } bind def
+%%EndProlog
+%%BeginSetup
+(4.0) FMVERSION
+1 1 0 0 612 792 0 1 19 FMDOCUMENT
+0 0 /Times-Bold FMFONTDEFINE
+1 0 /Times-Roman FMFONTDEFINE
+2 0 /Helvetica FMFONTDEFINE
+3 0 /Courier FMFONTDEFINE
+4 0 /Times-Italic FMFONTDEFINE
+5 0 /Helvetica-Bold FMFONTDEFINE
+32 FMFILLS
+0 0 FMFILL
+1 0.1 FMFILL
+2 0.3 FMFILL
+3 0.5 FMFILL
+4 0.7 FMFILL
+5 0.9 FMFILL
+6 0.97 FMFILL
+7 1 FMFILL
+8 <0f1e3c78f0e1c387> FMFILL
+9 <0f87c3e1f0783c1e> FMFILL
+10 <cccccccccccccccc> FMFILL
+11 <ffff0000ffff0000> FMFILL
+12 <8142241818244281> FMFILL
+13 <03060c183060c081> FMFILL
+14 <8040201008040201> FMFILL
+16 1 FMFILL
+17 0.9 FMFILL
+18 0.7 FMFILL
+19 0.5 FMFILL
+20 0.3 FMFILL
+21 0.1 FMFILL
+22 0.03 FMFILL
+23 0 FMFILL
+24 <f0e1c3870f1e3c78> FMFILL
+25 <f0783c1e0f87c3e1> FMFILL
+26 <3333333333333333> FMFILL
+27 <0000ffff0000ffff> FMFILL
+28 <7ebddbe7e7dbbd7e> FMFILL
+29 <fcf9f3e7cf9f3f7e> FMFILL
+30 <7fbfdfeff7fbfdfe> FMFILL
+%%EndSetup
+%%Page: "1" 1
+%%BeginPaperSize: Letter
+%%EndPaperSize
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+J
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 36 Q
+0 X
+0 0 0 1 0 0 0 K
+(XPM Manual) 200.5 534 T
+1 18 Q
+(The) 223.26 468 T
+0 F
+(X) 255.75 468 T
+(P) 273.25 468 T
+1 F
+(ix) 284.25 468 T
+0 F
+(M) 298.25 468 T
+1 F
+(ap Format) 315.24 468 T
+1 14 Q
+(Version: 3.4c) 268.28 375.97 T
+(May 27) 264.31 340.37 T
+1 11.2 Q
+(th) 307.47 345.97 T
+1 14 Q
+( 1994) 316.19 340.37 T
+2 F
+(Arnaud Le Hors) 256.98 249.67 T
+3 12 Q
+(lehors@sophia.inria.fr) 226.8 235 T
+1 10 Q
+(\251 BULL 1989-94) 269.98 135.63 T
+FMENDPAGE
+%%EndPage: "1" 1
+%%Page: "2" 2
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "2" 2
+%%Page: "3" 3
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 18 Q
+(Copyright restrictions) 72 681 T
+2 10 Q
+(Copyright \050C\051 1989-94) 72 652.33 T
+5 F
+(GROUPE BULL) 173.7 652.33 T
+2 F
+-0.62 (Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated) 72 628.33 P
+0.14 (documentation files \050the "Software"\051, to deal in the Software without restriction, including without limitation) 72 616.33 P
+0.59 (the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,) 72 604.33 P
+(and to permit persons to whom the Software is furnished to do so, subject to the following conditions:) 72 592.33 T
+-0.21 (The above copyright notice and this permission notice shall be included in all copies or substantial portions) 72 568.33 P
+(of the Software.) 72 556.33 T
+-0.71 (THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,) 72 532.33 P
+-0.5 (INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PAR-) 72 520.33 P
+-0.64 (TICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL) 72 508.33 P
+5 F
+-0.64 (GROUPE BULL) 393.07 508.33 P
+2 F
+-0.64 ( BE LIABLE FOR) 465.21 508.33 P
+0.22 (ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR) 72 496.33 P
+-0.54 (OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR) 72 484.33 P
+(OTHER DEALINGS IN THE SOFTWARE.) 72 472.33 T
+-0.65 (Except as contained in this notice, the name of) 72 448.33 P
+5 F
+-0.65 (GROUPE BULL) 275.73 448.33 P
+2 F
+-0.65 ( shall not be used in advertising or otherwise) 347.87 448.33 P
+-0.38 (to promote the sale, use or other dealings in this Software without prior written authorization from) 72 436.33 P
+5 F
+-0.38 (GROUPE) 496.66 436.33 P
+(BULL) 72 424.33 T
+2 F
+(.) 98.66 424.33 T
+0 18 Q
+(Acknowledgments) 72 395 T
+1 10 Q
+-0.05 (First I want to thank my team partner and friend Colas Nahaboo who proposed me this project, and who actively par-) 72 366.33 P
+(ticipated to its design.) 72 354.33 T
+0.12 (My thanks also go to my friend Lionel Mallet \050Simulog\051 who heavily tested) 72 336.33 P
+0 F
+0.12 (XPM) 379.33 336.33 P
+1 F
+0.12 ( by writing a dedicated icon editor) 402.1 336.33 P
+(called pixmap, and who often helped me making up my mind through long discussions when facing difficulties.) 72 324.33 T
+0.36 (Finally I want to thank all the users who helped me to improve the library by giving feed back, sending bug reports) 72 306.33 P
+-0.05 (with often patches to fix them, and even sometimes sending new chunks of code. It is also clear that the) 72 294.33 P
+0 F
+-0.05 (XPM) 488.12 294.33 P
+1 F
+-0.05 ( library) 510.89 294.33 P
+-0.04 (code would have never been so easy to compile on most of the today computers and operating systems without them.) 72 282.33 P
+0 18 Q
+(Support) 72 253 T
+1 10 Q
+1.05 (You can mail any question or suggestion relative to) 72 224.33 P
+0 F
+1.05 (XPM) 290.01 224.33 P
+1 F
+1.05 ( by electronic mail to) 312.78 224.33 P
+3 F
+2.51 (lehors@sophia.inria.fr) 405.5 224.33 P
+1 F
+1.05 (.) 537.5 224.33 P
+-0.07 (There is also a mailing list, please mail requests to) 72 212.33 P
+3 F
+-0.17 (xpm-talk-request@sophia.inria.fr) 275.44 212.33 P
+1 F
+-0.07 ( to subscribe. You) 467.44 212.33 P
+-0.35 (can find the latest release by anonymous ftp on avahi.inria.fr \050138.96.24.30\051 or ftp.x.org \050198.112.44.100\051, and also an) 72 200.33 P
+(archive of the mailing list on avahi.) 72 188.33 T
+1 14 Q
+(Arnaud Le Hors) 449.03 131.67 T
+1 10 Q
+(KOALA Project \320 BULL Research c/o INRIA) 353.93 118.33 T
+(2004 route des Lucioles \320 06565 Valbonne Cedex \320 FRANCE) 290.3 106.33 T
+FMENDPAGE
+%%EndPage: "3" 3
+%%Page: "4" 4
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+FMENDPAGE
+%%EndPage: "4" 4
+%%Page: "5" 5
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+225 639 396 657 R
+7 X
+0 0 0 1 0 0 0 K
+V
+1 18 Q
+0 X
+(Table of Contents) 246.01 645 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+1 12 Q
+(Chapter 1:) 72 568 T
+(Introduction & History) 135 568 T
+(........................................................................................) 249 568 T
+(7) 525 568 T
+(Chapter 2:) 72 544 T
+(The XPM Format) 135 544 T
+(................................................................................................) 225 544 T
+(8) 525 544 T
+(Chapter 3:) 72 520 T
+(The XPM Library) 135 520 T
+(................................................................................................) 225 520 T
+(11) 519 520 T
+(3.1  The Basic Level Interface) 108 498 T
+(.....................................................................................) 258 498 T
+(11) 519 498 T
+(3.1.1  The structures) 144 480 T
+(.........................................................................................) 246 480 T
+(11) 519 480 T
+(3.1.2  Functions to deal with XPM files) 144 466 T
+(..........................................................) 339 466 T
+(15) 519 466 T
+(3.1.3  Functions to deal with XPM data) 144 452 T
+(...........................................................) 336 452 T
+(18) 519 452 T
+(3.1.4  Functions to deal with XPM files and data) 144 438 T
+(............................................) 381 438 T
+(20) 519 438 T
+(3.1.5  Functions to deal with XPM buffers) 144 424 T
+(......................................................) 351 424 T
+(20) 519 424 T
+(3.1.6  Functions to deal with XPM files and buffers) 144 410 T
+(.......................................) 396 410 T
+(22) 519 410 T
+(3.1.7  Miscellaneous functions) 144 396 T
+(.........................................................................) 294 396 T
+(23) 519 396 T
+(3.2  The Advanced Level Interface) 108 374 T
+(..............................................................................) 279 374 T
+(24) 519 374 T
+(3.2.1  The structures) 144 356 T
+(.........................................................................................) 246 356 T
+(24) 519 356 T
+(3.2.2  Functions to deal with XPM files) 144 342 T
+(..........................................................) 339 342 T
+(26) 519 342 T
+(3.2.3  Functions to deal with XPM data) 144 328 T
+(...........................................................) 336 328 T
+(27) 519 328 T
+(3.2.4  Functions to deal with XPM buffers) 144 314 T
+(......................................................) 351 314 T
+(28) 519 314 T
+(3.2.5  Functions to deal with X images) 144 300 T
+(............................................................) 333 300 T
+(29) 519 300 T
+(3.2.6  Functions to deal with X pixmaps) 144 286 T
+(.........................................................) 342 286 T
+(30) 519 286 T
+(3.2.7  Miscellaneous functions) 144 272 T
+(.........................................................................) 294 272 T
+(30) 519 272 T
+FMENDPAGE
+%%EndPage: "5" 5
+%%Page: "6" 6
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+FMENDPAGE
+%%EndPage: "6" 6
+%%Page: "7" 7
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(7) 303 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 18 Q
+(Chapter 1) 267.26 680.84 T
+(Introduction & History) 216 644.84 T
+1 10 Q
+0.51 (First, Why another image format? We \050Koala team at Bull Research, France\051 felt that most images bundled with X) 72 586.18 P
+0.55 (applications will be small "icons", and that since many applications are color-customizable, existing image formats) 72 574.18 P
+-0.2 (such as gif, tiff, iff, etc... were intended for big images with well-defined colors and so weren\325t adapted to the task. So) 72 562.18 P
+0 F
+(XPM) 72 550.18 T
+1 F
+( was designed with these criterions in mind:) 94.77 550.18 T
+(\245) 72 532.18 T
+(be editable by hand \050under emacs, vi...\051. Although this sounds pretty weird today.) 86.4 532.18 T
+(\245) 72 514.18 T
+(be includable in C code. It may be unreasonable to load 1000 pixmap files on each start of an application.) 86.4 514.18 T
+(\245) 72 496.18 T
+(be a portable, mailable ascii format.) 86.4 496.18 T
+(\245) 72 478.18 T
+(provide defaults for monochrome/color/grayscale renderings.) 86.4 478.18 T
+(\245) 72 460.18 T
+-0.03 (provide overriding of colors. This way if the user wants your application to be bluish instead of greenish, you can) 86.4 460.18 P
+(use the SAME icon files.) 86.4 448.18 T
+(\245) 72 430.18 T
+(allow comments to be included in the file.) 86.4 430.18 T
+(\245) 72 412.18 T
+(compression must be managed apart of the format.) 86.4 412.18 T
+0.36 (The original idea of this format comes from Daniel Dardailler and Colas Nahaboo who designed the first version in) 72 380.18 P
+-0.22 (1989. While Daniel wanted to take out from UIL) 72 368.18 P
+1 8 Q
+-0.18 (1) 266.04 372.18 P
+1 10 Q
+-0.22 ( [Motif] the icon format, Colas thought it would be nice to do this in) 270.04 368.18 P
+-0.55 (a way allowing to include the pixmap files in a C program just like XBM) 72 356.18 P
+1 8 Q
+-0.44 (2) 357.09 360.18 P
+1 10 Q
+-0.55 ( files. Thus, Daniel developed and distributed) 361.09 356.18 P
+(in February 1989 the first version of the XPM library.) 72 344.18 T
+0.32 (Then Daniel left for OSF) 72 332.18 P
+1 8 Q
+0.26 (3) 173.83 336.18 P
+1 10 Q
+0.32 ( and I was hired by BULL. Colas told me about XPM and the need of a new version sup-) 177.83 332.18 P
+0.25 (porting symbolic colors to allow overriding of colors at load time, and different color defaults depending of the ren-) 72 320.18 P
+0.14 (dering the pixmap was displayed on. I liked the idea and worked on designing the new format with Colas and devel-) 72 308.18 P
+-0.57 (oped a new version of the library which I distributed in August 1990. In addition to the improvements mentioned above) 72 296.18 P
+0.64 (this new version of the format had the smart ability to support several programming language syntaxes. Indeed we) 72 284.18 P
+-0.24 (thought it would be nice to let people include pixmap files in Lisp or any other language programs as well as in C pro-) 72 272.18 P
+-0.41 (grams. Actually that was really funny and quite satisfactory from a research point of view, but on the other hand, while) 72 260.18 P
+0.05 (people needed to have a standard format this has been claimed to be "n" different formats and not a single one. More) 72 248.18 P
+0.02 (over, it appeared that really few people where using syntaxes different from C. So we removed this multi-syntax fea-) 72 236.18 P
+-0.01 (ture from the format and settled the C syntax to come up with XPM version 3. This last version also supports hotspot) 72 224.18 P
+(coordinates, transparent color, and possible extensions.) 72 212.18 T
+-0.17 (Since August 1990, the XPM library has been released at various rhythms depending on the need and the time I could) 72 200.18 P
+0.12 (spent on it \050this work having never been my main task\051, in order to always provide more features and to improve the) 72 188.18 P
+(code regarding both speed and robustness.) 72 176.18 T
+72 129 540 144 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+81 142 225 142 2 L
+0.5 H
+2 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+0 0 612 792 C
+1 8 Q
+0 X
+0 0 0 1 0 0 0 K
+(1. User Interface Language - OSF/Motif.) 90 123.67 T
+(2. X BitMap format.) 90 113.67 T
+(3. Open Software Foundation.) 90 103.67 T
+FMENDPAGE
+%%EndPage: "7" 7
+%%Page: "8" 8
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(8) 303 56.01 T
+0 18 Q
+(Chapter 2) 267.26 681 T
+(The XPM Format) 237.01 645 T
+1 10 Q
+0 (The) 72 586.33 P
+0 F
+0 (XPM) 90.06 586.33 P
+1 F
+0 ( format presents a C syntax, in order to provide the ability to include) 112.82 586.33 P
+0 F
+0 (XPM) 389.26 586.33 P
+1 F
+0 ( files in C and C++ programs. It) 412.02 586.33 P
+(is in fact an array of strings composed of six different sections as follows:) 72 574.33 T
+(/* XPM */) 129.6 556.33 T
+(static char*) 129.6 538.33 T
+3 F
+(<variable_name>) 177.92 538.33 T
+1 F
+([] = {) 267.92 538.33 T
+(<Values>) 129.6 520.33 T
+(<Colors>) 129.6 502.33 T
+(<Pixels>) 129.6 484.33 T
+(<Extensions>) 129.6 466.33 T
+(};) 129.6 448.33 T
+(The words are separated by a white space which can be composed of space and tabulation characters.) 72 424.33 T
+-0.16 (The) 72 400.33 P
+3 F
+-0.4 (<Values>) 89.89 400.33 P
+1 F
+-0.16 ( section is a string containing four or six integers in base 10 that correspond to: the pixmap width and) 137.88 400.33 P
+0.45 (height, the number of colors, the number of characters per pixel \050so there is no limit on the number of colors\051, and,) 72 388.33 P
+(optionally the hotspot coordinates and the) 72 376.33 T
+0 F
+(XPMEXT) 241.99 376.33 T
+1 F
+( tag if there is any extension following the) 285.32 376.33 T
+3 F
+(<Pixels>) 456.69 376.33 T
+1 F
+( section.) 504.69 376.33 T
+3 F
+(<width> <height> <ncolors> <cpp> [<x_hotspot> <y_hotspot>] [XPMEXT]) 72 352.33 T
+1 F
+(The) 72 328.33 T
+3 F
+(Colors) 90.05 328.33 T
+1 F
+( section contains as many strings as there are colors, and each string is as follows:) 126.05 328.33 T
+3 F
+(<chars> {<key> <color>}+) 72 304.33 T
+1 F
+0.05 (Where) 72 280.33 P
+3 F
+0.13 (<chars>) 101.21 280.33 P
+1 F
+0.05 ( is the) 143.21 280.33 P
+3 F
+0.13 (<chars_per_pixel>) 169.76 280.33 P
+1 F
+0.05 ( length string \050not surrounded by anything\051 representing the pixels,) 271.76 280.33 P
+3 F
+-0.46 (<color>) 72 268.33 P
+1 F
+-0.19 ( is the specified color, and) 114 268.33 P
+3 F
+-0.46 (<key>) 220.32 268.33 P
+1 F
+-0.19 ( is a keyword describing in which context this color should be used. Cur-) 250.32 268.33 P
+(rently the keys may have the following values:) 72 256.33 T
+( m) 144 238.33 T
+(for mono visual) 216 238.33 T
+( s) 144 222.33 T
+( for symbolic name) 216 222.33 T
+( g4) 144 206.33 T
+( for 4-level grayscale) 216 206.33 T
+( g) 144 190.33 T
+( for grayscale with more than 4 levels) 216 190.33 T
+( c) 144 174.33 T
+( for color visual) 216 174.33 T
+0.13 (Colors can be specified by giving the colorname, a # followed by the RGB code in hexadecimal, or a % followed by) 72 150.33 P
+-0.37 (the HSV code \050not implemented\051. The symbolic name provides the ability of specifying the colors at load time and not) 72 138.33 P
+(to hard-code them in the file.) 72 126.33 T
+0.22 (Also the string) 72 114.33 P
+0 F
+0.22 (None) 134.05 114.33 P
+1 F
+0.22 ( can be given as a colorname to mean \322transparent\323. Transparency is supported by the) 156.27 114.33 P
+0 F
+0.22 (XPM) 505.62 114.33 P
+1 F
+0.22 ( li-) 528.39 114.33 P
+0.25 (brary by providing a masking bitmap in addition to the pixmap. This mask can then be used either as a clip-mask of) 72 102.33 P
+FMENDPAGE
+%%EndPage: "8" 8
+%%Page: "9" 9
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(9) 303 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+1 F
+(an Xlib GC, or a shape-mask of a window using the X11 Nonrectangular Window Shape Extension [XShape].) 72 686.18 T
+1.16 (The) 72 662.18 P
+3 F
+2.77 (<Pixels>) 91.21 662.18 P
+1 F
+1.16 ( section is composed by) 139.21 662.18 P
+3 F
+2.77 (<height>) 243.04 662.18 P
+1 F
+1.16 ( strings of) 291.04 662.18 P
+3 F
+2.77 (<width>) 337 662.18 P
+1 F
+1.16 ( *) 379 662.18 P
+3 F
+2.77 (<chars_per_pixel>) 391.31 662.18 P
+1 F
+1.16 ( characters,) 493.31 662.18 P
+0.19 (where every) 72 650.18 P
+3 F
+0.44 (<chars_per_pixel>) 124.01 650.18 P
+1 F
+0.19 ( length string must be one of the previously defined groups in the) 226.01 650.18 P
+3 F
+0.44 (<Colors>) 492 650.18 P
+1 F
+(section.) 72 638.18 T
+0.16 (Then follows the) 72 614.18 P
+3 F
+0.39 (<Extensions>) 142.76 614.18 P
+1 F
+0.16 ( section which must be labeled, if not empty, in the) 214.76 614.18 P
+3 F
+0.39 (<Values>) 423.47 614.18 P
+1 F
+0.16 ( section as previ-) 471.47 614.18 P
+(ously described. This section may be composed by several) 72 602.18 T
+3 F
+(<Extension>) 308.63 602.18 T
+1 F
+( subsections which may be of two types:) 374.63 602.18 T
+(\245) 72 584.18 T
+(one stand alone string composed as follows:) 86.4 584.18 T
+3 F
+(XPMEXT <extension-name> <extension-data>) 86.4 568.18 T
+1 F
+(\245) 72 550.18 T
+(or a block composed by several strings:) 86.4 550.18 T
+3 F
+(XPMEXT <extension-name>) 86.4 534.18 T
+(<related extension-data composed of several strings>) 86.4 518.18 T
+1 F
+(Finally, if not empty, this section must end by the following string:) 72 494.18 T
+3 F
+(XPMENDEXT) 72 470.18 T
+1 F
+-0.29 (To avoid possible conflicts with extension names in shared files, they should be prefixed by the name of the company.) 72 446.18 P
+(This would ensure uniqueness.) 72 434.18 T
+FMENDPAGE
+%%EndPage: "9" 9
+%%Page: "10" 10
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(10) 300 56.01 T
+1 10 Q
+-0.12 (Below is an example which is the XPM file of a plaid pixmap. This is a 22x22 pixmap, with 4 colors and 2 characters) 72 686.33 P
+-0.14 (per pixel. The hotspot coordinates are \0500, 0\051. There are symbols and default colors for color and monochrome visuals.) 72 674.33 P
+(Finally there are two extensions.) 72 662.33 T
+3 F
+(/* XPM */) 72 620.33 T
+(static char *plaid[] = {) 72 608.33 T
+(/* plaid pixmap) 72 596.33 T
+( * width height ncolors chars_per_pixel */) 72 584.33 T
+("22 22 4 2 0 0 XPMEXT",) 72 572.33 T
+(/* colors */) 72 560.33 T
+("   c red) 72 548.33 T
+(   m white  s light_color ",) 132 548.33 T
+("Y  c green) 72 536.33 T
+(  m black  s lines_in_mix ",) 138 536.33 T
+("+  c yellow) 72 524.33 T
+( m white  s lines_in_dark ",) 144 524.33 T
+("x) 72 512.33 T
+( m black  s dark_color ",) 144 512.33 T
+(/* pixels */) 72 500.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 488.33 T
+("  x   x   x   x   x   x x x x x x x x x x x ",) 72 476.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 464.33 T
+("  x   x   x   x   x   x x x x x x x x x x x ",) 72 452.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 440.33 T
+("Y Y Y Y Y x Y Y Y Y Y + x + x + x + x + x + ",) 72 428.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 416.33 T
+("  x   x   x   x   x   x x x x x x x x x x x ",) 72 404.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 392.33 T
+("  x   x   x   x   x   x x x x x x x x x x x ",) 72 380.33 T
+("x   x   x x x   x   x x x x x x + x x x x x ",) 72 368.33 T
+("          x           x   x   x Y x   x   x ",) 72 356.33 T
+("          x             x   x   Y   x   x   ",) 72 344.33 T
+("          x           x   x   x Y x   x   x ",) 72 332.33 T
+("          x             x   x   Y   x   x   ",) 72 320.33 T
+("          x           x   x   x Y x   x   x ",) 72 308.33 T
+("x x x x x x x x x x x x x x x x x x x x x x ",) 72 296.33 T
+("          x           x   x   x Y x   x   x ",) 72 284.33 T
+("          x             x   x   Y   x   x   ",) 72 272.33 T
+("          x           x   x   x Y x   x   x ",) 72 260.33 T
+("          x             x   x   Y   x   x   ",) 72 248.33 T
+("          x           x   x   x Y x   x   x ") 72 236.33 T
+("XPMEXT ext1 data1",) 72 224.33 T
+("XPMEXT ext2",) 72 212.33 T
+("data2_1",) 72 200.33 T
+("data2_2",) 72 188.33 T
+("XPMENDEXT") 72 176.33 T
+(};) 72 164.33 T
+FMENDPAGE
+%%EndPage: "10" 10
+%%Page: "11" 11
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(1) 300.33 56.01 T
+(1) 305.67 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 18 Q
+(Chapter 3) 267.26 680.84 T
+(The XPM Library) 235.5 644.84 T
+1 10 Q
+-0.4 (The) 72 586.18 P
+0 F
+-0.4 (XPM) 89.65 586.18 P
+1 F
+-0.4 ( library basically provides two sets of Xlib-level functions in the C language. Most people should only know) 112.42 586.18 P
+0.24 (about the first one since it provides what most likely one need with a simple interface. The second set, which stands) 72 574.18 P
+0.42 (as a lower level called from the first one, is designed to be used from within applications which have more specific) 72 562.18 P
+(needs such as a pixmap editor or applications which needs to cache data such as) 72 550.18 T
+0 F
+(XPM) 394.43 550.18 T
+1 F
+( files.) 417.2 550.18 T
+0 14 Q
+(3.1) 72 495.51 T
+(The Basic Level Interface) 100.8 495.51 T
+1 10 Q
+-0.14 (The basic level interface allows to deal with XImage, Pixmap,) 72 470.18 P
+0 F
+-0.14 (XPM) 322.26 470.18 P
+1 F
+-0.14 ( file, data \050included) 345.03 470.18 P
+0 F
+-0.14 (XPM) 424.75 470.18 P
+1 F
+-0.14 ( file\051, buffer \050) 447.52 470.18 P
+0 F
+-0.14 (XPM) 501.54 470.18 P
+1 F
+-0.14 ( file) 524.3 470.18 P
+(in memory\051, and in many ways.) 72 458.18 T
+(The following subsections describe these functions and how to use them.) 72 434.18 T
+0 12 Q
+(3.1.1) 72 390.84 T
+(The structures) 108 390.84 T
+1 10 Q
+-0.23 (To provide a simple interface all the functions take, in addition to their main arguments such as a filename, a structure) 72 366.18 P
+0.28 (called) 72 354.18 P
+0 F
+0.28 (XpmAttributes) 98.66 354.18 P
+1 F
+0.28 (. This structure is composed of attributes to pass data such as colormap, visual, and attributes) 163.65 354.18 P
+(to retrieve returned data such as pixmap\325s width and height. The) 72 342.18 T
+0 F
+(XpmAttributes) 331.95 342.18 T
+1 F
+( structure is defined as follows:) 396.94 342.18 T
+(typedef struct {) 72 324.18 T
+(unsigned long valuemask;) 144 312.18 T
+(/* Specifies which attributes are defined */) 288 312.18 T
+(Visual *visual;) 144 300.18 T
+(/* Specifies the visual to use */) 288 300.18 T
+(Colormap colormap;) 144 288.18 T
+(/* Specifies the colormap to use */) 288 288.18 T
+(unsigned int depth;) 144 276.18 T
+(/* Specifies the depth */) 288 276.18 T
+(unsigned int width;) 144 264.18 T
+(/* Returns the width of the created pixmap */) 288 264.18 T
+(unsigned int height;) 144 252.18 T
+(/* Returns the height of the created pixmap */) 288 252.18 T
+(unsigned int x_hotspot;) 144 240.18 T
+(/* Returns the x hotspot\325s coordinate */) 288 240.18 T
+(unsigned int y_hotspot;) 144 228.18 T
+(/* Returns the y hotspot\325s coordinate */) 288 228.18 T
+(unsigned int cpp;) 144 216.18 T
+(/* Specifies the number of char per pixel */) 288 216.18 T
+(Pixel *pixels;) 144 204.18 T
+(/* List of used color pixels */) 288 204.18 T
+(unsigned int npixels;) 144 192.18 T
+(/* Number of pixels */) 288 192.18 T
+(XpmColorSymbol *colorsymbols;) 144 180.18 T
+(/* Array of color symbols to override */) 288 180.18 T
+(unsigned int numsymbols;) 144 168.18 T
+(/* Number of symbols */) 288 168.18 T
+(char *rgb_fname;) 144 156.18 T
+(/* RGB text file name */) 288 156.18 T
+(unsigned int nextensions;) 144 144.18 T
+(/* Number of extensions */) 288 144.18 T
+(XpmExtension *extensions;) 144 132.18 T
+(/* Array of extensions */) 288 132.18 T
+( int ncolors;) 144 120.18 T
+(/* Number of colors */) 288 120.18 T
+( XpmColor *colorTable;) 144 108.18 T
+(/* Color table pointer */) 288 108.18 T
+FMENDPAGE
+%%EndPage: "11" 11
+%%Page: "12" 12
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(12) 300 56.01 T
+1 10 Q
+( char *hints_cmt;) 144 686.33 T
+(/* Comment of the hints section */) 288 686.33 T
+( char *colors_cmt;) 144 674.33 T
+(/* Comment of the colors section */) 288 674.33 T
+( char *pixels_cmt;) 144 662.33 T
+(/* Comment of the pixels section */) 288 662.33 T
+( unsigned int mask_pixel;) 144 650.33 T
+(/* Transparent pixel\325s color table index */) 288 650.33 T
+( /* Color Allocation Directives */) 72 638.33 T
+(unsigned int exactColors;) 144 626.33 T
+(/* Only use exact colors for visual */) 288 626.33 T
+(unsigned int closeness;) 144 614.33 T
+(/* Allowable RGB deviation */) 288 614.33 T
+(unsigned int red_closeness;) 144 602.33 T
+(/* Allowable red deviation */) 288 602.33 T
+(unsigned int green_closeness;) 144 590.33 T
+(/* Allowable green deviation */) 288 590.33 T
+(unsigned int blue_closeness;) 144 578.33 T
+(/* Allowable blue deviation */) 288 578.33 T
+(int color_key;) 144 566.33 T
+(/* Use colors from this color set */) 288 566.33 T
+(} XpmAttributes;) 72 554.33 T
+0.01 (The valuemask is the bitwise inclusive OR of the valid attribute mask bits. If the valuemask is zero, the attributes are) 72 530.33 P
+-0.11 (ignored and not referenced and default values are taken for needed attributes which are not specified. This valuemask) 72 518.33 P
+-0.08 (had to be part of the structure to let) 72 506.33 P
+0 F
+-0.08 (XPM) 214.32 506.33 P
+1 F
+-0.08 ( functions modify its value when returning possible data such as hotspot co-) 237.09 506.33 P
+0.3 (ordinates or when requested data cannot be returned. In fact, the) 72 494.33 P
+0 F
+0.3 (XPM) 334.36 494.33 P
+1 F
+0.3 ( library functions will automatically return as) 357.13 494.33 P
+0.54 (many data as possible as long as this doesn\325t lead to some memory allocation. Otherwise data are returned only on) 72 482.33 P
+(request.) 72 470.33 T
+0.51 (To set an attribute, set the appropriate member of the) 72 446.33 P
+0 F
+0.51 (XpmAttributes) 291.76 446.33 P
+1 F
+0.51 ( structure and OR in the corresponding value) 356.75 446.33 P
+(bitmask in the valuemask member. The symbols for the value mask bits and) 72 434.33 T
+0 F
+(XpmAttributes) 378.64 434.33 T
+1 F
+( structure are:) 443.63 434.33 T
+0 F
+(Symbol Name) 78 404.33 T
+(Symbol V) 195 404.33 T
+(alue) 236.03 404.33 T
+(Related Members) 267 404.33 T
+(Comments) 375 404.33 T
+(XpmV) 78 380.33 T
+(isual) 105.96 380.33 T
+1 F
+(\0501L<<0\051) 195 382.33 T
+(visual) 267 382.33 T
+(Default value is:) 375 382.33 T
+(DefaultV) 375 370.33 T
+(isual\050display) 411.61 370.33 T
+(,) 462.07 370.33 T
+(DefaultScreen\050display\051\051.) 429 358.33 T
+0 F
+(XpmColormap) 78 336.33 T
+1 F
+(\0501L<<1\051) 195 338.33 T
+(colormap) 267 338.33 T
+(Default value is:) 375 338.33 T
+(DefaultColormap\050display) 375 326.33 T
+(,) 476.56 326.33 T
+(DefaultScreen\050display\051\051.) 429 314.33 T
+0 F
+(XpmDepth) 78 292.33 T
+1 F
+(\0501L<<2\051) 195 294.33 T
+(depth) 267 294.33 T
+(Default value is:) 375 294.33 T
+(DefaultDepth\050display) 375 282.33 T
+(,) 461 282.33 T
+(DefaultScreen\050display\051\051.) 429 270.33 T
+0 F
+(XpmSize) 78 248.33 T
+1 F
+(\0501L<<3\051) 195 250.33 T
+(width, height) 267 250.33 T
+-0.35 (W) 375 250.33 P
+-0.35 (ill be set when creating an XImage or) 384.04 250.33 P
+(a Pixmap.) 375 238.33 T
+0 F
+(XpmHotspot) 78 216.33 T
+1 F
+(\0501L<<4\051) 195 218.33 T
+(x_hotspot, y_hotspot) 267 218.33 T
+(W) 375 218.33 T
+(ill be set if hotspot coordinates are) 384.04 218.33 T
+(found when parsing.) 375 206.33 T
+0 F
+(XpmCharsPerPixel) 78 184.33 T
+1 F
+(\0501L<<5\051) 195 186.33 T
+(cpp) 267 186.33 T
+0 F
+(XpmColorSymbols) 78 160.33 T
+1 F
+(\0501L<<6\051) 195 162.33 T
+(colorsymbols,) 267 162.33 T
+(numcolorsymbols) 267 150.33 T
+0 F
+(XpmRgbFilename) 78 128.33 T
+1 F
+(\0501L<<7\051) 195 130.33 T
+(r) 267 130.33 T
+(gb_fname) 270.15 130.33 T
+72 419 540 419 2 L
+V
+0.5 H
+0 Z
+N
+72 395 540 395 2 L
+V
+N
+FMENDPAGE
+%%EndPage: "12" 12
+%%Page: "13" 13
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(13) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 F
+-0.35 (NOTE) 72 210.18 P
+1 F
+-0.35 (: In any case the) 100.34 210.18 P
+0 F
+-0.35 (XpmAttributes) 166.05 210.18 P
+1 F
+-0.35 ( valuemask must be set to some valid value, at least zero, otherwise unpredict-) 231.04 210.18 P
+(able errors can occur.) 72 198.18 T
+0.33 (The) 72 174.18 P
+0 F
+0.33 (colorTable) 90.38 174.18 P
+1 F
+0.33 ( field of the) 136.49 174.18 P
+0 F
+0.33 (XpmAttributes) 186.68 174.18 P
+1 F
+0.33 ( structure is an array of) 251.67 174.18 P
+0 F
+0.33 (XpmColor) 348.61 174.18 P
+1 F
+0.33 ( \050page 24\051 which is compatible with) 394.16 174.18 P
+-0.01 (an) 72 162.18 P
+0 F
+-0.01 (XpmImage) 83.93 162.18 P
+1 F
+-0.01 ( colortable \050page 24\051 and should be used with the corresponding flags:) 131.7 162.18 P
+0 F
+-0.01 (XpmColorT) 415.4 162.18 P
+-0.01 (able) 466.7 162.18 P
+1 F
+-0.01 ( and) 484.48 162.18 P
+0 F
+-0.01 (XpmRe-) 503.9 162.18 P
+0.1 (turnColorT) 72 150.18 P
+0.1 (able) 121.08 150.18 P
+1 F
+0.1 (. But in order to be backward compatible this field is cast to \050) 138.86 150.18 P
+0 F
+0.1 (XpmColor) 385.09 150.18 P
+1 F
+0.1 ( **\051, which is equivalent to) 430.64 150.18 P
+0.24 (\050char ***\051, when it is used with the old flags:) 72 138.18 P
+0 F
+0.24 (XpmInfos) 257.95 138.18 P
+1 F
+0.24 ( and) 300.73 138.18 P
+0 F
+0.24 (XpmReturnInfos) 320.64 138.18 P
+1 F
+0.24 (. In this case the colorTable is a two) 393.97 138.18 P
+(dimensional array of strings, organized as follows:) 72 126.18 T
+(colorTable[color#][0] points to the character string associated to the color.) 72 108.18 T
+0 F
+(XpmInfos) 78 654.18 T
+1 F
+(\0501L<<8\051) 195 656.18 T
+(cpp, pixels, npixels,) 267 656.18 T
+(colorT) 267 644.18 T
+(able, ncolors,) 292.96 644.18 T
+(hints_cmt, colors_cmt,) 267 632.18 T
+(pixels_cmt, mask_pixel) 267 620.18 T
+(Obsolete.) 375 656.18 T
+(colorT) 375 644.18 T
+(able cast to \050XpmColor **\051.) 400.96 644.18 T
+0 F
+(XpmReturnInfos) 78 598.18 T
+4 F
+(idem) 195 600.18 T
+(idem) 267 600.18 T
+1 F
+(Obsolete.) 375 600.18 T
+-0.04 (W) 375 588.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 588.18 P
+(tion failure.) 375 576.18 T
+0 F
+(XpmPixels) 78 554.18 T
+1 F
+(\0501L<<9\051) 195 556.18 T
+(pixels, npixels) 267 556.18 T
+(npixels will dif) 375 556.18 T
+(fer from ncolors if sev-) 435.38 556.18 T
+-0.09 (eral colors are bound to the same pixel,) 375 544.18 P
+(and if there is a mask \050None color\051.) 375 532.18 T
+0 F
+(XpmReturnPixels) 78 510.18 T
+4 F
+(idem) 195 512.18 T
+(idem) 267 512.18 T
+1 F
+-0.04 (W) 375 512.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 512.18 P
+(tion failure.) 375 500.18 T
+0 F
+(XpmExtensions) 78 478.18 T
+1 F
+(\0501L<<10\051) 195 480.18 T
+(extensions, nextensions) 267 480.18 T
+0 F
+(XpmReturnExtensions) 78 454.18 T
+4 F
+(idem) 195 456.18 T
+(idem) 267 456.18 T
+1 F
+-0.04 (W) 375 456.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 456.18 P
+(tion failure.) 375 444.18 T
+0 F
+(XpmExactColors) 78 422.18 T
+1 F
+(\0501L<<1) 195 424.18 T
+(1\051) 225.35 424.18 T
+(exactColors) 267 424.18 T
+(Possible values are:) 375 424.18 T
+(False \0500\051 or T) 375 412.18 T
+(rue \0501\051.) 429.36 412.18 T
+0 F
+(XpmCloseness) 78 390.18 T
+1 F
+(\0501L<<12\051) 195 392.18 T
+(closeness) 267 392.18 T
+(Possible values are integers within the) 375 392.18 T
+(range: 0 to 65535.) 375 380.18 T
+0 F
+(XpmRGBCloseness) 78 358.18 T
+1 F
+(\0501L<<13\051) 195 360.18 T
+(red_closeness,) 267 360.18 T
+(green_closeness,) 267 348.18 T
+(blue_closeness) 267 336.18 T
+(Possible values are integers within the) 375 360.18 T
+(range: 0 to 65535.) 375 348.18 T
+0 F
+(XpmColorKey) 78 314.18 T
+1 F
+(\0501L<<14\051) 195 316.18 T
+(color_key) 267 316.18 T
+(Possible values are:) 375 316.18 T
+(XPM_MONO, XPM_GRA) 375 304.18 T
+(Y4,) 484.08 304.18 T
+(XPM_GRA) 375 292.18 T
+(Y) 421.86 292.18 T
+(, XPM_COLOR.) 427.79 292.18 T
+0 F
+(XpmColorT) 78 270.18 T
+(able) 129.3 270.18 T
+1 F
+(\0501L<<15\051) 195 272.18 T
+(colorT) 267 272.18 T
+(able, ncolors) 292.96 272.18 T
+0 F
+(XpmReturnColorT) 78 246.18 T
+(able) 159.85 246.18 T
+4 F
+(idem) 195 248.18 T
+(idem) 267 248.18 T
+1 F
+-0.04 (W) 375 248.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 248.18 P
+(tion failure.) 375 236.18 T
+0 F
+(Symbol Name) 78 678.18 T
+(Symbol V) 195 678.18 T
+(alue) 236.03 678.18 T
+(Related Members) 267 678.18 T
+(Comments) 375 678.18 T
+72 692.84 540 692.84 2 L
+V
+0.5 H
+0 Z
+N
+72 668.84 540 668.84 2 L
+V
+N
+72 228.84 540 228.84 2 L
+V
+N
+FMENDPAGE
+%%EndPage: "13" 13
+%%Page: "14" 14
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(14) 300 56.01 T
+1 10 Q
+(colorTable[color#][1] points to the symbolic name of the color.) 72 686.33 T
+(colorTable[color#][2] points to the default color for monochrome visuals.) 72 674.33 T
+(colorTable[color#][3] points to the default color for 4-level grayscale visuals.) 72 662.33 T
+(colorTable[color#][4] points to the default color for other grayscale visuals.) 72 650.33 T
+(colorTable[color#][5] points to the default color for color visuals.) 72 638.33 T
+(Note that this can also be seen as an array of pointers to) 72 614.33 T
+0 F
+(XpmColor) 297.23 614.33 T
+1 F
+( structures which is then organized as follows:) 342.78 614.33 T
+(colorTable[#color] points to the) 72 590.33 T
+0 F
+(XpmColor) 201.98 590.33 T
+1 F
+( structure retaining related data.) 247.53 590.33 T
+-0.13 (Comments are limited to a single comment string by section. If more exist in the read file, then only the last comment) 72 566.33 P
+(of each section will be stored.) 72 554.33 T
+-0.09 (To get information back while writing out to a file, you can just set the mask bits) 72 530.33 P
+0 F
+-0.09 (XpmReturnInfos) 396.65 530.33 P
+1 F
+-0.09 ( to the valuemask) 469.98 530.33 P
+0.56 (of an) 72 518.33 P
+0 F
+0.56 (XpmAttributes) 95.88 518.33 P
+1 F
+0.56 (structure that you pass to the) 163.93 518.33 P
+0 F
+0.56 (XpmReadFileToPixmap) 284.47 518.33 P
+1 F
+0.56 ( \050page 16\051 function while reading the) 388.36 518.33 P
+0.11 (file, and then give the structure back to the) 72 506.33 P
+0 F
+0.11 (XpmWriteFileFromPixmap) 246.32 506.33 P
+1 F
+0.11 ( \050page 17\051) 365.19 506.33 P
+0.11 (function while writing. However) 408.57 506.33 P
+(this method should be considered as obsolete since the advanced level interface provides a cleaner way to do so.) 72 494.33 T
+(To allow overriding of colors at load time the) 72 462.33 T
+0 F
+(XPM) 256.7 462.33 T
+1 F
+( library defines the) 279.47 462.33 T
+0 F
+(XpmColorSymbol) 357.23 462.33 T
+1 F
+( structure which contains:) 435.01 462.33 T
+(typedef struct {) 72 444.33 T
+( char *name;) 144 432.33 T
+(/* Symbolic color name */) 288 432.33 T
+( char *value;) 144 420.33 T
+(/* Color value */) 288 420.33 T
+( Pixel pixel;) 144 408.33 T
+(/* Color pixel */) 288 408.33 T
+(} XpmColorSymbol;) 72 396.33 T
+-0.01 (So, to override default colors at load time, you just have to pass, via the) 72 372.33 P
+0 F
+-0.01 (XpmAttributes) 360.65 372.33 P
+1 F
+-0.01 ( structure, a list of) 425.64 372.33 P
+0 F
+-0.01 (XpmCol-) 500.56 372.33 P
+-0.14 (orSymbol) 72 360.33 P
+1 F
+-0.14 ( elements containing the desired colors to the) 113.67 360.33 P
+0 F
+-0.14 (XpmReadFileToPixmap) 295.87 360.33 P
+1 F
+-0.14 ( or) 399.76 360.33 P
+0 F
+-0.14 (XpmCreatePixmapFromData) 412.81 360.33 P
+1 F
+-0.3 ( \050page 18\051 functions. These colors can be specified by giving the color name in the value member or directly by giving) 72 348.33 P
+0.08 (the corresponding pixel in the pixel member. In the latter case the value member must be set to) 72 336.33 P
+0 F
+0.08 (NULL) 455.95 336.33 P
+1 F
+0.08 ( otherwise the) 483.73 336.33 P
+(given pixel will not be considered.) 72 324.33 T
+-0.34 (In addition, it is possible to set the pixel for a specific color) 72 300.33 P
+0 F
+-0.34 (value) 307.6 300.33 P
+1 F
+-0.34 (at load time by setting the color name to) 332.55 300.33 P
+0 F
+-0.34 (NULL) 493.12 300.33 P
+1 F
+-0.34 (, and) 520.9 300.33 P
+0.25 (setting the value and pixel fields appropriately. For example, by setting the color name to) 72 288.33 P
+0 F
+0.25 (NULL) 435.41 288.33 P
+1 F
+0.25 (, the value to \322red\323) 463.19 288.33 P
+0.06 (and the pixel to 51, all symbolic colors that are assigned to \322red\323 will be set to pixel 51. It is even possible to specify) 72 276.33 P
+(the pixel used for the transparent color \322none\323 when no mask is required.) 72 264.33 T
+(To pass and retrieve extension data use the) 72 240.33 T
+0 F
+(XpmExtension) 245.85 240.33 T
+1 F
+( structure which is defined below:) 309.19 240.33 T
+(typedef struct {) 72 222.33 T
+( char *name;) 144 210.33 T
+(/* name of the extension */) 288 210.33 T
+( unsigned int nlines;) 144 198.33 T
+(/* number of lines in this extension */) 288 198.33 T
+( char **lines;) 144 186.33 T
+(/* pointer to the extension array of strings */) 288 186.33 T
+(} XpmExtension;) 72 174.33 T
+-0.16 (To retrieve possible extension data stored in an) 72 150.33 P
+0 F
+-0.16 (XPM) 261.84 150.33 P
+1 F
+-0.16 ( file or data, you must set the mask bits) 284.61 150.33 P
+0 F
+-0.16 (XpmReturnExtensions) 442.22 150.33 P
+1 F
+0.16 (to the valuemask of an) 72 138.33 P
+0 F
+0.16 (XpmAttributes) 165.85 138.33 P
+1 F
+0.16 ( structure that you pass to the read function you use. Then the same structure) 230.84 138.33 P
+(may be passed the same way to any write function if you set the mask bits) 72 126.33 T
+0 F
+(XpmExtensions) 370.85 126.33 T
+1 F
+( to the valuemask.) 438.08 126.33 T
+FMENDPAGE
+%%EndPage: "14" 14
+%%Page: "15" 15
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(15) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(3.1.2) 72 684.84 T
+(Functions to deal with XPM files) 108 684.84 T
+1 10 Q
+(To create an) 72 660.18 T
+0 F
+(XImage) 123.92 660.18 T
+1 F
+( from an) 157.8 660.18 T
+0 F
+(XPM) 194.18 660.18 T
+1 F
+( file, use) 216.95 660.18 T
+0 F
+(XpmReadFileToImage) 253.61 660.18 T
+1 F
+(.) 351.38 660.18 T
+(int XpmReadFileToImage\050) 72 642.18 T
+4 F
+(display, filename, image_return, shapeimage_return, attributes) 180.6 642.18 T
+1 F
+(\051) 434.48 642.18 T
+(Display) 108 630.18 T
+4 F
+(*display;) 141.61 630.18 T
+1 F
+(char) 108 618.18 T
+4 F
+(*filename;) 127.71 618.18 T
+1 F
+(XImage) 108 606.18 T
+4 F
+(**image_return;) 142.71 606.18 T
+1 F
+(XImage) 108 594.18 T
+4 F
+(**shapeimage_return;) 142.71 594.18 T
+1 F
+(XpmAttributes) 108 582.18 T
+4 F
+(*attributes;) 170.5 582.18 T
+(display) 72 566.18 T
+1 F
+(Specifies the connection to the X server.) 171 566.18 T
+4 F
+(filename) 72 550.18 T
+1 F
+(Specifies the file name to use.) 171 550.18 T
+4 F
+(image_return) 72 534.18 T
+1 F
+(Returns the image which is created.) 171 534.18 T
+4 F
+(shapeimage_return) 72 518.18 T
+1 F
+(Returns the shape mask image which is created if the color None is used.) 171 518.18 T
+4 F
+(attributes) 72 502.18 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 502.18 T
+0.46 (The) 72 478.18 P
+0 F
+0.46 (XpmReadFileToImage) 90.5 478.18 P
+1 F
+0.46 ( function reads in a file in the) 188.27 478.18 P
+0 F
+0.46 (XPM) 311.89 478.18 P
+1 F
+0.46 ( format. If the file cannot be opened it returns) 334.66 478.18 P
+0 F
+0.46 (Xp-) 523.89 478.18 P
+0.15 (mOpenFailed) 72 466.18 P
+1 F
+0.15 (. If the file can be opened but does not contain valid) 130.34 466.18 P
+0 F
+0.15 (XPM) 342.43 466.18 P
+1 F
+0.15 (data, it returns) 367.85 466.18 P
+0 F
+0.15 (XpmFileInvalid) 428.3 466.18 P
+1 F
+0.15 (. If insuffi-) 496.09 466.18 P
+(cient working storage is allocated, it returns) 72 454.18 T
+0 F
+(XpmNoMemory) 249.75 454.18 T
+1 F
+(.) 319.73 454.18 T
+1.19 (If the passed) 72 430.18 P
+0 F
+1.19 (XpmAttributes) 128.61 430.18 P
+1 F
+1.19 ( structure pointer is not) 193.6 430.18 P
+0 F
+1.19 (NULL) 294.82 430.18 P
+1 F
+1.19 (,) 322.6 430.18 P
+0 F
+1.19 (XpmReadFileToImage) 328.79 430.18 P
+1 F
+1.19 ( looks for the following at-) 426.56 430.18 P
+0.07 (tributes:) 72 418.18 P
+0 F
+0.07 (XpmVisual) 107.35 418.18 P
+1 F
+0.07 (,) 155.69 418.18 P
+0 F
+0.07 (XpmColormap) 160.77 418.18 P
+1 F
+0.07 (,) 225.21 418.18 P
+0 F
+0.07 (XpmDepth) 230.28 418.18 P
+1 F
+0.07 (,) 277.5 418.18 P
+0 F
+0.07 (XpmColorSymbols) 282.57 418.18 P
+1 F
+0.07 (,) 364.24 418.18 P
+0 F
+0.07 (XpmExactColors) 369.31 418.18 P
+1 F
+0.07 (,) 443.19 418.18 P
+0 F
+0.07 (XpmCloseness) 448.27 418.18 P
+1 F
+0.07 (,) 510.49 418.18 P
+0 F
+0.07 (Xpm-) 515.56 418.18 P
+0.34 (RGBCloseness, XpmReturnPixels) 72 406.18 P
+1 F
+0.34 (,) 216.78 406.18 P
+0 F
+0.34 (XpmReturnExtensions) 222.11 406.18 P
+1 F
+0.34 (, sets the) 319.89 406.18 P
+0 F
+0.34 (XpmSize) 358.12 406.18 P
+1 F
+0.34 (, the) 396.45 406.18 P
+0 F
+0.34 (XpmCharsPerPixel) 416.85 406.18 P
+1 F
+0.34 (, and pos-) 500.17 406.18 P
+0.12 (sibly the) 72 394.18 P
+0 F
+0.12 (XpmHotspot) 108.9 394.18 P
+1 F
+0.12 ( attributes when returning. As a backward compatibility feature,) 163.9 394.18 P
+0 F
+0.12 (XpmReadFileToImage) 423.5 394.18 P
+1 F
+0.12 ( also) 521.27 394.18 P
+0.68 (looks for the) 72 382.18 P
+0 F
+0.68 (XpmReturnInfos) 127.09 382.18 P
+1 F
+0.68 ( attributes. In any case, if requested data cannot be returned because of insufficient) 200.42 382.18 P
+0.19 (memory storage,) 72 370.18 P
+0 F
+0.19 (XpmReadFileToImage) 142.09 370.18 P
+1 F
+0.19 ( will change the valuemask to mention this and will try to continue. So the) 239.86 370.18 P
+(caller should check on this before accessing this data.) 72 358.18 T
+0.39 (Note: The valuemask of the passed) 72 334.18 P
+0 F
+0.39 (XpmAttributes) 217.07 334.18 P
+1 F
+0.39 ( must be set to some valid value, at least zero, otherwise unpre-) 282.06 334.18 P
+(dictable errors can occur.) 72 322.18 T
+0 F
+0.76 (XpmReadFileToImage) 72 298.18 P
+1 F
+0.76 ( allocates colors, as read from the file or possibly overridden as specified in the) 169.77 298.18 P
+0 F
+0.76 (XpmCol-) 500.56 298.18 P
+0.04 (orSymbols) 72 286.18 P
+1 F
+0.04 ( attributes. The colors are allocated using the color settings for the visual specified by the) 117.56 286.18 P
+0 F
+0.04 (XpmColorKey) 477.23 286.18 P
+1 F
+0.05 (attribute, which has the value) 72 274.18 P
+0 F
+0.05 (XPM_MONO, XPM_GRAY4, XPM_GRAY,) 192.22 274.18 P
+1 F
+0.05 (or) 386.78 274.18 P
+0 F
+0.05 ( XPM_COLOR) 395.11 274.18 P
+1 F
+0.05 (. If the) 462.1 274.18 P
+0 F
+0.05 (XpmColor-) 491.12 274.18 P
+(Key) 72 262.18 T
+1 F
+( attribute is not set it is determined by examining the type of visual.) 89.22 262.18 T
+-0.17 (If no default value exists for the specified visual, it first looks for other defaults nearer to the monochrome visual type) 72 238.18 P
+0.47 (and secondly nearer to the color visual type. If the color which is found is not valid \050cannot be parsed\051, it looks for) 72 226.18 P
+(another default one according to the same algorithm.) 72 214.18 T
+-0.29 (If allocating a color fails, and the) 72 190.18 P
+0 F
+-0.29 (closeness) 204.94 190.18 P
+1 F
+-0.29 ( attribute is set, it tries to find a color already in the colormap that is closest) 243.27 190.18 P
+0.11 (to the desired color, and uses that. If no color can be found that is within) 72 178.18 P
+0 F
+0.11 (closeness) 365.93 178.18 P
+1 F
+0.11 (of the Red, Green and Blue com-) 406.87 178.18 P
+-0.62 (ponents of the desired color, it reverts to trying other default values as explained above. For finer control over the close-) 72 166.18 P
+-0.55 (ness requirements of a particular icon, the) 72 154.18 P
+0 F
+-0.55 (red_closeness) 238.08 154.18 P
+1 F
+-0.55 (,) 295.85 154.18 P
+0 F
+-0.55 (green_closeness) 300.3 154.18 P
+1 F
+-0.55 (, and) 367.51 154.18 P
+0 F
+-0.55 (blue_closeness) 388.34 154.18 P
+1 F
+-0.55 ( attributes may be used) 450.01 154.18 P
+(instead of the more general) 72 142.18 T
+0 F
+(closeness) 183.36 142.18 T
+1 F
+( attribute.) 221.69 142.18 T
+0.53 (The RGB components are integers within the range 0 \050black\051 to 65535 \050white\051. A closeness of less than 10000, for) 72 118.18 P
+-0.04 (example, will cause only quite close colors to be matched, while a closeness of more than 50000 will allow quite dis-) 72 106.18 P
+FMENDPAGE
+%%EndPage: "15" 15
+%%Page: "16" 16
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(16) 300 56.01 T
+1 10 Q
+-0.4 (similar colors to match. Specifying a closeness of more than 65535 will allow any color to match, thus forcing the icon) 72 686.33 P
+-0.05 (to be drawn in color no matter how bad the colormap is. The value 40000 seems to be about right for many situations) 72 674.33 P
+-0.04 (requiring reasonable but not perfect matches. With this setting the color must only be within the same general area of) 72 662.33 P
+(the RGB cube as the desired color.) 72 650.33 T
+0.12 (If the) 72 626.33 P
+0 F
+0.12 (exactColors) 96.11 626.33 P
+1 F
+0.12 ( attribute is set it then returns) 146.65 626.33 P
+0 F
+0.12 (XpmColorError) 266.63 626.33 P
+1 F
+0.12 (, otherwise it creates the images and returns) 337.17 626.33 P
+0 F
+0.12 (Xpm-) 515.56 626.33 P
+-0.12 (Success) 72 614.33 P
+1 F
+-0.12 (. If no color is found, and no close color exists or is wanted, and all visuals have been exhausted,) 104.22 614.33 P
+0 F
+-0.12 (XpmColor-) 491.12 614.33 P
+(Failed) 72 602.33 T
+1 F
+( is returned.) 98.67 602.33 T
+0 F
+0.1 (XpmReadFileToImage) 72 578.33 P
+1 F
+0.1 ( returns the created image to image_return if not) 169.77 578.33 P
+0 F
+0.1 (NULL) 366.47 578.33 P
+1 F
+0.1 ( and possibly the created shapemask) 394.25 578.33 P
+-0.06 (to shapeimage_return if not) 72 566.33 P
+0 F
+-0.06 (NULL) 184.51 566.33 P
+1 F
+-0.06 ( and the color) 212.29 566.33 P
+0 F
+-0.06 (None) 269.26 566.33 P
+1 F
+-0.06 ( is used. If required it stores into the) 291.48 566.33 P
+0 F
+-0.06 (XpmAttributes) 437.58 566.33 P
+1 F
+-0.06 ( structure) 502.57 566.33 P
+(the list of the used pixels.) 72 554.33 T
+-0.33 (When finished the caller must free the images using) 72 530.33 P
+0 F
+-0.33 (XDestroyImage) 279.29 530.33 P
+1 F
+-0.33 (, the colors using) 346.49 530.33 P
+0 F
+-0.33 (XFreeColors) 416 530.33 P
+1 F
+-0.33 (, and possibly the) 470.98 530.33 P
+(data returned into the) 72 518.33 T
+0 F
+(XpmAttributes) 159.76 518.33 T
+1 F
+( using) 224.75 518.33 T
+0 F
+(XpmFreeAttributes) 251.42 518.33 T
+1 F
+( \050page 23\051.) 335.84 518.33 T
+0.24 (In addition, on systems which support such features) 72 494.33 P
+0 F
+0.24 (XpmReadFileToImage) 283.6 494.33 P
+1 F
+0.24 (deals with compressed files by forking) 384.11 494.33 P
+0.25 (an) 72 482.33 P
+0 F
+0.25 (uncompress) 84.19 482.33 P
+1 F
+0.25 ( or) 135.3 482.33 P
+0 F
+0.25 (gzip) 149.13 482.33 P
+1 F
+0.25 ( process and reading from the piped result. It assumes that the specified file is compressed if) 166.91 482.33 P
+-0.18 (the given file name ends by \325.Z\325 or \325.gz\325. In case the file name does not end so,) 72 470.33 P
+0 F
+-0.18 (XpmReadFileToImage) 385.84 470.33 P
+1 F
+-0.18 ( first looks for) 483.61 470.33 P
+0.36 (a file of which the name is the given one followed by \325.Z\325 or \325.gz\325; then if such a file does not exist, it looks for the) 72 458.33 P
+0.08 (given file \050assumed as not compressed\051. And if instead of a file name) 72 446.33 P
+0 F
+0.08 (NULL) 352.39 446.33 P
+1 F
+0.08 ( is passed to) 380.17 446.33 P
+0 F
+0.08 (XpmReadFileToImage) 431.59 446.33 P
+1 F
+0.08 (, it) 529.36 446.33 P
+(reads from the standard input.) 72 434.33 T
+(To create a) 72 402.33 T
+0 F
+(Pixmap) 118.92 402.33 T
+1 F
+( from an) 151.7 402.33 T
+0 F
+(XPM) 188.08 402.33 T
+1 F
+( file, use) 210.85 402.33 T
+0 F
+(XpmReadFileToPixmap) 247.51 402.33 T
+1 F
+(.) 351.4 402.33 T
+(int XpmReadFileToPixmap\050) 72 384.33 T
+4 F
+(display, d, filename, pixmap_return, shapemask_return, attributes) 186.17 384.33 T
+1 F
+(\051) 451.16 384.33 T
+(Display) 108 372.33 T
+4 F
+(*display;) 141.61 372.33 T
+1 F
+(Drawable) 108 360.33 T
+4 F
+(d;) 149.37 360.33 T
+1 F
+(char) 108 348.33 T
+4 F
+(*filename;) 127.71 348.33 T
+1 F
+(Pixmap) 108 336.33 T
+4 F
+(*pixmap_return;) 141.06 336.33 T
+1 F
+(Pixmap) 108 324.33 T
+4 F
+(*shapemask_return;) 141.06 324.33 T
+1 F
+(XpmAttributes) 108 312.33 T
+4 F
+(*attributes;) 170.5 312.33 T
+(display) 72 296.33 T
+1 F
+(Specifies the connection to the X server.) 171 296.33 T
+4 F
+(d) 72 280.33 T
+1 F
+(Specifies which screen the pixmap is created on.) 171 280.33 T
+4 F
+(filename) 72 264.33 T
+1 F
+(Specifies the file name to use.) 171 264.33 T
+4 F
+(pixmap_return) 72 248.33 T
+1 F
+(Returns the pixmap which is created.) 171 248.33 T
+4 F
+(shapemask_return) 72 232.33 T
+1 F
+(Returns the shapemask which is created if the color None is used.) 171 232.33 T
+4 F
+(attributes) 72 216.33 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 216.33 T
+-0.51 (The) 72 192.33 P
+0 F
+-0.51 (XpmReadFileToPixmap) 89.54 192.33 P
+1 F
+-0.51 ( function creates X images using) 193.43 192.33 P
+0 F
+-0.51 (XpmReadFileToImage) 323.66 192.33 P
+1 F
+-0.51 ( \050page 15\051 and thus returns the) 421.43 192.33 P
+0.13 (same errors. In addition on success it then creates the related pixmaps, using) 72 180.33 P
+0 F
+0.13 (XPutImage) 381.63 180.33 P
+1 F
+0.13 (, which are returned to pix-) 430.51 180.33 P
+(map_return and shapemask_return if not) 72 168.33 T
+0 F
+(NULL) 236.69 168.33 T
+1 F
+(, and finally destroys the created images using) 264.47 168.33 T
+0 F
+(XDestroyImage) 451.94 168.33 T
+1 F
+(.) 519.14 168.33 T
+-0.19 (When finished the caller must free the pixmaps using) 72 144.33 P
+0 F
+-0.19 (XFreePixmap) 286.09 144.33 P
+1 F
+-0.19 (, the colors using) 345.52 144.33 P
+0 F
+-0.19 (XFreeColors) 415.59 144.33 P
+1 F
+-0.19 (, and possibly the) 470.57 144.33 P
+(data returned into the) 72 132.33 T
+0 F
+(XpmAttributes) 159.76 132.33 T
+1 F
+( using) 224.75 132.33 T
+0 F
+(XpmFreeAttributes) 251.42 132.33 T
+1 F
+(.) 335.84 132.33 T
+FMENDPAGE
+%%EndPage: "16" 16
+%%Page: "17" 17
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(17) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 F
+(XpmWriteFileFromImage) 74.5 686.18 T
+1 F
+( writes out an) 187.25 686.18 T
+0 F
+(XImage) 243.91 686.18 T
+1 F
+( to an) 277.79 686.18 T
+0 F
+(XPM) 302.51 686.18 T
+1 F
+( file.) 325.28 686.18 T
+(int XpmWriteFileFromImage\050) 72 668.18 T
+4 F
+(display, filename, image, shapeimage, attributes) 193.38 668.18 T
+1 F
+(\051) 387.26 668.18 T
+(Display) 108 656.18 T
+4 F
+(*display;) 141.61 656.18 T
+1 F
+(char) 108 644.18 T
+4 F
+(*filename;) 127.71 644.18 T
+1 F
+(XImage) 108 632.18 T
+4 F
+(*image;) 142.71 632.18 T
+1 F
+(XImage) 108 620.18 T
+4 F
+(*shapeimage;) 142.71 620.18 T
+1 F
+(XpmAttributes) 108 608.18 T
+4 F
+(*attributes;) 170.5 608.18 T
+(display) 72 592.18 T
+1 F
+(Specifies the connection to the X server.) 171 592.18 T
+4 F
+(filename) 72 576.18 T
+1 F
+(Specifies the file name to use.) 171 576.18 T
+4 F
+(image) 72 560.18 T
+1 F
+(Specifies the image.) 171 560.18 T
+4 F
+(shapeimage) 72 544.18 T
+1 F
+(Specifies the shape mask image.) 171 544.18 T
+4 F
+(attributes) 72 528.18 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 528.18 T
+-0.5 (The) 72 504.18 P
+0 F
+-0.5 (XpmWriteFileFromImage) 89.54 504.18 P
+1 F
+-0.5 ( function writes an image and its possible shapeimage out to a file in the) 202.29 504.18 P
+0 F
+-0.5 (XPM) 486.08 504.18 P
+1 F
+-0.5 ( format.) 508.85 504.18 P
+0.08 (If the file cannot be opened, it returns) 72 492.18 P
+0 F
+0.08 (XpmOpenFailed) 225.68 492.18 P
+1 F
+0.08 (. If insufficient working storage is allocated, it returns) 296.8 492.18 P
+0 F
+0.08 (Xpm-) 515.56 492.18 P
+(NoMemory) 72 480.18 T
+1 F
+(. If no error occurs then it returns) 120.87 480.18 T
+0 F
+(XpmSuccess) 256.11 480.18 T
+1 F
+(.) 309.44 480.18 T
+0.12 (If the passed) 72 456.18 P
+0 F
+0.12 (XpmAttributes) 125.4 456.18 P
+1 F
+0.12 ( structure pointer is not) 190.39 456.18 P
+0 F
+0.12 (NULL) 286.26 456.18 P
+1 F
+0.12 (,) 314.04 456.18 P
+0 F
+0.12 (XpmWriteFileFromImage) 319.16 456.18 P
+1 F
+0.12 ( looks for the following at-) 431.91 456.18 P
+-0.03 (tributes:) 72 444.18 P
+0 F
+-0.03 (XpmColormap) 107.25 444.18 P
+1 F
+-0.03 (,) 171.69 444.18 P
+0 F
+-0.03 (XpmHotspot) 176.65 444.18 P
+1 F
+-0.03 (,) 231.65 444.18 P
+0 F
+-0.03 (XpmCharsPerPixel) 236.62 444.18 P
+1 F
+-0.03 (,) 319.94 444.18 P
+0 F
+-0.03 (XpmRgbFilename) 324.91 444.18 P
+1 F
+-0.03 (, and) 403.24 444.18 P
+0 F
+-0.03 (XpmExtensions) 425.11 444.18 P
+1 F
+-0.03 (. As a back-) 492.34 444.18 P
+(ward compatibility feature,) 72 432.18 T
+0 F
+(XpmWriteFileFromImage) 183.09 432.18 T
+1 F
+( also looks for the) 295.84 432.18 T
+0 F
+(XpmInfos) 370 432.18 T
+1 F
+( attributes.) 412.78 432.18 T
+0.18 (If the filename contains an extension such as \322.xpm\323, in order to get a valid C variable name, the dot character is re-) 72 408.18 P
+0.59 (placed by an underscore \325_\325 when writing out. As a backward compatibility feature, if the) 72 396.18 P
+0 F
+0.59 (XpmInfos) 441.61 396.18 P
+1 F
+0.59 (attributes are) 487.48 396.18 P
+0.34 (defined it writes out possible stored information such as comments, color defaults and symbol. Finally, if the) 72 384.18 P
+0 F
+0.34 (Xpm-) 515.56 384.18 P
+-0.5 (RgbFilename) 72 372.18 P
+1 F
+-0.5 (attribute is defined,) 131.22 372.18 P
+0 F
+-0.5 (XpmWriteFileFromImage) 209.72 372.18 P
+1 F
+-0.5 ( searches for color names in this file and if found writes) 322.47 372.18 P
+(them out instead of the rgb values.) 72 360.18 T
+0.39 (In addition on systems which support such features if the given file name ends by \325.Z\325 or \325.gz\325 it is assumed to be a) 72 336.18 P
+0.45 (compressed file. Then,) 72 324.18 P
+0 F
+0.45 (XpmWriteFileFromImage) 166.95 324.18 P
+1 F
+0.45 (writes to a piped) 282.65 324.18 P
+0 F
+0.45 (compress) 353.35 324.18 P
+1 F
+0.45 ( or) 393.34 324.18 P
+0 F
+0.45 (gzip) 407.58 324.18 P
+1 F
+0.45 ( process. And if instead of a) 425.36 324.18 P
+(file name) 72 312.18 T
+0 F
+(NULL) 111.99 312.18 T
+1 F
+(is passed to) 142.27 312.18 T
+0 F
+(XpmWriteFileFromImage) 190.88 312.18 T
+1 F
+(, it writes to the standard output.) 303.63 312.18 T
+(To write out a) 72 280.18 T
+0 F
+(Pixmap) 130.88 280.18 T
+1 F
+( to an) 163.66 280.18 T
+0 F
+(XPM) 188.38 280.18 T
+1 F
+( file, use) 211.15 280.18 T
+0 F
+(XpmWriteFileFromPixmap) 247.81 280.18 T
+1 F
+(.) 366.68 280.18 T
+(int XpmWriteFileFromPixmap\050) 72 262.18 T
+4 F
+(display, filename, pixmap, shapemask, attributes) 198.95 262.18 T
+1 F
+(\051) 393.94 262.18 T
+(Display) 108 250.18 T
+4 F
+(*display;) 141.61 250.18 T
+1 F
+(char) 108 238.18 T
+4 F
+(*filename;) 127.71 238.18 T
+1 F
+(Pixmap) 108 226.18 T
+4 F
+(pixmap;) 141.06 226.18 T
+1 F
+(Pixmap) 108 214.18 T
+4 F
+(shapemask;) 141.06 214.18 T
+1 F
+(XpmAttributes) 108 202.18 T
+4 F
+(*attributes;) 170.5 202.18 T
+(display) 72 186.18 T
+1 F
+(Specifies the connection to the X server.) 171 186.18 T
+4 F
+(filename) 72 170.18 T
+1 F
+(Specifies the file name to use.) 171 170.18 T
+4 F
+(pixmap) 72 154.18 T
+1 F
+(Specifies the pixmap.) 171 154.18 T
+4 F
+(shapemask) 72 138.18 T
+1 F
+(Specifies the shape mask pixmap.) 171 138.18 T
+4 F
+(attributes) 72 122.18 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 122.18 T
+FMENDPAGE
+%%EndPage: "17" 17
+%%Page: "18" 18
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(18) 300 56.01 T
+1 10 Q
+-0.32 (If the passed) 72 686.33 P
+0 F
+-0.32 (XpmAttributes) 124.09 686.33 P
+1 F
+-0.32 ( structure pointer is not) 189.08 686.33 P
+0 F
+-0.32 (NULL) 282.76 686.33 P
+1 F
+-0.32 (,) 310.54 686.33 P
+0 F
+-0.32 (XpmWriteFileFromPixmap) 315.23 686.33 P
+1 F
+-0.32 (looks for the following at-) 436.28 686.33 P
+0.2 (tributes:) 72 674.33 P
+0 F
+0.2 (XpmSize) 107.48 674.33 P
+1 F
+0.2 (. If they are not defined it performs an) 145.81 674.33 P
+0 F
+0.2 (XGetGeometry) 302.55 674.33 P
+1 F
+0.2 ( operation. Then it uses) 368.08 674.33 P
+0 F
+0.2 (XGetImage) 465.17 674.33 P
+1 F
+0.2 ( to get) 514.6 674.33 P
+0.44 (from the given pixmaps the related X images which are passed to) 72 662.33 P
+0 F
+0.44 (XpmWriteFileFromImage) 341.1 662.33 P
+1 F
+0.44 (. Finally) 453.85 662.33 P
+0 F
+0.44 (XpmWrite-) 490.57 662.33 P
+-0.27 (FileFromPixmap) 72 650.33 P
+1 F
+-0.27 ( destroys the created images using) 144.77 650.33 P
+0 F
+-0.27 (XDestroyImage) 282.55 650.33 P
+1 F
+-0.27 (. The) 349.75 650.33 P
+0 F
+-0.27 (XpmWriteFileFromPixmap) 372.25 650.33 P
+1 F
+-0.27 (function re-) 493.34 650.33 P
+(turns the same errors as) 72 638.33 T
+0 F
+(XpmWriteFileFromImage) 168.92 638.33 T
+1 F
+(.) 281.67 638.33 T
+0 12 Q
+(3.1.3) 72 595 T
+(Functions to deal with XPM data) 108 595 T
+1 10 Q
+0.17 (An) 72 570.33 P
+0 F
+0.17 (XPM) 86.89 570.33 P
+1 F
+0.17 ( data is an array of character strings which may be obtained by simply including an) 109.65 570.33 P
+0 F
+0.17 (XPM) 447.24 570.33 P
+1 F
+0.17 ( file into a C pro-) 470.01 570.33 P
+(gram.) 72 558.33 T
+(To create an) 72 526.33 T
+0 F
+(XImage) 123.92 526.33 T
+1 F
+( from an) 157.8 526.33 T
+0 F
+(XPM) 194.18 526.33 T
+1 F
+( data, use) 216.95 526.33 T
+0 F
+(XpmCreateImageFromData) 256.94 526.33 T
+1 F
+(.) 378.01 526.33 T
+(int XpmCreateImageFromData\050) 72 508.33 T
+4 F
+(display, data, image_return, shapeimage_return, attributes) 200.03 508.33 T
+1 F
+(\051) 437.25 508.33 T
+(Display) 108 496.33 T
+4 F
+(*display;) 141.61 496.33 T
+1 F
+(char) 108 484.33 T
+4 F
+(**data;) 127.71 484.33 T
+1 F
+(XImage) 108 472.33 T
+4 F
+(**image_return;) 142.71 472.33 T
+1 F
+(XImage) 108 460.33 T
+4 F
+(**shapeimage_return;) 142.71 460.33 T
+1 F
+(XpmAttributes) 108 448.33 T
+4 F
+(*attributes;) 170.5 448.33 T
+(display) 72 432.33 T
+1 F
+(Specifies the connection to the X server.) 171 432.33 T
+4 F
+(data) 72 416.33 T
+1 F
+(Specifies the location of the data.) 171 416.33 T
+4 F
+(image_return) 72 400.33 T
+1 F
+(Returns the image which is created.) 171 400.33 T
+4 F
+(shapeimage_return) 72 384.33 T
+1 F
+(Returns the shape mask image which is created if the color None is used.) 171 384.33 T
+4 F
+(attributes) 72 368.33 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 368.33 T
+-0.05 (The) 72 344.33 P
+0 F
+-0.05 (XpmCreateImageFromData) 90 344.33 P
+1 F
+-0.05 ( function allows you to include in your C program an) 211.07 344.33 P
+0 F
+-0.05 (XPM) 425.78 344.33 P
+1 F
+-0.05 ( file which was written) 448.55 344.33 P
+(out by functions such as) 72 332.33 T
+0 F
+(XpmWriteFileFromImage) 171.16 332.33 T
+1 F
+( or) 283.91 332.33 T
+0 F
+(XpmWriteFileFromPixmap) 297.24 332.33 T
+1 F
+( without reading in the file.) 416.11 332.33 T
+0 F
+0.07 (XpmCreateImageFromData) 72 308.33 P
+1 F
+0.07 ( exactly works as) 193.07 308.33 P
+0 F
+0.07 (XpmReadFileToImage) 264.99 308.33 P
+1 F
+0.07 ( \050page 15\051 does and returns the same way. It) 362.76 308.33 P
+0.17 (just reads data instead of a file. Here again, it is the caller\325s responsibility to free the returned images, the colors and) 72 296.33 P
+(possibly the data returned into the) 72 284.33 T
+0 F
+(XpmAttributes) 210.32 284.33 T
+1 F
+( structure.) 275.31 284.33 T
+(To create a) 72 252.33 T
+0 F
+(Pixmap) 118.92 252.33 T
+1 F
+( from an) 151.7 252.33 T
+0 F
+(XPM) 188.08 252.33 T
+1 F
+( data, use) 210.85 252.33 T
+0 F
+(XpmCreatePixmapFromData.) 250.84 252.33 T
+1 F
+(int XpmCreatePixmapFromData\050) 72 234.33 T
+4 F
+(display, d, data, pixmap_return, shapemask_return, attributes) 205.6 234.33 T
+1 F
+(\051) 453.93 234.33 T
+(Display) 108 222.33 T
+4 F
+(*display;) 141.61 222.33 T
+1 F
+(Drawable) 108 210.33 T
+4 F
+(d;) 149.37 210.33 T
+1 F
+(char) 108 198.33 T
+4 F
+(**data;) 127.71 198.33 T
+1 F
+(Pixmap) 108 186.33 T
+4 F
+(*pixmap_return;) 141.06 186.33 T
+1 F
+(Pixmap) 108 174.33 T
+4 F
+(*shapemask_return;) 141.06 174.33 T
+1 F
+(XpmAttributes) 108 162.33 T
+4 F
+(*attributes;) 170.5 162.33 T
+(display) 72 146.33 T
+1 F
+(Specifies the connection to the X server.) 171 146.33 T
+4 F
+(d) 72 130.33 T
+1 F
+(Specifies which screen the pixmap is created on.) 171 130.33 T
+4 F
+(data) 72 114.33 T
+1 F
+(Specifies the location of the data.) 171 114.33 T
+FMENDPAGE
+%%EndPage: "18" 18
+%%Page: "19" 19
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(19) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+(pixmap_return) 72 686.18 T
+1 F
+(Returns the pixmap which is created.) 171 686.18 T
+4 F
+(shapemask_return) 72 670.18 T
+1 F
+(Returns the shape mask pixmap which is created if the color None is used.) 171 670.18 T
+4 F
+(attributes) 72 654.18 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 654.18 T
+1.09 (The) 72 630.18 P
+0 F
+1.09 (XpmCreatePixmapFromData) 91.14 630.18 P
+1 F
+1.09 ( function creates X images using) 218.33 630.18 P
+0 F
+1.09 (XpmCreateImageFromData) 358.18 630.18 P
+1 F
+1.09 ( \050page 18\051 and) 479.25 630.18 P
+0.16 (thus returns the same errors. In addition on success it then creates the related pixmaps, using) 72 618.18 P
+0 F
+0.16 (XPutImage) 446.66 618.18 P
+1 F
+0.16 (, which are) 495.54 618.18 P
+0.47 (returned to pixmap_return and shapemask_return if not) 72 606.18 P
+0 F
+0.47 (NULL) 298.82 606.18 P
+1 F
+0.47 (, and finally destroys the created images using) 326.6 606.18 P
+0 F
+0.47 (XDe-) 517.79 606.18 P
+(stroyImage) 72 594.18 T
+1 F
+(.) 120.32 594.18 T
+-0.45 (Do not forget to free the returned pixmaps, the colors, and possibly the data returned into the) 72 570.18 P
+0 F
+-0.45 (XpmAttributes) 437.97 570.18 P
+1 F
+-0.45 ( structure) 502.96 570.18 P
+(when done.) 72 558.18 T
+(In some cases, one may want to create an) 72 526.18 T
+0 F
+(XPM) 239.73 526.18 T
+1 F
+( data from an) 262.5 526.18 T
+0 F
+(XImage) 318.04 526.18 T
+1 F
+(, to do so use) 351.92 526.18 T
+0 F
+(XpmCreateDataFromImage) 406.92 526.18 T
+1 F
+(.) 527.99 526.18 T
+(int XpmCreateDataFromImage\050) 72 508.18 T
+4 F
+(display, data_return, image, shapeimage, attributes) 200.03 508.18 T
+1 F
+(\051) 407.25 508.18 T
+(Display) 108 496.18 T
+4 F
+(*display;) 141.61 496.18 T
+1 F
+(char) 108 484.18 T
+4 F
+(***data_return;) 127.71 484.18 T
+1 F
+(XImage) 108 472.18 T
+4 F
+(*image;) 142.71 472.18 T
+1 F
+(XImage) 108 460.18 T
+4 F
+(*shapeimage;) 142.71 460.18 T
+1 F
+(XpmAttributes) 108 448.18 T
+4 F
+(*attributes;) 170.5 448.18 T
+(display) 72 432.18 T
+1 F
+(Specifies the connection to the X server.) 171 432.18 T
+4 F
+(data_return) 72 416.18 T
+1 F
+(Returns the data which is created.) 171 416.18 T
+4 F
+(image) 72 400.18 T
+1 F
+(Specifies the image.) 171 400.18 T
+4 F
+(shapeimage) 72 384.18 T
+1 F
+(Specifies the shape mask image.) 171 384.18 T
+4 F
+(attributes) 72 368.18 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 368.18 T
+0.01 (The) 72 344.18 P
+0 F
+0.01 (XpmCreateDataFromImage) 90.06 344.18 P
+1 F
+0.01 ( function exactly works as) 211.13 344.18 P
+0 F
+0.01 (XpmWriteFileFromImage) 318.64 344.18 P
+1 F
+0.01 ( \050page 17\051 does and returns) 431.39 344.18 P
+0.07 (the same way. It just writes to a single block malloc\325ed data instead of to a file. It is the caller\325s responsibility to free) 72 332.18 P
+(the data, using) 72 320.18 T
+0 F
+(XpmFree) 132.55 320.18 T
+1 F
+( when finished.) 173.09 320.18 T
+0 F
+(XpmCreateDataFromPixmap) 72 288.18 T
+1 F
+( creates an) 199.19 288.18 T
+0 F
+(XPM) 243.89 288.18 T
+1 F
+( data from a) 266.66 288.18 T
+0 F
+(Pixmap) 317.2 288.18 T
+1 F
+(.) 349.98 288.18 T
+(int XpmCreateDataFromPixmap\050) 72 270.18 T
+4 F
+(display, data_return, pixmap, shapemask, attributes) 205.6 270.18 T
+1 F
+(\051) 413.93 270.18 T
+(Display) 108 258.18 T
+4 F
+(*display;) 141.61 258.18 T
+1 F
+(char) 108 246.18 T
+4 F
+(***data_return;) 127.71 246.18 T
+1 F
+(Pixmap) 108 234.18 T
+4 F
+(pixmap;) 141.06 234.18 T
+1 F
+(Pixmap) 108 222.18 T
+4 F
+(shapemask;) 141.06 222.18 T
+1 F
+(XpmAttributes) 108 210.18 T
+4 F
+(*attributes;) 170.5 210.18 T
+(display) 72 194.18 T
+1 F
+(Specifies the connection to the X server.) 171 194.18 T
+4 F
+(data_return) 72 178.18 T
+1 F
+(Returns the data which is created.) 171 178.18 T
+4 F
+(pixmap) 72 162.18 T
+1 F
+(Specifies the pixmap.) 171 162.18 T
+4 F
+(shapemask) 72 146.18 T
+1 F
+(Specifies the shape mask pixmap.) 171 146.18 T
+4 F
+(attributes) 72 130.18 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 130.18 T
+0.54 (The) 72 106.18 P
+0 F
+0.54 (XpmCreateDataFromPixmap) 90.59 106.18 P
+1 F
+0.54 ( function uses) 217.78 106.18 P
+0 F
+0.54 (XGetImage) 277.44 106.18 P
+1 F
+0.54 ( to get from the given pixmaps the related X images) 326.87 106.18 P
+FMENDPAGE
+%%EndPage: "19" 19
+%%Page: "20" 20
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(20) 300 56.01 T
+1 10 Q
+-0.29 (which are passed to) 72 686.33 P
+0 F
+-0.29 (XpmCreateDataFromImage) 151.91 686.33 P
+1 F
+-0.29 (. Then it destroys the created images using) 272.98 686.33 P
+0 F
+-0.29 (XDestroyImage) 443.65 686.33 P
+1 F
+-0.29 (.) 510.86 686.33 P
+0 F
+-0.29 (Xpm-) 515.56 686.33 P
+(CreateDataFromPixmap) 72 674.33 T
+1 F
+( returns the same errors as) 178.08 674.33 T
+0 F
+(XpmCreateDataFromImage) 285.27 674.33 T
+1 F
+(.) 406.34 674.33 T
+0 12 Q
+(3.1.4) 72 631 T
+(Functions to deal with XPM files and data) 108 631 T
+1 10 Q
+0.29 (To directly transform an) 72 606.33 P
+0 F
+0.29 (XPM) 173.15 606.33 P
+1 F
+0.29 ( file to and from an) 195.92 606.33 P
+0 F
+0.29 (XPM) 277.11 606.33 P
+1 F
+0.29 ( data array, without requiring an open X display, use) 299.89 606.33 P
+0 F
+0.29 (Xpm-) 515.56 606.33 P
+(ReadFileToData) 72 594.33 T
+1 F
+( and) 142.55 594.33 T
+0 F
+(XpmWriteFileFromData) 161.99 594.33 T
+1 F
+(.) 268.63 594.33 T
+0 F
+(XpmReadFileToData) 72 562.33 T
+1 F
+( allocates and fills an) 163.66 562.33 T
+0 F
+(XPM) 250.59 562.33 T
+1 F
+( data array from an) 273.36 562.33 T
+0 F
+(XPM) 351.94 562.33 T
+1 F
+( file.) 374.71 562.33 T
+(int XpmReadFileToData\050) 72 544.33 T
+4 F
+(filename, data_return) 174.49 544.33 T
+1 F
+(\051) 261.71 544.33 T
+(char) 108 532.33 T
+4 F
+(*filename;) 127.71 532.33 T
+1 F
+(char) 108 520.33 T
+4 F
+(***data_return;) 127.71 520.33 T
+(filename) 72 504.33 T
+1 F
+(Specifies the file name to read.) 171 504.33 T
+4 F
+(data_return) 72 488.33 T
+1 F
+(Returns the data array created.) 171 488.33 T
+0 F
+0.56 (XpmReadFileToData) 72 464.33 P
+1 F
+0.56 ( returns) 163.66 464.33 P
+0 F
+0.56 (XpmOpenFailed) 197.54 464.33 P
+1 F
+0.56 ( if it cannot open the file,) 268.66 464.33 P
+0 F
+0.56 (XpmNoMemory) 375.86 464.33 P
+1 F
+0.56 ( if insufficient working) 445.85 464.33 P
+0.18 (storage is allocated,) 72 452.33 P
+0 F
+0.18 (XpmFileInvalid) 154.19 452.33 P
+1 F
+0.18 ( if this is not a valid) 221.98 452.33 P
+0 F
+0.18 (XPM) 305.18 452.33 P
+1 F
+0.18 ( file, and) 327.95 452.33 P
+0 F
+0.18 (XpmSuccess) 366.26 452.33 P
+1 F
+0.18 (otherwise. The allocated data) 422.27 452.33 P
+(returned by) 72 440.33 T
+0 F
+(XpmReadFileToData) 120.32 440.33 T
+1 F
+( should be freed with) 211.98 440.33 T
+0 F
+(XpmFree) 298.91 440.33 T
+1 F
+( when done.) 339.45 440.33 T
+0 F
+(XpmWriteFileFromData) 72 408.33 T
+1 F
+( writes an) 178.64 408.33 T
+0 F
+(XPM) 220.02 408.33 T
+1 F
+( data array to an) 242.79 408.33 T
+0 F
+(XPM) 309.71 408.33 T
+1 F
+( file.) 332.48 408.33 T
+(int XpmWriteFileFromData\050) 72 390.33 T
+4 F
+(filename, data) 187.27 390.33 T
+1 F
+(\051) 244.49 390.33 T
+(char) 108 378.33 T
+4 F
+(*filename;) 127.71 378.33 T
+1 F
+(char) 108 366.33 T
+4 F
+(**data;) 127.71 366.33 T
+(filename) 72 350.33 T
+1 F
+(Specifies the file name to write.) 171 350.33 T
+4 F
+(data) 72 334.33 T
+1 F
+(Specifies the data array to read.) 171 334.33 T
+0 F
+-0.21 (XpmReadFileToData) 72 310.33 P
+1 F
+-0.21 ( returns) 163.66 310.33 P
+0 F
+-0.21 (XpmOpenFailed) 196.01 310.33 P
+1 F
+-0.21 ( if it cannot open the file,) 267.13 310.33 P
+0 F
+-0.21 (XpmFileInvalid) 368.97 310.33 P
+1 F
+-0.21 ( if this is not a valid) 436.76 310.33 P
+0 F
+-0.21 (XPM) 517.23 310.33 P
+1 F
+(data, and) 72 298.33 T
+0 F
+(XpmSuccess) 110.6 298.33 T
+1 F
+( otherwise.) 163.93 298.33 T
+0 12 Q
+(3.1.5) 72 255 T
+(Functions to deal with XPM buffers) 108 255 T
+1 10 Q
+0.5 (An) 72 230.33 P
+0 F
+0.5 (XPM) 87.22 230.33 P
+1 F
+0.5 ( buffer is a character string which may be obtained by simply making the exact copy of an) 109.99 230.33 P
+0 F
+0.5 (XPM) 482.33 230.33 P
+1 F
+0.5 ( file into) 505.1 230.33 P
+(memory.) 72 218.33 T
+(To create an) 72 186.33 T
+0 F
+(XImage) 123.92 186.33 T
+1 F
+( from an) 157.8 186.33 T
+0 F
+(XPM) 194.18 186.33 T
+1 F
+( buffer, use) 216.95 186.33 T
+0 F
+(XpmCreateImageFromBuffer) 264.71 186.33 T
+1 F
+(.) 393 186.33 T
+(int XpmCreateImageFromBuffer\050) 72 168.33 T
+4 F
+(display, buffer, image_return, shapeimage_return, attributes) 207.25 168.33 T
+1 F
+(\051) 450.58 168.33 T
+(Display) 108 156.33 T
+4 F
+(*display;) 141.61 156.33 T
+1 F
+(char) 108 144.33 T
+4 F
+(*buffer;) 127.71 144.33 T
+1 F
+(XImage) 108 132.33 T
+4 F
+(**image_return;) 142.71 132.33 T
+1 F
+(XImage) 108 120.33 T
+4 F
+(**shapeimage_return;) 142.71 120.33 T
+1 F
+(XpmAttributes) 108 108.33 T
+4 F
+(*attributes;) 170.5 108.33 T
+FMENDPAGE
+%%EndPage: "20" 20
+%%Page: "21" 21
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(21) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+(display) 72 686.18 T
+1 F
+(Specifies the connection to the X server.) 171 686.18 T
+4 F
+(buffer) 72 670.18 T
+1 F
+(Specifies the location of the buffer.) 171 670.18 T
+4 F
+(image_return) 72 654.18 T
+1 F
+(Returns the image which is created.) 171 654.18 T
+4 F
+(shapeimage_return) 72 638.18 T
+1 F
+(Returns the shape mask image which is created if the color None is used.) 171 638.18 T
+4 F
+(attributes) 72 622.18 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 622.18 T
+-0.43 (The) 72 598.18 P
+0 F
+-0.43 (XpmCreateImageFromBuffer) 89.62 598.18 P
+1 F
+-0.43 ( works the same way as) 217.91 598.18 P
+0 F
+-0.43 (XpmReadFileToImage) 312.51 598.18 P
+1 F
+-0.43 ( \050page 15\051, it just parses the buff-) 410.28 598.18 P
+-0.57 (er instead of the file. Be aware that the feature provided on some systems by) 72 586.18 P
+0 F
+-0.57 (XpmReadFileToImage) 371.74 586.18 P
+1 F
+-0.57 (to deal with com-) 471.44 586.18 P
+(pressed files is not available here.) 72 574.18 T
+(To create a) 72 542.18 T
+0 F
+(Pixmap) 118.92 542.18 T
+1 F
+( from an) 151.7 542.18 T
+0 F
+(XPM) 188.08 542.18 T
+1 F
+( buffer, use) 210.85 542.18 T
+0 F
+(XpmCreatePixmapFromBuffer) 258.61 542.18 T
+1 F
+(.) 393.02 542.18 T
+(int XpmCreatePixmapFromBuffer\050) 72 524.18 T
+4 F
+(display, d, buffer, pixmap_return, shapemask_return, attributes) 212.82 524.18 T
+1 F
+(\051) 467.26 524.18 T
+(Display) 108 512.18 T
+4 F
+(*display;) 141.61 512.18 T
+1 F
+(Drawable) 108 500.18 T
+4 F
+(d;) 149.37 500.18 T
+1 F
+(char) 108 488.18 T
+4 F
+(*buffer;) 127.71 488.18 T
+1 F
+(Pixmap) 108 476.18 T
+4 F
+(*pixmap_return;) 141.06 476.18 T
+1 F
+(Pixmap) 108 464.18 T
+4 F
+(*shapemask_return;) 141.06 464.18 T
+1 F
+(XpmAttributes) 108 452.18 T
+4 F
+(*attributes;) 170.5 452.18 T
+(display) 72 436.18 T
+1 F
+(Specifies the connection to the X server.) 171 436.18 T
+4 F
+(d) 72 420.18 T
+1 F
+(Specifies which screen the pixmap is created on.) 171 420.18 T
+4 F
+(buffer) 72 404.18 T
+1 F
+(Specifies the location of the buffer.) 171 404.18 T
+4 F
+(pixmap_return) 72 388.18 T
+1 F
+(Returns the pixmap which is created if the color None.) 171 388.18 T
+4 F
+(shapemask_return) 72 372.18 T
+1 F
+(Returns the shape mask pixmap which is created if the color None is used.) 171 372.18 T
+4 F
+(attributes) 72 356.18 T
+1 F
+(Specifies the location of a structure to get and store information.) 171 356.18 T
+0.88 (The) 72 332.18 P
+0 F
+0.88 (XpmCreatePixmapFromBuffer) 90.93 332.18 P
+1 F
+0.88 ( function works the same way as) 225.34 332.18 P
+0 F
+0.88 (XpmReadFileToPixmap) 364.54 332.18 P
+1 F
+0.88 ( \050page 16\051, it just) 468.43 332.18 P
+(calls) 72 320.18 T
+0 F
+(XpmCreateImageFromBuffer) 92.83 320.18 T
+1 F
+( instead of) 221.12 320.18 T
+0 F
+(XpmReadFileToImage) 265.28 320.18 T
+1 F
+(.) 363.05 320.18 T
+(To create an) 72 288.18 T
+0 F
+(XPM) 123.92 288.18 T
+1 F
+( buffer from an) 146.69 288.18 T
+0 F
+(XImage) 210 288.18 T
+1 F
+(, use) 243.88 288.18 T
+0 F
+(XpmCreateBufferFromImage) 264.71 288.18 T
+1 F
+(.) 393 288.18 T
+(int XpmCreateBufferFromImage\050) 72 270.18 T
+4 F
+(display, buffer_return, image, shapeimage, attributes) 207.25 270.18 T
+1 F
+(\051) 420.58 270.18 T
+(Display) 108 258.18 T
+4 F
+(*display;) 141.61 258.18 T
+1 F
+(char) 108 246.18 T
+4 F
+(**buffer_return;) 127.71 246.18 T
+1 F
+(XImage) 108 234.18 T
+4 F
+(*image;) 142.71 234.18 T
+1 F
+(XImage) 108 222.18 T
+4 F
+(*shapeimage;) 142.71 222.18 T
+1 F
+(XpmAttributes) 108 210.18 T
+4 F
+(*attributes;) 170.5 210.18 T
+(display) 72 194.18 T
+1 F
+(Specifies the connection to the X server.) 171 194.18 T
+4 F
+(buffer_return) 72 178.18 T
+1 F
+(Returns the buffer which is created.) 171 178.18 T
+4 F
+(image) 72 162.18 T
+1 F
+(Specifies the image.) 171 162.18 T
+4 F
+(shapeimage) 72 146.18 T
+1 F
+(Specifies the shape mask image.) 171 146.18 T
+4 F
+(attributes) 72 130.18 T
+1 F
+(Specifies the location of a structure containing information \050or) 171 130.18 T
+(NULL\051.) 423.46 130.18 T
+1.16 (The) 72 106.18 P
+0 F
+1.16 (XpmCreateBufferFromImage) 91.21 106.18 P
+1 F
+1.16 ( works as) 219.5 106.18 P
+0 F
+1.16 (XpmWriteFileFromImage) 263.26 106.18 P
+1 F
+1.16 ( \050page 17\051, it just writes to a malloc\325ed) 376.01 106.18 P
+FMENDPAGE
+%%EndPage: "21" 21
+%%Page: "22" 22
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(22) 300 56.01 T
+1 10 Q
+(buffer instead of to a file. The caller should free the buffer using) 72 686.33 T
+0 F
+(XpmFree) 331.93 686.33 T
+1 F
+( when finished.) 372.47 686.33 T
+0 F
+(XpmCreateBufferFromPixmap) 72 654.33 T
+1 F
+( creates an) 206.41 654.33 T
+0 F
+(XPM) 251.11 654.33 T
+1 F
+( buffer from a) 273.88 654.33 T
+0 F
+(Pixmap) 332.19 654.33 T
+1 F
+(.) 364.97 654.33 T
+(int XpmCreateBufferFromPixmap\050) 72 636.33 T
+4 F
+(display, buffer_return, pixmap, shapemask, attributes) 212.82 636.33 T
+1 F
+(\051) 427.26 636.33 T
+(Display) 108 624.33 T
+4 F
+(*display;) 141.61 624.33 T
+1 F
+(char) 108 612.33 T
+4 F
+(**buffer_return;) 127.71 612.33 T
+1 F
+(Pixmap) 108 600.33 T
+4 F
+(pixmap;) 141.06 600.33 T
+1 F
+(Pixmap) 108 588.33 T
+4 F
+(shapemask;) 141.06 588.33 T
+1 F
+(XpmAttributes) 108 576.33 T
+4 F
+(*attributes;) 170.5 576.33 T
+(display) 72 560.33 T
+1 F
+(Specifies the connection to the X server.) 171 560.33 T
+4 F
+(buffer_return) 72 544.33 T
+1 F
+(Returns the buffer which is created.) 171 544.33 T
+4 F
+(pixmap) 72 528.33 T
+1 F
+(Specifies the pixmap.) 171 528.33 T
+4 F
+(shapemask) 72 512.33 T
+1 F
+(Specifies the shape mask pixmap.) 171 512.33 T
+4 F
+(attributes) 72 496.33 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 496.33 T
+0.43 (The) 72 472.33 P
+0 F
+0.43 (XpmCreateBufferFromPixmap) 90.48 472.33 P
+1 F
+0.43 ( function works as) 224.89 472.33 P
+0 F
+0.43 (XpmWriteFileFromPixmap) 302.72 472.33 P
+1 F
+0.43 ( \050page 17\051, it just calls) 421.59 472.33 P
+0 F
+0.43 (Xpm-) 515.56 472.33 P
+-0.11 (CreateBufferFromImage) 72 460.33 P
+1 F
+-0.11 ( instead of) 179.18 460.33 P
+0 F
+-0.11 (XpmWriteFileFromImage) 223.01 460.33 P
+1 F
+-0.11 (. Once again, the caller should free the buffer using) 335.76 460.33 P
+0 F
+(XpmFree) 72 448.33 T
+1 F
+( when finished.) 112.54 448.33 T
+0 12 Q
+(3.1.6) 72 405 T
+(Functions to deal with XPM files and buffers) 108 405 T
+1 10 Q
+-0.42 (As a convenience, the) 72 380.33 P
+0 F
+-0.42 (XpmReadFileToBuffer) 160.56 380.33 P
+1 F
+-0.42 ( and) 259.44 380.33 P
+0 F
+-0.42 (XpmWriteFileFromBuffer) 278.04 380.33 P
+1 F
+-0.42 ( are provided to copy a file to a buffer) 391.9 380.33 P
+0.13 (and to write a file from a buffer. Thus for instance one may decide to use) 72 368.33 P
+0 F
+0.13 (XpmReadFileToBuffer) 368.79 368.33 P
+1 F
+0.13 (,) 467.67 368.33 P
+0 F
+0.13 (XpmCreatePix-) 472.8 368.33 P
+0.62 (mapFromBuffer) 72 356.33 P
+1 F
+0.62 (, and) 142.54 356.33 P
+0 F
+0.62 (XpmFree) 165.71 356.33 P
+1 F
+0.62 ( instead of) 206.25 356.33 P
+0 F
+0.62 (XpmReadFileToPixmap) 252.26 356.33 P
+1 F
+0.62 (. On some systems this may lead to a perfor-) 356.15 356.33 P
+(mance improvement, since the parsing will be performed in memory, but it uses more memory.) 72 344.33 T
+0 F
+(XpmReadFileToBuffer) 72 312.33 T
+1 F
+( allocates and fills a buffer from a file.) 170.88 312.33 T
+(int XpmReadFileToBuffer\050) 72 294.33 T
+4 F
+(filename, buffer_return) 181.71 294.33 T
+1 F
+(\051) 275.04 294.33 T
+(char) 108 282.33 T
+4 F
+(*filename;) 127.71 282.33 T
+1 F
+(char) 108 270.33 T
+4 F
+(**buffer_return;) 127.71 270.33 T
+(filename) 72 254.33 T
+1 F
+(Specifies the file name to read.) 171 254.33 T
+4 F
+(buffer_return) 72 238.33 T
+1 F
+(Returns the buffer created.) 171 238.33 T
+0 F
+0.42 (XpmReadFileToBuffer) 72 214.33 P
+1 F
+0.42 ( returns) 170.88 214.33 P
+0 F
+0.42 (XpmOpenFailed) 204.48 214.33 P
+1 F
+0.42 ( if it cannot open the file, returns) 275.6 214.33 P
+0 F
+0.42 (XpmNoMemory) 412.53 214.33 P
+1 F
+0.42 ( if insufficient) 482.51 214.33 P
+0.26 (working storage is allocated, and) 72 202.33 P
+0 F
+0.26 (XpmSuccess) 207.71 202.33 P
+1 F
+0.26 ( otherwise. The allocated buffer returned by) 261.04 202.33 P
+0 F
+0.26 (XpmReadFileToBuffer) 441.12 202.33 P
+1 F
+(should be freed with) 72 190.33 T
+0 F
+(XpmFree) 156.43 190.33 T
+1 F
+( when done.) 196.97 190.33 T
+0 F
+(XpmWriteFileFromBuffer) 72 158.33 T
+1 F
+( writes a buffer to a file.) 185.86 158.33 T
+(int XpmWriteFileFromBuffer\050) 72 140.33 T
+4 F
+(filename, data) 194.49 140.33 T
+1 F
+(\051) 251.71 140.33 T
+(char) 108 128.33 T
+4 F
+(*filename;) 127.71 128.33 T
+1 F
+(char) 108 116.33 T
+4 F
+(*buffer;) 127.71 116.33 T
+FMENDPAGE
+%%EndPage: "22" 22
+%%Page: "23" 23
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(23) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+(filename) 72 686.18 T
+1 F
+(Specifies the file name to write.) 171 686.18 T
+4 F
+(buffer) 72 670.18 T
+1 F
+(Specifies the buffer to read.) 171 670.18 T
+0 F
+(XpmWriteFileFromBuffer) 72 646.18 T
+1 F
+( returns) 185.86 646.18 T
+0 F
+(XpmOpenFailed) 218.63 646.18 T
+1 F
+( if it cannot open the file, and) 289.75 646.18 T
+0 F
+(XpmSuccess) 410.01 646.18 T
+1 F
+( otherwise.) 463.34 646.18 T
+0 12 Q
+(3.1.7) 72 602.84 T
+(Miscellaneous functions) 108 602.84 T
+1 10 Q
+(To free possible data stored into an) 72 578.18 T
+0 F
+(XpmAttributes) 215.03 578.18 T
+1 F
+( structure use) 280.02 578.18 T
+0 F
+(XpmFreeAttributes) 335.84 578.18 T
+1 F
+(.) 420.26 578.18 T
+(int XpmFreeAttributes\050) 72 560.18 T
+4 F
+(attributes) 166.16 560.18 T
+1 F
+(\051) 204.5 560.18 T
+(XpmAttributes) 108 548.18 T
+4 F
+(*attributes;) 170.5 548.18 T
+(attributes) 72 532.18 T
+1 F
+( Specifies the structure to free.) 110.34 532.18 T
+(The) 72 508.18 T
+0 F
+(XpmFreeAttributes) 90.05 508.18 T
+1 F
+( frees the structure members which have been malloc\325ed such as the pixels list.) 174.47 508.18 T
+(To dynamically allocate an) 72 476.18 T
+0 F
+(XpmAttributes) 183.09 476.18 T
+1 F
+( structure use the) 248.08 476.18 T
+0 F
+(XpmAttributesSize) 318.62 476.18 T
+1 F
+( function.) 400.83 476.18 T
+(int XpmAttributesSize\050\051) 72 458.18 T
+0.41 (The) 72 434.18 P
+0 F
+0.41 (XpmAttributesSize) 90.46 434.18 P
+1 F
+0.41 ( function provides application using dynamic libraries with a safe way to allocate and then) 172.67 434.18 P
+-0.42 (refer to an) 72 422.18 P
+0 F
+-0.42 (XpmAttributes) 114.32 422.18 P
+1 F
+-0.42 (structure, disregarding whether the) 181.39 422.18 P
+0 F
+-0.42 (XpmAttributes) 321.61 422.18 P
+1 F
+-0.42 ( structure size has changed or not since) 386.6 422.18 P
+(compiled.) 72 410.18 T
+(To free data possibly stored into an array of) 72 378.18 T
+0 F
+(XpmExtension) 249.46 378.18 T
+1 F
+( use) 312.8 378.18 T
+0 F
+(XpmFreeExtensions) 331.13 378.18 T
+1 F
+(.) 417.79 378.18 T
+(int XpmFreeExtensions\050) 72 360.18 T
+4 F
+(extensions, nextensions) 170.05 360.18 T
+1 F
+(\051) 263.37 360.18 T
+(XpmExtension) 108 348.18 T
+4 F
+(*extensions;) 170.5 348.18 T
+1 F
+(int) 108 336.18 T
+4 F
+(nextensions;) 121.06 336.18 T
+(extensions) 72 320.18 T
+1 F
+(Specifies the array to free.) 171 320.18 T
+4 F
+(nextensions) 72 304.18 T
+1 F
+(Specifies the number of extensions.) 171 304.18 T
+-0.31 (This function frees all data stored in every extension and the array itself. Note that) 72 280.18 P
+0 F
+-0.31 (XpmFreeAttributes) 399.01 280.18 P
+1 F
+-0.31 ( call this func-) 483.43 280.18 P
+(tion and thus most of the time it should not need to be explicitly called.) 72 268.18 T
+(To free any data allocated by an) 72 236.18 T
+0 F
+(XPM) 202.79 236.18 T
+1 F
+( function use the) 225.56 236.18 T
+0 F
+(XpmFree) 294.44 236.18 T
+1 F
+( function.) 334.98 236.18 T
+(int XpmFree\050) 72 218.18 T
+4 F
+(ptr) 126.16 218.18 T
+1 F
+(\051) 137.83 218.18 T
+(char) 108 206.18 T
+4 F
+(*ptr;) 127.71 206.18 T
+(ptr) 72 190.18 T
+1 F
+( Specifies the data to free.) 83.67 190.18 T
+-0.42 (The current distribution of the) 72 166.18 P
+0 F
+-0.42 (XPM) 192.92 166.18 P
+1 F
+-0.42 ( library uses the standard memory allocation functions and thus) 215.69 166.18 P
+0 F
+-0.42 (XpmFree) 467.53 166.18 P
+1 F
+-0.42 ( is noth-) 508.07 166.18 P
+0.13 (ing else than a define to the standard) 72 154.18 P
+0 F
+0.13 (free) 221.87 154.18 P
+1 F
+0.13 (. However since these functions may be redefined in specific environments) 238.52 154.18 P
+(it is wise to use) 72 142.18 T
+0 F
+(XpmFree) 136.17 142.18 T
+1 F
+(.) 176.71 142.18 T
+(To get data when building an error message, one can use) 72 110.18 T
+0 F
+(XpmGetErrorString) 301.39 110.18 T
+FMENDPAGE
+%%EndPage: "23" 23
+%%Page: "24" 24
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(24) 300 56.01 T
+1 10 Q
+(char *XpmGetErrorString\050) 72 686.33 T
+4 F
+(errorcode) 180.03 686.33 T
+1 F
+(\051) 220.02 686.33 T
+(int) 108 674.33 T
+4 F
+(errorcode) 121.06 674.33 T
+1 F
+(;) 161.05 674.33 T
+4 F
+(errorcode) 72 658.33 T
+1 F
+( Specifies the) 111.99 658.33 T
+0 F
+(XPM) 168.37 658.33 T
+1 F
+( error.) 191.14 658.33 T
+(XpmGetErrorString returns a string related to the given) 72 634.33 T
+0 F
+(XPM) 296.41 634.33 T
+1 F
+( error code.) 319.18 634.33 T
+(The) 72 602.33 T
+0 F
+(XpmLibraryVersion) 90.05 602.33 T
+1 F
+(can be used when one needs to figure out which version of the library is in use.) 180.88 602.33 T
+(int XpmLibraryVersion\050\051) 72 584.33 T
+0.08 (The value returned by) 72 560.33 P
+0 F
+0.08 (XpmLibraryVersion) 162.83 560.33 P
+1 F
+0.08 ( can be compared to the value of) 251.16 560.33 P
+0 F
+0.08 (XpmIncludeVersion) 384.5 560.33 P
+1 F
+0.08 ( which is defined) 471.17 560.33 P
+(in the header file "xpm.h". These numbers are computed with the following formula:) 72 548.33 T
+(\050XpmFormat * 100 + XpmVersion\051 * 100 + XpmRevision) 72 536.33 T
+0.42 (Where XpmFormat is the version number of the format, XpmVersion is the library version number \050which changes) 72 512.33 P
+(only if the API changes\051, and XpmRevision is the library minor version number.) 72 500.33 T
+0 14 Q
+(3.2) 72 445.67 T
+(The Advanced Level Interface) 100.8 445.67 T
+1 10 Q
+-0.23 (The advanced level interface is a set of functions that applications, such as icon editors, which needs to retrieve all the) 72 420.33 P
+(information stored in an) 72 408.33 T
+0 F
+(XPM) 170.88 408.33 T
+1 F
+( file and applications which perform data caching can use.) 193.65 408.33 T
+(The following subsections describe these functions and how to use them.) 72 384.33 T
+0 12 Q
+(3.2.1) 72 341 T
+(The structures) 108 341 T
+1 10 Q
+(The purpose of the structures defined in this section is to be able to store) 72 320.33 T
+0 F
+(XPM) 364.46 320.33 T
+1 F
+( images in memory to avoid any) 387.23 320.33 T
+(additional parsing without loosing information such as color defaults, symbolic color names, and comments.) 72 308.33 T
+-0.32 (Indeed, considering the) 72 292.33 P
+0 F
+-0.32 (XPM) 167.12 292.33 P
+1 F
+-0.32 (format one can see that there is a lot more information related to a color than just an rgb) 192.06 292.33 P
+-0.14 (value or a colormap index, the) 72 280.33 P
+0 F
+-0.14 (XpmColor) 195.27 280.33 P
+1 F
+-0.14 ( structure allows to store the different color defaults, the symbolic name of) 240.82 280.33 P
+(a color, and the characters string which represents it.) 72 268.33 T
+(typedef struct {) 72 252.33 T
+(char *string;) 144 240.33 T
+(/* characters string */) 288 240.33 T
+(char *symbolic;) 144 228.33 T
+(/* symbolic name */) 288 228.33 T
+(char *m_color;) 144 216.33 T
+(/* monochrome default */) 288 216.33 T
+(char *g4_color;) 144 204.33 T
+(/* 4 level grayscale default */) 288 204.33 T
+(char *g_color;) 144 192.33 T
+(/* other level grayscale default */) 288 192.33 T
+(char *c_color;) 144 180.33 T
+(/* color default */) 288 180.33 T
+(} XpmColor;) 72 168.33 T
+-0.22 (The) 72 144.33 P
+0 F
+-0.22 (XpmImage) 89.83 144.33 P
+1 F
+-0.22 ( structure is defined to store the image data definition with its size, the length of the characters strings) 137.6 144.33 P
+(representing each color, and the related color table.) 72 132.33 T
+(typedef struct {) 72 114.33 T
+(unsigned int width;) 144 102.33 T
+(/* image width */) 288 102.33 T
+FMENDPAGE
+%%EndPage: "24" 24
+%%Page: "25" 25
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(25) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+1 F
+(unsigned int height;) 144 686.18 T
+(/* image height */) 288 686.18 T
+(unsigned int cpp;) 144 674.18 T
+(/* number of characters per pixel */) 288 674.18 T
+(unsigned int ncolors;) 144 662.18 T
+(/* number of colors */) 288 662.18 T
+(XpmColor *colorTable;) 144 650.18 T
+(/* list of related colors */) 288 650.18 T
+(unsigned int *data;) 144 638.18 T
+(/* image data */) 288 638.18 T
+(} XpmImage) 72 626.18 T
+0.28 (The) 72 602.18 P
+0 F
+0.28 (XpmImage) 90.33 602.18 P
+1 F
+0.28 ( data is an array of width*height color indexes, each color index referencing the related color in the) 138.1 602.18 P
+(colortable.) 72 590.18 T
+-0.49 (In addition, to store all the possible optional data which an) 72 566.18 P
+0 F
+-0.49 (XPM) 303.31 566.18 P
+1 F
+-0.49 ( file may contain, an) 326.08 566.18 P
+0 F
+-0.49 (XpmInfo) 408.08 566.18 P
+1 F
+-0.49 ( structure can be passed) 446.97 566.18 P
+-0.35 (to the reading function. This structure can then be given back to the writing function. Comments are limited to a single) 72 554.18 P
+-0.38 (strings by) 72 542.18 P
+0 F
+-0.38 (XPM) 112.91 542.18 P
+1 F
+-0.38 ( format section. If more exist in the read file, then only the last comment of each section will be stored.) 135.68 542.18 P
+(typedef struct {) 72 524.18 T
+(unsigned long valuemask;) 144 512.18 T
+(/* Specifies which attributes are defined */) 288 512.18 T
+(char *hints_cmt;) 144 500.18 T
+(/* comment of the hints section */) 288 500.18 T
+(char *colors_cmt;) 144 488.18 T
+(/* comment of the colors section */) 288 488.18 T
+(char *pixels_cmt;) 144 476.18 T
+(/* comment of the pixels section */) 288 476.18 T
+(unsigned int x_hotspot;) 144 464.18 T
+(/* Returns the x hotspot\325s coordinate */) 288 464.18 T
+(unsigned int y_hotspot;) 144 452.18 T
+(/* Returns the y hotspot\325s coordinate */) 288 452.18 T
+(unsigned int nextensions;) 144 440.18 T
+(/* number of extensions */) 288 440.18 T
+(XpmExtension *extensions;) 144 428.18 T
+(/* pointer to array of extensions */) 288 428.18 T
+(} XpmInfo;) 72 416.18 T
+0.01 (The valuemask is the bitwise inclusive OR of the valid attribute mask bits. If the valuemask is zero, the attributes are) 72 392.18 P
+-0.36 (ignored and not referenced. This valuemask had to be part of the structure to let) 72 380.18 P
+0 F
+-0.36 (XPM) 387.65 380.18 P
+1 F
+-0.36 ( functions modify its value when) 410.42 380.18 P
+-0.54 (returning possible data such as hotspot coordinates or when requested data cannot be returned. In fact, the) 72 368.18 P
+0 F
+-0.54 (XPM) 488.61 368.18 P
+1 F
+-0.54 ( library) 511.38 368.18 P
+0.38 (functions will automatically return the hotspot coordinates since this doesn\325t lead to any memory allocation. On the) 72 356.18 P
+(other hand, comments and extensions are returned only on request.) 72 344.18 T
+0.03 (To set an attribute, set the appropriate member of the) 72 320.18 P
+0 F
+0.03 (XpmInfo) 287 320.18 P
+1 F
+0.03 (structure and OR in the corresponding value bitmask) 328.42 320.18 P
+(in the valuemask member. The symbols for the value mask bits and) 72 308.18 T
+0 F
+(XpmInfo) 344.47 308.18 T
+1 F
+(structure are:) 385.86 308.18 T
+0 F
+(Symbol Name) 78 278.18 T
+(Symbol V) 195 278.18 T
+(alue) 236.03 278.18 T
+(Related Members) 267 278.18 T
+(Comments) 375 278.18 T
+(XpmComments) 78 254.18 T
+1 F
+(\0501L<<8\051) 195 256.18 T
+(hints_cmt, colors_cmt,) 267 256.18 T
+(pixels_cmt) 267 244.18 T
+0 F
+(XpmReturnComments) 78 222.18 T
+4 F
+(idem) 195 224.18 T
+(idem) 267 224.18 T
+1 F
+-0.04 (W) 375 224.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 224.18 P
+(tion failure.) 375 212.18 T
+0 F
+(XpmColorT) 78 190.18 T
+(able) 129.3 190.18 T
+1 F
+(\0501L<<15\051) 195 192.18 T
+(colorT) 267 192.18 T
+(able, ncolors) 292.96 192.18 T
+0 F
+(XpmReturnColorT) 78 166.18 T
+(able) 159.85 166.18 T
+4 F
+(idem) 195 168.18 T
+(idem) 267 168.18 T
+1 F
+-0.04 (W) 375 168.18 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 168.18 P
+(tion failure.) 375 156.18 T
+0 F
+(XpmExtensions) 78 134.18 T
+1 F
+(\0501L<<10\051) 195 136.18 T
+(extensions, nextensions) 267 136.18 T
+72 292.85 540 292.85 2 L
+V
+0.5 H
+0 Z
+N
+72 268.84 540 268.84 2 L
+V
+N
+FMENDPAGE
+%%EndPage: "25" 25
+%%Page: "26" 26
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(26) 300 56.01 T
+0 10 Q
+-0.14 (NOTE) 72 618.33 P
+1 F
+-0.14 (: In any case the) 100.34 618.33 P
+0 F
+-0.14 (XpmInfo) 167.09 618.33 P
+1 F
+-0.14 ( structure valuemask must be set to some valid value, at least zero, otherwise unpre-) 205.98 618.33 P
+(dictable errors can occur.) 72 606.33 T
+0 12 Q
+(3.2.2) 72 563 T
+(Functions to deal with XPM files) 108 563 T
+1 10 Q
+(To create an) 72 538.33 T
+0 F
+(XpmImage) 123.92 538.33 T
+1 F
+( from an) 171.69 538.33 T
+0 F
+(XPM) 208.07 538.33 T
+1 F
+( file, use) 230.84 538.33 T
+0 F
+(XpmReadFileToXpmImage) 267.5 538.33 T
+1 F
+(.) 386.38 538.33 T
+(int XpmReadFileToXpmImage\050) 72 520.33 T
+4 F
+(filename, image) 200.6 520.33 T
+1 F
+(, info\051) 264.48 520.33 T
+(char) 108 508.33 T
+4 F
+(*filename;) 127.71 508.33 T
+1 F
+(XpmImage) 108 496.33 T
+4 F
+(*image;) 155.49 496.33 T
+1 F
+(XpmInfo *info;) 108 484.33 T
+4 F
+(filename) 72 468.33 T
+1 F
+(Specifies the file name to read from.) 171 468.33 T
+4 F
+(image) 72 452.33 T
+1 F
+(Specifies the image structure location.) 171 452.33 T
+(info) 72 436.33 T
+(Specifies the location of a structure to store possible information \050or NULL\051.) 171 436.33 T
+0.34 (The) 72 412.33 P
+0 F
+0.34 (XpmReadFileToXpmImage) 90.39 412.33 P
+1 F
+0.34 ( function reads in a file in the) 209.27 412.33 P
+0 F
+0.34 (XPM) 331.98 412.33 P
+1 F
+0.34 ( format. If the file cannot be opened it returns) 354.75 412.33 P
+0 F
+-0.22 (XpmOpenFailed) 72 400.33 P
+1 F
+-0.22 (. If the file can be opened but does not contain valid) 143.12 400.33 P
+0 F
+-0.22 (XPM) 350.76 400.33 P
+1 F
+-0.22 (data, it returns) 375.81 400.33 P
+0 F
+-0.22 (XpmFileInvalid) 435.15 400.33 P
+1 F
+-0.22 (. If insuf-) 502.94 400.33 P
+0.05 (ficient working storage is allocated, it returns) 72 388.33 P
+0 F
+0.05 (XpmNoMemory) 256.23 388.33 P
+1 F
+0.05 (. On success it fills in the given) 326.21 388.33 P
+0 F
+0.05 (XpmImage) 454.69 388.33 P
+1 F
+0.05 ( structure) 502.46 388.33 P
+(and returns) 72 376.33 T
+0 F
+(XpmSuccess) 119.21 376.33 T
+1 F
+(.) 172.54 376.33 T
+-0.56 (If the passed) 72 352.33 P
+0 F
+-0.56 (XpmInfo) 123.37 352.33 P
+1 F
+-0.56 (structure pointer is not) 164.2 352.33 P
+0 F
+-0.56 (NULL) 254.74 352.33 P
+1 F
+-0.56 (,) 282.52 352.33 P
+0 F
+-0.56 (XpmReadFileToXpmImage) 286.96 352.33 P
+1 F
+-0.56 ( looks for the following attributes:) 405.85 352.33 P
+0 F
+-0.41 (XpmReturnComments) 72 340.33 P
+1 F
+-0.41 ( and) 169.76 340.33 P
+0 F
+-0.41 (XpmReturnExtensions) 188.39 340.33 P
+1 F
+-0.41 (, and sets possibly the) 286.17 340.33 P
+0 F
+-0.41 (XpmHotspot) 374.14 340.33 P
+1 F
+-0.41 ( attribute when returning. In) 429.14 340.33 P
+0.13 (any case, if requested data cannot be returned because of insufficient memory storage,) 72 328.33 P
+0 F
+0.13 (XpmReadFileToXpmImage) 421.12 328.33 P
+1 F
+-0.25 (will change the valuemask to mention this and will try to continue. So the caller should check on this before accessing) 72 316.33 P
+(requested data.) 72 304.33 T
+-0.23 (Note: The valuemask of the passed) 72 280.33 P
+0 F
+-0.23 (XpmInfo) 213.35 280.33 P
+1 F
+-0.23 ( structure must be set to some valid value, at least zero, otherwise unpre-) 252.24 280.33 P
+(dictable errors can occur.) 72 268.33 T
+-0.42 (In addition on systems which support such features) 72 244.33 P
+0 F
+-0.42 (XpmReadFileToXpmImage) 275.87 244.33 P
+1 F
+-0.42 (deals with compressed files by fork-) 396.83 244.33 P
+-0.1 (ing an) 72 232.33 P
+0 F
+-0.1 (uncompress) 99.02 232.33 P
+1 F
+-0.1 ( or) 150.13 232.33 P
+0 F
+-0.1 (gzip) 163.25 232.33 P
+1 F
+-0.1 ( process and reading from the piped result. It assumes that the specified file is compressed) 181.03 232.33 P
+0.24 (if the given file name ends by \325.Z\325 or \325.gz\325. In case the file name does not end so,) 72 220.33 P
+0 F
+0.24 (XpmReadFileToXpmImage) 402.27 220.33 P
+1 F
+0.24 ( first) 521.15 220.33 P
+(looks for a file of which the name is the given one followed by \325.Z\325 or \325.gz\325; then if such a file does not exist, it looks) 72 208.33 T
+-0.34 (for the given file \050assumed as not compressed\051. And if instead of a file name) 72 196.33 P
+0 F
+-0.34 (NULL) 375.23 196.33 P
+1 F
+-0.34 ( is passed to) 403.01 196.33 P
+0 F
+-0.34 (XpmReadFileToXp-) 452.78 196.33 P
+(mImage) 72 184.33 T
+1 F
+(, it reads from the standard input.) 106.99 184.33 T
+(To write out an) 72 152.33 T
+0 F
+(XpmImage) 135.88 152.33 T
+1 F
+( to an) 183.65 152.33 T
+0 F
+(XPM) 208.37 152.33 T
+1 F
+( file, use) 231.14 152.33 T
+0 F
+(XpmWriteFileFromXpmImage) 267.8 152.33 T
+1 F
+(int XpmWriteFileFromXpmImage\050) 72 134.33 T
+4 F
+(filename, image, shapeimage, info) 213.38 134.33 T
+1 F
+(\051) 350.59 134.33 T
+(char) 108 122.33 T
+4 F
+(*filename;) 127.71 122.33 T
+1 F
+(XpmImage) 108 110.33 T
+4 F
+(*image;) 155.49 110.33 T
+0 F
+(XpmReturnExtensions) 78 654.33 T
+4 F
+(idem) 195 656.33 T
+(idem) 267 656.33 T
+1 F
+-0.04 (W) 375 656.33 P
+-0.04 (ill be unset in case of memory alloca-) 384.04 656.33 P
+(tion failure.) 375 644.33 T
+0 F
+(Symbol Name) 78 678.33 T
+(Symbol V) 195 678.33 T
+(alue) 236.03 678.33 T
+(Related Members) 267 678.33 T
+(Comments) 375 678.33 T
+72 693 540 693 2 L
+V
+0.5 H
+0 Z
+N
+72 669 540 669 2 L
+V
+N
+72 637 540 637 2 L
+V
+N
+FMENDPAGE
+%%EndPage: "26" 26
+%%Page: "27" 27
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(27) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+1 F
+(XpmInfo *info;) 108 686.18 T
+4 F
+(filename) 72 670.18 T
+1 F
+(Specifies the file name to use.) 171 670.18 T
+4 F
+(image) 72 654.18 T
+1 F
+(Specifies the image.) 171 654.18 T
+4 F
+(info) 72 638.18 T
+1 F
+(Specifies the location of a structure to get information from \050or NULL\051.) 171 638.18 T
+0.19 (The) 72 614.18 P
+0 F
+0.19 (XpmWriteFileFromXpmImage) 90.24 614.18 P
+1 F
+0.19 ( function writes an image out to a file in the) 224.1 614.18 P
+0 F
+0.19 (XPM) 403.64 614.18 P
+1 F
+0.19 ( format. If the file cannot be) 426.41 614.18 P
+-0.63 (opened, it returns) 72 602.18 P
+0 F
+-0.63 (XpmOpenFailed) 142.33 602.18 P
+1 F
+-0.63 (. If insufficient working storage is allocated, it returns) 213.45 602.18 P
+0 F
+-0.63 (XpmNoMemory) 425.81 602.18 P
+1 F
+-0.63 (. If no error) 495.79 602.18 P
+(occurs then it returns) 72 590.18 T
+0 F
+(XpmSuccess) 158.65 590.18 T
+1 F
+(.) 211.98 590.18 T
+0.48 (If the passed) 72 566.18 P
+0 F
+0.48 (XpmInfo) 126.47 566.18 P
+1 F
+0.48 (structure pointer is not) 168.34 566.18 P
+0 F
+0.48 (NULL) 263.01 566.18 P
+1 F
+0.48 (,) 290.79 566.18 P
+0 F
+0.48 (XpmWriteFileFromXpmImage) 296.27 566.18 P
+1 F
+0.48 ( looks for the following at-) 430.13 566.18 P
+(tributes:) 72 554.18 T
+0 F
+(XpmComments) 107.28 554.18 T
+1 F
+(,) 174.49 554.18 T
+0 F
+(XpmExtensions) 179.49 554.18 T
+1 F
+(, and) 246.72 554.18 T
+0 F
+(XpmHotspot) 268.66 554.18 T
+1 F
+(, and writes the related information out as well.) 323.66 554.18 T
+0.39 (In addition on systems which support such features if the given file name ends by \325.Z\325 or \325.gz\325 it is assumed to be a) 72 530.18 P
+0.28 (compressed file. Then,) 72 518.18 P
+0 F
+0.28 (XpmWriteFileFromXpmImage) 166.43 518.18 P
+1 F
+0.28 (writes to a piped) 303.07 518.18 P
+0 F
+0.28 (compress) 373.07 518.18 P
+1 F
+0.28 ( or) 413.06 518.18 P
+0 F
+0.28 (gzip) 426.95 518.18 P
+1 F
+0.28 ( process. And if instead) 444.73 518.18 P
+(of a file name) 72 506.18 T
+0 F
+(NULL) 129.76 506.18 T
+1 F
+(is passed to) 160.04 506.18 T
+0 F
+(XpmWriteFileFromXpmImage) 208.65 506.18 T
+1 F
+(, it writes to the standard output.) 342.51 506.18 T
+0 12 Q
+(3.2.3) 72 462.84 T
+(Functions to deal with XPM data) 108 462.84 T
+1 10 Q
+(To create an) 72 438.18 T
+0 F
+(XpmImage) 123.92 438.18 T
+1 F
+( from an) 171.69 438.18 T
+0 F
+(XPM) 208.07 438.18 T
+1 F
+( data, use) 230.84 438.18 T
+0 F
+(XpmCreateXpmImageFromData) 270.83 438.18 T
+1 F
+(.) 413.01 438.18 T
+(int XpmCreateXpmImageFromData\050) 72 420.18 T
+4 F
+(data, image, info) 220.03 420.18 T
+1 F
+(\051) 287.81 420.18 T
+(char) 108 408.18 T
+4 F
+(**data;) 127.71 408.18 T
+1 F
+(XpmImage) 108 396.18 T
+4 F
+(*image;) 155.49 396.18 T
+1 F
+(XpmInfo) 108 384.18 T
+4 F
+(*info;) 147.16 384.18 T
+(data) 72 368.18 T
+1 F
+(Specifies the location of the data.) 171 368.18 T
+4 F
+(image) 72 352.18 T
+1 F
+(Specifies the image structure location.) 171 352.18 T
+4 F
+(info) 72 336.18 T
+1 F
+(Specifies the location of an) 171 336.18 T
+0 F
+(XpmInfo) 282.37 336.18 T
+1 F
+(structure to get and store information \050or NULL\051.) 323.76 336.18 T
+0 F
+0.54 (XpmCreateXpmImageFromData) 72 312.18 P
+1 F
+0.54 ( fills in the given) 214.18 312.18 P
+0 F
+0.54 (XpmImage) 287.16 312.18 P
+1 F
+0.54 ( structure from the given data. If the data does not) 334.93 312.18 P
+1.2 (contain valid) 72 300.18 P
+0 F
+1.2 (XPM) 128.85 300.18 P
+1 F
+1.2 (data, it returns) 155.32 300.18 P
+0 F
+1.2 (XpmFileInvalid) 218.92 300.18 P
+1 F
+1.2 (. If insufficient working storage is allocated, it returns) 286.71 300.18 P
+0 F
+1.2 (Xpm-) 515.56 300.18 P
+(NoMemory) 72 288.18 T
+1 F
+(, on success it returns) 120.87 288.18 T
+0 F
+(XpmSuccess) 209.19 288.18 T
+1 F
+(.) 262.52 288.18 T
+-0.12 (If the passed) 72 264.18 P
+0 F
+-0.12 (XpmInfo) 124.69 264.18 P
+1 F
+-0.12 (structure pointer is not) 165.96 264.18 P
+0 F
+-0.12 (NULL) 258.26 264.18 P
+1 F
+-0.12 (,) 286.04 264.18 P
+0 F
+-0.12 (XpmCreateXpmImageFromData) 290.92 264.18 P
+1 F
+-0.12 ( looks for the following at-) 433.1 264.18 P
+-0.36 (tributes:) 72 252.18 P
+0 F
+-0.36 (XpmReturnExtensions) 106.92 252.18 P
+1 F
+-0.36 (, and sets possibly the) 204.7 252.18 P
+0 F
+-0.36 (XpmHotspot) 292.91 252.18 P
+1 F
+-0.36 ( attribute when returning. In any case, if request-) 347.91 252.18 P
+0.51 (ed data cannot be returned because of insufficient memory storage,) 72 240.18 P
+0 F
+0.51 (XpmCreateXpmImageFromData) 347.91 240.18 P
+1 F
+0.51 ( will change) 490.09 240.18 P
+0.16 (the valuemask to mention this and will try to continue. So the caller should check on this before accessing requested) 72 228.18 P
+(data.) 72 216.18 T
+-0.23 (Note: The valuemask of the passed) 72 192.18 P
+0 F
+-0.23 (XpmInfo) 213.35 192.18 P
+1 F
+-0.23 ( structure must be set to some valid value, at least zero, otherwise unpre-) 252.24 192.18 P
+(dictable errors can occur.) 72 180.18 T
+0 F
+(XpmCreateDataFromXpmImage) 72 156.18 T
+1 F
+( creates an) 214.18 156.18 T
+0 F
+(XPM) 258.88 156.18 T
+1 F
+( data from an) 281.65 156.18 T
+0 F
+(XmImage) 337.19 156.18 T
+1 F
+(.) 379.4 156.18 T
+(int XpmCreateDataFromXpmImage\050) 72 138.18 T
+4 F
+(data_return, image, info) 220.03 138.18 T
+1 F
+(\051) 317.81 138.18 T
+(char) 108 126.18 T
+4 F
+(***data_return;) 127.71 126.18 T
+1 F
+(XxpmImage) 108 114.18 T
+4 F
+(*image;) 160.49 114.18 T
+FMENDPAGE
+%%EndPage: "27" 27
+%%Page: "28" 28
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(28) 300 56.01 T
+1 10 Q
+(XpmInfo) 108 686.33 T
+4 F
+(*info;) 147.16 686.33 T
+(data_return) 72 670.33 T
+1 F
+(Returns the data which is created.) 171 670.33 T
+4 F
+(image) 72 654.33 T
+1 F
+(Specifies the image.) 171 654.33 T
+4 F
+(info) 72 638.33 T
+1 F
+(Specifies the location of a structure to get information.) 171 638.33 T
+-0.15 (The) 72 614.33 P
+0 F
+-0.15 (XpmCreateDataFromXpmImage) 89.9 614.33 P
+1 F
+-0.15 ( function writes out the given) 232.08 614.33 P
+4 F
+-0.15 (image) 351.2 614.33 P
+1 F
+-0.15 ( to a single block malloc\325ed data in) 375.64 614.33 P
+0 F
+-0.15 (XPM) 517.23 614.33 P
+1 F
+-0.15 (format. If insufficient working storage is allocated, it returns) 72 602.33 P
+0 F
+-0.15 (XpmNoMemory) 315.37 602.33 P
+1 F
+-0.15 (, and returns) 385.35 602.33 P
+0 F
+-0.15 (XpmSuccess) 437.12 602.33 P
+1 F
+-0.15 ( on success.) 490.45 602.33 P
+-0.12 (If the passed) 72 578.33 P
+0 F
+-0.12 (XpmInfo) 124.69 578.33 P
+1 F
+-0.12 (structure pointer is not) 165.96 578.33 P
+0 F
+-0.12 (NULL) 258.26 578.33 P
+1 F
+-0.12 (,) 286.04 578.33 P
+0 F
+-0.12 (XpmCreateDataFromXpmImage) 290.92 578.33 P
+1 F
+-0.12 ( looks for the following at-) 433.1 578.33 P
+(tributes:) 72 566.33 T
+0 F
+(XpmExtensions) 107.28 566.33 T
+1 F
+(, and) 174.51 566.33 T
+0 F
+(XpmHotspot) 196.45 566.33 T
+1 F
+(, and writes the related information out as well.) 251.45 566.33 T
+(It is the caller\325s responsibility to free the data, using) 72 542.33 T
+0 F
+(XpmFree) 282.25 542.33 T
+1 F
+( when finished.) 322.79 542.33 T
+0 12 Q
+(3.2.4) 72 499 T
+(Functions to deal with XPM buffers) 108 499 T
+1 10 Q
+(To create an) 72 474.33 T
+0 F
+(XpmImage) 123.92 474.33 T
+1 F
+( from an) 171.69 474.33 T
+0 F
+(XPM) 208.07 474.33 T
+1 F
+( buffer, use) 230.84 474.33 T
+0 F
+(XpmCreateXpmImageFromBuffer) 278.6 474.33 T
+1 F
+(.) 428 474.33 T
+(int XpmCreateXpmImageFromBuffer\050) 72 456.33 T
+4 F
+(buffer, image, info) 227.25 456.33 T
+1 F
+(\051) 301.14 456.33 T
+(char) 108 444.33 T
+4 F
+(*buffer;) 127.71 444.33 T
+1 F
+(XpmImage) 108 432.33 T
+4 F
+(*image;) 155.49 432.33 T
+1 F
+(XpmInfo) 108 420.33 T
+4 F
+(*info;) 147.16 420.33 T
+(buffer) 72 404.33 T
+1 F
+(Specifies the location of the buffer.) 171 404.33 T
+4 F
+(image) 72 388.33 T
+1 F
+(Specifies the image structure location.) 171 388.33 T
+4 F
+(info) 72 372.33 T
+1 F
+(Specifies the location of a structure to store possible information \050or NULL) 171 372.33 T
+0 F
+(\051) 472.9 372.33 T
+1 F
+(.) 476.23 372.33 T
+-0.28 (The) 72 348.33 P
+0 F
+-0.28 (XpmCreateXpmImageFromBuffer) 89.78 348.33 P
+1 F
+-0.28 ( reads the given) 239.18 348.33 P
+4 F
+-0.28 (buffer) 303.62 348.33 P
+1 F
+-0.28 ( to fill in the given) 327.51 348.33 P
+0 F
+-0.28 (XpmImage) 402.53 348.33 P
+1 F
+-0.28 ( structure. If the buffer) 450.3 348.33 P
+0.56 (does not contain valid) 72 336.33 P
+0 F
+0.56 (XPM) 164.77 336.33 P
+1 F
+0.56 (data, it returns) 190.6 336.33 P
+0 F
+0.56 (XpmFileInvalid) 252.25 336.33 P
+1 F
+0.56 (. If insufficient working storage is allocated, it returns) 320.04 336.33 P
+0 F
+(XpmNoMemory) 72 324.33 T
+1 F
+(, and returns) 141.98 324.33 T
+0 F
+(XpmSuccess) 194.19 324.33 T
+1 F
+( on success.) 247.52 324.33 T
+0.32 (If the passed) 72 300.33 P
+0 F
+0.32 (XpmInfo) 126 300.33 P
+1 F
+0.32 (structure pointer is not) 167.72 300.33 P
+0 F
+0.32 (NULL) 261.77 300.33 P
+1 F
+0.32 (,) 289.55 300.33 P
+0 F
+0.32 (XpmCreateXpmImageFromBuffer) 294.87 300.33 P
+1 F
+0.32 ( looks for the following) 444.27 300.33 P
+0.55 (attributes:) 72 288.33 P
+0 F
+0.55 (XpmReturnComments) 115.05 288.33 P
+1 F
+0.55 ( and) 212.81 288.33 P
+0 F
+0.55 (XpmReturnExtensions) 233.36 288.33 P
+1 F
+0.55 (, and sets possibly the) 331.14 288.33 P
+0 F
+0.55 (XpmHotspot) 423.9 288.33 P
+1 F
+0.55 ( attribute when) 478.9 288.33 P
+0.14 (returning. In any case, if requested data cannot be returned because of insufficient memory storage,) 72 276.33 P
+0 F
+0.14 (XpmCreateXp-) 473.91 276.33 P
+0.25 (mImageFromBuffer) 72 264.33 P
+1 F
+0.25 ( will change the valuemask to mention this and will try to continue. So the caller should check) 158.64 264.33 P
+(on this before accessing requested data.) 72 252.33 T
+-0.23 (Note: The valuemask of the passed) 72 228.33 P
+0 F
+-0.23 (XpmInfo) 213.35 228.33 P
+1 F
+-0.23 ( structure must be set to some valid value, at least zero, otherwise unpre-) 252.24 228.33 P
+(dictable errors can occur.) 72 216.33 T
+(To create an) 72 184.33 T
+0 F
+(XPM) 123.92 184.33 T
+1 F
+( buffer from an) 146.69 184.33 T
+0 F
+(XpmImage) 210 184.33 T
+1 F
+(, use) 257.77 184.33 T
+0 F
+(XpmCreateBufferFromXpmImage) 278.6 184.33 T
+1 F
+(.) 428 184.33 T
+(int XpmCreateBufferFromXpmImage\050) 72 166.33 T
+4 F
+(buffer_return, image, info) 227.25 166.33 T
+1 F
+(\051) 331.14 166.33 T
+(char) 108 154.33 T
+4 F
+(**buffer_return;) 127.71 154.33 T
+1 F
+(XpmImage) 108 142.33 T
+4 F
+(*image;) 155.49 142.33 T
+1 F
+(XpmInfo) 108 130.33 T
+4 F
+(*info;) 147.16 130.33 T
+(buffer_return) 72 114.33 T
+1 F
+(Returns the buffer which is created.) 171 114.33 T
+FMENDPAGE
+%%EndPage: "28" 28
+%%Page: "29" 29
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(29) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+(image) 72 686.18 T
+1 F
+(Specifies the image.) 171 686.18 T
+4 F
+(info) 72 670.18 T
+1 F
+(Specifies the location of a structure to get possible information \050or NULL) 171 670.18 T
+0 F
+(\051) 465.68 670.18 T
+1 F
+(.) 469.01 670.18 T
+0.08 (The) 72 646.18 P
+0 F
+0.08 (XpmCreateBufferFromXpmImage) 90.13 646.18 P
+1 F
+0.08 ( writes out the given) 239.53 646.18 P
+4 F
+0.08 (image) 324.07 646.18 P
+1 F
+0.08 ( to a single block malloc\325ed buffer in) 348.51 646.18 P
+0 F
+0.08 (XPM) 499.66 646.18 P
+1 F
+0.08 ( for-) 522.43 646.18 P
+(mat. If insufficient working storage is allocated, it returns) 72 634.18 T
+0 F
+(XpmNoMemory) 305.02 634.18 T
+1 F
+(, and returns) 375 634.18 T
+0 F
+(XpmSuccess) 427.21 634.18 T
+1 F
+( on success.) 480.54 634.18 T
+0.32 (If the passed) 72 610.18 P
+0 F
+0.32 (XpmInfo) 126 610.18 P
+1 F
+0.32 (structure pointer is not) 167.72 610.18 P
+0 F
+0.32 (NULL) 261.77 610.18 P
+1 F
+0.32 (,) 289.55 610.18 P
+0 F
+0.32 (XpmCreateBufferFromXpmImage) 294.87 610.18 P
+1 F
+0.32 ( looks for the following) 444.27 610.18 P
+(attributes:) 72 598.18 T
+0 F
+(XpmComments) 114.5 598.18 T
+1 F
+(,) 181.71 598.18 T
+0 F
+(XpmExtensions) 186.71 598.18 T
+1 F
+(, and) 253.94 598.18 T
+0 F
+(XpmHotspot) 275.88 598.18 T
+1 F
+(, and writes the related information out as well.) 330.88 598.18 T
+(The caller should free the buffer using) 72 574.18 T
+0 F
+(XpmFree) 227.79 574.18 T
+1 F
+( when finished.) 268.33 574.18 T
+0 12 Q
+(3.2.5) 72 530.84 T
+(Functions to deal with X images) 108 530.84 T
+1 10 Q
+(To create an) 72 506.18 T
+0 F
+(XImage) 123.92 506.18 T
+1 F
+( from an) 157.8 506.18 T
+0 F
+(XpmImage) 194.18 506.18 T
+1 F
+(, use) 241.95 506.18 T
+0 F
+(XpmCreateImageFromXpmImage) 262.78 506.18 T
+1 F
+(.) 411.07 506.18 T
+(int XpmCreateImageFromXpmImage\050) 72 488.18 T
+4 F
+(display, image, image_return, shapeimage_return, attributes) 226.14 488.18 T
+1 F
+(\051) 470.02 488.18 T
+(Display) 108 476.18 T
+4 F
+(*display;) 141.61 476.18 T
+1 F
+(XpmImage) 108 464.18 T
+4 F
+(*image;) 155.49 464.18 T
+1 F
+(XImage) 108 452.18 T
+4 F
+(*image_return;) 142.71 452.18 T
+1 F
+(XImage) 108 440.18 T
+4 F
+(*shapeimage_return;) 142.71 440.18 T
+1 F
+(XpmAttributes) 108 428.18 T
+4 F
+(*attributes;) 170.5 428.18 T
+(display) 72 412.18 T
+1 F
+(Specifies the connection to the X server.) 171 412.18 T
+4 F
+(image) 72 396.18 T
+1 F
+(Specifies the) 171 396.18 T
+0 F
+(XpmImage) 224.88 396.18 T
+1 F
+(.) 272.65 396.18 T
+4 F
+(image_return) 72 380.18 T
+1 F
+(Returns the image which is created.) 171 380.18 T
+4 F
+(shapeimage_return) 72 364.18 T
+1 F
+(Returns the shape mask image which is created if any.) 171 364.18 T
+4 F
+(attributes) 72 348.18 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 348.18 T
+0.03 (From the given) 72 324.18 P
+0 F
+0.03 (XpmImage) 135.69 324.18 P
+1 F
+0.03 ( and) 183.46 324.18 P
+0 F
+0.03 (XpmAttributes) 202.96 324.18 P
+1 F
+0.03 ( if not) 267.95 324.18 P
+0 F
+0.03 (NULL) 294.42 324.18 P
+1 F
+0.03 (,) 322.2 324.18 P
+0 F
+0.03 (XpmCreateImageFromXpmImage) 327.23 324.18 P
+1 F
+0.03 ( allocates colors) 475.52 324.18 P
+(and creates X images following the same mechanism as) 72 312.18 T
+0 F
+(XpmReadFileToImage) 297.79 312.18 T
+1 F
+( \050page 15\051.) 395.56 312.18 T
+-0.33 (When finished the caller must free the images using) 72 288.18 P
+0 F
+-0.33 (XDestroyImage) 279.29 288.18 P
+1 F
+-0.33 (, the colors using) 346.49 288.18 P
+0 F
+-0.33 (XFreeColors) 416 288.18 P
+1 F
+-0.33 (, and possibly the) 470.98 288.18 P
+(data returned into the) 72 276.18 T
+0 F
+(XpmAttributes) 159.76 276.18 T
+1 F
+( using) 224.75 276.18 T
+0 F
+(XpmFreeAttributes) 251.42 276.18 T
+1 F
+( \050page 23\051.) 335.84 276.18 T
+(To create an) 72 244.18 T
+0 F
+(XpmImage) 123.92 244.18 T
+1 F
+( from an) 171.69 244.18 T
+0 F
+(XImage) 208.07 244.18 T
+1 F
+(, use) 241.95 244.18 T
+0 F
+(XpmCreateXpmImageFromImage) 262.78 244.18 T
+1 F
+(.) 411.07 244.18 T
+(int XpmCreateXpmImageFromImage\050) 72 226.18 T
+4 F
+(display, image, shapeimage, xpmimage, attributes) 226.14 226.18 T
+1 F
+(\051) 426.68 226.18 T
+(Display) 108 214.18 T
+4 F
+(*display;) 141.61 214.18 T
+1 F
+(XImage) 108 202.18 T
+4 F
+(*image;) 142.71 202.18 T
+1 F
+(XImage) 108 190.18 T
+4 F
+(*shapeimage;) 142.71 190.18 T
+1 F
+(XpmImage) 108 178.18 T
+4 F
+(*xpmimage) 155.49 178.18 T
+1 F
+(XpmAttributes) 108 166.18 T
+4 F
+(*attributes;) 170.5 166.18 T
+(display) 72 150.18 T
+1 F
+(Specifies the connection to the X server.) 171 150.18 T
+4 F
+(image) 72 134.18 T
+1 F
+(Specifies the image which is created.) 171 134.18 T
+4 F
+(shapeimage) 72 118.18 T
+1 F
+(Specifies the shape mask image which is created if any.) 171 118.18 T
+FMENDPAGE
+%%EndPage: "29" 29
+%%Page: "30" 30
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(30) 300 56.01 T
+4 10 Q
+(xpmimage) 72 686.33 T
+1 F
+(Specifies the location of an) 171 686.33 T
+0 F
+(XpmImage) 282.37 686.33 T
+1 F
+(structure.) 332.64 686.33 T
+4 F
+(attributes) 72 670.33 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 670.33 T
+-0.53 (From the given X images and) 72 646.33 P
+0 F
+-0.53 (XpmAttributes) 189.91 646.33 P
+1 F
+-0.53 ( if not) 254.9 646.33 P
+0 F
+-0.53 (NULL) 279.7 646.33 P
+1 F
+-0.53 (,) 307.48 646.33 P
+0 F
+-0.53 (XpmCreateXpmImageFromImage) 311.95 646.33 P
+1 F
+-0.53 ( creates an) 460.23 646.33 P
+0 F
+-0.53 (XpmIm-) 503.34 646.33 P
+(age) 72 634.33 T
+1 F
+( following the same mechanism as) 86.44 634.33 T
+0 F
+(XpmWriteFileFromImage) 226.98 634.33 T
+1 F
+(.) 339.73 634.33 T
+0 12 Q
+(3.2.6) 72 591 T
+(Functions to deal with X pixmaps) 108 591 T
+1 10 Q
+-0.28 (To create a) 72 566.33 P
+0 F
+-0.28 (Pixmap) 118.09 566.33 P
+1 F
+-0.28 (with its possible related shapemask from an) 153.1 566.33 P
+0 F
+-0.28 (XpmImage) 328.65 566.33 P
+1 F
+-0.28 (, use) 376.42 566.33 P
+0 F
+-0.28 (XpmCreatePixmapFromXpmIm-) 396.7 566.33 P
+(age) 72 554.33 T
+1 F
+(.) 86.44 554.33 T
+(int XpmCreatePixmapFromXpmImage\050) 72 536.33 T
+4 F
+(display, d, image, pixmap_return, shapemask_return, attributes) 231.71 536.33 T
+1 F
+(\051) 486.7 536.33 T
+(Display) 108 524.33 T
+4 F
+(*display;) 141.61 524.33 T
+1 F
+(Drawable d;) 108 512.33 T
+(XpmImage) 108 500.33 T
+4 F
+(*image;) 155.49 500.33 T
+1 F
+(Pixmap) 108 488.33 T
+4 F
+(*pixmap_return;) 141.06 488.33 T
+1 F
+(Pixmap) 108 476.33 T
+4 F
+(*shapemask_return;) 141.06 476.33 T
+1 F
+(XpmAttributes) 108 464.33 T
+4 F
+(*attributes;) 170.5 464.33 T
+(display) 72 448.33 T
+1 F
+(Specifies the connection to the X server.) 171 448.33 T
+4 F
+(d) 72 432.33 T
+1 F
+(Specifies which screen the pixmap is created on.) 171 432.33 T
+4 F
+(image) 72 416.33 T
+1 F
+(Specifies the) 171 416.33 T
+0 F
+(XpmImage) 224.88 416.33 T
+1 F
+(.) 272.65 416.33 T
+4 F
+(pixmap_return) 72 400.33 T
+1 F
+(Returns the pixmap which is created.) 171 400.33 T
+4 F
+(shapemask_return) 72 384.33 T
+1 F
+(Returns the shape mask which is created if any.) 171 384.33 T
+4 F
+(attributes) 72 368.33 T
+1 F
+(Specifies the location of a structure to get and store information \050or NULL\051.) 171 368.33 T
+0 F
+0.18 (XpmCreatePixmapFromXpmImage) 72 344.33 P
+1 F
+0.18 ( creates X images calling) 226.41 344.33 P
+0 F
+0.18 (XpmCreateImageFromXpmImage) 330.35 344.33 P
+1 F
+0.18 ( \050page 28\051 with) 478.64 344.33 P
+0.35 (the given) 72 332.33 P
+0 F
+0.35 (XpmImage) 112.15 332.33 P
+1 F
+0.35 ( and) 159.92 332.33 P
+0 F
+0.35 (XpmAttributes) 180.07 332.33 P
+1 F
+0.35 (, then it creates the related pixmaps which are returned to) 245.06 332.33 P
+4 F
+0.35 (pixmap_return) 480.56 332.33 P
+1 F
+(and) 72 320.33 T
+4 F
+(shapemask_return) 88.94 320.33 T
+1 F
+( using) 162.82 320.33 T
+0 F
+(XPutImage) 189.49 320.33 T
+1 F
+(. Finally it destroys the X images with) 238.37 320.33 T
+0 F
+(XDestroyImage) 393.65 320.33 T
+1 F
+(.) 460.85 320.33 T
+-0.19 (When finished the caller must free the pixmaps using) 72 296.33 P
+0 F
+-0.19 (XFreePixmap) 286.09 296.33 P
+1 F
+-0.19 (, the colors using) 345.52 296.33 P
+0 F
+-0.19 (XFreeColors) 415.59 296.33 P
+1 F
+-0.19 (, and possibly the) 470.57 296.33 P
+(data returned into the) 72 284.33 T
+0 F
+(XpmAttributes) 159.76 284.33 T
+1 F
+( using) 224.75 284.33 T
+0 F
+(XpmFreeAttributes) 251.42 284.33 T
+1 F
+(.) 335.84 284.33 T
+(To create an) 72 252.33 T
+0 F
+(XpmImage) 123.92 252.33 T
+1 F
+( from a) 171.69 252.33 T
+0 F
+(Pixmap) 203.07 252.33 T
+1 F
+(, use) 235.85 252.33 T
+0 F
+(XpmCreateXpmImageFromPixmap) 256.68 252.33 T
+1 F
+(.) 411.09 252.33 T
+(int XpmCreateXpmImageFromPixmap\050) 72 234.33 T
+4 F
+(display, pixmap, shapemask, xpmimage, attributes) 231.71 234.33 T
+1 F
+(\051) 433.36 234.33 T
+(Display) 108 222.33 T
+4 F
+(*display;) 141.61 222.33 T
+1 F
+(Pixmap) 108 210.33 T
+4 F
+(*pixmap;) 141.06 210.33 T
+1 F
+(Pixmap) 108 198.33 T
+4 F
+(*shapemask;) 141.06 198.33 T
+1 F
+(XpmImage) 108 186.33 T
+4 F
+(*xpmimage) 155.49 186.33 T
+1 F
+(XpmAttributes) 108 174.33 T
+4 F
+(*attributes;) 170.5 174.33 T
+(display) 72 158.33 T
+1 F
+(Specifies the connection to the X server.) 171 158.33 T
+4 F
+(pixmap) 72 142.33 T
+1 F
+(Specifies the pixmap.) 171 142.33 T
+4 F
+(shapemask) 72 126.33 T
+1 F
+(Specifies the shape mask pixmap.) 171 126.33 T
+4 F
+(xpmimage) 72 110.33 T
+1 F
+(Specifies the location of an) 171 110.33 T
+0 F
+(XpmImage) 282.37 110.33 T
+1 F
+(structure.) 332.64 110.33 T
+FMENDPAGE
+%%EndPage: "30" 30
+%%Page: "31" 31
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(31) 300 56.01 T
+4 10 Q
+(attributes) 72 686.33 T
+1 F
+(Specifies the location of a structure containing information \050or NULL\051.) 171 686.33 T
+-0.02 (From the given pixmaps and) 72 662.33 P
+0 F
+-0.02 (XpmAttributes) 188.84 662.33 P
+1 F
+-0.02 ( if not) 253.83 662.33 P
+0 F
+-0.02 (NULL) 280.15 662.33 P
+1 F
+-0.02 (,) 307.93 662.33 P
+0 F
+-0.02 (XpmCreateXpmImageFromPixmap) 312.91 662.33 P
+1 F
+-0.02 (gets the related X) 469.8 662.33 P
+0.02 (images by calling) 72 650.33 P
+0 F
+0.02 (XGetImage) 145.11 650.33 P
+1 F
+0.02 (, then it gives them to) 194.54 650.33 P
+0 F
+0.02 (XpmCreateXpmImageFromImage) 283.84 650.33 P
+1 F
+0.02 ( \050page 28\051 to create an) 432.13 650.33 P
+0 F
+0.02 (Xp-) 523.89 650.33 P
+(mImage) 72 638.33 T
+1 F
+( which is returned to) 106.99 638.33 T
+4 F
+(xpmimage) 191.7 638.33 T
+1 F
+(. Finally it destroys the created X images using) 232.8 638.33 T
+0 F
+(XDestroyImage) 423.34 638.33 T
+1 F
+(.) 490.54 638.33 T
+0 12 Q
+(3.2.7) 72 595 T
+(Miscellaneous functions) 108 595 T
+1 10 Q
+(To free possible data stored into an) 72 570.33 T
+0 F
+(XpmImage) 215.03 570.33 T
+1 F
+(structure use) 265.3 570.33 T
+0 F
+(XpmFreeXpmImage) 318.62 570.33 T
+1 F
+(.) 406.93 570.33 T
+(int XpmFreeXpmImage\050) 72 552.33 T
+4 F
+(image) 171.15 552.33 T
+1 F
+(\051) 195.59 552.33 T
+(XpmImage) 108 540.33 T
+4 F
+(*image;) 155.49 540.33 T
+(image) 72 524.33 T
+1 F
+(Specifies the structure to free.) 98.94 524.33 T
+(The) 72 500.33 T
+0 F
+(XpmFreeXpmImage) 90.05 500.33 T
+1 F
+(frees the structure members which are not) 180.86 500.33 T
+0 F
+(NULL) 351.09 500.33 T
+1 F
+(, but not the structure itself.) 378.87 500.33 T
+(To free possible data stored into an) 72 468.33 T
+0 F
+(XpmInfo) 215.03 468.33 T
+1 F
+(structure use) 256.42 468.33 T
+0 F
+(XpmFreeXpmInfo) 309.74 468.33 T
+1 F
+(.) 389.17 468.33 T
+(int XpmFreeXpmInfo\050) 72 450.33 T
+4 F
+(info) 162.82 450.33 T
+1 F
+(\051) 178.38 450.33 T
+(XpmInfo) 108 438.33 T
+4 F
+( *info;) 144.66 438.33 T
+(info) 72 422.33 T
+1 F
+(Specifies the structure to free.) 90.06 422.33 T
+(The) 72 398.33 T
+0 F
+(XpmFreeXpmInfo) 90.05 398.33 T
+1 F
+(frees the structure members which are not) 171.98 398.33 T
+0 F
+(NULL) 342.21 398.33 T
+1 F
+(, but not the structure itself.) 369.99 398.33 T
+FMENDPAGE
+%%EndPage: "31" 31
+%%Page: "31" 32
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+225 639 396 657 R
+7 X
+0 0 0 1 0 0 0 K
+V
+1 18 Q
+0 X
+(Index) 290.01 645 T
+0 12 Q
+(31) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+1 F
+(XpmAttributes, 11) 72 569.33 T
+(XpmAttributesSize, 23) 72 557.33 T
+(XpmColorSymbol, 14) 72 545.33 T
+(XpmCreateBufferFromImage, 21) 72 533.33 T
+(XpmCreateBufferFromPixmap, 22) 72 521.33 T
+(XpmCreateBufferFromXpmImage, 28) 72 509.33 T
+(XpmCreateDataFromImage, 19) 72 497.33 T
+(XpmCreateDataFromPixmap, 19) 72 485.33 T
+(XpmCreateDataFromXpmImage, 27) 72 473.33 T
+(XpmCreateImageFromBuffer, 20) 72 461.33 T
+(XpmCreateImageFromData, 18) 72 449.33 T
+(XpmCreateImageFromXpmImage, 29) 72 437.33 T
+(XpmCreatePixmapFromBuffer, 21) 72 425.33 T
+(XpmCreatePixmapFromData, 18) 72 413.33 T
+(XpmCreatePixmapFromXpmImage, 30) 72 401.33 T
+(XpmCreateXpmImageFromBuffer, 28) 72 389.33 T
+(XpmCreateXpmImageFromData, 27) 72 377.33 T
+(XpmCreateXpmImageFromImage, 29) 72 365.33 T
+(XpmCreateXpmImageFromPixmap, 30) 72 353.33 T
+(XpmExtension, 14) 72 341.33 T
+(XpmFree, 23) 72 329.33 T
+(XpmFreeAttributes, 23) 72 317.33 T
+(XpmFreeExtensions, 23) 72 305.33 T
+(XpmFreeXpmImage, 30) 72 293.33 T
+(XpmFreeXpmInfos, 30) 72 281.33 T
+(XpmGetErrorString, 23) 72 269.33 T
+(XpmImage, 24) 72 257.33 T
+(XpmIncludeVersion, 24) 72 245.33 T
+(XpmInfo, 25) 72 233.33 T
+(XpmLibraryVersion, 24) 72 221.33 T
+(XpmReadFileToBuffer, 22) 72 209.33 T
+(XpmReadFileToData, 20) 72 197.33 T
+(XpmReadFileToImage, 15) 72 185.33 T
+(XpmReadFileToPixmap, 16) 72 173.33 T
+(XpmReadFileToXpmImage, 26) 72 161.33 T
+(XpmWriteFileFromBuffer, 22) 72 149.33 T
+(XpmWriteFileFromData, 20) 72 137.33 T
+(XpmWriteFileFromPixmap, 17) 72 125.33 T
+(XpmWriteFileFromXpmImage, 26) 72 113.33 T
+FMENDPAGE
+%%EndPage: "31" 32
+%%Page: "32" 33
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(32) 300 56.01 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+FMENDPAGE
+%%EndPage: "32" 33
+%%Page: "33" 34
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+225 639 396 657 R
+7 X
+0 0 0 1 0 0 0 K
+V
+1 18 Q
+0 X
+(Bibliography) 263 645 T
+261 729 369 738 R
+7 X
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(33) 300 56.01 T
+1 F
+([Motif]) 99 568 T
+(OSF/Motif Programmer\325s Reference) 180 568 T
+4 F
+(Open Software Foundation, Prentice-Hall, 1993, ISBN 0-13-643115-1) 180 556 T
+1 F
+([Xlib]) 99 534 T
+(James Gettys and Robert W. Scheifler) 180 534 T
+(Xlib - C Language X interface) 180 522 T
+4 F
+(X version 11, Release 5, MIT X Consortium, 1991) 180 510 T
+1 F
+([XShape]) 99 488 T
+(Keith Packard) 180 488 T
+(X11 Nonrectangular Window Shape Extension) 180 476 T
+4 F
+(X version 11, Release 5, MIT X Consortium, 1991) 180 464 T
+FMENDPAGE
+%%EndPage: "33" 34
+%%Page: "34" 35
+612 792 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+261 729 369 738 R
+7 X
+0 0 0 1 0 0 0 K
+V
+4 10 Q
+0 X
+(XPM Manual) 287.92 731.33 T
+0 12 Q
+(34) 300 56.01 T
+FMENDPAGE
+%%EndPage: "34" 35
+%%Trailer
+%%BoundingBox: 0 0 612 792
+%%PageOrder: Ascend
+%%Pages: 35
+%%DocumentFonts: Times-Bold
+%%+ Times-Roman
+%%+ Helvetica
+%%+ Courier
+%%+ Times-Italic
+%%+ Helvetica-Bold
+%%EOF

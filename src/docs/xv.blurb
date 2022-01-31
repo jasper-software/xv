@@ -1,0 +1,54 @@
+XV 2.10 is now available for anonymous ftp on the machines 'export.lcs.mit.edu'
+(in contrib/xv-2.10.tar.Z) and 'ftp.cis.upenn.edu' (in pub/xv-2.10.tar.Z).
+
+New Features:
+	TIFF file i/o
+	PDS/VICAR file input
+	color gradient generation
+	'reload current image' on an external signal
+	improved 'slow24' 24-to-8 color conversion algorithm
+	incorporates the ppmquant 24-to-8 color conversion algorithm
+	displays x,y coordinates of handles in the 'graph' windows
+	improved GIF89 parsing
+	faster dithering for 1-bit B/W X displays
+
+And of course, there's several new command line options, X resources, and more
+bug fixes than I'd care to admit :-)
+
+And no, it still doesn't display true 24-bit images on 24-bit displays.  Get
+back to me next year on that subject...
+
+
+Brief Description:
+------------------
+XV is a program that displays image files in GIF87, GIF89, JPEG,
+PBM/PGM/PPM, TIFF, PDS/VICAR Sun Rasterfile, and X11 Bitmap formats.
+XV runs on nearly ALL X displays: 1, 2, 4, 6, 8, 16, 24, and 32-bit,
+color, greyscale, and black/white.
+
+XV displays one image at a time in an output window, or on the root
+window.  You can arbitrarily stretch or compress the window, and the
+picture will be rescaled to fit.  You can rotate the picture in
+90-degree steps.  You can flip the picture vertically and
+horizontally.  You can repeatedly 'crop' a picture (define a
+rectangular 'region-of-interest' and 'throw away' the rest).  You can
+magnify any portion of the picture by any amount, up to the maximum
+size of your screen.
+
+XV allows you click on the picture to determine pixel RGB values and
+x,y coordinates.  You can perform arbitrary 'gamma correction' on the
+picture both in RGB space and HSV space.  You can specify the maximum
+number of colors that XV should use, for some interesting visual
+effects.  You can have the program produce a stippled version of the
+picture using black and white, or any other pair of colors.
+
+XV can write images in a variety of formats, with many of the
+modifications you may have made to the picture saved as well.  You can
+use XV to do format conversion.  XV will also automatically uncompress
+compress-ed files, as well as read files from stdin.
+
+
+John Bradley                    University of Pennsylvania  -  GRASP Lab
+     bradley@cis.upenn.edu
+
+     March 3, 1992

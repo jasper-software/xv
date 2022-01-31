@@ -1,0 +1,18 @@
+This directory contains the xv manual, the man page, and documentation on 
+several of the image formats used by XV.
+
+Warning!  The xv manual (xvdocs.ps) is approximately 130 pages long, and most
+of those pages have images on them.  As such, it may take quite a while to
+print.  (It took around 30 minutes on a 600 dpi Apple LaserWriter Pro connected
+via ethernet.  Plan accordingly.)
+
+Also, the file 'penn.policy' contains relevant information on Penn's 
+software policy.  Since it is well-known that I work for Penn (and there's
+this Penn Shield in the info box, and whatnot), some folks have questioned
+whether I have the legal right to sell this software.  Needless to say,
+I do.  (In summary, "software developed by Penn folks is the property of
+the software author.  Penn has no interest in it other than rights to use
+it, and a non-exclusive right to market.")  Please check the policy if this 
+concerns you.
+
+--jhb, 12/5/94

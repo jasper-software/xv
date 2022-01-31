@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# getweather - gets the latest weather GIF image file from the anonymous ftp 
+# area of the server machine (SERVERHOST), in the directory (DIRNAME)
+# and copies it to the file WEATHERFILE if successful
+#
+# this should be run hourly, on the half-hour,  in a crontab entry
+#
+# John Bradley, 03/26/92
+#
+# based on getnettables, by John Dotts Hagan
+
+
+set SERVERHOST	= vmd.cso.uiuc.edu
+set DIRNAME     = wx
+set ACCT        = anonymous
+set PASS	= foo@bar.edu
+set HOSTMANAGER = root
+set WEATHERFILE = /usr/local/lib/weather.gif
+
+set FNAME = SA`date -u +'%m%d%H'`.GIF
+
+unset noclobber
+cd /tmp
+echo "open $SERVERHOST\
+user $ACCT $PASS\
+bin\
+hash\
+cd $DIRNAME \
+get $FNAME \
+quit" | ftp -n -i -v -d
+
+if ( ! -e $FNAME) then
+# 	echo "new weather file $FNAME was not created" \
+#		| /usr/ucb/mail -s "getweather error" "$HOSTMANAGER"
+ 	exit(-1)
+endif
+
+if (-z $FNAME) then
+#	echo "new weather file $FNAME is empty" \
+#		| /usr/ucb/mail -s "getweather error" "$HOSTMANAGER"
+	exit(-1)
+endif
+
+cp $FNAME $WEATHERFILE.1
+rm $FNAME
+mv $WEATHERFILE.1 $WEATHERFILE
+

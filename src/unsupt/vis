@@ -1,0 +1,1590 @@
+(Message /usr/users/bradley/Mail/inbox:28)
+Return-Path: tmb@ai.mit.edu
+Received-Date: Wed, 13 Nov 91 07:27:59 EST
+Received: from life.ai.mit.edu by central.cis.upenn.edu
+	id AA18349; Wed, 13 Nov 91 07:27:57 -0500
+Posted-Date: Wed, 13 Nov 91 07:24:28 EST
+Received: from bambleweenie57 (bambleweenie57.ai.mit.edu) by life.ai.mit.edu (4.1/AI-4.10) id AA24831; Wed, 13 Nov 91 07:27:53 EST
+From: tmb@ai.mit.edu (Thomas M. Breuel)
+Received: by bambleweenie57 (4.1/AI-4.10) id AA05108; Wed, 13 Nov 91 07:24:28 EST
+Date: Wed, 13 Nov 91 07:24:28 EST
+Message-Id: <9111131224.AA05108@bambleweenie57>
+To: bradley@central.cis.upenn.edu
+Subject: simple VIS format reader for "xv"
+
+Below you find a "shar" file containing code for reading the two most
+common types of VIS format images: 8bit unsigned and machine-dependent
+single precision floating point. Also included are patches necessary
+to add this reading function to "xv".
+
+VIS format is a simple, flexible image format that has originated here
+at the AI lab and that is used by several vision research labs for
+storing and displaying images. It consists of header lines of the form
+"name=value" followed by a line containing a form-feed as the first
+character, followed by the raw image data.  The lines "DIMS=" and
+"ETYPE=" specify the dimensions of the image and the type of the
+binary data. Later header lines override earlier header lines, which
+makes it possible to keep a history in the header.
+
+I'd appreciate if you could include this in the next version of "xv".
+Eventually, I may send you a nicer version, but this version seems to
+be working.
+
+					Thanks, Thomas.
+
+# This is a shell archive.  Remove anything before this line,
+# then unpack it by saving it in a file and typing "sh file".
+#
+# Wrapped by volterra!tmb on Wed Nov 13 06:59:43 EST 1991
+# Contents:  xvvis.c xvvis.diffs
+ 
+echo x - xvvis.c
+sed 's/^@//' > "xvvis.c" <<'@//E*O*F xvvis.c//'
+/*
+ * xvvis.c - load routine for 'vis' format pictures
+ *
+ * LoadVIS(fname, numcols)  -  loads a VIS pic, does 24to8 code if nec.
+ * WriteVIS(fp, pic, w, h, r,g,b, numcols, style)
+ * WriteRaw(fp, pic, w, h, r,g,b, numcols, style)
+ */
+
+#include "xv.h"
+
+static int VISError();
+
+int LoadVIS(fname,nc)
+char *fname;
+int   nc;
+{
+	FILE  *fp;
+	char buf[1000];
+	int w=-1,h=-1;
+	char etype[100];
+	int raster=getenv("VIS_RASTER")&&atoi(getenv("VIS_RASTER"));
+	
+	fp=fopen(fname,"r");
+	if (!fp) return VISError("unable to open file");
+
+	while(fgets(buf,sizeof buf,fp)) {
+		if(!buf[0]||buf[0]=='\n'||buf[0]=='\f') break;
+		sscanf(buf,"DIMS=%d %d",&w,&h);
+		sscanf(buf,"ETYPE=%s",etype);
+	}
+
+	if(w<0||h<0) {fclose(fp); return VISError("bad format");}
+
+	pWIDE=w; pHIGH=h;
+	{int i; for(i=0;i<256;i++) r[i]=g[i]=b[i]=i;}
+
+	if(!strcmp(etype,"uchar")) {
+		int i,j;
+		pic=(unsigned char*)malloc(w*h);
+		if(!pic) {fclose(fp); return VISError("cannot allocate enough memory");}
+		if(!raster) for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+(h-j-1)*w]=getc(fp);
+		else for(j=0;j<h;j++) for(i=0;i<w;i++) pic[i+j*w]=getc(fp);
+	} else if(!strcmp(etype,"float")) {
+		int i,j,n;
+		float min=1e38,max=-1e38;
+		float *t;
+		t=(float*)malloc(w*h*sizeof *t);
+		if(!t) {fclose(fp); return VISError("cannot allocate enough memory");}
+		pic=(unsigned char*)malloc(w*h); 
+		if(!pic) {free(t); fclose(fp); return VISError("cannot allocate enough memory");}
+		fread(t,sizeof *t,w*h,fp);
+		n=w*h;
+		for(i=0;i<n;i++) {if(t[i]<min) min=t[i]; if(t[i]>max) max=t[i];}
+		if(max==min) max=min+1.0;
+		if(!raster) for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+(h-j-1)*w]=255*(t[i*h+j]-min)/(max-min);
+		else for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+j*w]=255*(t[i+j*w]-min)/(max-min);
+		free(t);
+	} else {close(fp); return VISError("unknown ETYPE");}
+
+	fclose(fp);
+	return 0;
+}
+
+static int VISError(st)
+char *st;
+{
+	SetISTR(ISTR_WARNING,"LoadVIS() - %s",cmd,st);
+	Warning();
+	return -1;
+}
+@//E*O*F xvvis.c//
+chmod u=rw,g=r,o=r xvvis.c
+ 
+echo x - xvvis.diffs
+sed 's/^@//' > "xvvis.diffs" <<'@//E*O*F xvvis.diffs//'
+diff -c xv.orig/Imakefile xv/Imakefile
+*** xv.orig/Imakefile	Wed Nov 13 05:55:55 1991
+--- xv/Imakefile	Wed Nov 13 06:23:48 1991
+***************
+*** 108,118 ****
+  
+  SRCS1 =	xv.c xv24to8.c xvbutt.c xvctrl.c xvdir.c xvfish.c xvgam.c\
+  	xvgif.c xvgifwr.c xvinfo.c xvmisc.c xvpbm.c xvpm.c xvscrl.c\
+! 	xvxbm.c vprintf.c xvjpeg.c
+  
+  OBJS1 =	xv.o xv24to8.o xvbutt.o xvctrl.o xvdir.o xvfish.o xvgam.o\
+  	xvgif.o xvgifwr.o xvinfo.o xvmisc.o xvpbm.o xvpm.o xvscrl.o \
+! 	xvxbm.o vprintf.o xvjpeg.o $(JOBJS)
+  
+  SRCS2=	bggen.c
+  OBJS2=	bggen.o
+--- 108,118 ----
+  
+  SRCS1 =	xv.c xv24to8.c xvbutt.c xvctrl.c xvdir.c xvfish.c xvgam.c\
+  	xvgif.c xvgifwr.c xvinfo.c xvmisc.c xvpbm.c xvpm.c xvscrl.c\
+! 	xvxbm.c vprintf.c xvjpeg.c xvvis.c
+  
+  OBJS1 =	xv.o xv24to8.o xvbutt.o xvctrl.o xvdir.o xvfish.o xvgam.o\
+  	xvgif.o xvgifwr.o xvinfo.o xvmisc.o xvpbm.o xvpm.o xvscrl.o \
+! 	xvxbm.o vprintf.o xvjpeg.o $(JOBJS) xvvis.o
+  
+  SRCS2=	bggen.c
+  OBJS2=	bggen.o
+diff -c xv.orig/xv.c xv/xv.c
+*** xv.orig/xv.c	Wed Nov 13 05:56:12 1991
+--- xv/xv.c	Wed Nov 13 06:22:39 1991
+***************
+*** 54,59 ****
+--- 54,60 ----
+  #define PBM     3
+  #define XBM     4
+  #define JFIF    5
++ #define VIS 6
+  
+  static unsigned long rootbg, rootfg;  /* fg/bg for root border */
+  static int    waitsec = -1;     /* seconds between pics. -1=wait for event */
+***************
+*** 784,789 ****
+--- 785,792 ----
+  
+    else if (strncmp(magicno,"#define",7)==0) filetype = XBM;
+  
++   else if (strncmp(magicno,"VISF",4)==0) filetype = VIS;
++ 
+    if (filetype == UNKNOWN) {
+      SetISTR(ISTR_INFO,"'%s' not in a recognized format.", basename);
+      Warning();
+***************
+*** 798,803 ****
+--- 801,807 ----
+    case PBM:  i = LoadPBM (filename,ncols); break;
+    case XBM:  i = LoadXBM (filename,ncols); break;
+    case JFIF: i = LoadJFIF(filename,ncols); break;
++   case VIS: i= LoadVIS(filename,ncols); break;
+    }
+    WaitCursor();
+  
+@//E*O*F xvvis.diffs//
+chmod u=rw,g=rw,o=r xvvis.diffs
+ 
+exit 0
+
+Return-Path: tmb@ai.mit.edu
+Received-Date: Fri, 15 Nov 91 15:40:42 EST
+Received: from life.ai.mit.edu by central.cis.upenn.edu
+	id AA29972; Fri, 15 Nov 91 15:40:34 -0500
+Posted-Date: Fri, 15 Nov 91 15:36:41 EST
+Received: from bambleweenie57 (bambleweenie57.ai.mit.edu) by life.ai.mit.edu (4.1/AI-4.10) id AA21156; Fri, 15 Nov 91 15:40:10 EST
+From: tmb@ai.mit.edu (Thomas M. Breuel)
+Received: by bambleweenie57 (4.1/AI-4.10) id AA09661; Fri, 15 Nov 91 15:36:41 EST
+Date: Fri, 15 Nov 91 15:36:41 EST
+Message-Id: <9111152036.AA09661@bambleweenie57>
+To: bradley@central.cis.upenn.edu
+Subject: VIS support for xv
+
+I added file saving. Here is a shar file with the files that I touched.
+I'd appreciate if this made it into the next release of xv.
+
+				Thanks, Thomas.
+
+
+# This is a shell archive.  Remove anything before this line,
+# then unpack it by saving it in a file and typing "sh file".
+#
+# Wrapped by  on Fri Nov 15 15:35:17 EST 1991
+# Contents:  xv.h xvdir.c xvvis.c
+ 
+echo x - xv.h
+sed 's/^@//' > "xv.h" <<'@//E*O*F xv.h//'
+/*
+ *  xv.h  -  header file for xv, but you probably guessed as much
+ */
+
+/*
+ * Copyright 1989, 1990 by the University of Pennsylvania
+ *
+ * Permission to use, copy, and distribute for non-commercial purposes,
+ * is hereby granted without fee, providing that the above copyright
+ * notice appear in all copies and that both the copyright notice and this
+ * permission notice appear in supporting documentation.
+ *
+ * The software may be modified for your own purposes, but modified versions
+ * may not be distributed.
+ *
+ * This software is provided "as is" without any express or implied warranty.
+ */
+
+#define REVDATE   "Rev: 11/29/90  (Patchlevel 3)"
+
+#ifdef SVR4             /* SysV release 4 uses dirent */
+#ifndef sgi             /* but Silicon Graphics doesn't */
+#define DIRENT
+#endif
+#endif
+
+
+/* include files */
+#include <stdio.h>
+#include <math.h>
+#include <ctype.h>
+#include <string.h>
+extern int   errno;             /* this SHOULD be in errno.h */
+extern char *sys_errlist[];     /* this SHOULD be in errno.h */
+
+#ifndef __convexc__             /* Convex doesn't have <memory.h> */
+#include <memory.h>             /* for 'memset()' prototype */
+#endif
+
+/* neither IBM AOS 4.3, Convex, nor BSD 4.3 on VAX have <malloc.h> */
+#if !defined(ibm032) && !defined(__convexc__) && \
+    !(defined(vax) && !defined(ultrix))
+#if defined(hp300) || defined(hp800)
+#include <sys/malloc.h>                /* it's in 'sys' on HPs*/
+#else
+#include <malloc.h>
+#endif
+#endif
+
+
+#if defined(NEED_MEMROUTINES)
+#define memcpy(d,s,l) bcopy(s,d,l)
+#endif
+
+
+#include <X11/Xos.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/cursorfont.h>
+#include <X11/keysym.h>
+
+
+#if defined(NEEDSTIME) || defined(NEEDSDIR)
+#include <sys/types.h>    /* only include <sys/types.h> once */
+#endif
+
+#ifdef NEEDSTIME
+#ifndef sgi              /* silicon graphics doesn't have timeb.h */
+#include <sys/timeb.h>
+#endif
+#undef SIGCHLD
+#include <signal.h>
+#if defined(sco) && !defined(NOTIMER)
+#include <sys/itimer.h>
+#endif
+#ifndef  sigmask
+#define  sigmask(m)      (1 << ((m)-1))
+#endif
+#endif
+
+#ifdef NEEDSDIR
+#ifndef HPUX
+#ifdef sco
+#include <sys/ndir.h>
+#define lstat stat
+#else
+#ifndef ATT
+#include <sys/dir.h>
+#endif  /* ATT */
+#endif  /* sco */
+#endif  /* not HPUX */
+#include <sys/param.h>
+#include <sys/stat.h>
+#ifdef DIRENT
+#include <dirent.h>
+#endif
+#endif
+
+#ifdef NEEDSVARARGS
+#include <varargs.h>
+#endif
+
+/* signal macros */
+#ifdef SVR4
+#define HOLD_SIG         sighold(SIGALRM)  /* block ALRM sig from occurring */
+#define RELEASE_SIG      sigrelse(SIGALRM) /* */
+#define PAUSE_SIG        sigpause(SIGALRM) /* sleep until ALRM signal */
+#else
+#define HOLD_SIG         sigblock(sigmask(SIGALRM))
+#define RELEASE_SIG      sigblock(0)
+#define PAUSE_SIG        sigpause(0)
+#endif
+
+
+#ifdef i386
+#define MAXPATHLEN    500
+#define UNCOMPRESS    "/usr/local/bin/uncompress"   /* uncompress program */
+#undef  HOLD_SIG
+#define HOLD_SIG      /* don't know how to handle signals  MWS 10/18/90 */
+#undef  RELEASE_SIG
+#define RELEASE_SIG   /* */
+#undef  PAUSE_SIG
+#define PAUSE_SIG     /* */
+#else
+#define UNCOMPRESS "/usr/ucb/uncompress"   /* for uncompressing .Z files */
+#endif
+
+#define PROGNAME  "xv"             /* used in resource database */
+
+#define DEFINFOGEOM "-10+10"       /* default position of info window */
+#define DEFDIRGEOM  "-10-10"       /* default position of directory window */
+#define DEFCTRLGEOM "+400+400"     /* default position of ctrl window */
+#define DEFGAMGEOM  "+10-10"       /* default position of gamma window */
+
+#define INFOWIDE 500               /* (fixed) size of info window */
+#define INFOHIGH 250
+
+#define CTRLWIDE 440               /* (fixed) size of control window */
+#define CTRLHIGH 295
+
+#define DIRWIDE  300               /* (fixed) size of directory window */
+#define DIRHIGH  438
+
+#define GAMWIDE  366               /* (fixed) size of Gamma window */
+#define GAMHIGH  356
+
+#define MAXNAMES 1024   /* max # of files (more than this?  Get REAL!)
+
+/* strings in the INFOBOX (used in SetISTR and GetISTR) */
+#define NISTR         9    /* number of ISTRs */
+#define ISTR_INFO     0
+#define ISTR_WARNING  1
+#define ISTR_FILENAME 2
+#define ISTR_FORMAT   3
+#define ISTR_RES      4
+#define ISTR_CROP     5
+#define ISTR_EXPAND   6
+#define ISTR_COLOR    7
+#define ISTR_COLOR2   8
+
+/* potential values of 'infomode', used in info box drawing routines */
+#define INF_NONE 0    /* empty box */
+#define INF_STR  1    /* just ISTR_INFO */
+#define INF_PART 2    /* filename, format, size and infostr */
+#define INF_FULL 3    /* INF_PART + clipping, expansion, colorinfo */
+
+
+/* buttons in the ctrl window */
+#define NBUTTS  20
+#define BNEXT   0
+#define BPREV   1
+#define BCROP   2
+#define BUNCROP 3
+#define BNORM   4
+#define BMAX    5
+#define BUP2    6
+#define BDN2    7
+#define BUP10   8
+#define BDN10   9
+#define BQUIT   10
+#define B4BY3   11
+#define BSAVE   12
+#define BROTL   13
+#define BINFO   14
+#define BGAMMA  15
+#define BASPECT 16
+#define BROTR   17
+#define BMAXPECT 18
+#define BACROP   19
+
+/* buttons in the 'save' window */
+#define S_NBUTTS 4
+#define S_BOPEN  0
+#define S_BSAVE  1
+#define S_BCANC  2
+#define S_BQUIT  3
+
+
+/* buttons in the 'gamma' window */
+#define G_NBUTTS  17
+#define G_BAPPLY  0
+#define G_BNOGAM  1
+#define G_BRESET  2
+#define G_BDEF    3
+#define G_BGTYPE  4
+#define G_BCLOSE  5
+#define G_BUP_BR  6
+#define G_BDN_BR  7
+#define G_BUP_CN  8
+#define G_BDN_CN  9
+#define G_BHSVRGB 10
+#define G_B1      11
+#define G_B2      12
+#define G_B3      13
+#define G_B4      14
+#define G_BSET    15
+#define G_BUNDO   16
+
+
+/* definitions of first char of dirnames[i] (filetype) */
+#define C_FIFO  'f'    /* FIFO special file */
+#define C_CHR   'c'    /* character special file */
+#define C_DIR   'd'    /* directory */
+#define C_BLK   'b'    /* block special file */
+#define C_LNK   'l'    /* symbolic link */
+#define C_SOCK  's'    /* socket */
+#define C_REG   ' '    /* regular file */
+
+
+/* random string-placing definitions */
+#define SPACING 3      /* vertical space between strings */
+#define ASCENT   (mfinfo->ascent)
+#define DESCENT  (mfinfo->descent)
+#define CHIGH    (ASCENT + DESCENT)
+#define LINEHIGH (CHIGH + SPACING)
+
+
+#define STDINSTR "<stdin>"
+
+
+#ifndef MAIN
+#define WHERE extern
+#else
+#define WHERE
+#endif
+
+typedef unsigned char byte;
+
+typedef struct { Window win;            /* window ID */
+		 int len;               /* length of major axis */
+		 int vert;              /* true if vertical, else horizontal */
+		 int active;            /* true if scroll bar can do anything*/
+		 int min,max;           /* min/max values 'pos' can take */
+		 int val;               /* 'value' of scrollbar */
+		 int page;              /* amt val change on pageup/pagedown */
+		 int tpos;              /* thumb pos. (pixels from tmin) */
+		 int tmin,tmax;         /* min/max thumb offsets (from 0,0) */
+		 int tsize;             /* size of thumb (in pixels) */
+		 unsigned long fg,bg;   /* colors */
+		 void (*drawobj)();     /* redraws obj controlled by scrl*/
+		 int uplit, dnlit;      /* true if up&down arrows are lit */
+	       } SCRL;
+
+typedef struct { Window win;            /* parent window */
+		 int x,y,w,h;           /* size of button rectangle */
+		 int lit;               /* if true, invert colors */
+		 int active;            /* if false, stipple gray */
+		 int toggle;            /* if true, clicking toggles state */
+		 unsigned long fg,bg;   /* colors */
+		 char *str;             /* string in button */
+	       } BUTT;
+
+
+typedef struct { Window win;            /* window */
+		 int x,y,w,h;           /* size of window */
+		 unsigned long fg,bg;   /* colors */
+		 char **str;            /* ptr to list of strings */
+		 int   nstr;            /* number of strings */
+		 int   selected;        /* number of 'selected' string */
+		 int   nlines;          /* number of lines shown at once */
+		 SCRL  scrl;            /* scrollbar that controls list */
+		 int   filetypes;       /* true if filetype icons to be drawn*/
+		 int   dirsonly;        /* if true, only dirs selectable */
+	       } LIST;
+
+
+typedef struct rbutt { Window        win;      /* parent window */
+		       int           x,y;      /* position in parent */
+		       char         *str;      /* the message string */
+		       int           selected; /* selected or not */
+		       int           active;   /* selectable? */
+		       struct rbutt *next;     /* pointer to next in group */
+		       unsigned long fg,bg;    /* colors */
+		     } RBUTT;
+
+/* MACROS */
+#define CENTERX(f,x,str) ((x)-XTextWidth(f,str,strlen(str))/2)
+#define CENTERY(f,y) ((y)-((f->ascent+f->descent)/2)+f->ascent)
+
+/* RANGE forces a to be in the range b..c (inclusive) */
+#define RANGE(a,b,c) { if (a<b) a=b;  if (a>c) a=c; }
+
+/* PTINRECT returns '1' if x,y is in rect (inclusive) */
+#define PTINRECT(x,y,rx,ry,rw,rh) \
+           ((x)>=(rx) && (y)>=(ry) && (x)<=(rx)+(rw) && (y)<=(ry)+(rh))
+
+/* MONO returns total intensity of r,g,b components */
+#define MONO(rd,gn,bl) (((rd)*11 + (gn)*16 + (bl)*5) >> 5)  /*.33R+ .5G+ .17B*/
+
+
+
+/* X stuff */
+WHERE Display       *theDisp;
+WHERE int           theScreen;
+WHERE unsigned int  ncells, dispWIDE, dispHIGH, dispDEEP;
+WHERE Colormap      theCmap, LocalCmap;
+WHERE Window        rootW, mainW;
+WHERE GC            theGC;
+WHERE unsigned long black, white, fg, bg, infofg, infobg;
+WHERE Font          mfont, monofont;
+WHERE XFontStruct   *mfinfo, *monofinfo;
+WHERE Visual        *theVisual;
+WHERE Cursor        arrow, cross;
+WHERE Pixmap        iconPix;
+
+/* global vars used by LOAD routines */
+WHERE byte          *pic;                   /* ptr to loaded picture */
+WHERE unsigned int   pWIDE,pHIGH;           /* size of 'pic' */
+WHERE byte           r[256],g[256],b[256];  /* colormap */
+WHERE char          *cmd;                   /* program name for printf's */
+WHERE int            DEBUG;                 /* print debugging info */
+WHERE int            mono;                  /* true if displaying grayscale */
+
+
+/* more global variables, used by xv and xvmisc */
+WHERE byte          *cpic;         /* cropped version of pic */
+WHERE unsigned int  cWIDE, cHIGH,  /* size of cropped region */
+                    cXOFF, cYOFF;  /* offset of region from 0,0 of pic */
+
+WHERE byte          *epic;         /* expanded version of cpic */
+                                   /* points to pic when at 1:1 expansion */
+                                   /* this is converted to 'theImage' */
+WHERE unsigned int  eWIDE, eHIGH;  /* size of epic */
+WHERE unsigned int  normFact;      /* factor to shrink picture by for 'norm' */
+
+WHERE byte           rorg[256],gorg[256],borg[256];  /* ORIGINAL colormap */
+WHERE byte           gamcr[256];   /* gamma correction curve */
+WHERE byte           fsgamcr[256]; /* gamma correction curve (for FS dither) */
+
+
+WHERE XImage        *theImage;     /* X version of epic */
+
+
+WHERE unsigned long freecols[256]; /* list of pixel values to free */
+WHERE int           nfcols;        /* number of colors to free */
+WHERE unsigned long cols[256];     /* maps pic pixel values to X pixel vals */
+WHERE int           fc2pcol[256];  /* maps freecols into pic pixel values */
+WHERE int           numcols;       /* # of desired colors in picture */
+WHERE int           ncols;         /* max # of (different) colors to alloc */
+
+WHERE char          str[128];      /* dummy string used for error messages */
+
+WHERE int           expand,        /* expansion amount */
+                    bwidth,        /* border width of created windows */
+                    noglob,        /* force to only use colors it alloced */
+                    revvideo,      /* reverse video */
+                    perfect,       /* perfect color.  install own colormap */
+                    fixedaspect,   /* fixed aspect ratio */
+                    slow24,        /* use slow 24to8 algorithm */
+                    ninstall,      /* true if using icccm-complaint WM
+				      (a WM that will does install CMaps */
+                    useroot,       /* true if we should draw in rootW */
+                    noqcheck,      /* true if we should NOT do QuickCheck */
+                    rwcolor,       /* true if we should use R/W color cells */
+                    rwthistime,    /* true if we DID use R/W color cells */
+                    fish,          /* turn on annoying fish */
+                    fishrunning;   /* true if fish are in operation */
+
+WHERE float         defaspect,     /* default aspect ratio to use */
+                    normaspect;    /* normal aspect ratio of this picture */
+
+WHERE int           crx1, cry1,    /* dimensions of cropping rectangle */
+                    crx2, cry2;
+
+
+
+/* stuff used for 'info' box */
+WHERE Window        infoW;
+WHERE int           infoUp;       /* boolean:  whether infobox is visible */
+WHERE int           infoMode;
+
+
+/* stuff used for 'ctrl' box */
+WHERE Window        ctrlW;
+WHERE int           ctrlUp;       /* boolean:  whether ctrlbox is visible */
+WHERE char         *namelist[MAXNAMES];  /* list of file names from argv */
+WHERE char         *dispnames[MAXNAMES]; /* truncated names shown in listbox */
+WHERE int           numnames, curname;
+WHERE LIST          nList;
+WHERE BUTT          but[NBUTTS];         /* command buttons in ctrl window */
+WHERE Pixmap        grayTile, grayStip;  /* for drawing dim things */
+
+/* stuff used for 'directory' box */
+WHERE Window        dirW, ddirW, dnamW;
+WHERE int           dirUp;       /* is dirW mapped or not */
+WHERE LIST          dList;       /* list of filenames in current directory */
+WHERE BUTT          dbut[S_NBUTTS];
+
+/* stuff used for 'gamma' box */
+#define NUMHANDS 4
+WHERE Window        gamW,graphW;
+WHERE int           gamUp;       /* is gamW mapped or not */
+WHERE BUTT          gbut[G_NBUTTS];
+WHERE XPoint        ghand[NUMHANDS];
+
+#undef WHERE
+
+
+
+
+
+/* function declarations for externally-callable functions */
+
+#ifdef __STDC__ 
+/****************************** XV.C ****************************/
+void DrawWindow(int, int, int, int);
+void WCrop(int, int);
+void WUnCrop(void);
+void WResize(int, int);
+void WRotate(void);
+void InvCropRect(void);
+void MakeRootPic(void);
+void XvFreeColors(Display*, Colormap, unsigned long*, int, unsigned long, int);
+
+/*************************** XVMISC.C ***************************/
+Window CreateWindow(char *, char *, unsigned int, unsigned int, 
+		    unsigned long, unsigned long);
+void Resize(int, int);
+void Rotate(int);
+void SortColormap(void);
+void AllocColors(void);
+void AllocRWColors(void);
+void DoMonoAndRV(void);
+void DoCrop(void);
+void UnCrop(void);
+void AutoCrop(void);
+void FSDither(byte *, int, int, byte *);
+void CreateXImage(void);
+void CenterString(Window, char *, int, int);
+void ULineString(Window, char *, int, int);
+int  StringWidth(char *);
+void FakeButtonPress(BUTT *);
+void SetCropString(void);
+void Warning(void);
+void FatalError(char *);
+void LoadFishCursors(void);
+void SetCursors(int);
+void WaitCursor(void);
+void Quit(int);
+void Timer(int);
+
+/*************************** XV24TO8.C **************************/
+int  Conv24to8(byte *, int, int, int);
+void InitFSDTables(void);
+
+/**************************** XVCTRL.C **************************/
+void CreateCtrl(char *);
+void CtrlBox(int);
+void RedrawCtrl(int, int, int, int);
+int  ClickCtrl(int, int);
+void DrawCtrlStr(void);
+void ScrollToCurrent(void);
+
+void LSCreate(LIST *, Window, int, int, int, int, int, char **, int, 
+	      unsigned long, unsigned long, void (*)(void), int, int);
+void LSRedraw(LIST *);
+int  LSClick (LIST *, XButtonEvent *);
+void LSNewData(LIST *, char **, int);
+
+
+/*************************** XVINFO.C ***************************/
+void  CreateInfo(char *);
+void  InfoBox(int);
+void  RedrawInfo(int, int, int, int);
+void  SetInfoMode(int);
+void  SetISTR(int, ...);
+char *GetISTR(int);
+
+/**************************** XVDIR.C ***************************/
+void CreateDirW(char *);
+void DirBox(int);
+void RedrawDirW(int,int,int,int);
+int  ClickDirW(int, int);
+void LoadCurrentDirectory(void);
+void RedrawDDirW(void);
+void RedrawDNamW(void);
+void SelectDir(int);
+void DirOpenActive(void);
+void TrackDDirW(int,int);
+int  DirKey(int);
+int  DoSave(void);
+void SetDirFName(char *);
+
+
+/**************************** XVGAM.C **************************/
+void CreateGam(char *);
+void GamBox(int);
+void RedrawGam(int, int, int, int);
+void RedrawGraph(int, int, int, int);
+void ClickGam(int, int);
+void TrackGraph(int, int);
+void GenerateGamma(void);
+void GenerateFSGamma(void);
+void GammifyColors(void);
+void SetGPreset(int, int, int, int, int, int, int);
+
+/*************************** XVSCRL.C ***************************/
+void SCCreate  (SCRL *, Window, int, int, int, int, int, int, int, int, 
+                      unsigned long, unsigned long, void (*)(void));
+void SCSetRange(SCRL *, int, int, int, int);
+void SCSetVal  (SCRL *, int);
+void SCRedraw  (SCRL *);
+void SCTrack   (SCRL *, int, int);
+
+
+/**************************** XVBUTT.C ***************************/
+
+void BTCreate(BUTT *, Window, int, int, int, int, char *, 
+	      unsigned long, unsigned long);
+void BTSetActive(BUTT *, int);
+void BTRedraw(BUTT *);
+int  BTTrack (BUTT *);
+
+
+RBUTT *RBCreate(RBUTT *, Window, int, int, char*, 
+		unsigned long, unsigned long);
+void   RBRedraw(RBUTT *, int);
+void   RBSelect(RBUTT *, int);
+int    RBWhich(RBUTT *);
+int    RBCount(RBUTT *);
+void   RBSetActive(RBUTT *, int, int);
+int    RBClick(RBUTT *, int, int);
+void   RBTrack(RBUTT *, int);
+
+
+/**************************** XVGIF.C ***************************/
+int LoadGIF(char *, int);
+
+/*************************** XVGIFWR.C **************************/
+int WriteGIF(FILE *, byte *, int, int, byte *, byte *, byte *, int, int);
+
+/**************************** XVPM.C ****************************/
+int LoadPM(char *, int);
+int WritePM(FILE *, byte *, int, int, byte *, byte *, byte *, int, int);
+
+/**************************** XVPBM.C ***************************/
+int LoadPBM(char *, int);
+int WritePBM(FILE *, byte *, int, int, byte *, byte *, byte *, int, int, int);
+
+/**************************** XVXBM.C ***************************/
+int LoadXBM(char *, int);
+int WriteXBM(FILE *, byte *, int, int, char *);
+
+/**************************** XVJPEG.C ***************************/
+int LoadJFIF(char *, int);
+
+
+
+
+#else     /* using non-ANSI cc.  Function defs, but no params */
+
+
+
+
+/****************************** XV.C ****************************/
+void DrawWindow(), WCrop(), WUnCrop(), WResize(), WRotate(), InvCropRect();
+void MakeRootPic();
+void XvFreeColors();
+
+/*************************** XVMISC.C ***************************/
+Window CreateWindow();
+void   Resize(), Rotate(), SortColormap(), AllocColors(), DoCrop(), UnCrop();
+void   AutoCrop(), DoMonoAndRV();
+void   AllocRWColors(), FSDither(), CenterString(), ULineString();
+int    StringWidth();
+void   FakeButtonPress(), SetCropString(), Warning(), FatalError(), Quit();
+void   Timer(), CreateXImage(), LoadFishCursors(), SetCursors(), WaitCursor();
+
+/*************************** XV24TO8.C **************************/
+int  Conv24to8();
+void InitFSDTables();
+
+/**************************** XVCTRL.C **************************/
+void CreateCtrl(), CtrlBox(), RedrawCtrl(), DrawCtrlStr(), ScrollToCurrent();
+int  ClickCtrl();
+
+void LSCreate(), LSRedraw(), LSNewData();
+int  LSClick();
+
+/*************************** XVINFO.C ***************************/
+void  CreateInfo(), InfoBox(), RedrawInfo(), SetInfoMode(), SetISTR();
+char *GetISTR();
+
+/**************************** XVDIR.C ***************************/
+void CreateDirW(), DirBox(), RedrawDirW(), LoadCurrentDirectory();
+int  ClickDirW(), DoSave(), DirKey();
+void RedrawDDirW(), RedrawDNamW(), SelectDir(), DirOpenActive(), TrackDDirW();
+void SetDirFName();
+
+/**************************** XVGAM.C **************************/
+void CreateGam(), GamBox(), RedrawGam(), RedrawGraph(), ClickGam();
+void TrackGraph(), GenerateGamma(), GenerateFSGamma(), GammifyColors();
+void SetGPreset();
+
+/*************************** XVSCRL.C ***************************/
+void SCCreate(), SCSetRange(), SCSetVal(), SCRedraw(), SCTrack();
+
+/**************************** XVBUTT.C ***************************/
+void BTCreate(), BTSetActive(), BTRedraw();
+int  BTTrack();
+
+RBUTT *RBCreate();
+void   RBRedraw(), RBSelect(), RBSetActive(), RBTrack();
+int    RBWhich(), RBCount(), RBClick();
+
+/**************************** XVGIF.C ***************************/
+int LoadGIF();
+
+/*************************** XVGIFWR.C **************************/
+int WriteGIF();
+
+/**************************** XVPM.C ****************************/
+int LoadPM(), WritePM();
+
+/**************************** XVPBM.C ***************************/
+int LoadPBM(), WritePBM();
+
+/**************************** XVXBM.C ***************************/
+int LoadXBM(), WriteXBM();
+
+/**************************** XVJPEG.C ***************************/
+int LoadJFIF();
+
+#endif
+@//E*O*F xv.h//
+chmod u=rw,g=r,o=r xv.h
+ 
+echo x - xvdir.c
+sed 's/^@//' > "xvdir.c" <<'@//E*O*F xvdir.c//'
+/* 
+ * xvdir.c - Directory changin', file i/o dialog box
+ *
+ * callable functions:
+ *
+ *   CreateDirW(geom,bwidth)-  creates the dirW window.  Doesn't map it.
+ *   DirBox(vis)            -  random processing based on value of 'vis'
+ *                             maps/unmaps window, etc.
+ *   RedrawDirW(x,y,w,h)    -  called by 'expose' events
+ *   ClickDirW()            -  handles mouse clicks in DirW
+ *   LoadCurrentDirectory() -  loads up current dir information for dirW
+ *   DoSave()               -  calls appropriate save routines
+ *   SetDirFName()          -  sets the 'save-as' filename 
+ */
+
+/*
+ * Copyright 1989, 1990 by the University of Pennsylvania
+ *
+ * Permission to use, copy, and distribute for non-commercial purposes,
+ * is hereby granted without fee, providing that the above copyright
+ * notice appear in all copies and that both the copyright notice and this
+ * permission notice appear in supporting documentation.
+ *
+ * The software may be modified for your own purposes, but modified versions
+ * may not be distributed.
+ *
+ * This software is provided "as is" without any express or implied warranty.
+ */
+
+
+#define NEEDSDIR
+#include "xv.h"
+
+#define NLINES 9                   /* # of lines in list control (keep odd) */
+#define LISTW  200
+
+#define BUTTW   60
+#define BUTTH   19
+#define DDWIDE  LISTW-80+15
+
+#define MAXDEEP 30    /* maximum number of directories in cwd path */
+#define MAXFNLEN 40   /* max length of filename being entered */
+
+#define DEFFILENAME ""   /* default filename filled in when program starts */
+
+#ifdef __STDC__
+static void RedrawDList(void);
+static int  dnamcmp(char **, char **);
+#else
+static void RedrawDList();
+static int  dnamcmp();
+#endif
+
+static int    listh;
+static char  *dirnames[MAXNAMES];
+static int    numdirnames = 0, ndirs = 0;
+static char   path[MAXPATHLEN+1];
+static char  *dirs[MAXDEEP];            /* list of directory names */
+static char  *lastdir;                  /* name of the directory we're in */
+static char   filename[MAXFNLEN];       /* filename being entered */
+static RBUTT *formatRB, *colorRB, *sizeRB;
+
+
+/***************************************************/
+void CreateDirW(geom)
+char *geom;
+{
+  int y;
+
+  listh = LINEHIGH * NLINES;
+
+  dirW = CreateWindow("xv save dialog",geom,DIRWIDE, DIRHIGH, infofg, infobg);
+  if (!dirW) FatalError("couldn't create 'save' window!");
+
+  /* create doo-wah's */
+  ddirW = XCreateSimpleWindow(theDisp, dirW, 40, 5, DDWIDE, LINEHIGH,
+			      2, infofg, infobg);
+  if (!ddirW) FatalError("can't create path window");
+  XSelectInput(theDisp, ddirW, ExposureMask | ButtonPressMask);
+
+  dnamW = XCreateSimpleWindow(theDisp, dirW, 80, listh+75-ASCENT-4, 
+			      200, LINEHIGH+4, 1, infofg, infobg);
+  if (!dnamW) FatalError("can't create name window");
+  XSelectInput(theDisp, dnamW, ExposureMask);
+
+
+  LSCreate(&dList, dirW, 10, 14+LINEHIGH, LISTW, listh, NLINES,
+	   dirnames, numdirnames,
+	   infofg, infobg, RedrawDList, 1, 0);
+
+  BTCreate(&dbut[S_BOPEN], dirW, 233, dList.y-9+listh/5, 60, BUTTH, 
+	   "Open", infofg, infobg);
+  BTCreate(&dbut[S_BSAVE], dirW, 233, dList.y-9+(listh*2)/5, 60, BUTTH, 
+	   "Save", infofg, infobg);
+  BTCreate(&dbut[S_BCANC], dirW, 233, dList.y-9+(listh*3)/5, 60, BUTTH, 
+	   "Cancel", infofg, infobg);
+  BTCreate(&dbut[S_BQUIT], dirW, 233, dList.y-9+(listh*4)/5, 60, BUTTH, 
+	   "Quit", infofg, infobg);
+
+  y = listh + 110;
+  formatRB = RBCreate(NULL, dirW, 26, y, "GIF", infofg, infobg);
+  RBCreate(formatRB, dirW, 26, y+18, "PM", infofg, infobg);
+  RBCreate(formatRB, dirW, 26, y+36, "PBM (raw)", infofg, infobg);
+  RBCreate(formatRB, dirW, 26, y+54, "PBM (ascii)", infofg, infobg);
+  RBCreate(formatRB, dirW, 26, y+72, "X11 Bitmap", infofg, infobg);
+  RBCreate(formatRB, dirW, 26, y+90, "VIS", infofg, infobg);
+
+  colorRB = RBCreate(NULL, dirW, DIRWIDE/2, y, "Full Color", infofg, infobg);
+  RBCreate(colorRB, dirW, DIRWIDE/2, y+18, "Greyscale", infofg, infobg);
+  RBCreate(colorRB, dirW, DIRWIDE/2, y+36, "B/W Dithered", infofg, infobg);
+
+  y = y + 133;
+  sizeRB = RBCreate(NULL, dirW, 26, y, "Normal Size", infofg, infobg);
+  RBCreate(sizeRB, dirW, 26, y+18, "At Current Expansion", infofg, infobg);
+
+  SetDirFName(DEFFILENAME);
+
+  LoadCurrentDirectory();
+
+  XMapSubwindows(theDisp, dirW);
+}
+  
+
+/***************************************************/
+void DirBox(vis)
+int vis;
+{
+  if (vis) XMapRaised(theDisp, dirW);
+  else     XUnmapWindow(theDisp, dirW);
+
+  BTSetActive(&but[BSAVE], !vis);
+
+  dirUp = vis;
+}
+
+
+/***************************************************/
+void RedrawDirW(x,y,w,h)
+int x,y,w,h;
+{
+  int  i,ypos;
+  char foo[30];
+  XRectangle xr;
+
+  xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
+  XSetClipRectangles(theDisp, theGC, 0,0, &xr, 1, Unsorted);
+
+  if (dList.nstr==1) strcpy(foo,"1 file");
+                else sprintf(foo,"%d files",dList.nstr);
+
+  ypos = dList.y + dList.h + 5 + ASCENT;
+  XSetForeground(theDisp, theGC, infobg);
+  XFillRectangle(theDisp, dirW, theGC, 10, ypos-ASCENT, DIRWIDE, CHIGH);
+  XSetForeground(theDisp, theGC, infofg);
+  XDrawString(theDisp, dirW, theGC, 10, ypos, foo, strlen(foo));
+
+  XDrawString(theDisp, dirW, theGC, 10, dList.h+75, "File name:",10);
+
+  for (i=0; i<S_NBUTTS; i++) BTRedraw(&dbut[i]);
+
+  RBRedraw(formatRB, -1);
+  RBRedraw(colorRB, -1);
+  RBRedraw(sizeRB, -1);
+
+  ULineString(dirW, "Format", formatRB->x-16, formatRB->y-3-DESCENT);
+  ULineString(dirW, "Colors", colorRB->x-16,  colorRB->y-3-DESCENT);
+  ULineString(dirW, "Size",   sizeRB->x-16,   sizeRB->y-3-DESCENT);
+
+  XSetClipMask(theDisp, theGC, None);
+}
+
+
+/***************************************************/
+void RedrawDDirW()
+{
+  XSetForeground(theDisp, theGC, infofg);
+  XSetBackground(theDisp, theGC, infobg);
+
+  XClearWindow(theDisp, ddirW);
+  XDrawString(theDisp, ddirW, theGC, 3, ASCENT + 1,
+              lastdir, strlen(lastdir));
+}
+
+
+/***************************************************/
+int ClickDirW(x,y)
+int x,y;
+{
+  BUTT  *bp;
+  int    bnum;
+
+
+  /* check the RBUTTS first, since they don't DO anything */
+  if ( (bnum=RBClick(formatRB, x,y)) >= 0) { 
+    RBTrack(formatRB, bnum);
+    if (RBWhich(formatRB)==4) {  /* turn off FULLCOLOR + GRAYSCALE */
+      RBSetActive(colorRB,0,0);
+      RBSetActive(colorRB,1,0);
+      RBSelect(colorRB,2);
+    }
+    else {                       /* turn on FULLCOLOR + GRAYSCALE */
+      RBSetActive(colorRB,0,1);
+      RBSetActive(colorRB,1,1);
+    }
+    return -1;
+  }
+
+  if ( (bnum=RBClick(colorRB, x,y)) >= 0) 
+    { RBTrack(colorRB, bnum);  return -1; }
+
+  if ( (bnum=RBClick(sizeRB, x,y)) >= 0) 
+    { RBTrack(sizeRB, bnum);  return -1; }
+
+  for (bnum=0; bnum<S_NBUTTS; bnum++) {
+    bp = &dbut[bnum];
+    if (PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) break;
+  }
+
+  if (bnum<S_NBUTTS) {   /* found one */
+    if (BTTrack(bp)) return (bnum);
+  }
+
+  return -1;
+}
+
+
+/***************************************************/
+void SelectDir(n)
+int n;
+{
+  int pend;
+
+  /* called when entry #n in the dir list was selected/double-clicked */
+
+  if (dList.str[n][0] == C_DIR || 
+      dList.str[n][0] == C_LNK) {  /* it's cool, it's (possibly) a directory */
+    pend = strlen(path);
+    strcat(path,dList.str[n]+1);   /* add to pathname */
+    if (chdir(path)) {
+      fprintf(stderr,"unable to cd to '%s'\n",path);
+      path[pend] = '\0';           /* undo path modification */
+    }
+    else 
+      LoadCurrentDirectory();
+  }
+
+  else {  /* not a directory */
+    /* copy the clicked-on filename into the 'save-as' filename */
+    SetDirFName(dList.str[n]+1);
+  }
+}
+
+
+/***************************************************/
+void TrackDDirW(x,y)
+int x,y;
+{
+  Window        menuW, rW, cW;
+  int           rx, ry, i,j, sel, lastsel;
+  unsigned int  mask;
+
+  XSetForeground(theDisp, theGC, infofg);
+  XSetBackground(theDisp, theGC, infobg);
+
+  menuW = XCreateSimpleWindow(theDisp, dirW, 40, 5, DDWIDE, ndirs*LINEHIGH,
+			      2, infofg, infobg);
+  if (!menuW) FatalError("can't create path window");
+
+  XMapRaised(theDisp, menuW);
+
+  for (i=ndirs-1, j=0; i>=0; i--,j++)
+    XDrawString(theDisp, menuW, theGC, 3, j*LINEHIGH + ASCENT + 1,
+		dirs[i], dirs[i+1]-dirs[i]);
+
+  XFlush(theDisp);
+  XSetFunction(theDisp, theGC, GXinvert);
+  XSetPlaneMask(theDisp, theGC, infofg ^ infobg);
+  lastsel = -1;  sel = 0;
+
+  while (XQueryPointer(theDisp, menuW, &rW, &cW, &rx, &ry, &x, &y, &mask)) {
+    if (!(mask & Button1Mask)) break;
+
+    /* see if mouse has left window */
+
+    sel = y / LINEHIGH;
+    if (sel>=ndirs) sel = ndirs-1;
+    if (sel<0) sel = 0;
+    if (sel != lastsel) {
+      XFillRectangle(theDisp,menuW,theGC,0,lastsel*LINEHIGH,DDWIDE,LINEHIGH);
+      XFillRectangle(theDisp,menuW,theGC,0,sel*LINEHIGH,DDWIDE,LINEHIGH);
+      lastsel = sel;
+    }
+  }
+
+  XSetFunction(theDisp, theGC, GXcopy);
+  XSetPlaneMask(theDisp, theGC, AllPlanes);
+  XDestroyWindow(theDisp, menuW);
+
+  if (sel!=0) { /* changed directories */
+    /* end 'path' by changing trailing '/' (of dir name) to a '\0' */
+    *(dirs[(ndirs-1)-sel + 1] - 1) = '\0';
+
+    /* special case:  if cd to '/', fix path (it's currently "") */
+    if (path[0] == '\0') strcpy(path,"/");
+
+    if (chdir(path)) {
+      fprintf(stderr,"unable to cd to '%s'\n",path);
+    }
+    else 
+      LoadCurrentDirectory();   
+  }
+}
+
+
+/***************************************************/
+static void RedrawDList()
+{
+  LSRedraw(&dList);
+}
+
+
+/***************************************************/
+void LoadCurrentDirectory()
+{
+  DIR           *dirp;
+#ifdef DIRENT
+  struct dirent *dp;
+#else
+  struct direct *dp;
+#endif
+  int            i, ftype;
+  struct stat    st;
+  char          *dbeg, *dend;
+
+  /* get rid of previous file names */
+  for (i=0; i<numdirnames; i++) free(dirnames[i]);
+
+  numdirnames = 0;
+
+#ifdef SVR4
+  getcwd(path, sizeof(path));
+#else
+  getwd(path);
+#endif
+  if (path[strlen(path)-1] != '/')
+    strcat(path,"/");   /* tack on a trailing '/' to make path consistent */
+
+  /* path will be something like: "/u3/bradley/src/weiner/whatever/" */
+  /* parse path into individual directory names */
+  dbeg = dend = path;
+  for (i=0; i<MAXDEEP && dend; i++) {
+    dend = strchr(dbeg,'/');  /* find next '/' char */
+    dirs[i] = dbeg;
+    dbeg = dend+1;
+  }
+  ndirs = i-1;
+
+  lastdir = dirs[ndirs-1];
+  RedrawDDirW();
+
+  dirp = opendir(".");
+  if (!dirp) {
+    fprintf(stderr,"unable to open current directory");
+    return;
+  }
+
+  i=0;
+  while ( (dp = readdir(dirp)) != NULL) {
+    if (strcmp(dp->d_name, ".")==0 || strcmp(dp->d_name, "..")==0) {
+      /* skip over '.' and '..' */
+    }
+    else {
+#ifdef DIRENT
+#ifdef i386
+      /* Not 100% sure d_reclen is correct, but it works...  MWS 10/18/90 */
+      dirnames[i] = (char *) malloc(dp->d_reclen + 2); /* filetype + '\0'*/
+#else
+      dirnames[i] = (char *) malloc(strlen(dp->d_name) + 3);
+#endif
+#else
+      dirnames[i] = (char *) malloc(dp->d_namlen + 2); /* +2=filetype + '\0'*/
+#endif
+      if (!dirnames[i]) FatalError("malloc error while reading directory");
+      strcpy(dirnames[i]+1, dp->d_name);
+
+      /* figure out what type of file the beastie is */
+      dirnames[i][0] = C_REG;   /* default to normal file, if lstat fails */
+
+#if defined(i386) || defined (SYSV)
+      if (stat(dirnames[i]+1, &st)==0) {
+#else
+      if (lstat(dirnames[i]+1, &st)==0) {
+#endif
+	ftype = st.st_mode & S_IFMT;   /* mask off uninteresting bits */
+	if      (ftype == S_IFDIR)  dirnames[i][0] = C_DIR;
+	else if (ftype == S_IFCHR)  dirnames[i][0] = C_CHR;
+	else if (ftype == S_IFBLK)  dirnames[i][0] = C_BLK;
+
+#ifdef S_IFIFO
+	else if (ftype == S_IFIFO)  dirnames[i][0] = C_FIFO;
+#endif
+
+#ifdef S_IFLNK
+	else if (ftype == S_IFLNK)  dirnames[i][0] = C_LNK;
+#endif
+
+#ifdef S_IFSOCK
+        else if (ftype == S_IFSOCK) dirnames[i][0] = C_SOCK;
+#endif
+      }
+      else {
+	/* fprintf(stderr,"problems 'stat-ing' files\n");*/
+	dirnames[i][0] = C_REG;
+      }
+      i++;
+    }
+  }
+
+  closedir(dirp);
+
+  numdirnames = i;
+
+  qsort((char *) dirnames, numdirnames, sizeof(char *), dnamcmp);
+  LSNewData(&dList, dirnames, numdirnames);
+  DirOpenActive();
+  RedrawDirW(0,0,DIRWIDE,DIRHIGH);
+}
+
+
+/***************************************************/
+static int dnamcmp(s1,s2)
+char **s1, **s2;
+{
+  /* sort so that directories are at beginning of list */
+
+  /* if both dirs or both not dirs, sort on name */
+  if ( (**s1 == C_DIR && **s2 == C_DIR) || (**s1 != C_DIR && **s2 != C_DIR))
+    return (strcmp((*s1)+1, (*s2)+1));
+
+  else if (**s1==C_DIR) return -1;  /* s1 is first */
+  else return 1;                    /* s2 is first */
+}
+
+
+
+
+
+/***************************************************/
+int DirKey(c)
+int c;
+{
+  /* got keypress in dirW.  stick on end of filename */
+  int len;
+
+  len = strlen(filename);
+  
+  if (c>' ' && c<'\177') {              /* printable characters */
+    if (c=='/') return(-1);             /* no directories in filename */
+    if (len >= MAXFNLEN-1) return(-1);  /* max length of string */
+    filename[len]=c;  filename[len+1]='\0';
+  }
+
+  else if (c=='\010' || c=='\177') {    /* BS or DEL */
+    if (len==0) return(-1);             /* string already empty */
+    filename[len-1]='\0';
+  }
+
+  else if (c=='\025' || c=='\013') {    /* ^U or ^K clear line */
+    filename[0] = '\0';
+  }
+
+  else if (c=='\012' || c=='\015') {    /* CR or LF */
+    FakeButtonPress(&dbut[S_BSAVE]);
+  }
+
+  else return(-1);                      /* unhandled character */
+
+  SetDirFName(filename);
+  return(0);
+}
+
+
+/***************************************************/
+void RedrawDNamW()
+{
+  int width, len;
+
+  len = strlen(filename);
+  XSetForeground(theDisp, theGC, infofg);
+  XDrawString(theDisp, dnamW, theGC, 3, ASCENT+3, filename, len);
+  width = StringWidth(filename);
+  XDrawLine(theDisp, dnamW, theGC, 3+width+1, 3, 3+width+1, 
+	    3+CHIGH);
+}
+
+
+/***************************************************/
+void DirOpenActive()
+{
+  if (dList.selected>=dList.nstr || dList.selected<0) 
+    BTSetActive(&dbut[S_BOPEN],0);
+
+  else if (dList.str[dList.selected][0] == C_DIR ||
+      dList.str[dList.selected][0] == C_LNK) 
+    BTSetActive(&dbut[S_BOPEN],1);
+
+  else
+    BTSetActive(&dbut[S_BOPEN],0);
+
+  XFlush(theDisp);
+}
+
+
+
+/***************************************************/
+int DoSave()
+{
+  FILE *fp;
+  byte *thepic, *bwpic;
+  int   w,h,rv,i;
+
+  /* opens file, does appropriate color pre-processing, calls save routine
+     based on chosen format.  Returns '0' if successful */
+
+  WaitCursor();
+
+  bwpic = NULL;
+
+  if (RBWhich(sizeRB)==1) { thepic = epic;  w = eWIDE;  h = eHIGH; }
+                     else { thepic = cpic;  w = cWIDE;  h = cHIGH; }
+
+  if (RBWhich(colorRB)==2) {
+    /* generate a FSDithered 1-byte per pixel image */
+    bwpic = (byte *) malloc(w*h);
+    if (!bwpic) FatalError("unable to malloc dithered picture (DoSave)");
+    FSDither(thepic, w, h, bwpic);
+    thepic = bwpic;
+  }
+
+  /* open file */
+  fp = fopen(filename, "w");
+  if (!fp) {
+    SetISTR(ISTR_INFO,"Can't create '%s' -  %s",filename,sys_errlist[errno]);
+    Warning();
+    if (bwpic) free(bwpic);
+    SetCursors(-1);
+    return -1;
+  }
+
+  if ((mono || ncols==0) && RBWhich(colorRB)==0) {
+    /* if we're saving color, but we're viewing B/W we have to NOT do
+       the 'monofication' of the colormap ... */
+    for (i=0; i<numcols; i++) {
+      r[i] = rorg[i];  g[i] = gorg[i];  b[i] = borg[i];  /* original */
+      
+      if (revvideo) {
+	r[i] = 255-r[i];  g[i] = 255-g[i];  b[i] = 255-b[i];
+      }
+   } 
+
+    GammifyColors();
+  }
+      
+  rv = 0;
+  i = RBWhich(formatRB);
+  switch (i) {
+  case 0:  rv = WriteGIF(fp,thepic,w, h, r, g, b, numcols, RBWhich(colorRB));
+           break;
+  case 1:  rv = WritePM (fp,thepic,w, h, r, g, b, numcols, RBWhich(colorRB)); 
+           break;
+  case 2:  rv = WritePBM(fp,thepic,w, h, r, g, b, numcols, RBWhich(colorRB),1);
+           break;
+  case 3:  rv = WritePBM(fp,thepic,w, h, r, g, b, numcols, RBWhich(colorRB),0);
+           break;
+  case 4:  rv = WriteXBM(fp,thepic,w, h, filename);
+           break;
+  case 5:  rv = WriteVIS(fp,thepic,w,h,r,g,b,numcols,RBWhich(colorRB));
+	  break;
+  }
+
+  fclose(fp);
+  if (rv) unlink(filename);   /* couldn't properly write file:  delete it */
+
+  if (!rv) {
+    SetISTR(ISTR_INFO,"Successfully wrote '%s'",filename);
+    LoadCurrentDirectory();   /* wrote file: rescan directory */
+  }
+
+  if (bwpic) free(bwpic);
+
+  if ((mono || ncols==0) && RBWhich(colorRB)==0) {
+    /* restore normal colormap */
+    DoMonoAndRV();
+    GammifyColors();
+  }
+
+  SetCursors(-1);
+
+  return rv;
+}
+
+
+
+/***************************************************/
+void SetDirFName(st)
+char *st;
+{
+  strncpy(filename, st, MAXFNLEN-1);
+  filename[MAXFNLEN-1] = '\0';  /* make sure it's terminated */
+  XClearWindow(theDisp, dnamW);
+  RedrawDNamW();
+  BTSetActive(&dbut[S_BSAVE], strlen(filename)!=0);
+}
+
+@//E*O*F xvdir.c//
+chmod u=rw,g=r,o=r xvdir.c
+ 
+echo x - xvvis.c
+sed 's/^@//' > "xvvis.c" <<'@//E*O*F xvvis.c//'
+/*
+ * xvvis.c - load routine for 'vis' format pictures
+ *
+ * LoadVIS(fname, numcols)  -  loads a VIS pic, does 24to8 code if nec.
+ * WriteVIS(fp, pic, w, h, r,g,b, numcols, style)
+ */
+
+/*
+ * Copyright 1989, 1990 by the University of Pennsylvania
+ *
+ * Permission to use, copy, and distribute for non-commercial purposes,
+ * is hereby granted without fee, providing that the above copyright
+ * notice appear in all copies and that both the copyright notice and this
+ * permission notice appear in supporting documentation.
+ *
+ * The software may be modified for your own purposes, but modified versions
+ * may not be distributed.
+ *
+ * This software is provided "as is" without any express or implied warranty.
+ */
+
+
+#include "xv.h"
+
+static int VISError();
+
+int LoadVIS(fname,nc)
+char *fname;
+int   nc;
+{
+	FILE  *fp;
+	char buf[1000];
+	int w=-1,h=-1;
+	char etype[100];
+	int raster=getenv("VIS_RASTER")&&atoi(getenv("VIS_RASTER"));
+	
+	fp=fopen(fname,"r");
+	if (!fp) return VISError("unable to open file");
+
+	while(fgets(buf,sizeof buf,fp)) {
+		if(!buf[0]||buf[0]=='\n'||buf[0]=='\f') break;
+		sscanf(buf,"DIMS=%d %d",&w,&h);
+		sscanf(buf,"ETYPE=%s",etype);
+	}
+
+	if(w<0||h<0) {fclose(fp); return VISError("bad format");}
+
+	pWIDE=w; pHIGH=h;
+	{int i; for(i=0;i<256;i++) r[i]=g[i]=b[i]=i;}
+
+	if(!strcmp(etype,"uchar")) {
+		int i,j;
+		pic=(unsigned char*)malloc(w*h);
+		if(!pic) {fclose(fp); return VISError("cannot allocate enough memory");}
+		if(!raster) for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+(h-j-1)*w]=getc(fp);
+		else for(j=0;j<h;j++) for(i=0;i<w;i++) pic[i+j*w]=getc(fp);
+	} else if(!strcmp(etype,"float")) {
+		int i,j,n;
+		float min=1e38,max=-1e38;
+		float *t;
+		t=(float*)malloc(w*h*sizeof *t);
+		if(!t) {fclose(fp); return VISError("cannot allocate enough memory");}
+		pic=(unsigned char*)malloc(w*h); 
+		if(!pic) {free(t); fclose(fp); return VISError("cannot allocate enough memory");}
+		fread(t,sizeof *t,w*h,fp);
+		n=w*h;
+		for(i=0;i<n;i++) {if(t[i]<min) min=t[i]; if(t[i]>max) max=t[i];}
+		if(max==min) max=min+1.0;
+		if(!raster) for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+(h-j-1)*w]=255*(t[i*h+j]-min)/(max-min);
+		else for(i=0;i<w;i++) for(j=0;j<h;j++) pic[i+j*w]=255*(t[i+j*w]-min)/(max-min);
+		free(t);
+	} else {close(fp); return VISError("unknown ETYPE");}
+
+	fclose(fp);
+	return 0;
+}
+
+int WriteVIS(fp,thepic,w,h,rmap,gmap,bmap,numcols,colorstyle)
+FILE *fp;
+byte *thepic;
+int w,h;
+byte *rmap,*gmap,*bmap;
+{
+	int i,j;
+
+	fprintf(fp,"VISF=\nDIMS=%d %d\nETYPE=uchar\n\f\n",w,h);
+
+	if(colorstyle==2) {
+		for(i=0;i<w;i++) for(j=0;j<h;j++) putc(thepic[i+(h-j-1)*w]?255:0,fp);
+	} else {
+		int rgb[256];
+		for (i=0; i<numcols; i++) rgb[i] = MONO(rmap[i],gmap[i],bmap[i]);
+		for(i=0;i<w;i++) for(j=0;j<h;j++) putc(rgb[thepic[i+(h-j-1)*w]],fp);
+	}
+	return 0;
+}
+
+static int VISError(st)
+char *st;
+{
+	SetISTR(ISTR_WARNING,"LoadVIS() - %s",cmd,st);
+	Warning();
+	return -1;
+}
+
+@//E*O*F xvvis.c//
+chmod u=rw,g=r,o=r xvvis.c
+ 
+exit 0
+
+

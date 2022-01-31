@@ -1,0 +1,21 @@
+DOCS:
+  File docs/xvdoc.ps has an error in the banner for page 2. The page title is 
+  "Section 2: The Image Window" when it should be "Section 1: Overview".
+
+  Add mention of '-pkludge' and 'popupKludge' 
+
+  Hall of Fame:  Lester Ingber should be 'ingber@alumni.caltech.edu'
+
+
+From: James Ralston Crawford (qralston+@pitt.edu)
+  When deleting files in 'xv controls' window, it should also delete 
+  thumbnail file, if any
+
+
+From: Mitchell Blank Jr <blankm@cae.wisc.edu>
+  (try an use schnauzer in /usr/feh/foo, where feh is rwx--x--x.  Need to
+   set a var each time chdir is successfully called (make xv_chdir).  
+   Then in xv_getwd, if getcwd() fails, try stat()'ing the var.  
+   If it exists, assume we're there, and return the var.  Otherwise, fall back
+   to other directories...
+

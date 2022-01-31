@@ -1,0 +1,143 @@
+(Message /usr/users/bradley/Mail/inbox:5)
+Return-Path: atkins@ee-cf.stanford.edu
+Received-Date: Tue, 17 Nov 92 16:47:41 EST
+Received: from EE-CF.Stanford.EDU by central.cis.upenn.edu
+	id AA13926; Tue, 17 Nov 92 16:47:39 -0500
+Posted-Date: Tue, 17 Nov 92 13:47:31 -0800
+Received: from Anchor.Stanford.EDU by EE-CF.Stanford.EDU (4.1/25-eef) id AA10739; Tue, 17 Nov 92 13:47:36 PST
+Received: by Anchor.Stanford.EDU (4.1/)
+	id AA23105; Tue, 17 Nov 92 13:47:33 PST
+Message-Id: <9211172147.AA23105@Anchor.Stanford.EDU>
+From: "Todd Atkins" <atkins@anchor.stanford.edu>
+To: bradley@central.cis.upenn.edu
+Subject: XV 2.21
+Date: Tue, 17 Nov 92 13:47:31 -0800
+
+
+Hi John,
+
+  One of the patches that I sent you for viewing group 3 files was 
+wrong.  I found some problems with trying to identify group 3 files.
+I need to find some good documentation on group 3 format before I
+can feel more confident with that part of the code.  In the meantime,
+I have decided that it is best to make the user tell XV that
+the file is a fax file.  I will include the new patch for xv.c
+at the end of this message.
+
+- Todd Atkins
+
+*** xv.c	Tue Nov 17 13:37:21 1992
+--- xv.c.orig	Wed Apr 29 16:01:47 1992
+***************
+*** 125,135 ****
+  
+  /* yech! */
+  
+- #ifdef HAVE_G3
+- #define G3 10
+- #endif /* HAVE_G3 */
+  
+  
+  static int    revvideo   = 0;   /* true if we should reverse video */
+  static int    dfltkludge = 0;   /* true if we're viewing dfltpic */
+  static int    keeparound = 1;   /* if true, don't quit after del. last image */
+--- 125,133 ----
+  
+  /* yech! */
+  
+  
+  
++ 
+  static int    revvideo   = 0;   /* true if we should reverse video */
+  static int    dfltkludge = 0;   /* true if we're viewing dfltpic */
+  static int    keeparound = 1;   /* if true, don't quit after del. last image */
+***************
+*** 175,186 ****
+  static void smoothResize();
+  #endif
+  
+- #ifdef HAVE_G3
+- int fax = 0;
+- int highresfax = 0;
+- #endif /* HAVE_G3 */
+  
+- 
+  /*******************************************/
+  int main(argc, argv)
+  int   argc;
+--- 173,179 ----
+***************
+*** 571,586 ****
+      
+      else if (!argcmp(argv[i],"-nolimits",3))	/* waitloop */
+        nolimits++;
+! 
+! #ifdef HAVE_G3
+!     else if (!argcmp(argv[i],"-fax",3))		/* Fax */
+!       fax++;
+! 
+!     else if (!argcmp(argv[i],"-highresfax",4))	/* High Resolution Fax */
+!       highresfax++;
+! #endif /* HAVE_G3 */
+! 
+! 
+      else Syntax();
+    }
+  
+--- 564,570 ----
+      
+      else if (!argcmp(argv[i],"-nolimits",3))	/* waitloop */
+        nolimits++;
+!     
+      else Syntax();
+    }
+  
+***************
+*** 885,891 ****
+    epicmode = EM_RAW;   SetEpicMode();
+    XSelectInput(theDisp, ctrlW, ExposureMask | ButtonPressMask | KeyPressMask
+  	       | StructureNotifyMask);
+- 
+    if (ctrlmap < 0) {    /* map iconified */
+      XWMHints xwmh;
+      xwmh.initial_state = IconicState;
+--- 869,874 ----
+***************
+*** 1030,1039 ****
+    printoption("[-wait seconds]");
+    printoption("[-white color]");
+    printoption("[-wloop]");
+- #ifdef HAVE_G3
+-   printoption("[-fax]");
+-   printoption("[-highresfax]");
+- #endif /* HAVE_G3 */
+    printoption("[filename ...]");
+    fprintf(stderr,"\n\n");
+    Quit(1);
+--- 1013,1018 ----
+***************
+*** 1344,1353 ****
+        filetype = PDSVICAR;
+  #endif
+  
+- #ifdef HAVE_G3
+-   else if ( fax || highresfax )
+-       filetype = G3;
+- #endif /* HAVE_G3 */
+  
+    if (filetype == UNKNOWN) {
+      SetISTR(ISTR_INFO,"'%s' not in a recognized format.", basefname);
+--- 1323,1328 ----
+***************
+*** 1377,1386 ****
+  #ifdef HAVE_PDS
+    case PDSVICAR:    i = LoadPDS(filename, ncols);    break;
+  #endif
+- 
+- #ifdef HAVE_G3
+-   case G3:	    i = LoadG3 (filename,ncols);     break;
+- #endif /* HAVE_G3 */
+    }
+  
+  
+--- 1352,1357 ----
