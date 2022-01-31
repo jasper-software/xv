@@ -1,0 +1,21 @@
+[CPMASKについて]
+	この patch によってかけられた CPmask は FLMASK プログラム等
+	でかけたものとは違いfile に passwd の情報を残しません。
+
+	xv は jpeg file を save する時に
+	「CREATOR: XV Version 3.10a Rev: 12/29/94 Quality = 75, 
+	  Smoothing = 0」
+	というような情報を加えます。
+
+	CPmask はこの部分にこっそりpasswd情報を書き込むのですが、こ
+	れが原因で CPmask のかけられた file を xv で読み込んでその
+	まま save しなおすと passwd を調べる tool とかで判定できない
+	file が出来上がるわけです。
+
+	そのために、前の version では CPmask がかけられていない file
+	の場合は error pop up するようにしていたのですが、不便である
+	との mail を沢山受けたので変えることにしました。
+
+	ですから、この patch では新しく CPmask をかけずに、はずすだ
+	けにして下さい。
+

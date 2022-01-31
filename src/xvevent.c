@@ -1376,6 +1376,12 @@ static void handleButtonEvent(event, donep, retvalp)
 	  break;
 	}
 
+	else if (MBClick(&flmaskMB, x,y)) {
+	  i = MBTrack(&flmaskMB);
+	  if (i>=0) DoMask(i);
+	  break;
+	}
+
 	i=ClickCtrl(x,y);
 
 	switch (i) {
@@ -1401,6 +1407,7 @@ static void handleButtonEvent(event, donep, retvalp)
 	case BCROP:   Crop();                       break;
 	case BUNCROP: UnCrop();                     break;
 	case BACROP:  AutoCrop();                   break;
+	case BMASKS:  MaskCr();                     break;
 
 	case BPAD:
 	  {
@@ -1772,6 +1779,16 @@ static void handleKeyEvent(event, donep, retvalp)
       else if (ks==XK_d) FakeButtonPress(&but[BCLEAR]);
 
       else if (ks==XK_u) DoAlg(ALG_NONE);
+
+      else if (ks==XK_f) DoMask(MSK_FLMASK);
+      else if (ks==XK_g) DoMask(MSK_Q0MASK);
+      else if (ks==XK_h) DoMask(MSK_WIN);
+      else if (ks==XK_i) DoMask(MSK_MEKO);
+      else if (ks==XK_j) DoMask(MSK_CPMASK);
+      else if (ks==XK_l) DoMask(MSK_RGB);
+      else if (ks==XK_n) DoMask(MSK_BITREV);
+      else if (ks==XK_w) DoMask(MSK_COLREV);
+
       else if (ks==XK_b) DoAlg(ALG_BLUR);
       else if (ks==XK_s) DoAlg(ALG_SHARPEN);
       else if (ks==XK_e) DoAlg(ALG_EDGE);
@@ -1901,6 +1918,7 @@ static void handleKeyEvent(event, donep, retvalp)
       case 'c':    FakeButtonPress(&but[BCROP]);    break;
       case 'u':    FakeButtonPress(&but[BUNCROP]);  break;
       case 'C':    FakeButtonPress(&but[BACROP]);   break;
+      case 'f':    FakeButtonPress(&but[BMASKS]);   break;
       case 'P':    FakeButtonPress(&but[BPAD]);     break;
       case 'A':    FakeButtonPress(&but[BANNOT]);   break;
 

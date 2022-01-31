@@ -26,7 +26,8 @@ static void FineRotate     PARM((int));
 static void Pixelize       PARM((void));
 static void Spread         PARM((void));
 static void MedianFilter   PARM((void));
-static void saveOrigPic    PARM((void));
+
+void saveOrigPic    PARM((void));
 
 static void doBlurConvolv  PARM((byte *,int,int,byte *, int,int,int,int, int));
 static void doSharpConvolv PARM((byte *,int,int,byte *, int,int,int,int, int));
@@ -41,7 +42,6 @@ static void doPixel        PARM((byte *,int,int,byte *, int,int,int,int,
 static void doSpread       PARM((byte *,int,int,byte *, int,int,int,int,
 				 int, int));
 static void doMedianFilter PARM((byte *,int,int,byte *, int,int,int,int, int));
-
 static void add2bb         PARM((int *, int *, int *, int *, int, int));
 static void rotXfer        PARM((int, int, double *,double *,
 				 double,double, double));
@@ -50,13 +50,12 @@ static void rotXfer        PARM((int, int, double *,double *,
 static void intsort        PARM((int *, int));
 #endif
 
-static int  start24bitAlg  PARM((byte **, byte **));
-static void end24bitAlg    PARM((byte *, byte *));
+int         start24bitAlg  PARM((byte **, byte **));
+void        end24bitAlg    PARM((byte *, byte *));
+void        printUTime     PARM((const char *));
 
-static void printUTime     PARM((const char *));
-
-static byte *origPic = (byte *) NULL;
-static int  origPicType;
+byte *origPic = (byte *) NULL;
+int  origPicType;
 static byte origrmap[256], origgmap[256], origbmap[256];
 
 
@@ -69,7 +68,7 @@ static byte origrmap[256], origgmap[256], origbmap[256];
 
 
 /***************************/
-static void printUTime(str)
+void printUTime(str)
      const char *str;
 {
 #ifdef TIMING_TEST
@@ -83,10 +82,6 @@ static void printUTime(str)
 }
 
 
-
-
-
-
 /************************************************************/
 void AlgInit()
 {
@@ -97,6 +92,7 @@ void AlgInit()
   origPic = (byte *) NULL;
 
   algMB.dim[ALG_NONE] = 1;    /* can't undo when init'ed already */
+  flmaskMB.dim[MSK_NONE]=1;
 }
 
 
@@ -108,21 +104,22 @@ void DoAlg(anum)
      algorithm */
 
   switch (anum) {
-  case ALG_NONE:      NoAlg();        break;
-  case ALG_BLUR:      Blur();         break;
-  case ALG_SHARPEN:   Sharpen();      break;
-  case ALG_EDGE:      EdgeDetect();   break;
-  case ALG_TINF:      TinFoil();      break;
-  case ALG_OIL:       OilPaint();     break;
-  case ALG_BLEND:     Blend();        break;
-  case ALG_ROTATE:    FineRotate(0);  break;
-  case ALG_ROTATECLR: FineRotate(1);  break;
-  case ALG_PIXEL:     Pixelize();     break;
-  case ALG_SPREAD:    Spread();       break;
-  case ALG_MEDIAN:    MedianFilter(); break;
+  case ALG_NONE:      NoAlg();        	break;
+  case ALG_BLUR:      Blur();         	break;
+  case ALG_SHARPEN:   Sharpen();      	break;
+  case ALG_EDGE:      EdgeDetect();   	break;
+  case ALG_TINF:      TinFoil();      	break;
+  case ALG_OIL:       OilPaint();     	break;
+  case ALG_BLEND:     Blend();        	break;
+  case ALG_ROTATE:    FineRotate(0);  	break;
+  case ALG_ROTATECLR: FineRotate(1);  	break;
+  case ALG_PIXEL:     Pixelize();     	break;
+  case ALG_SPREAD:    Spread();       	break;
+  case ALG_MEDIAN:    MedianFilter(); 	break;
   }
 
   algMB.dim[ALG_NONE] = (origPic == (byte *) NULL);
+  flmaskMB.dim[MSK_NONE] = (origPic == (byte *) NULL);
 }
 
 
@@ -1568,7 +1565,7 @@ static void intsort(a, n)
 
 
 /***********************************************/
-static int start24bitAlg(pic24, tmpPic)
+int start24bitAlg(pic24, tmpPic)
      byte **pic24, **tmpPic;
 {
   /* generates a 24-bit version of 'pic', if neccessary, and also mallocs
@@ -1601,7 +1598,7 @@ static int start24bitAlg(pic24, tmpPic)
 
 
 /***********************************************/
-static void end24bitAlg(pic24, outPic)
+void end24bitAlg(pic24, outPic)
      byte *pic24, *outPic;
 {
   /* given pic24, and outPic, which has the new 24-bit image, installs it */
@@ -1630,7 +1627,7 @@ static void end24bitAlg(pic24, outPic)
 
 
 /************************/
-static void saveOrigPic()
+void saveOrigPic()
 {
   /* saves original picture into origPic, if it hasn't already been done.
      This allows us to undo algorithms...
@@ -1670,6 +1667,4 @@ static void saveOrigPic()
     pic = NULL;
   }
 }
-
-
 

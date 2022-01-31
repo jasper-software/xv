@@ -348,7 +348,8 @@ int w,h;
   CreateXImage();
 }
 
-
+byte *origPic;
+int  origPicType;
 
 /********************************************/
 void GenerateCpic()
@@ -1182,6 +1183,12 @@ void DoRotate(dir)
   /* dir=0: 90 degrees clockwise, else 90 degrees counter-clockwise */
   WaitCursor();
 
+  if (origPic!=NULL) {
+        int tmp_pw,tmp_ph;
+        tmp_pw=pWIDE;
+        tmp_ph=pHIGH;
+        RotatePic(origPic,origPicType,&tmp_pw,&tmp_ph,dir);
+  }
   RotatePic(pic, picType, &pWIDE, &pHIGH, dir);
 
   /* rotate clipped version and modify 'clip' coords */

@@ -116,6 +116,17 @@ static const char *conv24MList[] = { "8-bit mode\t\2448",
 				     "Slow 24->8",
 				     "Best 24->8" };
 
+static const char *mskMList[] = { "Undo All\t\244u",
+				  MBSEP,
+				  "FLmask\t\244f",
+				  "Q0mask\t\244g",
+				  "WIN\t\244h",
+				  "MEKO\t\244i",
+				  "CPmask\t\244j",
+				  "RGB\t\244l",
+				  "BitRev.\t\244n",
+				  "ColRev.\t\244w"};
+
 static const char *algMList[] = { "Undo All\t\244u",
 				  MBSEP,
 				  "Blur...\t\244b",
@@ -307,11 +318,13 @@ void CreateCtrl(geom)
   BTCreate(&but[BPAD],    ctrlW,BX0,          BY1,BUTTW/2,BUTTH,"",BCLS);
   BTCreate(&but[BANNOT],  ctrlW,BX0+BUTTW/2+1,BY1,BUTTW/2,BUTTH,"",BCLS);
 
-  BTCreate(&but[BCROP],   ctrlW,BX1,  BY1,BUTTW,BUTTH,"Crop",    BCLS);
-  BTCreate(&but[BUNCROP], ctrlW,BX2,  BY1,BUTTW,BUTTH,"UnCrop",  BCLS);
-  BTCreate(&but[BACROP],  ctrlW,BX3,  BY1,BUTTW,BUTTH,"AutoCrop",BCLS);
-  BTCreate(&but[BABOUT],  ctrlW,BX4,  BY1,BUTTW,BUTTH,"About XV",BCLS);
-  BTCreate(&but[BQUIT],   ctrlW,BX5,  BY1,BUTTW,BUTTH,"Quit",    BCLS);
+#define NEW_BUTW BUTTW*3/4
+  BTCreate(&but[BCROP],   ctrlW,BX1             ,BY1,NEW_BUTW,BUTTH,"Crp",     BCLS);
+  BTCreate(&but[BUNCROP], ctrlW,BX1+NEW_BUTW  +1,BY1,NEW_BUTW,BUTTH,"UCrp",    BCLS);
+  BTCreate(&but[BACROP],  ctrlW,BX1+NEW_BUTW*2+2,BY1,NEW_BUTW,BUTTH,"ACrp",    BCLS);
+  BTCreate(&but[BMASKS],  ctrlW,BX1+NEW_BUTW*3+3,BY1,NEW_BUTW,BUTTH,"Mask",    BCLS);
+  BTCreate(&but[BABOUT],  ctrlW,BX4,             BY1,BUTTW,   BUTTH,"About XV",BCLS);
+  BTCreate(&but[BQUIT],   ctrlW,BX5,             BY1,BUTTW,   BUTTH,"Quit",    BCLS);
 
   BTCreate(&but[BXV],     ctrlW,5,5, 100, (u_int) nList.y - 5 - 2 - 5,
 	   "", BCLS);
@@ -345,16 +358,18 @@ void CreateCtrl(geom)
   /* have to create menu buttons after XMapSubWindows, as we *don't* want
      the popup menus mapped */
 
-  MBCreate(&dispMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5,112,19,
+  MBCreate(&dispMB,   ctrlW, CTRLWIDE - 8 - 84 - 3*(84+2), 5,84,19,
 	   "Display",    dispMList,   DMB_MAX,    BCLS);
-  MBCreate(&conv24MB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5,112,19,
+  MBCreate(&conv24MB, ctrlW, CTRLWIDE - 8 - 84 - 2*(84+2), 5,84,19,
 	   "24/8 Bit",   conv24MList, CONV24_MAX, BCLS);
-  MBCreate(&algMB,    ctrlW, CTRLWIDE - 8 - 112,             5,112,19,
+  MBCreate(&algMB,    ctrlW, CTRLWIDE - 8 - 84 -   (84+2), 5,84,19,
 	   "Algorithms", algMList,    ALG_MAX,    BCLS);
+  MBCreate(&flmaskMB, ctrlW, CTRLWIDE - 8 - 84,            5,84,19, 
+	   "FLmask",     mskMList,    MSK_MAX,    BCLS);
 
-  MBCreate(&rootMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+2), 5+21,112,19,
+  MBCreate(&rootMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+3), 5+21,112,19,
 	   "Root",       rootMList,   RMB_MAX,    BCLS);
-  MBCreate(&windowMB, ctrlW, CTRLWIDE - 8 - 112 - (112+2),   5+21,112,19,
+  MBCreate(&windowMB, ctrlW, CTRLWIDE - 8 - 112 - (112+3),   5+21,112,19,
 	   "Windows",    windowMList, WMB_MAX,    BCLS);
   MBCreate(&sizeMB,   ctrlW, CTRLWIDE - 8 - 112,             5+21,112,19,
 	   "Image Size", sizeMList,   SZMB_MAX,   BCLS);
@@ -440,6 +455,7 @@ int x,y,w,h;
   MBRedraw(&dispMB);
   MBRedraw(&conv24MB);
   MBRedraw(&algMB);
+  MBRedraw(&flmaskMB);
   MBRedraw(&rootMB);
   MBRedraw(&windowMB);
   MBRedraw(&sizeMB);

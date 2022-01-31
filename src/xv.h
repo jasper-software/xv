@@ -17,6 +17,7 @@
 /* GRR 3rd public jumbo F+E patches:	20050501 */
 /* GRR 4th public jumbo F+E patch:  	20070520 */
 /* GRR 5th public jumbo F+E patch:  	200xxxxx (probably mid-2009) */
+/* FLMask 2.1 (modified) patch:		20090820 */
 /* MDA 6th patch: 20220127 */
 #define REVDATE   "version 3.10a-20220127"
 #define VERSTR    "3.10a-20220127"
@@ -488,10 +489,11 @@
 #define BCROP    19
 #define BUNCROP  20
 #define BACROP   21
-#define BABOUT   22
-#define BQUIT    23
-#define BXV      24
-#define NBUTTS   25    /* # of butts */
+#define BMASKS   22
+#define BABOUT   23
+#define BQUIT    24
+#define BXV      25
+#define NBUTTS   26    /* # of butts */
 
 
 /* buttons in the load/save window */
@@ -836,6 +838,18 @@
 #define ALG_MEDIAN    12
 #define ALG_MAX       13
 
+/* FLmask algorithms */
+#define MSK_NONE	0
+#define MSK_SEP1	1  /* separator */
+#define MSK_FLMASK	2
+#define MSK_Q0MASK	3
+#define MSK_WIN		4
+#define MSK_MEKO	5
+#define MSK_CPMASK	6
+#define MSK_RGB		7
+#define MSK_BITREV	8
+#define MSK_COLREV	9
+#define MSK_MAX		10
 
 /* indices into sizeMB */
 #define SZMB_NORM     0
@@ -1102,6 +1116,14 @@ typedef struct {  int    spline;
 		  char   gvstr[GVMAX+1];
 		} GRAF_STATE;
 
+typedef struct {  int    n;
+		  char   flg;
+		} CPS;
+
+typedef struct {  int                n;
+		  unsigned short int r;
+		} MKT;
+
 
 /* MACROS */
 #define CENTERX(f,x,str) ((x)-XTextWidth(f,str, (int) strlen(str))/2)
@@ -1329,6 +1351,7 @@ WHERE int           dispMode;
 WHERE MBUTT         dispMB;              /* display mode menu button */
 WHERE MBUTT         conv24MB;            /* 24-to-8 conversion mode mbutt */
 WHERE MBUTT         algMB;               /* Algorithms mbutt */
+WHERE MBUTT         flmaskMB;            /* FLmask mbutt */
 WHERE MBUTT         rootMB;
 WHERE MBUTT         sizeMB;
 WHERE MBUTT         windowMB;
@@ -1598,6 +1621,10 @@ void   MakeBrowCmap        PARM((void));
 void   ChangeCmapMode      PARM((int, int, int));
 
 
+/************************** XVCPMASK.C **************************/
+CPS   *calcCPmask          PARM((char *, int));
+
+
 /**************************** XVCTRL.C **************************/
 void   CreateCtrl          PARM((const char *));
 void   SetButtPix          PARM((BUTT *, Pixmap, int, int));
@@ -1641,6 +1668,8 @@ int  DoSelection           PARM((XButtonEvent *));
 void MoveGrowSelection     PARM((int, int, int, int));
 void BlinkSelection        PARM((int));
 void FlashSelection        PARM((int));
+/* FLmask: Mask Select. */
+void MaskSelect            PARM((int,int,int,int));
 
 void CropRect2Rect         PARM((int*,int*,int*,int*, int,int,int,int));
 void CoordE2C              PARM((int, int, int *, int *));
@@ -1816,6 +1845,11 @@ void  SetISTR(int, ...);
 #else
 void  SetISTR();
 #endif
+
+
+/*************************** XVMASK.C ***************************/
+void DoMask                PARM((int));
+void MaskCr                PARM((void));
 
 
 /*************************** XVMISC.C ***************************/
@@ -2014,6 +2048,11 @@ int   WriteMAG             PARM((FILE *, byte *, int, int, int,
 int   LoadMAKI             PARM((char *, PICINFO *));
 int   WriteMAKI            PARM((FILE *, byte *, int, int, int,
 				 byte *, byte *, byte *, int, int));
+
+
+/**************************** XVMEKO.C ***************************/
+MKT  *calcMEKO             PARM((int));
+
 
 /**************************** XVMGCSFX.C ***************************/
 int   is_mgcsfx            PARM((char *, unsigned char *, int));

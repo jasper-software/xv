@@ -101,8 +101,6 @@ static Cursor copycurs = (Cursor) 0;
 static Cursor cutcurs  = (Cursor) 0;
 
 
-
-
 /********************************************/
 int CutAllowed()
 {
@@ -1861,4 +1859,11 @@ static void CoordE2Prnd(ex, ey, px_ret, py_ret)
   CoordC2P(cx, cy, px_ret, py_ret);
 }
 
+
+void MaskSelect (x1,x2,y1,y2)
+int x1,x2,y1,y2;
+{
+	selrx = x1;  selry = y1;  selrw = x2;  selrh = y2;
+	EnableSelection(1);
+}
 

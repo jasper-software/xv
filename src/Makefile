@@ -347,6 +347,7 @@ LIBS = $(TIFFLIB) $(JPEGLIB) $(PNGLIB) $(ZLIBLIB) $(JP2KLIB) -L/usr/X11R6/lib -l
 
 OBJS = 	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+	xvmask.o xvcpmask.o xvmeko.o \
 	xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvgam.o xvbmp.o \
 	xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
 	xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \

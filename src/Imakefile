@@ -160,6 +160,7 @@ INCLUDES = $(JPEGINCLUDE) $(TIFFINCLUDE)
 
 SRCS1 =	xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c \
 	xv24to8.c xvgif.c xvpm.c xvinfo.c xvctrl.c xvscrl.c xvalg.c \
+	xvmask.c xvcpmask.c xvmeko.c \
 	xvgifwr.c xvdir.c xvbutt.c xvpbm.c xvxbm.c xvgam.c xvbmp.c \
 	xvdial.c xvgraf.c xvsunras.c xvjpeg.c xvps.c xvpopup.c xvdflt.c \
 	xvtiff.c xvtiffwr.c xvpds.c xvrle.c xviris.c xvgrab.c vprintf.c \
@@ -170,6 +171,7 @@ SRCS1 =	xv.c xvevent.c xvroot.c xvmisc.c xvimage.c xvcolor.c xvsmooth.c \
 
 OBJS1 =	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+	xvmask.o xvcpmask.o xvmeko.o \
 	xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvgam.o xvbmp.o \
 	xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
 	xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
