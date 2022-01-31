@@ -390,7 +390,7 @@
 #  include <limits.h>           /* LONG_MAX (really want CLOCK_T_MAX) */
 #  include <sys/times.h>        /* times() */
 #  ifndef CLK_TCK               /* can be undefined in strict-ANSI mode */
-#    define CLK_TCK CLOCKS_PER_SEC   /* claimed to be same thing in time.h */
+#    define CLK_TCK sysconf(_SC_CLK_TCK)
 #  endif
 #endif
 
