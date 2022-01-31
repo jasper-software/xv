@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 1/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1><a name="control-window">The Control Window</a></h1>
+
+<p><img src="images/fig-003.gif" width="454" height="378"></p>
+
+<p>The <i>xv controls</i> window is the central point of control
+for the program, which just goes to show how appropriately it was
+named. It contains controls to resize the current image, flip and
+rotate it, load and save different files, and bring up the other <i>xv</i>
+windows. It can be brought up by clicking the Right mouse button
+in the image window, or by pressing the <b>?</b> key inside any
+open <i>xv</i> window. Doing either of these things while the <i>xv
+controls</i> window is visible will hide it.</p>
+
+<p>All of the following commands may be executed by either
+clicking the appropriate command button, or typing the keyboard
+equivalent (where given) into any open <i>xv</i> window.</p>
+
+<h2><a name="resizing-commands">Resizing Commands</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><a name="image-size-menu"><img
+        src="images/fig-004.gif" width="117" height="217"></a></td>
+        <td valign="top">The resizing commands have all been
+        moved to the <b>Image Size </b>menu. Note that none of
+        the 'resizing' commands modify the image in any way. They
+        only affect how the image is displayed. The image remains
+        at its original size. This allows you to arbitrarily
+        stretch and compact the image without compounding error
+        caused by earlier resizing. In each case, the displayed
+        image is recomputed from the original internal image.<p>Note:
+        The keyboard equivalents for each command are listed on
+        the right side of the menu. These commands may be entered
+        in the <i>xv image </i>window, the <i>xv controls </i>window,
+        the <i>xv info</i> window, and the <i>xv color editor</i>
+        window. They may <i>not </i>be entered in the <i>xv
+        visual schnauzer </i>windows, the <i>xv load </i>window,
+        or the <i>xv save </i>window. The same goes for all other
+        commands listed in the <i>xv controls</i> window.</p>
+        </td>
+    </tr>
+</table>
+
+<dl>
+    <dt><a name="normal"><img src="images/fig-005.gif"
+        width="113" height="16"></a></dt>
+    <dd>Attempts to return the image to its normal size, where
+        one image pixel maps to one screen pixel. For example, if
+        the image (or the current cropped portion of the image)
+        has a size of 320x200, this command will attempt to make
+        the image window 320 screen pixels wide by 200 screen
+        pixels high. <p>This command may fail in two cases. If
+        you're running a window manager (such as <i>mwm</i>) that
+        enforces a minimum window size, and the 'normal' size is
+        too small, the image may get distorted. See the note in
+        &quot;<a href="image-window.html#cropping">Cropping</a>&quot;
+        for more information.</p>
+        <p>Also, if the image is larger than the size of your
+        screen, it will be shrunk (preserving the aspect ratio)
+        until it fits on the screen. For example, if you try to
+        display a 1400x900 image on a 1280x1024 screen, the <b>Normal</b>
+        command will display a 1280x823 image. (1400/900 =
+        1280/823)</p>
+    </dd>
+    <dt><a name="max-size"><img src="images/fig-006.gif"
+        width="113" height="16"></a></dt>
+    <dd>This command will make the displayed image the same size
+        as the screen. If you are running a window manager that
+        puts up a title bar, you'll find that the title bar is
+        now off the top of the screen. To get the title bar back,
+        simply shrink the image to anything smaller than the size
+        of the screen. The window will be moved so that the title
+        bar is once again visible.</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="maxpect"><img src="images/fig-007.gif"
+        width="113" height="16"></a></dt>
+    <dd>Makes the image as large as possible, while preserving
+        the aspect ratio. This avoids the generally unwanted
+        image distortion that <b>Max Size</b> is capable of
+        generating. For example, if you have a 320x200 image, and
+        an 1280x1024 screen, doing the <b>Maxpect</b> command
+        will result in an image that is 1280x800. <b>Max Size</b>
+        , on the other hand, would've generated an image of size
+        1280x1024, which would be appear 'stretched' vertically.</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="double-size"><img src="images/fig-008.gif"
+        width="113" height="16"></a></dt>
+    <dd>Doubles the current size of the image, with the
+        constraint that neither axis is allowed to be larger than
+        the screen. For example, given a 320x200 image and a
+        1280x1024 screen, the image can be doubled once (to
+        640x400), a second time (to 1280x800), but a third time
+        would make the image 1280x1024. You'll note that on the
+        third time, the width didn't change at all, since it was
+        already at its maximum value. Also note that the height
+        wasn't allowed to double (from 800 to 1600), but was
+        truncated at its maximum value (1024).</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="half-size"><img src="images/fig-009.gif"
+        width="113" height="16"></a></dt>
+    <dd>Halves the current size of the image, with the constraint
+        that neither axis is allowed to have a size less than 1
+        pixel. Also, you may run into 'minimum size' problems
+        with your window manager. See the note in &quot;<a
+        href="image-window.html#cropping">Cropping</a>&quot; for
+        more information. <p>Note that the window size is
+        maintained as a pair of integers. As a result you may see
+        some integer round-off problems. For example, if you
+        halve a 265x185 image, you'll get a 132x92 image, which
+        is just fine. However, if you <b>Double Size</b> this
+        image, you'll get a 264x184 image, not the 265x185 image
+        that you started with.</p>
+    </dd>
+    <dt><a name="10%-Larger"><img src="images/fig-010.gif"
+        width="113" height="16"></a></dt>
+    <dd>Increases the current size of the image by 10%, subject
+        to the constraint that the image cannot be made larger
+        than the screen size (in either axis). For example,
+        issuing this command on a 320x200 image will result in a
+        352x220 image. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="10%-smaller"><img src="images/fig-011.gif"
+        width="113" height="16"></a></dt>
+    <dd>Decreases the current size of the image by 10%. Neither
+        axis of the image is allowed to shrink below 1 pixel.
+        Also, you run the risk of running into 'minimum window
+        size' problems with your window manager. <p>It should be
+        noted that the <b>10% Larger</b> and <b>10% Smaller</b>
+        commands have no concept of an 'original size'. They
+        simply increase or decrease the current image size by
+        10%. As a result, they do not undo each other. For
+        example, take a 320x200 image. Do a <b>10% Larger</b> and
+        the image will be 352x220. If you issue the <b>10%
+        Smaller</b> command now, the image will be made (352 -
+        35.2)x(220 - 22), or 316x198.</p>
+    </dd>
+    <dt><a name="set-size"><img src="images/fig-012.gif"
+        width="113" height="16"></a></dt>
+    <dd>Lets you specify the exact size, or exact expansion, to
+        display the image. Pops open a dialog box where you can
+        type a string of the form &quot; <i>width </i>x <i>height&quot;</i>,
+        &quot; <i>expansion</i>%&quot;, or &quot; <i>horiz-expansion</i>%
+        x <i>vert-expansion</i>%&quot;. The spaces between
+        numbers aren't necessary, but the 'x' and '%' characters
+        are. </dd>
+    <dt>&nbsp;</dt>
+    <dd><dl>
+            <dd><img src="images/fig-013.gif" width="422"
+                height="209"></dd>
+        </dl>
+    </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="re-aspect"><img src="images/fig-014.gif"
+        width="113" height="16"></a></dt>
+    <dd>Applies the 'default aspect ratio' to the image. This is
+        done automatically when the image is first loaded.
+        Normally, the default aspect ratio is '1:1', but certain
+        GIF files may have an aspect ratio encoded in them. You
+        can also set the default aspect ratio via a command-line
+        argument or an X resource. See &quot;<a
+        href="modifying-behavior-1.html#sizing-options">Image
+        Sizing Options</a>&quot; for more info. The idea behind
+        this command is that you'd stretch the image manually
+        (via your window manager) to roughly the size you'd like,
+        and then use the <b>Aspect</b> command to fix up the
+        proportions. <p>Normally <b>Aspect</b> expands one axis
+        of the image to correct the aspect ratio. If this would
+        result in an image that is larger than the screen, the <b>Aspect</b>
+        command will instead shrink one of the axes to correct
+        the aspect ratio.</p>
+    </dd>
+    <dt><a name="4x3"><img src="images/fig-015.gif" width="113"
+        height="16"></a></dt>
+    <dd>Attempts to resize the image so that the ratio of width
+        to height is equal to 4 to 3. (e.g., 320x240, 400x300,
+        etc.) This is useful because many images were meant to
+        fill the screen on whatever system they were generated,
+        and nearly all video tubes have an aspect ratio of 4:3.
+        This command will stretch the image so that things will
+        probably look right on your X display (nearly all of
+        which, thankfully, have square pixels). This command is
+        particularly useful for images which have really bizarre
+        sizes (such as the 600x200 images presumably meant for
+        CGA, and the 640x350 16-color EGA images). </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="int-expand"><img src="images/fig-016.gif"
+        width="113" height="16"></a></dt>
+    <dd>Resizes the image to the nearest integral expansion or
+        compression ratio. For example, if an image is currently
+        being displayed at &quot;162.43% x 231%&quot;, the <b>IntExpnd</b>
+        command will show the image at a &quot;200% x 200%&quot;
+        expansion ratio. Likewise, if an image is being shown at
+        a &quot;37% x 70%&quot; expansion ratio, <b>IntExpnd</b>
+        will resize it to &quot;33% x 50%&quot;, the nearest
+        integer compression ratios.</dd>
+</dl>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-017.gif"
+        align="left" hspace="0" width="36" height="25"></td>
+        <td valign="top">An alternate way of issuing the <b>10%
+        Larger</b> command.</td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><img src="images/fig-018.gif" align="left" hspace="0"
+        width="36" height="25"></td>
+        <td>An alternate way of issuing the <b>10% Smaller</b>
+        command.</td>
+    </tr>
+</table>
+
+<h2><a name="rotate-flip-commands">Rotate/Flip Commands</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><img src="images/fig-019.gif" align="left" hspace="0"
+        width="36" height="25"></td>
+        <td><a name="rotate-clockwise">Rotates</a> the <i>entire</i>
+        image (not the selection) 90 clockwise.<br>
+        Keyboard equivalent: <b>t</b></td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><img src="images/fig-020.gif" align="left" hspace="0"
+        width="36" height="25"></td>
+        <td><a name="rotate-counter-clockwise">Rotates</a> the <i>entire</i>
+        image (not the selection) 90 counter-clockwise.<br>
+        Keyboard Equivalent: <b>T</b></td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-021.gif"
+        align="left" hspace="0" width="36" height="25"></td>
+        <td valign="top"><a name="flip-horizontal">Flips</a> the
+        image (or the selected area of the image) horizontally
+        (around the vertical center-line of the image).<br>
+        Keyboard Equivalent: <b>h</b></td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-022.gif"
+        align="left" hspace="0" width="36" height="25"></td>
+        <td valign="top"><a name="flip-vertical">Flips</a> the
+        image (or the selected area of the image) vertically
+        (around the horizontal center-line of the image).<br>
+        Keyboard Equivalent: <b>v</b></td>
+    </tr>
+</table>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-2.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="image-window.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>
+
+
+
+
+
+

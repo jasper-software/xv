@@ -1,0 +1,351 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 3/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="bit-menu">The 24/8 Bit Menu</a></h2>
+
+<p><i>xv </i>has a whopping grand total of <i>two</i> internal
+image formats: 8-bit colormapped, and 24-bit RGB. Every image you
+load is converted to one of these two formats, as part of the
+image loading procedure, before you ever get to see the image.</p>
+
+<p>There are a few crucial differences between these two modes.
+In 8-bit mode, you have a colormap, and thus color-editing
+changes (see &quot;<a href="color-editor-1.html">The Color Editor</a>&quot;
+) can happen much more quickly. On the downside, most of the
+image editing functions only actually operate on 24-bit images.
+(Such as the <b>Algorithms</b> menu, described later in this
+section.) If you use these functions, <i>xv</i> will convert the
+8-bit image into a 24-bit image, operate on the 24-bit data, and
+convert the result back to an 8-bit image. As a result, artifacts
+can be introduced from the image conversions. As such, if you're
+going to be doing a lot of this sort of thing, switch to 24-bit
+mode first.</p>
+
+<p>But I digress...</p>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td><img src="images/fig-044.gif" width="132"
+        height="153"></td>
+        <td>This menu lets you see which mode <i>xv</i> is
+        currently operating in, and lets you change modes. You
+        can also force <i>xv</i> to remain in the current mode,
+        and select how the program will convert 24-bit images
+        into 8-bit images. </td>
+    </tr>
+</table>
+
+<dl>
+    <dt><a name="8-bit-mode"><img src="images/fig-045.gif"
+        width="128" height="16"></a></dt>
+    <dd>Forces the program into <b>8-bit mode</b> when selected.
+        If you are currently working on a 24-bit image, it will
+        be converted into an 8-bit image using the selected
+        conversion algorithm (see below), and the 24-bit data
+        will be thrown away. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="24-bit-mode"><img src="images/fig-046.gif"
+        width="128" height="16"></a></dt>
+    <dd>Forces the program into <b>24-bit mode</b> when selected.
+        If you currently working on an 8-bit image, it will be
+        converted into a 24-bit image and the 8-bit image will be
+        thrown away. Note that if you are working on a 24-bit
+        image, switch to <b>8-bit mode</b>, and switch back to <b>24-bit
+        mode</b>, your 24-bit data will have been lost in the
+        conversions. A dialog box will pop up to alert you of
+        this potential problem. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="lock-current-mode"><img src="images/fig-047.gif"
+        width="128" height="16"></a></dt>
+    <dd>Normally, <i>xv</i> will switch between 8 and 24-bit
+        modes based on the image type (if you load a 24-bit
+        image, it'll switch to <b>24-bit mode</b>, otherwise it
+        will use <b>8-bit mode</b> ). Turning this option on will
+        force <i>xv</i> to remain in the current mode. One reason
+        that you might wish to this would be to lock <i>xv</i>
+        into <b>8-bit mode</b> so that 24-bit images are shown
+        dithered with the 'Slow' algorithm (see below), which
+        produces better looking images on 8-bit displays. (Just
+        don't try to save the image afterwards!) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="quick-24-8"><img src="images/fig-048.gif"
+        width="128" height="16"></a></dt>
+    <dd>Converts 24-bit images to 8-bit images by dithering with
+        a fixed 6x6x6 RGB colormap. It is the quickest of the
+        three algorithms, but also generally produces the worst
+        images. It can also be selected via the '-quick24'
+        command-line option or X resource. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="slow-24-8"><img src="images/fig-049.gif"
+        width="128" height="16"></a></dt>
+    <dd>The default algorithm. Takes about twice as long as the
+        Fast algorithm. Uses the median-cut algorithm to pick a
+        set of 256 colors, and then dithers with these colors. It
+        can be selected via the '-slow24' command-line option or
+        X resource. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="best-24-8"><img src="images/fig-050.gif"
+        width="128" height="15"></a></dt>
+    <dd>By far and away the slowest of the algorithms. Can take
+        up to ten times as long as the Slow algorithm. Uses a
+        cleverer version of the median-cut algorithm to pick a
+        better set of 256 colors than the slow algorithm. Does
+        not dither. This might look best if you're going to be
+        expanding the image by very much, as the dithering in the
+        other two algorithms becomes very noticeable. You can
+        also select this option via the '-best24' command-line
+        option or X resource. </dd>
+</dl>
+
+<p>Note that none of the three 24-&gt;8 algorithm choices
+immediately <i>does</i> anything. They merely select which
+algorithm will be used the next time <i>xv</i> feels a need to
+convert a 24-bit image into an 8-bit image. </p>
+
+<h2><a name="algorithms">Image Algorithms</a></h2>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><a name="algorithms-menu"><img
+        src="images/fig-054.gif" width="120" height="233"></a></td>
+        <td valign="top"><i>xv</i> now has the ability to run a
+        number of standard image-processing algorithms on the
+        current image, or any rectangular portion of the current
+        image. If there is a current selection rectangle (See
+        &quot;<a href="image-window.html#selection-rectangle">Selection
+        Rectangle</a>&quot; ), the algorithm will only affect the
+        selected area. Otherwise, the algorithms operate on the
+        entire image.<p>Algorithms are chosen via the <b>Algorithms</b>
+        menu, and are executed immediately. Algorithms are
+        cumulative, in that if you run an algorithm on an image,
+        and then run a second algorithm, the second algorithm
+        operates on the modified image produced by the first
+        algorithm. And so on.</p>
+        <p>See &quot;<a href="adding-algorithms.html">Adding
+        Algorithms to <i>xv</i></a><i>&quot;</i> for information
+        on how you can add additional algorithms to this menu.</p>
+        </td>
+    </tr>
+</table>
+
+<p>Also, it should be noted that the algorithms operate on 24-bit
+images. If you are currently operating on an 8-bit image, and you
+run an algorithm, the image will be converted up to 24-bits, the
+algorithm will be run, and the result will be converted back to
+8-bits using the currently selected 24-&gt;8 algorithm. As such,
+if you're going to be doing a lot of algorithm-ing, you may find
+it faster to temporarily switch to <b>24-bit mode</b>. Likewise,
+if you intend to run multiple algorithms on the same image (say,
+a <b>Blur</b> followed by an <b>Emboss</b> ), you should <i>definitely</i>
+switch to <b>24-bit mode</b>, to maintain full 24-bit precision
+on the intermediate images (i.e., to prevent noise from being
+added to the image by any intermediate 24-&gt;8 conversions). </p>
+
+<dl>
+    <dt><a name="undo-all"><img src="images/fig-051.gif"
+        width="116" height="16"></a></dt>
+    <dd>The (normally dimmed-out) <b>Undo All</b> selection
+        undoes any and all algorithms that have been run on the
+        current image. It restores the image to the state it was
+        in when the first algorithm was executed, and it also
+        puts <i>xv</i> back into the 8/24-bit mode it <i>was</i>
+        in.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; u</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="blur"><img src="images/fig-052.gif" width="116"
+        height="16"></a></dt>
+    <dd>Runs a convolution over each plane (red, green, blue) of
+        the image, using a <i>n*n</i> convolution mask consisting
+        of all 1's. It has the effect of, for each pixel in the
+        image, replacing it with the average value of all the
+        pixels in the <i>n*n</i> rectangle centered around the
+        pixel in question. When you select this command, a dialog
+        box is opened up to request the value for '<i>n</i>'.
+        Values must be greater than or equal to '3', and they
+        must also be odd (e.g. 3,7,5,9,11). Larger values blur
+        the image to a greater extent. <p><b>Warning!</b> This
+        algorithm, due to its <i>n</i>^2 nature, can get very
+        slow as <i>n</i> is increased. Values above '15' aren't
+        particularly recommended.</p>
+        <p>Note: This command is a reasonable way to turn
+        dithered black-and-white images back into some semblance
+        of the greyscale that they probably originally started
+        as.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; b</b> </p>
+    </dd>
+    <dt><a name="sharpen"><img src="images/fig-053.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs an edge-sharpening algorithm on the image, which
+        attempts to maximize contrast between adjacent pixels.
+        Prompts for a 'strength' value of 0% through 99%.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; s</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="edge-detect"><img src="images/fig-055.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs a convolution using a pair of convolutions, one
+        which detects horizontal edges, and one which detects
+        vertical edges. The convolution is done separately for
+        each plane (red, green, blue) of the image. It is only
+        done for pixels that have the 3x3 mask fully contained
+        within the image, to avoid pesky edge conditions. One
+        note: since it runs an edge detection separately for each
+        plane of the image, the results are colorful. You'll get
+        red edges when there are edges in the red plane, yellow
+        edges when there are edges in the red and green planes,
+        and so on. If you'd like a traditional grey edge
+        detection (based on the overall intensity of each pixel),
+        you should use the <b>Saturation</b> dial in the <i>xv
+        color editor</i> (See &quot;<a
+        href="color-editor-2.html#saturation-control">The
+        Saturation Control</a>&quot; ) to completely desaturate
+        all the colors in the image (turning it grey) first.
+        Then, the results will also be grey.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; e</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="emboss"><img src="images/fig-056.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs an algorithm that produces nifty 'embossed' images
+        by using a variation of the edge detection algorithm. It
+        produces greyscale (8-bit) images where most of the image
+        is shown as a medium gray. 'Leading' edges (edges found
+        on the top and left sides) are shown as a lighter gray,
+        and 'trailing' edges (bottom and right edges) are shown
+        as a darker gray. The image wind up looking like
+        pseudo-3-d, sort of like the Motif toolkit. You can then
+        use the <b>White</b> dial in the <i>xv color editor</i>
+        (See &quot;<a
+        href="color-editor-2.html#white-remapping-control">The
+        White Remapping Control</a>&quot; ) to colorize the image
+        as you see fit<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; m</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="oil-painting"><img src="images/fig-057.gif"
+        width="116" height="16"></a></dt>
+    <dd>Does an 'oil transfer', as described in the book
+        &quot;Beyond Photography&quot;, by Holzman. It is a sort
+        of localized smearing. The basic algorithm is to take a
+        rectangle (7x7 in this case) centered around the current
+        pixel, compute a histogram of these (49) pixels, and
+        replace the current pixel with the 'most popular' pixel
+        as determined by the histogram.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; o</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="blend"><img src="images/fig-058.gif" width="116"
+        height="16"></a></dt>
+    <dd>Blends a rectangular selection out of existence by
+        replacing the selected area with a radial gradient fill.
+        Each pixel on the edge of the selection retains its
+        original color, the pixel in the center is replaced by
+        the average of all the edge pixels, and all remaining
+        pixels are replaced by the weighted average of the center
+        pixel and the edge pixel (along the line that runs
+        through the center pixel and the pixel being computed). <p>This
+        is much easier to see than it is to explain.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; B</b> </p>
+    </dd>
+    <dt><a name="copy-rotate"><img src="images/fig-059.gif"
+        width="116" height="16"></a></dt>
+    <dd>Does arbitrary (smooth) rotation of the entire image (or
+        the selected region). You will be prompted to enter a
+        rotation amount, in degrees. Positive values rotate the
+        image counter-clockwise, negative values rotate the image
+        clockwise. The <b>Copy Rotate</b> function makes a copy
+        of the selection, rotates it, and pastes it back on top
+        of the original.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; t</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="clear-rotate"><img src="images/fig-060.gif"
+        width="116" height="16"></a></dt>
+    <dd>Also does arbitrary smooth rotation, as with the <b>Copy
+        Rotate </b>command, but this version clears the original
+        image (using the 'current color', see &quot;<a
+        href="image-window.html#displaying-pixel-values">Displaying
+        Pixel Values</a>&quot; ) before pasting the rotated
+        version.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; T</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="pixelize"><img src="images/fig-061.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs a 'pixelization' algorithm, suitable for obscuring
+        sensitive and/or naughty parts of an image. Pops open a
+        dialog box which prompts for either a single value '<i>m</i>',
+        or a pair of values '<i>m</i><font size="2">x</font><i>n</i>'.
+        Divides the image (or the selected region) up into <i>m</i>-by-<i>m</i>
+        squares (if a single value was entered) or <i>m</i>-by-<i>n</i>
+        rectangles (if a pair of values were entered). Each area
+        is filled with the average color of all pixels contained
+        within the area.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; p</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="spread"><img src="images/fig-062.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs a 'random spread' algorithm on the selected area of
+        the image (or the entire image). Pops up a dialog box
+        which prompts for either a single value '<i>m</i>', or a
+        pair of values '<i>m</i><font size="2">x</font><em>n</em>'.
+        In the case of the single value, each pixel in the image
+        is swapped with some other random pixel located within a
+        distance of <i>m</i> pixels from the first pixel. If two
+        values are entered, each pixel is swapped with another
+        pixel located within <i>m</i>,<i>n</i> of the original
+        pixel. This can produce an interesting 'de-rez' effect.
+        Whether it's useful or not is for you to decide.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; S</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="despeckle"><img src="images/fig-063.gif"
+        width="116" height="16"></a></dt>
+    <dd>Runs a despeckling algorithm, also known as a <i>median
+        filter</i> among image-processing circles. This algorithm
+        is good at removing minor noise from an image, such as
+        you'll normally find on scanned-in faxes and the like. It
+        may also prove useful for de-dithering images, turning
+        black-and-white dithered images into greyscale images,
+        and dithered color images into undithered color images.
+        Note that the <b>Blur</b> algorithm can also be used in
+        the same way, and may do a better job of un-dithering.
+        However, the <b>DeSpeckle</b> algorithm generally leaves
+        edges alone, unlike the <b>Blur</b> algorithm, which
+        blurs everything uniformly. <p>This algorithm runs
+        through the selected area of the image, and for each
+        pixel in the image, looks at the <i>m</i>-by-<i>m</i>
+        square centered around the pixel. It replaces the pixel
+        with the median value of the pixels found in the square.
+        As with the <b>Blur</b> algorithm, you will be prompted
+        for a value of '<i>m</i>'. The value must not be less
+        than '3', and it must be odd. Larger values have a
+        greater effect, though '3' should be sufficient for most
+        purposes.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; k</b></p>
+    </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-4.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

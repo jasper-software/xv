@@ -1,0 +1,392 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Adding Other Image Formats to xv, part 1/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Adding Other Image Formats to <i>xv</i></h1>
+
+<p>This appendix is split up into two sections, one for reading a
+new file format, and the other for writing a new file format.
+Note that you do not necessarily have to read <i>and</i> write a
+new file format. For example, <i>xv</i> can read PCX files, but
+it doesn't write them. Likewise, <i>xv</i> traditionally could
+only write PostScript files, but couldn't read them. (And
+technically, it still doesn't.)</p>
+
+<p>For the purposes of this example, I'll be talking about the
+PBM/PGM/PPM code specifically. (See the file <tt>xvpbm.c</tt> for
+full details.)</p>
+
+<h2><a name="writing-code-reading-new-file-format">Writing Code
+for Reading a New File Format</a></h2>
+
+<p>Note: Despite the wide variety of displays and file formats <i>xv</i>
+can deal with, internally it only manipulates 8-bit colormapped
+images or 24-bit RGB images. If you're loading an 8-bit
+colormapped image, such as a GIF image, no problem. If you're
+loading an 8-or-fewer-bits format that doesn't have a colormap
+(such as an 8-bit greyscale image, or a 1-bit B/W bitmap) your <tt>Load</tt>
+() routine will have to generate an appropriate colormap.</p>
+
+<p>Make a copy of <tt>xvpbm.c</tt> , calling it something
+appropriate. For the rest of this appendix, mentally replace the
+string '<tt>xvpbm.c</tt>' with the name of your new file.</p>
+
+<p>Edit the <tt>Makefile</tt> and/or the <tt>Imakefile</tt> so
+that your new module will be compiled. In the <tt>Makefile</tt> ,
+add &quot;<tt>xvpbm.o</tt>&quot; to the &quot;<tt>OBJS = ...</tt>&quot;
+macro definition. In the <tt>Imakefile</tt> , add &quot;<tt>xvpbm.o</tt>&quot;
+to the end of the &quot;<tt>OBJS1 = ...</tt>&quot; macro
+definition, and &quot;<tt>xvpbm.c&quot;</tt> to the end of the <tt>&quot;SRCS1
+= ...&quot;</tt> macro definition.</p>
+
+<p>Edit the new module.</p>
+
+<p>You'll need to <tt>#include &quot;xv.h&quot;</tt> , of course.</p>
+
+<p>The module should have one externally callable function that
+does the work of loading up the file. The function is called with
+two arguments, a <i>filename</i> to load, and a pointer to a <tt>PICINFO</tt>
+structure, like so:</p>
+
+<pre>/*******************************************/
+int LoadPBM(fname, pinfo)
+char *fname;   PICINFO *pinfo;
+/*******************************************/</pre>
+
+<p>The file name will be the complete file name (absolute, not
+relative to any directory). Note: if <i>xv</i> is reading from <tt>stdin</tt>,
+don't worry about it. <tt>stdin</tt> is always automatically
+copied to a temporary file. The same goes for pipes and
+compressed files. Your <tt>Load()</tt> routine is guaranteed that
+it will be reading from a real file that appears to be in your
+file format, not a stream. This lets you use routines such as <tt>fseek()</tt>
+, and such.</p>
+
+<p>The <tt>pinfo</tt> argument is a pointer to a <tt>PICINFO</tt>
+structure. This structure is used to hold the complete set of
+information associated with the image that will be loaded. When
+your <tt>Load()</tt> routine is called, the fields in this
+structure will all be zeroed-out. It is your function's
+responsibility to load up the structure appropriately, and
+completely. The structure is defined as:</p>
+
+<blockquote>
+    <pre><font size="2">/* info structure filled in by the LoadXXX() image reading routines */
+ <tt>typedef struct {byte *pic;                  /* image data */
+                 int   w, h;                 /* size */
+                 int   type;                 /* PIC8 or PIC24 */
+                 byte  r[256],g[256],b[256]; /* colormap, if PIC8 */
+                 int   normw, normh;         /* normal size of image.
+                                                normally == w,h except when
+                                                doing quick load for icons*/</tt>
+ <tt>                int   frmType;              /* def. Format type to save in */
+                 int   colType;              /* def. Color type to save in */
+                 char  fullInfo[128];        /* Format: field in info box */
+                 char  shrtInfo[128];        /* short format info */
+                 char *comment;              /* comment text */
+                 int   numpages;             /* # of page files, if &gt;1 */
+                 char  pagebname[64];        /* basename of page files */
+</tt> <tt>} PICINFO; </tt></font></pre>
+</blockquote>
+
+<p><tt>The Load()</tt> function should return '1' on success, '0'
+on failure.</p>
+
+<p>All other information is communicated using the <tt>PICINFO</tt>
+structure. The fields should be setup as follows:</p>
+
+<dl>
+    <dt><tt>byte *pic;</tt></dt>
+    <dd>This is an array of bytes which holds the returned image.
+        The array is <tt>malloc()</tt> 'd by the <tt>Load()</tt>
+        routine. The array should be <tt>w*h</tt> bytes long (for
+        an 8-bit colormapped image) or <tt>w*h*3</tt> bytes long
+        (for a 24-bit RGB image). For an 8-bit image, there is
+        one byte per pixel, which serves as an index into the
+        returned colormap (see below). For a 24-bit image, there
+        are three bytes per pixel, in red, green blue, order. In
+        either case, pixels start at the top-left corner, and
+        proceed in normal scan-line order. There is no padding of
+        any sort at the end of a scan line.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int w, h;</tt></dt>
+    <dd>These variables specify the width and height (in pixels)
+        of the image that has been loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int type;</tt></dt>
+    <dd>This variable is used to tell the calling routine whether
+        the loaded image is an 8-bit image or a 24-bit image. It <i>must</i>
+        be set equal to <tt>PIC8</tt> or <tt>PIC24</tt> ,
+        whichever one is appropriate. These constants are defined
+        in ' <tt>xv.h</tt> '.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>byte r[256], g[256], b[256];</tt></dt>
+    <dd>If the returned image is an 8-bit image, you must load up
+        these variables with the colormap for the image. A given
+        pixel value in <tt>pic</tt> maps to an RGB color through
+        these arrays. In each array, a value of 0 means 'off',
+        and a value of 255 means 'fully on'. Note: the arrays do
+        not have to be completely filled. Only RGB entries for
+        pixels that actually exist in <tt>pic</tt> need to be
+        set. For example, if <tt>pic</tt> is known to be a B/W
+        bitmap with pixel values of 0 and 1, you would only have
+        to set entries '0' and '1' of the <tt>r,g,b</tt> arrays.</dd>
+    <dt>&nbsp;</dt>
+    <dd>On the other hand, if the returned image is a 24-bit
+        image, the <tt>r,g,b</tt> arrays are ignored, and you do
+        not have to do anything with them.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int normw, normh;</tt></dt>
+    <dd>These specify the 'normal' size of the image. Normally,
+        they are equal to <tt>w</tt> and <tt>h</tt>,
+        respectively. The only exception is when doing a 'quick'
+        load for icon generation, in which case it may be
+        possible to read a 'reduced' version of the image,
+        sufficient for generating the tiny icon files. In such a
+        case, <tt>w</tt> and <tt>h</tt> would reflect the
+        (reduced) size of the image returned, and <tt>normw</tt>
+        and <tt>normh</tt> would reflect the 'normal' image size,
+        for use in the comments displayed in the <i>xv visual
+        schnauzer</i>. Currently only the <tt>LoadJFIF()</tt>
+        function in <tt>xvjpeg.c</tt> actually does this. </dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int frmType;</tt></dt>
+    <dd>This lets you specify the <i>Format</i> type to
+        automatically select when you <b>Save</b> a file. As
+        such, this is only relevant if you intend to have <i>xv</i>
+        write your image format as well as read it. If you are
+        only writing an image loader, you should set this field
+        to ' <tt>-1</tt> '. On the other hand, if you <i>do</i>
+        intend to write a <tt>Write()</tt> function for your
+        format, you should edit <tt>xv.h</tt> , find the <tt>F_*</tt>
+        format definitions, and add one for your format. See <tt>xvpcx.c</tt>
+        for an example of a load-only format, or <tt>xvpbm.c</tt>
+        for a load-and-save format.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int colType;</tt></dt>
+    <dd>Used to determine which <i>Colors</i> setting should be
+        used by default when you save a file. Since <i>xv</i>
+        will use this setting no matter <i>what</i> format you're
+        using, you must fill this field in appropriately
+        regardless of whether or not you plan to have a <tt>Write()</tt>
+        function for your format. This field should be set to <tt>F_FULLCOLOR</tt>
+        for any type of color image, <tt>F_GREYSCALE</tt> for
+        greyscale images, and <tt>F_BWDITHER</tt> for
+        black-and-white 1-bit images. If in doubt, <tt>F_FULLCOLOR</tt>
+        is always a safe choice, though it'd be nice if your
+        module 'does the right thing'. (For instance if you read
+        colormapped images, you should check to see if the
+        colormap consists only of shades of grey, and set <tt>F_GREYSCALE</tt>
+        if it does.)</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>char fullInfo[128];</tt></dt>
+    <dd>This string will be shown in the <i>Format</i> field of
+        the <i>xv info</i> window. It should be set to something
+        like this:<p><tt>Color PPM, raw format (12345 bytes)</tt></p>
+    </dd>
+    <dt><tt>char shrtInfo[128];</tt></dt>
+    <dd>A 'short' version of the info string. This gets displayed
+        in the <i>info</i> line at the bottom of the <i>xv
+        controls</i> and <i>xv info</i> windows when the image is
+        loaded. It should look like this:</dd>
+    <dt>&nbsp;</dt>
+    <dd><tt>512x400 PPM.</tt></dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>char *comment;</tt></dt>
+    <dd>If your image file format supports some sort of comment
+        field, and you find one in the file, you should <tt>malloc()</tt>
+        a pointer to a null-terminated string and copy any and
+        all comments into this field. If there are multiple
+        comments in a file, you should concatenate them together
+        to form one long string. This string <i>MUST</i> be
+        null-terminated, as <i>xv</i> will expect to be able to
+        use <tt>strlen()</tt> on it, and possibly other 'string'
+        functions.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>int numpages; char pagebname[64];</tt></dt>
+    <dd>These two fields will only be used if your are writing a <tt>Load()</tt>
+        function for a format that may have multiple images per
+        file. If your format only ever has a single image per
+        file, you don't have to worry about (or do anything with)
+        these two fields.</dd>
+    <dt>&nbsp;</dt>
+    <dd>On the other hand, if your format <i>does</i> do multiple
+        images per file, <i>and</i> the current file has more
+        than one image in it, then what your program should do is
+        <i>split</i> the multi-image file up into a temporary
+        collection of single-image files, which should probably
+        live in <tt>/tmp</tt> or something. Once you've done so,
+        you should return the number of files created in <tt>numpages</tt>
+        , and the 'base' filename of the page files in <tt>pagebname</tt>
+        . The files created should have a common 'base', with the
+        page number appended. (e.g.,
+        &quot;/tmp/xvpg12345a.1&quot;,
+        &quot;/tmp/xvpg12345a.2&quot;, etc., where
+        &quot;/tmp/xvpg12345a.&quot; is the base filename
+        (created by the <tt>mktemp()</tt> system function)) You
+        should also load the first file and return its image in
+        the normal way.</dd>
+    <dt>&nbsp;</dt>
+    <dd>See the <tt>LoadPS()</tt> function in <tt>xvps.c</tt> for
+        a complete example of how this is done. Also, note that
+        if your format supports multiple image per file, you
+        should also pass in a ' <tt>quick</tt> ' parameter, which
+        will tell your function to only load the first 'page' of
+        the file. This is used by the <i>visual schnauzer</i>,
+        which needs to load images when it generates icon files.
+        To speed things up, the <i>schnauzer</i> tells the <tt>Load()</tt>
+        function to only load the first page, as that's all it
+        need to generate the icon file. </dd>
+</dl>
+
+<h3><a name="error-handling">Error Handling</a></h3>
+
+<p>Non-fatal errors in your <tt>Load()</tt> routine should be
+handled by calling the function <font size="2"><tt>SetISTR(ISTR_WARNING,
+&quot;%s: %s&quot;, bname, err)</tt></font>, and returning a zero
+value. Where <i>bname</i> is the 'simple' name of your file
+(which can be obtained using <tt>BaseName()</tt> function in <tt>xvmisc.c</tt>
+), and <i>err</i> should be an appropriate error string.</p>
+
+<p>Non-fatal errors are considered to be errors that only affect
+the success of loading this one image, and not the continued
+success of running <i>xv</i>. For instance, &quot;can't open
+file&quot;, &quot;premature EOF&quot;, &quot;garbage in
+file&quot;, etc. are all non-fatal errors. On the other hand, not
+being able to allocate memory (unsuccessful returns from <tt>malloc()</tt>
+) <i>is</i> considered a fatal error, as it means <i>xv</i> is
+likely to run out of memory in the near future anyhow.</p>
+
+<p>Fatal errors should be handled by calling <tt>FatalError(error_string)</tt>
+. This function prints the string to <tt>stderr</tt> , and exits
+the program with an error code.</p>
+
+<p>Warnings (such as 'truncated file') that may need to be noted
+can be handled by calling <tt>SetISTR()</tt> as shown above, but
+continuing to return '1' from the <tt>Load()</tt> routine,
+signifying success.</p>
+
+<p>Also, if your load routine fails for <i>any reason</i>, it is
+your responsibility to <tt>free()</tt> any pointers allocated
+(such as the <i>pic</i> field and the <i>comment</i> field, and
+return NULL in these fields). Otherwise, there'll be memory leaks
+whenever an image load fails.</p>
+
+<h3><a name="hooking-it-up">Hooking it up to </a><strong>xv</strong>
+</h3>
+
+<p>Once you have written a <tt>Load()</tt> routine, you'll want
+to hook it up to the <i>xv</i> source.</p>
+
+<p>Edit <tt>xv.h</tt> and add a function prototype for any global
+functions you've written (presumably just <tt>LoadPBM()</tt> in
+this case). Follow the style used for the other <tt>Load*()</tt>
+function declarations.</p>
+
+<p>Find the <tt>RFT_*</tt> definitions and tack one on the end
+for your format (e.g., <tt>RFT_PBM</tt> ). This is a list of
+values that ' <tt>ReadFileType()</tt> ' can return. We'll be
+working on that soon enough.</p>
+
+<p>Edit <tt>xv.c</tt> :</p>
+
+<ol>
+    <li>Tell the <tt>ReadFileType()</tt> routine about your
+        format. Add an 'else-if' case that determines if the file
+        in question is in your format. Note that it must be
+        possible to uniquely identify your format by reading the
+        first 16 characters (or so) of the file. If your file
+        format <i>doesn't</i> have some sort of <i>magic number</i>,
+        you won't be able to conveniently hook it into <i>xv</i>,
+        though you can certainly come up with some sort of
+        kludge...</li>
+    <li>Tell the <tt>ReadPicFile()</tt> routine about your
+        format. Add another <tt>case</tt> for your format type,
+        and have it call your <tt>Load()</tt> routine with the
+        appropriate arguments.</li>
+    <li>Hook your file up into the <i>visual schnauzer</i>. Edit
+        the file <tt>xvbrowse.c</tt></li>
+</ol>
+
+<p>The first thing you have to do is create a 'generic' icon for
+your file format. Copy one of the existing ones (such as ' <tt>bits/br_pbm.xbm</tt>
+') to get the size and the general 'look' correct.</p>
+
+<p><tt>#include</tt> this icon at the top of the file.</p>
+
+<p>Add an appropriately-named <tt>BF_*</tt> definition to the end
+of the list, and increase <tt>BF_MAX</tt> appropriately.</p>
+
+<p>Have the icon pixmap created in the <tt>CreateBrowse()</tt>
+function, by doing something like this:</p>
+
+<blockquote>
+    <pre><font size="2">bfIcons[BF_PBM] = MakePix1(br-&gt;win, br_pbm_bits,
+                           br_pbm_width, br_pbm_height);</font></pre>
+</blockquote>
+
+<p>Hook your format into the <tt>scanFile()</tt> function. Find
+the following code:</p>
+
+<blockquote>
+    <pre><font size="2">switch (filetype) {
+case RFT_GIF:      bf-&gt;ftype = BF_GIF;      break;
+case RFT_PM:       bf-&gt;ftype = BF_PM;       break;</font></pre>
+</blockquote>
+
+<p>etc...</p>
+
+<p>And add a case for your format. (To map <tt>RFT_*</tt> values
+into their corresponding <tt>BF_*</tt> values.)</p>
+
+<p>Hook your format into the <tt>genIcon()</tt> function. Find
+the following code:</p>
+
+<blockquote>
+    <pre><font size="2">sprintf(str, &quot;%dx%d &quot;, pinfo.w, pinfo.h);
+switch (filetype) {
+  case RFT_GIF:      if (strstr(pinfo.shrtInfo, &quot;GIF89&quot;))
+                       strcat(str,&quot;GIF89 file&quot;);
+                     else
+                       strcat(str,&quot;GIF87 file&quot;);
+  break;
+  case RFT_PM:       strcat(str,&quot;PM file&quot;);  break</font>
+</pre>
+</blockquote>
+
+<p>And add a case for your format. This generates an appropriate
+info string that gets put in the icon files maintained by the <i>visual
+schnauzer</i> (and displayed whenever you click on an icon in the
+<i>schnauzer</i> window).</p>
+
+<p>That should do it. Consult the files <tt>xv.h, xv.c,
+xvbrowse.c,</tt> and <tt>xvpbm.c</tt> for any further specifics.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="adding-formats-2.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="diversity-algorithm.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Visual Schnauzer, part 1/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Visual Schnauzer</h1>
+
+<p><a name="visual-schnauzer-window"><img
+src="images/fig-147.gif" width="629" height="386"></a> </p>
+
+<h2><a name="what-s-visual-schnauzer">What's a Visual Schnauzer?</a></h2>
+
+<p>Hint: it's not a smallish seeing-eye dog of Germanic descent.</p>
+
+<p>Probably the most exciting new feature in Version 3.00 was the
+<i>Visual Schnauzer</i>, and while it hasn't changed dramatically
+in Version 3.10, it's still plenty exciting. The <i>Visual
+Schnauzer </i>gives you a visual interface to the UNIX file
+system. It lets you view tiny 'thumbnail' representations of your
+image files, directories, and other files. It lets you create
+directories, rename files, move and copy files to different
+directories, delete files, view image files, view text files, and
+just generally nose around.</p>
+
+<p>In short, it's cool, and it should be of some use for those of
+us who have large numbers of GIF and JPEG files with
+non-descriptive MS-DOS-<i>style</i> '8+3' filenames.</p>
+
+<p>Note: Unlike most <i>xv</i> windows, schnauzer windows are
+resizable. You can decide how many (or few) icons you'd like
+displayed by changing the size of the schnauzer window. It also
+should be pointed out that there are more command buttons
+available than are shown at the default schnauzer size. If you
+make the window larger, you will be given additional command
+buttons. <i>All</i> the commands are always available from the <b>Misc.
+Commands</b> menu.</p>
+
+<h2><a name="operating-schnauzer">Operating the Schnauzer</a></h2>
+
+<p>Click on the <b>Visual Schnauzer</b> button in the <i>xv
+controls</i> window, or type a <b>&lt;Ctrl&gt; v</b> inside any
+active <i>xv</i> window. This will open a schnauzer window. The
+window will display the contents of the directory that you were
+in when you started <i>xv</i>. (Though this behavior, like so
+many things, can be overridden. See the description of the '<tt>-dir</tt>'
+command-line option in &quot;<a
+href="modifying-behavior-3.html#miscellaneous-options">Miscellaneous
+Options</a>&quot;.)</p>
+
+<p>The first time you open an image directory with the schnauzer,
+you'll find that your image files are <i>not</i> displayed as
+spiffy little thumbnail icons, but instead are shown as generic
+icons showing the file format used. This is because the icons
+need to be generated from the image files. Displaying a thumbnail
+icon would normally require loading the entire image, compressing
+it down to a small 80x60-<i>ish</i> image, and dithering it with
+some set of colors. This is a very time-consuming operation. To
+avoid doing this every single time you open a schnauzer window, <i>xv</i>
+lets you do this operation once, and it maintains the results in
+a hidden subdirectory ('<tt>.xvpics</tt>') for each directory.
+This subdirectory contains one small (2k) file for each file in
+the parent directory. The icons are in an 8-bit per pixel format,
+pre-dithered with a 332 RGB colormap.</p>
+
+<p>So, assuming that there are some image files in the current
+directory, the first thing you should do is generate some icons.
+(If there aren't any image files in the current directory, exit <i>xv</i>
+and start it again from a directory that <i>does</i> have image
+files. We'll discuss navigating via the schnauzer later.)</p>
+
+<h3><a name="generating-icons">Generating Image Icons</a></h3>
+
+<p>To generate icons for all the images in the current directory,
+issue the <b>select All files</b> command from the <b>Misc.
+Commands</b> menu. All the icons in the current directory should
+'light up' in some way to signify that they are selected, with
+the possible exception of the <tt>&lt;parent&gt;</tt> directory.</p>
+
+<p>Next, issue the <b>Generate icons</b> command from the <b>Misc.
+Commands</b> menu. <i>xv</i> will begin the process of generating
+icon files for the selected files. This process can be quite
+time-consuming, particularly if you have a large number of files
+in the directory, or the image files are in the JPEG format.
+During this time, <i>xv</i> is effectively 'out-to-lunch', as it
+will not be paying attention to any X events. There isn't any way
+to stop it either, though if you <i>kill</i> the <i>xv</i>
+process from another window, you will succeed in stopping the
+icon generation. You will <i>not</i> lose any computed icons by
+doing this, as icon files are written out as they are computed,
+so it's perfectly safe to stop the generation via this method.</p>
+
+<p>Also, you'll note that <i>xv</i> displays a bar-graph
+'progress meter' at the top of the schnauzer window while it's
+doing this, so you can gauge roughly how long it will take. Icons
+will be displayed as they are generated, in an attempt to make
+the process as entertaining as possible.</p>
+
+<h3><a name="changing-directories">Changing Directories</a></h3>
+
+<p>The name of the current directory is displayed in a button at
+the top-center of the schnauzer window. You can change to any
+higher-level directory in the current path by pulling down this
+menu button. The names of the parent directories will be shown in
+the pull down menu.</p>
+
+<p>You can also go up one level by double-clicking on the <tt>&lt;parent&gt;</tt>
+directory icon.</p>
+
+<p>You can go down to any subdirectory by double-clicking on the
+appropriate subdirectory icon.</p>
+
+<p>The <b>Change Directory</b> command gives you a more direct
+route: you just type the pathname of the directory you'd like to
+go to.</p>
+
+<h3><a name="scrolling-schnauzer">Scrolling the Schnauzer</a></h3>
+
+<p>You can scroll the schnauzer by operating the vertical scroll
+bar, which operates exactly as described in &quot;<a
+href="control-window-6.html#operating-list-window">Operating a
+List Window</a>&quot; .</p>
+
+<p>You can also scroll the window a page at a time by using the <b>&lt;PageUp&gt;</b>
+and <b>&lt;PageDown&gt;</b> keys on your keyboard (which may be
+labeled <b>&lt;Prev&gt;</b> and <b>&lt;Next&gt; </b>on some
+keyboards). The <b>&lt;Home&gt;</b> and <b>&lt;End&gt;</b> keys
+will take you to the beginning and end of the list, respectively.
+(If your keyboard doesn't have Home and End keys, <b>&lt;Shift&gt;</b>
+<b>&lt;PageUp&gt; </b>and <b>&lt;Shift&gt;</b> <b>&lt;PageDown&gt;</b>
+may also work.) You can scroll the list a line at a time by using
+the up and down arrow keys. Note, however, that the arrow keys
+move the indicator that shows the currently selected file.
+Likewise, the left and right arrow keys move the selection
+indicator left and right, wrapping at the edges of the window.</p>
+
+<p>Also, if you type a normal, alphabetic character into the
+schnauzer window, it will attempt to scroll the window so that
+the first file beginning with that character will be visible.
+Note that this behavior keeps you from typing normal <i>xv</i>
+keyboard equivalents into this window, so don't even try it.</p>
+
+<h3><a name="selecting-files">Selecting Files</a></h3>
+
+<p>Double-click on an image file's icon. The image should be
+loaded, and the full path name of the image should be added to
+the bottom of the <i>xv controls</i> window's name list. You can
+also double-click on text files to view them in a TextView
+window. (See &quot;<a href="textview-window.html">The TextView
+Window</a>&quot; for more information.)</p>
+
+<p>It is possible to select more than one file at a time. The
+easiest way to do so is to hold down the <b>&lt;Shift&gt;</b> key
+and click on icons. When the <b>&lt;Shift&gt;</b> key is held
+down, any icons clicked on are simply toggled between being
+selected, and being <i>not</i> selected. All other files remain
+as they were. If you type <b>&lt;Shift&gt; &lt;Space&gt;</b>, <i>xv</i>
+will keep all currently 'lit' files lit, and light (and load) the
+file <i>after </i>the last lit file it finds. This can be useful
+for building up a big list of files to delete by <b>&lt;Shift&gt;
+&lt;Space&gt;</b>-ing your way through the list, and manually
+unselecting any files you want to keep.</p>
+
+<p>You can also select files by drawing a rectangle around icons
+that you want selected. To do so, simply click in the space in
+between the icons, and drag. A rectangle will be drawn, and all
+icons that are inside (or partially inside) the rectangle will be
+selected. Note that if you drag the rectangle off the top or
+bottom of the window, the window will automatically scroll. Also,
+if you hold down the <b>&lt;Shift&gt;</b> key while you draw a
+rectangle, any previously selected icons will continue to remain
+lit.</p>
+
+<p>Finally, you can also select files by using the <b>select All
+files</b> command from the menu (or by typing a <b>&lt;Ctrl&gt; a</b>)
+to select all the icons in the current directory. If you want <i>most</i>
+of the files selected, it might be easiest to select all the
+files, hold down the <b>&lt;Shift&gt;</b> key, and selectively
+turn off the ones you don't want selected.</p>
+
+<p>If you double-click on a selected file while there are
+multiple files selected, the clicked-on file will be displayed,
+and <i>all</i> selected filenames will be copied into the <i>xv
+controls</i> window's list.</p>
+
+<h3><a name="file-management">File Management</a></h3>
+
+<p>Once you have some files selected, you can move them to other
+directories by clicking on a lit icon and dragging it into one of
+the subdirectories. When you press the mouse button, the cursor
+will change to a 'files' cursor to indicate that you are
+potentially moving files around. If you move the cursor near the
+top or bottom edge of the window, the window will scroll up or
+down accordingly. Necessary, as the subdirectory folders are
+always shown at the top of the window. When you move the cursor
+on top of a folder (either the <tt>&lt;parent&gt;</tt> directory,
+or one of the subdirectories), the folder will light up to
+acknowledge your selection. If you release the mouse button while
+a folder is lit, all currently selected files (and folders) will
+be moved into the lit folder.</p>
+
+<p>Note that, using only one schnauzer window, it's only possible
+to move files up or down one directory level. If you want to move
+files to completely unrelated directories, you can easily
+accomplish this by opening a second schnauzer window (via the <b>open
+new Window</b> command in the menu, or <b>&lt;Ctrl&gt; w</b>).
+Get the second schnauzer window aimed at the desired destination
+directory, and simply drag the files from the first window into
+the second window.</p>
+
+<p>Also, when you drag files around, <i>xv</i> normally 'moves'
+the files from one directory to another. If you'd like, you can
+copy files instead of moving them. Just press (and hold down) the
+<b>&lt;Ctrl&gt;</b> key while dragging the files. The 'files'
+cursor will change to display 'CPY' as well, to signify that you
+are copying files instead of moving them.</p>
+
+<p>The remaining file-management commands (renaming files,
+deleting files, and creating subdirectories) are discussed below.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="visual-schnauzer-2.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="color-editor-3.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

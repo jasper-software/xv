@@ -1,0 +1,394 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Color Editor, part 2/3</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="hsv-modification-tools">The HSV Modification Tools</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><img src="images/fig-110.gif" width="207"
+        height="502"></td>
+        <td>There are four separate controls in the HSV
+        Modification tool.<p>At the top of the window are a pair
+        of circular controls that handle hue remapping.</p>
+        <p>Lower down is a circular control that maps 'white'
+        (and greys) to a specified color. There is also dial
+        control that lets you saturate/desaturate the colors of
+        the image.</p>
+        <p>Finally, at the bottom there is a graph window that
+        lets you modify intensity values via an arbitrary
+        remapping function.</p>
+        </td>
+    </tr>
+</table>
+
+<h3><a name="hue-remapping-controls">Hue Remapping Controls</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-111.gif"
+        width="201" height="187"></td>
+        <td valign="top">These two dials are used to define a
+        source and a destination range of hue values. Every hue
+        in the source range (defined in the <i>From</i> dial)
+        gets mapped to the value of the corresponding point in
+        the destination range (defined in the <i>To</i> dial).<p>Each
+        dial has a pair of radial lines with handles at their
+        ends. Between the two lines an arc is drawn with an arrow
+        at one end. The wedge drawn by these lines and the arc
+        defines a range of values (in degrees). The direction of
+        the arc (clockwise, or counter-clockwise) determines the
+        direction of this range of values (increasing or
+        decreasing).</p>
+        </td>
+    </tr>
+</table>
+
+<p>Distributed around the dial are tick marks and the letters
+'R', 'Y', 'G', 'C', 'B', and 'M'. These letters stand for the
+colors Red, Yellow, Green, Cyan, Blue, and Magenta, and they show
+where these colors appear on the circle.</p>
+
+<p>The range is shown numerically below the control. By default
+the range is '330 , 30 CW'. This means that a range of values
+[330 , 331 , 332 , ... 359 , 0 , 1 , ... 28 , 29 , 30] has been
+defined. Note that (being a circle and all) it wraps back to 0
+after 359 .</p>
+
+<p>The range can be changed in many different ways. You can click
+on the 'handles' at the end of the radial lines and move them
+around. If you click inside the dial, but not on one of the
+handles, you'll be able to drag the range around as a single
+object. There are also 5 buttons below the dial that let you
+rotate the range, flip the direction of the range, and
+increase/decrease the size of the range while keeping it centered
+around the same value.</p>
+
+<p>In its default state, the <i>To</i> dial is set to the same
+range as the <i>From</i> dial. When the two dials are set to the
+same range, they are effectively 'turned off', and ignored.</p>
+
+<p>An example of hue remapping:</p>
+
+<ol>
+    <li>As a simple example of the sort of things you can do with
+        the hue remapping control, we'll change the color of the
+        3-D fish in the default (xv logo) image without changing
+        any other colors in the image. Since the fish are drawn
+        using many different shades of pink, you would not want
+        to do this with the <i>Colormap Editing</i> tool. It
+        would take forever, or at least most of your lunch break.</li>
+    <li>Get the default image up on the screen by running <i>xv</i>
+        without specifying any filenames on the command line.
+        Open up the <i>xv color editor</i> window via the <b>Color
+        Editor</b> command.</li>
+    <li>Next, click the mouse in the image window and d rag it
+        around. You'll find that pixels in the fish bodies have a
+        Hue component value of '0' (which corresponds to pure
+        red).</li>
+    <li>To remap this hue, simply adjust the <i>From</i> dial so
+        that its range includes this Hue value. (It probably
+        already does, by default.) Then twiddle the <i>To</i>
+        dial to remap the hues. If you find more than the fish
+        changing color, you can shrink the <i>From</i> range so
+        it covers a smaller range of hues. This may help.</li>
+</ol>
+
+<p>Note that the values printed when you are tracking pixel
+values in the image are the values <i>before</i> the <i>HSV
+Modification</i> tool is applied. For example, the background of
+the default image will still claim to be blue, regardless of what
+color you may have changed it to. This is so that you know what
+Hue value you will need to remap if you want to change its color
+again.</p>
+
+<p>If you press the <b>Reset</b> button that is located near the
+hue remapping controls, it will effectively disable the hue
+remapping by setting the <i>To</i> range equal to the <i>From</i>
+range.</p>
+
+<p>Below the hue remapping controls are a group of 'radio
+buttons'. You can have up to six different hue remappings
+happening simultaneously. Higher numbered mappings take
+precedence over lower numbered mappings.</p>
+
+<p>An example of multiple hue remappings:</p>
+
+<ol>
+    <li>Draw a <i>From</i> range that is a complete circle. The
+        easiest way to do this is to draw a range that is nearly
+        a full circle, then click and hold down the 'increase
+        range' button located below the <i>From</i> range dial
+        until the range stops getting bigger.</li>
+    <li>Copy this range to the <i>To</i> range by pressing the <b>Reset</b>
+        button.</li>
+    <li>Rotate the <i>To</i> range slightly, by either clicking
+        and dragging anywhere in the <i>To</i> range dial, or by
+        using the 'rotate clockwise' and 'rotate
+        counter-clockwise' buttons located below the <i>To</i>
+        range.</li>
+    <li>You've just built yourself what is effectively a tint
+        control.</li>
+    <li>Now, suppose, you'd like to adjust the sky color of your
+        (tint-modified) image, without affecting anything else.
+        Clicking on the sky in the image window reveals that the
+        background still has an (original) hue of around 240. To
+        modify this hue without affecting anything else, we'll
+        need a second hue remapping.</li>
+    <li>Click on the <b>2</b> radio button. The dials will change
+        to some other default setting. As before, set the <i>From</i>
+        range to encompass the value 240, preferably as 'tightly'
+        as possible, and set the <i>To</i> range to produce the
+        desired background color. Note that since both the sky
+        and the ocean are blueish, it may not be possible to
+        change the color of one without affecting the color of
+        the other.</li>
+</ol>
+
+<p>Note that the six hue remappings are not 'cascaded'. The
+output of one remapping is not fed as input into any of the other
+hue remappings. The hue remappings always operate on the hue
+values in the original image. In this example, if remapping #1
+adds 32 to all hue values, thereby mapping the blue background
+(value 240) into a purple-blue (value 272), remapping #2 still
+sees the background at 240, and can remap it to anything it
+likes. Similarly, in the same example, if remapping #1 has mapped
+a green-blue color (value 208) into blue (value 240), remapping
+#2 will not map this into another color. As far as remapping #2
+is concerned, that green-blue is still green-blue.</p>
+
+<p>If it seems complicated, I'm sorry. It is.</p>
+
+<h3><a name="white-remapping-control">The White Remapping Control</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-112.gif" width="89"
+        height="127"></td>
+        <td valign="top">In the HSV colorspace, 'white'
+        (including black, and all the greys in between) has no
+        Hue or Saturation components. As such, it is not possible
+        to use the hue remapping controls to change the color of
+        white pixels in the image, since they have no 'color' to
+        change.</td>
+    </tr>
+</table>
+
+<p>The white remapping control gives you a way to add Hue and
+Saturation components to all the whites in the image. It consists
+of a movable point in a color dial. The angle of the dot from the
+center of the dial determines the Hue component. The distance of
+the dot from the center of the dial determines the Saturation
+component. The further the dot is from the center of the dial,
+the more saturated the color will be.</p>
+
+<p>You can control the white remapping control in several ways.
+You can click on the handle and drag it around with the mouse.
+There are also four buttons provided under the dial. One pair
+allows you to rotate the handle clockwise and counter-clockwise
+without changing its distance from the center. The other pair of
+buttons lets you change the distance between the handle and the
+center without changing the angle.</p>
+
+<p>The current Hue and Saturation values provided by the control
+are displayed below the dial. The first number is the Hue
+component, in degrees, and the second is the Saturation
+component, as a percentage.</p>
+
+<p>There is also a checkbox that will let you turn off the white
+remapping control. This lets you quickly compare your modified
+'white' with the original white. You can also effectively disable
+the white remapping control by putting the handle back in the
+center of the control. The easiest way to do this is to click and
+hold the 'move towards center' button until the saturation value
+gets down to 0%.</p>
+
+<p>Example:</p>
+
+<ol>
+    <li>Press the <b>Grey</b> button in the <b>Colormap Editing</b>
+        tool. This turns all the colors in the image into shades
+        of grey.</li>
+    <li>Drag the handle in the white remapping control halfway
+        down towards the 'R' mark. The Hue and Saturation values
+        should be roughly 0 and 50%. The image should now be
+        displayed in shades of pink.</li>
+</ol>
+
+<h3><a name="saturation-control">The Saturation Control</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-113.gif"
+        width="102" height="123"></td>
+        <td valign="top">The saturation control lets you globally
+        increase or decrease the color saturation of the image.
+        In effect, it is much like the 'color' control on most
+        color televisions.<p>The saturation control is a dial
+        that operates exactly like the dials described in &quot;<a
+        href="color-editor-1.html#using-dial-controls">Using the
+        Dial Controls</a>&quot;. In short, you can click and hold
+        down any of the four buttons in the bottom of the control
+        to increase or decrease the control's value. You can also
+        click on the dial itself and move the pointer around
+        directly.</p>
+        </td>
+    </tr>
+</table>
+
+<p>The saturation control has values that range from '-100%' to
+'+100%'. At its default setting of '0%', the saturation control
+has no effect on the image. As the values increase, the colors
+become more saturated, up to '+100%', at which point every color
+is fully saturated. Likewise, as values decrease, the colors
+become desaturated. At '-100%', every color will be completely
+desaturated (i.e., a shade of grey). Note that this control is
+applied after the White Remapping control, so if you 'greyify'
+the image by completely desaturating it, you will not be able to
+color it using the White Remapping control. You could get around
+this problem by saving the (now grey) image, and reloading, or
+you could simply use the <b>Grey</b> button in the <b>Colormap
+Editor</b> instead.</p>
+
+<p>Unless you're trying for some special effects, the useful
+range of this control is probably 20%. Also note that the control
+will have no effect on shades of grey, as they have no color to
+saturate.</p>
+
+<h3><a name="intensity-graph">The Intensity Graph</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-114.gif"
+        width="167" height="149"></td>
+        <td valign="top">The <i>Intensity</i> graph allows you to
+        change the brightness of the image, change the contrast
+        of the image, and get some unique effects.<p>The <a
+        name="graph-function"><i>Intensity</i></a> graph is a
+        function that lets you remap intensity values (the Value
+        component in the HSV Colorspace) into other intensity
+        values. The input and output values of this function both
+        range from 0 to 255. The input values range along the <i>x
+        </i>axis of this graph (the horizontal). For every input
+        value (point along the <i>x </i>axis) there is a unique
+        output value determined by the height of the graph at
+        that point. In the graph's default state, the function is
+        a straight line from bottom-left to top-right. In this
+        case, each input value produces an equivalent output
+        value, and the graph has no effect.</p>
+        </td>
+    </tr>
+</table>
+
+<p><a name="graph-operating">There</a> are a number of 'handles'
+along the graph. These provide your major means of interacting
+with the graph. You can move them around arbitrarily, subject to
+these two constraints: the handles at the far left and far right
+of the graph can only be moved vertically, and handles must
+remain between their neighboring handles for the graph to remain
+a proper function.</p>
+
+<p>The handles are normally connected by a spline curve. To see
+this, move one of the handles by clicking and dragging it. (Note
+that the <i>x,y</i> position of the current handle is displayed
+while the mouse button is held down.) The function will remain a
+smoothly curved line that passes through all the handles. You can
+change this behavior by putting the function into 'lines' mode.
+Press the <img src="images/fig-115.gif" width="31" height="24">
+button. The function will change to a series of line segments
+that connect the handles. Press the <img src="images/fig-116.gif"
+width="31" height="24"> button to go back to 'spline' mode.</p>
+
+<p>The next two buttons let you add or delete handles. The <img
+src="images/fig-117.gif" width="31" height="24"> button will
+insert a handle into the largest 'gap' in the function. The <img
+src="images/fig-118.gif" width="31" height="24"> button will
+remove a handle from the smallest 'gap' in the function. You can
+have as few as 2 handles, or as many as 16. Note that as the
+number of handles gets large, the spline will start getting out
+of control. You may wish to switch to 'lines' mode in this case.</p>
+
+<p>The <img src="images/fig-119.gif" width="31" height="24">
+button puts everything back on a straight line connecting
+bottom-left to top-right (a 1:1 function). It does not change the
+number of handles, nor does it change the <i>x</i> -positions of
+the handles.</p>
+
+<p><a name="gamma-correction">The</a> <img
+src="images/fig-120.gif" width="31" height="24"> button lets you
+set the function curve by entering a single number. The function
+is set equal to the gamma function:</p>
+
+<blockquote>
+    <p><i>y = 255 * ((i/255)</i> ^ (<i>1/g))</i></p>
+</blockquote>
+
+<p>where <i>i</i> is the input value (0-255), g is the gamma
+value, and <i>y</i> is the computed result (0-255).</p>
+
+<ul>
+    <li>Gamma values (for our purposes) are floating point
+        numbers that can range between -1000 and 1000,
+        non-inclusive.</li>
+    <li>A gamma value of '1.00' results in the normal 1:1
+        straight line.</li>
+    <li>Gamma values of less than 1.00 but greater than 0.00
+        result in 'exponential' curves which will dim the image.</li>
+    <li>Gamma values greater than 1.00 result in 'logarithmic'
+        curves, which will brighten the image. Try it and see.</li>
+    <li>Gamma values between 0 and -1 result in reversed
+        'exponential' curves.</li>
+    <li>Gamma values less than -1 result in reversed
+        'logarithmic' curves.</li>
+</ul>
+
+<p>There is a shortcut for the <img src="images/fig-121.gif"
+width="31" height="24"> button. Type <b>g</b> while the mouse is
+inside the graph window.</p>
+
+<p>Also, touching any of the handles after a <img
+src="images/fig-122.gif" width="31" height="24"> command will put
+the graph back into its 'normal' mode. (Either 'spline' or
+'lines' depending on which of the top two buttons is turned on.)</p>
+
+<p>Generally, whenever you move a graph handle and let go of it,
+the image will be redrawn to show you the effects of what you've
+done. This can be time-consuming if you intend to move many
+points around. You can temporarily prevent the redisplay of the
+image by holding down a <b>&lt;Shift&gt;</b> key. Continue to
+hold the <b>&lt;shift&gt;</b> key down while you move the handles
+to the new position. Release the <b>&lt;Shift&gt;</b> key when
+you're done, and the image will be redisplayed.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="color-editor-3.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="color-editor-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>
+
+
+

@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Diversity Algorithm</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Diversity Algorithm</h1>
+
+<p>The problem: You want to display an image that has <i>n</i>
+colors in it. You can only get <i>m</i> colors, where <i>m</i>&lt;<i>n</i>.
+What colors do you use?</p>
+
+<p>As explained in &quot;<a href="color-allocation.html">Color
+Allocation in <i>xv</i></a>&quot; , colors on a non- <i>TrueColor</i>
+X display are a scarce resource. You can't guarantee that you'll
+get as many colors as you might like. You can't even know ahead
+of time how many colors you will succeed in getting. As such, the
+first step of all of the color allocation algorithms is to sort
+the colors in order of decreasing 'importance'. The colors are
+then allocated in this order, so that if the color allocation
+fails after <i>m</i> colors, then at least we allocated the <i>m</i>
+most 'important' colors.</p>
+
+<p>This sorting algorithm is called the <i>Diversity Algorithm</i>,
+and is described in detail here. While the algorithms described
+in &quot;<a href="color-allocation.html">Color Allocation in <i>xv</i></a>&quot;
+are probably only of use to other X programmers (or programmers
+using other windowing systems with shared colormap resources),
+the Diversity Algorithm should be of use to anyone who has to
+display an image using fewer colors than they'd like to have. As
+far as I know, the Diversity Algorithm is an original algorithm
+designed for this program.</p>
+
+<h2><a name="picking-most-important-colors">Picking the Most
+'Important' Colors</a></h2>
+
+<p>There are many different criteria that one could use to define
+which colors in an image are 'important'.</p>
+
+<p>The most naive approach would be to simply ignore the
+question, and just use the first <i>m</i> colors from the
+colormap. This is clearly unacceptable. The entries in a colormap
+are generally not sorted in any order whatsoever. Even when the
+colors <i>are</i> sorted in some order, it's not likely that it
+will be a useful order.</p>
+
+<p>For example, in a normal greyscale picture, there is an
+implied colormap consisting of a continuous collection of greys,
+with black at the beginning, and white at the end. If a program
+were to only use the first few colors from this colormap, it
+would have several shades of <i>black</i>, but no <i>whites</i>,
+or even <i>middle greys</i>.</p>
+
+<p>A method of determining a color's importance to the overall
+picture quality is needed.</p>
+
+<p>A color's 'importance' can be determined intuitively by asking
+the question &quot;If we can only use one of these two colors,
+which one would make the picture look better?&quot;. The goal is
+to have the picture be recognizable with very few colors.
+Additional colors should smooth out color gradation, but should
+not add significant detail, nor change the color balance of the
+overall picture.</p>
+
+<p>Picking colors in this order is not a trivial task, and is
+open to some degree of subjectivity. One method might involve
+calculating a histogram of the data to find out which colors are
+used the most often (i.e., which colors have the greatest number
+of pixels associated with them), and using those colors first.
+This is certainly a valid approach, but it places too much
+emphasis on large, uniformly colored regions, such as
+backgrounds. This is not generally where the 'interesting'
+portion of the picture is found.</p>
+
+<p>For example, assume a picture that consists of a blue
+background, with a relatively small <i>red</i> square on it.
+Furthermore, suppose that the background isn't just one solid
+shade of blue, but is actually made up of three shades of blue ( <i>light
+blue</i>, <i>dark blue</i>, and <i>medium blue</i>, to give them
+names). Finally, assume that a histogram has been computed, and <i>light
+blue</i> has been found to be the most prevalent color, followed
+by <i>medium blue</i>, <i>dark blue</i>, and <i>red</i>, in that
+order.</p>
+
+<p>Now, attempt to display this picture using only two colors.
+Which two should be used? If the selection criteria is simply 'in
+order of decreasing usage', <i>light blue</i> and <i>medium blue</i>
+would be picked. However, if this is done the <i>red</i> square
+will disappear completely (as <i>red</i> will wind up being
+'approximated' by one of the two blues). Clearly the solution is
+to use <i>red</i> and one of the blues. Which blue, though? It
+could be argued that since there are three blues and only one of
+them can be used, <i>middle blue</i> should be selected, since it
+is the 'average' blue. This is where it gets somewhat subjective.
+The Diversity Algorithm would pick <i>light blue</i>, since it is
+used more than the others. When possible, the algorithm will try
+to maximize the number of pixels that are 'correct' (i.e. exactly
+what was asked for), rather than trying to minimize the total
+error of the picture. This way, additional colors smooth out
+gradations, rather than changing the overall color balance of the
+picture.</p>
+
+<p>Suppose that a small <i>yellow</i> circle is added to the
+picture described above. If the problem is still 'display this
+picture using only two colors', then it cannot be resolved in any
+satisfactory method. There are no two colors that will adequately
+display <i>red</i>, <i>yellow</i>, and <i>blue</i> simultaneously
+. No matter what colors are used, one of the three major colors
+will be lost. As this is now a no-win scenario, it is no longer
+very interesting. It doesn't matter what colors are picked, since
+it will look bad regardless. However, if the problem is changed,
+and <i>three</i> colors can now be selected, it is intuitively
+obvious that <i>yellow</i>, <i>red</i>, and one of the blues
+should be selected.</p>
+
+<p>So, the question is, &quot;what is being maximized when colors
+are selected in this manner?&quot; Certainly, since the blue
+regions are so much larger than the <i>red</i> and <i>yellow</i>
+regions, any rule based on the number of pixels satisfied by the
+color choice is irrelevant. What <i>is</i> being maximized is the
+<i>diversity</i> of the colors. By picking colors that are as
+unlike each other as possible, we wind up covering the
+'inhabited' portion of the RGB color space as quickly as
+possible.</p>
+
+<p>As a general rule, this tends to bring out the major details
+(such as objects) in the picture first, since the details are
+likely to involve contrasting colors. As more colors are picked,
+gaps in the RGB space are filled in. This smoothes out the color
+gradations, and brings out lesser detail (such as texture).</p>
+
+<h2><a name="original-diversity-algorithm">The Original Diversity
+Algorithm</a></h2>
+
+<p>The algorithm operates as follows:</p>
+
+<ol>
+    <li>Run a histogram on the entire picture to determine 'pixel
+        counts' for each desired color in the colormap. Important
+        point: throw away any colors that have a 'pixel count' of
+        0. These colors are never actually used in the image, and
+        it's important that we not waste valuable colorcells
+        allocating unused colors.</li>
+    <li>Pick the color with the highest pixel count. This is the
+        'overall' color of the picture.</li>
+    <li>Run through the list of un-picked colors, and find the
+        one with the greatest 'distance' from the first color.
+        This is the color that is most diverse from the 'overall'
+        color. Distance is defined by the traditional 'Euclidean'
+        formula: <p><i>d</i> = [ (r1 - r2)^2 + (g1 - g2)^2 + (b1
+        - b2)^2 ]^1/2</p>
+        <p>where r1,g1,b1 are the RGB components of one color,
+        and r2,g2,b2 are the RGB components of another color. <i>d</i>
+        is the computed distance between the two colors.</p>
+    </li>
+    <li>For each color remaining in the 'unpicked' list, compute
+        the distance from it to each of the colors in the
+        'picked' list. Find the color in the unpicked list that
+        is furthest from all of the colors in the picked list.
+        Pick this color. Repeat until all colors have been
+        picked.</li>
+</ol>
+
+<h2><a name="modified-diversity-algorithm">The Modified Diversity
+Algorithm</a></h2>
+
+<p>Tom Lane of the Independent JPEG Group came up with a couple
+of improvements to the Diversity Algorithm, resulting in the
+Modified Diversity Algorithm, which is what <i>xv</i> currently
+uses. He rightly pointed out that, on displays with an
+intermediate number of colors (~64), too much emphasis was being
+placed on getting 'different' colors, and not enough emphasis was
+placed on getting the 'correct' colors. His idea was to modify
+the sorting criteria slightly, to better balance the allocation
+between diverse colors and 'popular' colors (colors with high
+'pixel counts'). His solution to the problem was to alternate
+between picking colors based on diversity and based on
+popularity.</p>
+
+<p>In the Modified Diversity Algorithm, as implemented in <i>xv</i>,
+the first color picked is the most-popular color. The second
+color picked is the color furthest away from the first color. The
+third through tenth colors picked are all picked using the normal
+Diversity Algorithm. The eleventh color picked is picked on
+popularity, (the un-picked color with the highest 'pixel count'
+is chosen). The twelfth color is once again picked on diversity.
+The thirteenth color is chosen on popularity, and so on,
+alternating, until all the colors have been picked.</p>
+
+<p>It should be pointed out that there's a fair amount of
+subjectivity here, and certainly different fine-tunings of the
+color picking order will make some pictures look better, and
+other pictures look worse. Tom originally had the algorithm pick
+colors alternately based on diversity and popularity right from
+the first color. (The first color picked on popularity, the
+second on diversity, the third on popularity, etc.) I felt that
+this broke the algorithm for displays with very few colors
+(&lt;16), and proposed the strategy described above. (First color
+picked on popularity, the next ten colors picked on diversity,
+remaining colors alternately picked on popularity and diversity.)</p>
+
+<p>Tom's other major modification to the Diversity Algorithm was
+to rewrite it so that 'diverse' colors are picked in O(<i>n</i>^2)
+time, instead of O(<i>n^</i>3) time. Applied cleverness is a
+useful thing!</p>
+
+<p>For further information, consult the source code. (The
+function '<tt>SortColors()</tt>' in the file '<tt>xvcolor.c</tt>'.)
+</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="adding-formats-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="color-allocation.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

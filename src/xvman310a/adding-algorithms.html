@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Adding Algorithms to xv</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Adding Algorithms to <i>xv</i></h1>
+
+<p>With the addition of the <b>Algorithms</b> menu in the <i>xv
+controls</i> window, <i>xv</i> can now perform standard
+image-processing algorithms. However, I'm not really into the
+whole image-processing <i>scene</i>, so I've only implemented a
+few algorithms.</p>
+
+<p>Please! Feel free to add your own algorithms, it's easy, and
+if you'd care to donate them, they may find their way into future
+official releases of <i>xv</i>, and eternal fame and glory will
+be yours, in the form of a credit in the &quot;Hall of Fame&quot;
+listing..</p>
+
+<h2><a name="adding-an-algorithm">Adding an Algorithm</a></h2>
+
+<p>For the purposes of this example, I'll be adding a new
+algorithm called 'Noise' which will simply add (or subtract) a
+small random amount from each pixel in the image. I can't see
+that this would be a very useful algorithm (which is why it's not
+already <i>in xv</i> ), but then again, what do I know about such
+things...</p>
+
+<p>Edit <tt>xv.h</tt> , and find the block that starts with:</p>
+
+<blockquote>
+    <pre><font size="2">#define ALG_NONE  0
+#define ALG_SEP1  1  /* separator */
+#define ALG_BLUR3 2</font></pre>
+</blockquote>
+
+<p>and add an additional definition at the end of the list (right
+before <tt>ALG_MAX</tt> ) for your algorithm. Don't forget to
+increment <tt>ALG_MAX</tt> to reflect the additional algorithm:</p>
+
+<blockquote>
+    <pre><font size="2">#define ALG_TINF  6
+#define ALG_OIL   7
+#define ALG_NOISE 8
+#define ALG_MAX   9</font></pre>
+</blockquote>
+
+<p>Edit <tt>xvctrl.c</tt> , and find where the array <tt>algMList[]</tt>
+is initialized. Add a string for your new algorithm. The string's
+position in the list must match the number that you assigned to
+the <tt>ALG_*</tt> value in <tt>xv.h</tt> :</p>
+
+<blockquote>
+    <pre><font size="2">static char *algMList[] = { &quot;Undo All&quot;,
+                            MBSEP,
+                            &quot;Blur (3x3)&quot;,
+                            &quot;Blur (7x7)&quot;,
+                            &quot;Edge Detection&quot;,
+                            &quot;Emboss&quot;,
+                            &quot;Oil Painting&quot;,
+                            &quot;Add Noise&quot;};</font></pre>
+</blockquote>
+
+<p>Edit <tt>xvalg.c</tt> , and find the <tt>DoAlg()</tt>
+function. This function is called with an <tt>ALG_*</tt> value
+whenever something is selected from the <b>Algorithms</b> menu.
+Add a case for the new <tt>ALG_NOISE</tt> value, and have it call
+your top-level function, with no parameters:</p>
+
+<blockquote>
+    <pre><font size="2">  case ALG_TINF:  EdgeDetect(1);  break;
+  case ALG_OIL:   OilPaint();     break;
+  case ALG_NOISE: Noise();        break;
+}</font></pre>
+</blockquote>
+
+<p>Write your top-level function:</p>
+
+<blockquote>
+    <pre><font size="2">/************************/
+static void Noise()
+{
+  byte *pic24, *tmpPic;
+
+  /* turn on flapping fish cursor */
+  WaitCursor();
+
+  /* mention progress... */
+  SetISTR(ISTR_INFO, &quot;Running Noise algorithm...&quot;);
+
+  /* generates a 24-bit version of  <tt>pic</tt> <tt>, if necessary.
+     also generates a w*h*3 buffer (tmpPic) to hold intermediate results */
+  if (start24bitAlg(&amp;pic24, &amp;tmpPic)) return;
+
+  /* do the noise algorithm */
+  doNoise(pic24, pWIDE,pHIGH, tmpPic);
+
+  /* if we're in PIC8 mode, convert pic24 back to PIC8. free pic24 &amp; tmppic */ 
+  end24bitAlg(pic24, tmpPic);
+} </tt></font></pre>
+</blockquote>
+
+<p><font size="4" face="Times New Roman"><tt>Now write the
+function that does the work of your algorithm. It will be passed
+a 24-bit RGB source image </tt><i><tt>srcpic</tt></i><tt>, its
+dimensions </tt><i><tt>w,h,</tt></i><tt> and a destination 24-bit
+image </tt><i><tt>dstpic</tt></i><tt> of the same size. If your
+algorithm is normally meant to be run on greyscale images (as so
+many image algorithms are), you should simply run it separately
+for each of the </tt><i><tt>Red, Green, </tt></i><tt>and </tt><i><tt>Blue</tt></i><tt>
+planes, and glue the results back together at the end of the
+algorithm.</tt></font></p>
+
+<blockquote>
+    <pre><font size="2"><tt>/************************/
+static void doNoise(srcpic, w, h, dstpic)
+  byte *srcpic, *dstpic;
+  int   w, h;
+{
+  byte *sp, *dp;
+  int   x,y,newr,newg,newb;
+
+  printUTime(&quot;start of doNoise&quot;);   /* print timing info */
+
+  for (y=0; y&lt;h; y++) {
+    if ((y &amp; 15) == 0) WaitCursor();
+
+    sp = srcpic + y*w*3;     /* position sp,dp at start of line #y */
+    dp = dstpic + y*w*3;
+    for (x=0; x&lt;w; x++) {
+      newr = sp[0] + (random()&amp;0x3f)-0x20;  /* add noise to red   component */
+      newg = sp[1] + (random()&amp;0x3f)-0x20;  /* add noise to green component */
+      newb = sp[2] + (random()&amp;0x3f)-0x20;  /* add noise to blue  component */
+      RANGE(newr, 0, 255);   /* clip values to range[0..255] inclusive */
+      RANGE(newg, 0, 255);   /* RANGE() is defined in xv.h */
+      RANGE(newb, 0, 255);
+      dp[0] = (byte) newr;   /* store new values in dstpic */
+      dp[1] = (byte) newg;
+      dp[2] = (byte) newb;
+
+      sp += 3;  dp += 3;     /* advance to next 3-byte pixel in images */
+    }
+  }
+  printUTime(&quot;end of doConvolv&quot;);
+}</tt></font></pre>
+</blockquote>
+
+<p><font size="4" face="Times New Roman"><tt>Note that this
+algorithm is written in about as non-optimal a way as possible,
+for the sake of clarity.</tt></font></p>
+
+<p><font size="4" face="Times New Roman"><tt>Also note that if
+you define</tt></font><font face="Times New Roman"><tt> </tt></font><tt>TIMING_TEST</tt>
+at the beginning of <tt>xvalg.c</tt> , it will turn on code that
+will let you measure the CPU time your algorithm requires. Once
+you have a working algorithm, you may find this useful if you
+wish to try to optimize your algorithm for increased performance.</p>
+
+<p>And that's all there is to it! </p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="index.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="adding-formats-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

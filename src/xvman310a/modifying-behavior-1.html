@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Modifying xv Behavior, part 1/4</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Modifying <em>xv</em> Behavior</h1>
+
+<p><i>xv</i> supports literally dozens of command line options
+and X11 resources. Fortunately, it is doubtful that you'll ever
+need to use more than a small few. The rest are provided mainly
+for that 'one special case' application of <i>xv</i>... Note that
+you do not have to specify the entire option name, only enough
+characters to uniquely identify the option. Thus, '<tt>-geom</tt>'
+is a fine abbreviation of '<tt>-geometry</tt>'.</p>
+
+<h2><a name="command-line-options-overview">Command Line Options
+Overview</a></h2>
+
+<p>If you start <i>xv</i> with the command '<tt>xv -help</tt>',
+the current (wildly out of control) list of options will be
+displayed:</p>
+
+<blockquote>
+    <p><font size="2"><tt>xv [-] [-/+24] [-/+2xlimit] [-/+4x3]
+    [-/+8] [-/+acrop] [-aspect w:h] [-best24] [-bg color] [-black
+    color] [-bw width] [-/+cecmap] [-cegeometry geom] [-/+cemap]
+    [-cgamma rval gval bval] [-cgeometry geom] [-/+clear]
+    [-/+close] [-/+cmap] [-cmtgeometry geom] [-/+cmtmap] [-crop x
+    y w h] [-cursor char#] [-DEBUG level] [-dir directory]
+    [-display disp] [-/+dither] [-drift dx dy] [-expand exp |
+    hexp:vexp] [-fg color] [-/+fixed] [-flist fname] [-gamma val]
+    [-geometry geom] [-grabdelay seconds] [-gsdev str] [-gsgeom
+    geom] [-gsres int] [-help] [-/+hflip] [-hi color] [-/+hist]
+    [-/+hsv] [-icgeometry geom] [-/+iconic] [-igeometry geom]
+    [-/+imap] [-/+lbrowse] [-lo color] [-/+loadclear] [-/+max]
+    [-/+maxpect] [-mfn font] [-/+mono] [-name str] [-ncols #]
+    [-/+ninstall] [-/+nodecor] [-/+nofreecols] [-/+nolimits]
+    [-/+nopos] [-/+noqcheck] [-/+noresetroot] [-/+norm]
+    [-/+nostat] [-/+owncmap] [-/+perfect] [-/+poll] [-preset #]
+    [-quick24] [-/+quit] [-/+random] [-/+raw] [-rbg color] [-rfg
+    color] [-/+rgb] [-RM] [-rmode #] [-/+root] [-rotate deg]
+    [-/+rv] [-/+rw] [-slow24] [-/+smooth] [-/+stdcmap]
+    [-tgeometry geom] [-/+vflip] [-/+viewonly] [-visual type]
+    [-/+vsdisable] [-vsgeometry geom] [-/+vsmap] [-/+vsperfect]
+    [-wait seconds] [-white color] [-/+wloop] [filename ...]</tt></font></p>
+</blockquote>
+
+<p>Yes, as a matter of fact, I <i>am</i> a little embarrassed
+about it.</p>
+
+<p>One big change starting in <i>xv </i>3.10: In the past, most
+of the command-line options were <i>toggles</i>, in that they
+would normally turn some feature on, but if you had an X resource
+that also turned that feature on, then they would turn that
+feature <i>off. </i>Now, they are absolute settings. For
+instance, '<tt>-rv'</tt> turns on reverse video mode, regardless
+of the setting of the '<tt>xv.reverse'</tt> resource, and '<tt>+rv'</tt>
+turns <i>off</i> reverse video mode, regardless of the setting of
+the '<tt>xv.reverse'</tt> resource. (Thanks Peder!)</p>
+
+<h2><a name="general-options">General Options</a></h2>
+
+<p>Note: In the following sections, the part of the option name
+shown in <b>boldface</b> is the shortest allowable abbreviation
+of the option in question.</p>
+
+<dl>
+    <dt><a name="help"><b>-he</b><tt>lp</tt></a></dt>
+    <dd>Print usage instructions, listing the current available
+        command-line options. Any unrecognized option will do
+        this as well. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="display"><b>-dis</b><tt>play</tt> <i>disp</i></a></dt>
+    <dd>Specifies the display that <i>xv</i> should attempt to
+        connect to. If you don't specify a display, <i>xv</i>
+        will use the environment variable <tt>$DISPLAY</tt> . </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="fg"><b>-fg</b> <i>color</i></a></dt>
+    <dd>Sets the foreground color used by the windows. </dd>
+    <dd>(Resource name: <tt>foreground</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="bg"><b>-bg</b> <i>color</i></a></dt>
+    <dd>Sets the background color used by the windows. </dd>
+    <dd>(Resource name: <tt>background</tt> . Type: string) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="hi"><b>-hi</b> <i>color</i></a></dt>
+    <dd>Sets the highlight color used for the top-left edges of
+        the control buttons. </dd>
+    <dd>(Resource name: <tt>highlight</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="lo"><b>-lo</b> <i>color</i></a></dt>
+    <dd>Sets the lowlight color used for the bottom-right edges
+        of the control buttons, and also the background of some
+        windows. </dd>
+    <dd>(Resource name: <tt>lowlight</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="bw"><b>-bw</b> <i>bwidth</i></a></dt>
+    <dd>Sets the width of the border on the windows. Your window
+        manager may choose to ignore this, however. </dd>
+    <dd>(Resource name: <tt>borderWidth</tt> . Type: integer)</dd>
+</dl>
+
+<h2><a name="sizing-options">Image Sizing Options</a></h2>
+
+<dl>
+    <dt><a name="geometry"><b>-ge</b><tt>ometry</tt> <i>geom</i></a></dt>
+    <dd>Lets you specify the size and placement of the 'image'
+        window. It's most useful when you only specify a
+        position, and let <i>xv</i> choose the size. If you
+        specify a size as well, <i>xv</i> will create a window of
+        that size, unless <tt>-fixed</tt> is specified. The geom
+        argument is in the form of a normal X geometry string
+        (e.g. &quot;300x240&quot; or &quot;+10+10&quot; or
+        &quot;400x300+10+10&quot;) </dd>
+    <dd>(Resource name: <tt>geometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="fixed"><b>-</b>/<b>+fi</b><tt>xed</tt></a></dt>
+    <dd>Only used in conjunction with the <tt>-geometry</tt>
+        option. If you specify a window size with the <tt>-geometry</tt>
+        option, <i>xv</i> will normally stretch the picture to
+        exactly that size. This is not always desirable, as it
+        may seriously distort the aspect ratio of the picture.
+        Specifying the <tt>-fixed</tt> option corrects this
+        behavior by instructing <i>xv</i> to use the specified
+        geometry size as a maximum window size. It will preserve
+        the original aspect ratio of the picture. ( <tt>+fixed</tt>
+        turns off this feature, forcing the image to be exactly
+        the size specified by the <tt>-geometry</tt> option.) <p>For
+        example, if you give a rectangular geometry of '320x240',
+        and you try to display a square picture with a size of
+        '256x256', the window opened will actually be '240x240',
+        which is the largest square that still fits in the
+        '320x240' rectangle that was specified.</p>
+        <p>(Resource name: <tt>fixed</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="expand"><b>-e</b><tt>xpand</tt> <i>exp</i></a></dt>
+    <dd>Lets you specify an initial expansion or compression
+        factor for the picture. You can specify floating-point
+        values. Values larger than zero multiply the picture's
+        dimensions by the given factor. (i.e., an expand factor
+        of '3' will make a 320x200 image display as 960x600). <p>Factors
+        less than zero are treated as reciprocals. (i.e., an
+        expand factor of '-4' makes the picture 1/4 th its normal
+        size.). '0' is not a valid expansion factor.</p>
+        <p>You can also specify a pair of expansion values,
+        separated by a colon, to set different horizontal and
+        vertical expansion ratios. For instance, '3:2' would
+        expand images 3x horizontally, and 2x vertically.</p>
+        <p>(Resource name: <tt>expand</tt> . Type: string) </p>
+    </dd>
+    <dt><a name="aspect"><b>-as</b><tt>pect</tt> <i>w:h</i></a></dt>
+    <dd>Lets you set an initial aspect ratio, and also sets the
+        value used by the <b>Aspect</b> command. The aspect ratio
+        of nearly every X display (and, in fact, <i>any</i>
+        civilized graphics display) is 1:1. What this means is
+        that pixels appear to be 'square'. A 100 pixel wide by
+        100 pixel high box will appear on the screen as a square.
+        Unfortunately, this is not the case with some screens and
+        digitizers. The <tt>-aspect</tt> option lets you stretch
+        the picture so that the picture appears correctly on your
+        display. Unlike the other size- related options, this one
+        doesn't care what the size of the overall picture is. It
+        operates on a pixel-by-pixel basis, stretching each image
+        pixel slightly, in either width or height, depending on
+        the ratio. <p>Aspect ratios greater than '1:1' (e.g.,
+        '4:3') make the picture wider than normal. Aspect ratios
+        less than '1:1' (e.g. '2:3') make the picture taller than
+        normal. (Useful aspect ratio: A 512x480 image that was
+        supposed to fill a standard 4x3 video screen (produced by
+        many video digitizers) should be displayed with an aspect
+        ratio of '5:4')</p>
+        <p>(Resource name: <tt>aspect</tt> . Type: string)</p>
+    </dd>
+</dl>
+
+<h2><a name="color-allocation-options">Color Allocation Options</a></h2>
+
+<dl>
+    <dt><a name="ncols"><b>-nc</b><tt>ols</tt> <i>nc</i></a></dt>
+    <dd>Sets the maximum number of colors that <i>xv</i> will
+        use. By default, this is 'as many as it can get'.
+        However, you can set this to smaller values for
+        interesting effect. If you set it to '0', it will display
+        the picture by dithering with 'black' and 'white'. (The
+        actual colors used can be set by the <tt>- black</tt> and
+        <tt>-white</tt> options, below.) <p>The other major use
+        of this option is to limit the number of colors used when
+        putting up an image that's going to be hanging around for
+        a while. (i.e., an image in the root window) You may want
+        to limit the number of colors used for such images so
+        that other programs will still have some colorcells
+        available for their own use.</p>
+        <p>(Resource name: <tt>ncols</tt> . Type: integer)</p>
+    </dd>
+    <dt><a name="rw"><b>-</b>/<b>+rw</b></a></dt>
+    <dd>Tells <i>xv</i> to use read/write color cells. Normally, <i>xv</i>
+        allocates colors read- only, which allows it to share
+        colors with other programs. If you use read/write color
+        cells, no other program can use the colors that <i>xv</i>
+        is using, and vice-versa. The major reason to do such a
+        thing is that using read/write color cells allows the <b>Apply</b>
+        function in the <i>xv color editor</i> window to operate
+        much faster. ( <tt>+rw</tt> forces <i>xv</i> to use
+        read-only color, the default) <p>(Resource name: <tt>rwColor</tt>
+        . Type: boolean)</p>
+    </dd>
+    <dt><a name="perfect"><b>-</b>/<b>+pe</b><tt>rfect</tt></a></dt>
+    <dd>Makes <i>xv</i> try 'extra hard' to get all the colors it
+        wants. In particular, when <tt>-perfect</tt> is
+        specified, <i>xv</i> will allocate and install its own
+        colormap if (and only if) it was unable to allocate all
+        the desired colors. This option is not allowed in
+        conjunction with the <tt>-root</tt> option. <p>(Resource
+        name: <tt>perfect</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="owncmap"><b>-</b>/<b>+o</b><tt>wncmap</tt></a></dt>
+    <dd>Like '<tt>-perfect'</tt>, only this option forces <i>xv</i>
+        to always allocate and install its own colormap, thereby
+        leaving the default colormap untouched. <p>(Resource
+        name: <tt>ownCmap</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="stdcmap"><b>-</b>/<b>+st</b><tt>dcmap</tt></a></dt>
+    <dd>Puts <i>xv</i> into <b>Use Std. Colormap</b> mode. All
+        images will be shown dithered using the same set of
+        colors. This lets you run multiple copies of <i>xv</i> to
+        display multiple images simultaneously, and still have
+        enough colors to go around. <p>(Resource name: <tt>useStdCmap</tt>
+        . Type: boolean)</p>
+    </dd>
+    <dt><a name="cecmap"><b>-</b>/<b>+cec</b><tt>map</tt></a></dt>
+    <dd>Specifies whether <i>xv</i> installs the image's colormap
+        in the <i>xv color editor</i> window, as well as in the
+        image's window. By default, the program does not install
+        the colormap in the color editor window, as this often
+        makes the color editor window unreadable. Note, however
+        that the <i>Colormap Editor</i> tool will be appear
+        somewhat misleading. (This option only applies when the '<tt>-perfect'</tt>
+        or '<tt>-owncmap'</tt> options create their own
+        colormaps.) <p>(Resource name: <tt>ceditColorMap</tt> .
+        Type boolean)</p>
+    </dd>
+    <dt><a name="ninstall"><b>-</b>/<b>+ni</b><tt>nstall</tt></a></dt>
+    <dd>Prevents <i>xv</i> from 'installing' its own colormap,
+        when the <tt>-perfect</tt> or <tt>-owncmap</tt> options
+        are in effect. Instead of installing the colormap, it
+        will merely 'ask the window manager, nicely' to take care
+        of it. This is the correct way to install a colormap
+        (i.e., ask the WM to do it), unfortunately, it doesn't
+        actually seem to work in many window managers, so the
+        default behavior is for <i>xv</i> to handle installation
+        itself. However, this has been seen to annoy one window
+        manager (<i>dxwm</i>), so this option is provided if your
+        WM doesn't like programs installing their own colormaps. <p>(Resource
+        name: <tt>ninstall</tt> . Type: boolean)</p>
+    </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="modifying-behavior-2.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="external-programs.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

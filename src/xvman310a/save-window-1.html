@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Save Window, part 1/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Save Window</h1>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><a name="save-window"><img
+        src="images/fig-170.gif" width="364" height="430"></a></td>
+        <td valign="top">Damned if it doesn't look suspiciously
+        like the <i>xv load </i>window! The <i>xv save</i> window
+        lets you write images back to disk, presumably after
+        you've modified them. You can write images back in many
+        different formats, not just the original format.<p><b>Warning!</b>
+        <i>Images are saved as they are currently shown!</i>
+        (i.e. At the current size, with the current color
+        modification, rotation, cropping, etc. applied.) The only
+        exceptions to this rule are if you are displaying images
+        on a 1-bit B/W display, or displaying 24-bit images on a
+        non-24-bit display. The fact that such images have to be
+        dithered in order to be displayed doesn't count as
+        'modification', and the file won't be saved 'as
+        displayed'. As such, you can manipulate and save color
+        images on a 1-bit display, and 24-bit images on <i>any</i>
+        type of display, even if you can't really see them 'as
+        they are'.</p>
+        </td>
+    </tr>
+</table>
+
+<p>For the most part, the <i>xv save</i> window operates exactly
+like the <i>xv load</i> window. (See &quot;<a
+href="load-window.html">The Load Window</a>&quot; for details.)
+Only the differences are listed here.</p>
+
+<p>When the window is opened, it should have the filename of the
+currently loaded file already entered into the text entry region.
+If you click on a file name in the list window, this name will be
+cleared and replaced with the new name. Likewise, the <b>Format</b>
+and <b>Colors</b> selections will reflect the currently loaded
+image. This behavior can be annoying if you are using <i>xv</i>
+to do file format conversion, or are routinely typing the same
+filename (a piped command, for instance). </p>
+
+<dl>
+    <dt><img src="images/fig-171.gif" width="81" height="25"></dt>
+    <dd>The <b>Prev Set</b> button restores the <b>Format</b> and
+        <b>Colors</b> choices to the settings that were used the
+        last time a file was saved during this particular run of <i>xv</i>.
+    </dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-172.gif" width="81" height="25"></dt>
+    <dd>Likewise, the <b>Prev Name</b> button restores the
+        filename string to the value it had the last time a file
+        was saved. </dd>
+</dl>
+
+<p>At the top of the window are a pair of pull-down menus, <b>Format</b>
+and <b>Colors</b> . These menus let you choose the image file
+format and color settings that will be used when you save the
+image. Normally, they display the format that the current image
+is already in. If you change formats, and your filename has a
+recognized suffix (i.e., '.gif', '.GIF', '.pbm', etc.), the
+suffix portion of your filename will be replaced with the new,
+appropriate suffix for the selected format.</p>
+
+<p>You can pipe output from <i>xv</i> to other programs by using
+the <i>xv save</i> window. If the first character of the
+specified filename is '!' or '|', the rest of the filename is
+interpreted as a command to pipe output to, in the currently
+selected image format. A fine use for this feature is directly
+printing images to a PostScript printer by selecting 'PostScript'
+in the formats list, and typing something like &quot; <tt>| lpr</tt>
+&quot; as the filename. In this case, <i>xv</i> will create a
+temporary file, write the PostScript to that file, and cat the
+contents of that file to the entered command. <i>xv</i> will wait
+for the command to complete. If the command completed
+successfully, the <i>xv save</i> window will disappear. If the
+command was unsuccessful, the window will remain visible. In any
+event, the temporary file will be deleted. </p>
+
+<dl>
+    <dt><a name="normal-size"><img src="images/fig-173.gif"
+        width="94" height="17"></a></dt>
+    <dd>Normally, when you save an image, it will be saved at the
+        current expansion (i.e., one screen pixel will map to one
+        image pixel in the saved file). Sometimes, however, it's
+        desirable to save an image at its original size. This is
+        particularly relevant when you're viewing images larger
+        than your screen. By default, <i>xv</i> will
+        automatically shrink images so that they fit on the
+        screen. If you save these images, you'll find that you've
+        lost a lot of data, that maybe you wanted to keep. That's
+        what this checkbox is here for. Note: certain operations,
+        most notably the <b>Smooth</b> and <b>Dither</b>
+        commands, only affect the 'displayed' image. If you
+        choose to save an image at its normal size, these effects
+        will not be in the saved image. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="selected-area"><img src="images/fig-174.gif"
+        width="104" height="17"></a></dt>
+    <dd>If you have a selection rectangle drawn on the image,
+        this control can be used. When enabled, only the contents
+        of the selection will be saved. This can be very useful
+        if you want to break parts of an image out into their own
+        files, as was done <i>extensively</i> to put together
+        this documentation. (i.e. I <b>Grab</b>'bed an <i>xv</i>
+        window, such as this <i>save</i> window, moved the
+        selection rectangle around so that it contained various
+        parts of the image (such as the 'Selected Area' button to
+        the left), and saved these parts in their own separate
+        files, for use with Microsoft Word.) </dd>
+</dl>
+
+<p>One important note: If your selection goes 'off-screen'
+(beyond the boundaries of the <i>xv image</i> window), as can
+happen when you zoom-in to fine-tune the position of the
+selection rectangle, your selection will be <i>cropped</i> to the
+window when you save it, <i>unless</i> you also turn on the <b>Normal</b>
+checkbox. You can not save expanded areas of the image that are
+not visible in the <i>xv image</i> window, as such areas don't
+really exist (they aren't computed).</p>
+
+<h2><a name="color-choices">Color Choices</a></h2>
+
+<p>At the top of the <i>xv save </i>window there is the <b>Colors
+</b>menu, which contains a list of possible color styles to use
+when saving the image.. Most file formats support different
+'sub-formats' for 24-bit color, 8-bit greyscale, 1-bit B/W
+stippled, etc. Not all of them do. Likewise, not all 'Color'
+choices are available in all formats.</p>
+
+<p>In general, the choices in the <b>Colors</b> menu do the
+following:</p>
+
+<dl>
+    <dt><img src="images/fig-175.gif" width="151" height="16"></dt>
+    <dd>Saves the image as currently shown with all color
+        modifications, cropping, rotation, flipping, resizing,
+        and smoothing. The image will be saved with all of its
+        colors, even if you weren't able to display them all on
+        your screen. For example, you can load a color image on a
+        1-bit B/W display, modify it, and write it back. The
+        saved image will still be full color, even though all you
+        could see on your screen was some B/W-dithered nightmare.</dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-176.gif" width="151" height="16"></dt>
+    <dd>Like <b>Full Color</b> , but saves the image in a
+        greyscale format.</dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-177.gif" width="151" height="16"></dt>
+    <dd>Like <b>Full Color</b> , but before saving the image <i>xv</i>
+        generates a 1-bit-per- pixel, black-and-white dithered
+        version of the image, and saves that, instead.</dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-178.gif" width="151" height="16"></dt>
+    <dd>Saves the image as currently shown, with all color
+        modifications, cropping, rotation, flipping, resizing,
+        and smoothing. The image will be saved as shown on the
+        screen, <i>with as many or few colors</i> as <i>xv</i>
+        was able to use on the display. The major purpose of this
+        is to allow special effects (color reduction) to be
+        saved, in conjunction with the '-ncols' command line
+        option. You will probably never need to use this.</dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="save-window-2.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="load-window.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

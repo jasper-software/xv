@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 2/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="display-menu">The Display Menu</a></h2>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td><img src="images/fig-023.gif" width="138"
+        height="185"></td>
+        <td>This menu controls how the image is displayed on your
+        screen. None of these commands <i>actually</i> modify the
+        image itself, only how it is presented. </td>
+    </tr>
+</table>
+
+<h3><a name="dithering-commands">Dithering Commands</a></h3>
+
+<dl>
+    <dt><a name="raw"><img src="images/fig-024.gif" width="134"
+        height="15"></a></dt>
+    <dd>Returns the displayed image to its 'raw' state (where
+        each pixel in the displayed image is as close as possible
+        to the corresponding pixel in the internal image). In
+        short, it turns off any dithering or smoothing. This
+        command is normally disabled, and is only enabled <i>after</i>
+        you have issued a <b>Dithered</b> or <b>Smooth</b>
+        command.</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="dithered"><img src="images/fig-025.gif"
+        width="134" height="16"></a></dt>
+    <dd>Regenerates the displayed image by dithering with the
+        available colors in an attempt to approximate the
+        original image. This has a useful effect <i>only</i> if
+        the color allocation code failed to get all the colors it
+        wanted. If it <i>did</i> get all the desired colors, the <b>Dither</b>
+        command will just generate the same display image as the <b>Raw</b>
+        command. On the other hand, if you didn't get all the
+        desired colors, the <b>Dither</b> command will try to
+        approximate the missing colors by dithering with the
+        colors that <i>were</i> obtained, which can help
+        eliminate visible banding, and such. Note: If you are
+        running <i>xv</i> on a 1-bit display the <b>Dither</b>
+        command will be disabled, as the image will always be
+        dithered for display.</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="smooth"><img src="images/fig-026.gif"
+        width="134" height="16"></a></dt>
+    <dd>Smoothes out distortion caused by integer round-off when
+        an image is expanded or shrunk. This is generally a
+        desirable effect, however it can be fairly time-consuming
+        on large images, so by default it is not done
+        automatically. See &quot;<a
+        href="modifying-behavior-3.html#manipulation-options">Modifying
+        <i>xv</i> Behavior</a>&quot; for more details. Note that <b>Smooth</b>
+        <i>only</i> has a useful effect if the image has been
+        resized. If the image is being displayed at its normal
+        1:1 expansion ratio, then the <b>Smooth</b> command will
+        not have a useful effect. <p>Note: if you are currently
+        in '24-bit mode' (see &quot;<a
+        href="control-window-3.html#bit-menu">The 24/8 Bit Menu</a>&quot;
+        for more info), the <b>Dithered</b> command is disabled, <b>Raw</b>
+        displays the image (dithered on an 8-bit display), and <b>Smooth</b>
+        displays a smoothed version of the image (dithered on an
+        8-bit display).</p>
+    </dd>
+</dl>
+
+<h3><a name="color-allocation-commands">Color Allocation Commands</a></h3>
+
+<dl>
+    <dt><a name="rw-colors"><img src="images/fig-027.gif"
+        width="134" height="16"></a></dt>
+    <dd>When turned on, forces <i>xv</i> to use read/write color
+        cells (ignored and disabled in <b>Use Std. Colormap</b>
+        mode, below).. Normally, <i>xv</i> allocates read-only
+        color cells, which allows it to share colors with other
+        programs. If you use read/write color cells, no other
+        program can use the colormap entries that <i>xv</i> is
+        using, and vice-versa. The major advantage is that using
+        read/write color cells allows the <b>Apply</b> function
+        in the <i>xv color editor</i> window to operate much
+        faster, and allows the <b>Auto-Apply while dragging</b>
+        feature to be used at all. Also note that this command is
+        only enabled if you are running <i>xv</i> on a <i>PseudoColor</i>
+        display. See &quot;<a href="color-allocation.html">Color
+        Allocation in <i>xv</i></a><i>&quot;</i> for more
+        information on display modes. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="normal-colors"><img src="images/fig-028.gif"
+        width="134" height="16"></a></dt>
+    <dd><i>xv</i>'s normal color allocation mode. For any given
+        picture, <i>xv</i> figures out what colors should be
+        allocated, and tries to allocate them (read-only, or
+        read/write, as determined by the <b>Read/Write Colors</b>
+        setting). If any color allocation fails, <i>xv</i> will
+        try a few other tricks, and generally just map the
+        remaining colors (the ones it didn't get) into the <i>closest</i>
+        colors that it <i>did</i> get. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="perfect-colors"><img src="images/fig-029.gif"
+        width="134" height="16"></a></dt>
+    <dd>When <b>Perfect Colors</b> is turned on, <i>xv</i>
+        proceeds as in the <b>Normal Colors</b> case. If any
+        color allocation request fails, all colors are freed, and
+        <i>xv</i> creates itself a private colormap, and tries
+        all over again. It is assumed that having a private
+        colormap will provide more colors than allocating out of
+        the already partially-used system default colormap. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="use-own-colormap"><img src="images/fig-030.gif"
+        width="134" height="16"></a></dt>
+    <dd>Like <b>Perfect Colors</b> , but it doesn't even <i>try</i>
+        to allocate out of the system colormap. Instead, it
+        starts off by creating its own colormap, and allocating
+        from there. Slightly faster than <b>Perfect Colors</b>
+        mode. Also useful, as certain X servers (AIX 3.1 running
+        on an RS6000, for instance) <i>never</i> report an
+        allocation error for read-only color cells. They just
+        return the closest color found in the system colormap.
+        Generally nice behavior, but it prevents <b>Perfect
+        Colors</b> mode from ever allocating a colormap... </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="use-std-colormap"><img src="images/fig-031.gif"
+        width="134" height="16"></a></dt>
+    <dd>An entirely different color allocation mode. Instead of
+        picking the (generally unique) colors that each image
+        requires, this mode forces all images to be displayed
+        (dithered) using the same set of (standard) colors. The
+        downside is that the images don't look as nice as they do
+        in the other modes. The upside is that you can display
+        many images simultaneously (by running more than one copy
+        of <i>xv</i>) without instantly running out of colors.
+        The setting of <b>Read/Write Colors</b> is ignored while
+        in this mode. Also, this mode is the only one available
+        when you are displaying images in 24-bit mode. </dd>
+</dl>
+
+<h2><a name="root-display-modes">Root Display Modes</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><a name="root-menu"><img src="images/fig-032.gif"
+        width="186" height="201"></a></td>
+        <td valign="top">While <i>xv</i> normally displays an
+        image in its own window, it is also possible for it to
+        display images on the <i>root window</i> (a.k.a. 'the
+        desktop'). You would normally use this feature from the
+        command- line, as part of some sort of X startup script,
+        to put up a background pattern or image of your choice.
+        See &quot;<a
+        href="modifying-behavior-2.html#root-window-options">Root
+        Window Options</a>&quot; for further information on the
+        relevant command-line options.<p>You can also specify
+        root display options interactively, while the program is
+        running, by using the <b>Root</b> menu, as shown.</p>
+        </td>
+    </tr>
+</table>
+
+<p>One note regarding root display: it is not possible for <i>xv</i>
+to receive button presses or keyboard presses in the root window.
+As such, there are several functions that cannot be used while in
+a 'root' mode, such as pixel tracking, image editing, pan and
+zoom operations, etc. If you want to do such things, you'll have
+to temporarily return to 'window' mode, and return to 'root' mode
+when you're finished. Also, when you are in a 'root' mode, you
+will not be able to get rid of the <i>xv</i> <i>controls</i>
+window. At best you can iconify it (using your window manager).
+There's a good reason for this. If you <i>could</i> get rid of
+the window, there would be no way to ever get it back (since it
+won't see keypresses or mouse clicks in the root window).</p>
+
+<p>One other note: If you are running <i>xv</i> on certain 24-bit
+displays, where the 'default' visual type is an 8-bit
+PseudoColor, but <i>xv</i> in its cleverness has decided to use a
+24-bit TrueColor mode, you will <i>not</i> be able to switch the
+display to a root mode. This is because <i>xv</i> requires the
+visual used in the 'window' mode to be the same as the visual
+used for the 'root' modes. In the case of these types of
+displays, it is not possible to put a 24-bit TrueColor image on
+the root window. You can get this to work by using the ' <tt>-visual
+default</tt> ' command-line option, which will force <i>xv</i> to
+use the 'default' visual for both the 'window' and 'root' modes.</p>
+
+<p>Also note: This is only necessary to get this menu to work on
+such displays. If you use the '<tt>-root</tt>' or '<tt>-rmode</tt>'
+command-line options, <i>xv</i> will automatically use patented
+&quot;DoTheRightThing&quot; technology...</p>
+
+<dl>
+    <dt><a name="root-window"><img src="images/fig-033.gif"
+        width="182" height="16"></a></dt>
+    <dd>Displays the image in a window. If you were previously in
+        a 'root' mode, the root window will also be cleared.</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-tiled"><img src="images/fig-034.gif"
+        width="182" height="16"></a></dt>
+    <dd>The image is displayed in the root window. One image is
+        displayed aligned with the top-left corner of the screen.
+        The image is then duplicated towards the bottom and right
+        edges of the screen, as many times as necessary to fill
+        the screen. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-integer-tiled"><img
+        src="images/fig-035.gif" width="182" height="16"></a></dt>
+    <dd>Similar to <b>Root: Tiled</b>, except that the image is
+        first shrunk so that its width and height are integer
+        divisors of the screen's width and height. This keeps the
+        images along the bottom and right edges of the screen
+        from being 'chopped-off'. <p>Note: using any of the
+        'resizing' commands (such as <b>Normal</b>, <b>Double
+        Size</b>, etc.) will lose the 'integer'-ness of the
+        image, and you'll have to re-select this mode to
+        'integer-ify' the image again. </p>
+    </dd>
+    <dt><a name="root-mirrored"><img src="images/fig-036.gif"
+        width="182" height="16"></a></dt>
+    <dd>Tiles the original image with versions that have been
+        horizontally flipped, vertically flipped, and both
+        horizontally and vertically flipped. This gets rid of the
+        sharp dividing lines where tiled images meet. The effect
+        is quite interesting. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-integer-mirrored"><img
+        src="images/fig-037.gif" width="182" height="16"></a></dt>
+    <dd>Like <b>Root: Mirrored</b>, but also does the
+        integer-ization described under the <b>Root: Integer
+        Tiled</b> entry. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-center-tiled"><img src="images/fig-038.gif"
+        width="182" height="16"></a></dt>
+    <dd>Like <b>Root: Tiled</b>, but it positions the images so
+        that one of them is centered on the screen, and the rest
+        are tiled off in all directions. Visually pleasing
+        without the image size distortion associated with <b>Root:
+        Integer Tiled</b> . </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-centered"><img src="images/fig-039.gif"
+        width="182" height="16"></a></dt>
+    <dd>Displays a single image centered in the root window,
+        surrounded by black, or your choice of any other solid
+        color. (See &quot;<a
+        href="modifying-behavior-2.html#root-window-options">Modifying
+        <i>xv</i> Behavior </a>&quot; for more information.) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-centered-warp"><img
+        src="images/fig-040.gif" width="182" height="16"></a></dt>
+    <dd>Displays a single image centered in the root window,
+        surrounded by a black and white 'warp' pattern, which
+        produces some mildly visually pleasing Moir effects. The
+        colors can also be chosen by the user. (See &quot;<a
+        href="modifying-behavior-2.html#root-window-options">Modifying
+        <i>xv</i> Behavior</a>&quot; for details.) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-centered-brick"><img
+        src="images/fig-041.gif" width="182" height="16"></a></dt>
+    <dd>Displays a single image centered in the root window,
+        surrounded by a black and white 'brick' pattern. Again,
+        the colors can be set by the user. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-symmetrical-tiled"><img
+        src="images/fig-042.gif" width="182" height="16"></a></dt>
+    <dd>Tiles images on the root window such that the images are
+        symmetric around the horizontal and vertical center lines
+        of the screen. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="root-symmetrical-mirrored"><img
+        src="images/fig-043.gif" width="182" height="16"></a></dt>
+    <dd>Like the <b>Root: symmetrical tiled</b> mode, but the
+        images are also mirrored. </dd>
+</dl>
+
+<p>Note: The three 'centered' modes (<b>Root: Centered</b> , <b>Root:
+Centered, Warp</b>, and <b>Root: Centered, Brick</b>, but not <b>Root:
+Center Tiled</b>) require the creation of a Pixmap the size of
+the screen. This can be a fairly large request for resources, and
+will fail on a color X terminal with insufficient memory. They
+can also require the transmission of considerably more data than
+the other 'root' modes. If you're on a brain-damaged X terminal
+hanging off a slow network, you should probably go somewhere
+else. Barring that, you should certainly avoid the 'centered'
+modes.</p>
+
+<p>Also note: If you quit <i>xv</i> while displaying an image on
+the root window, the image will remain in the root window, and
+the colors used by the image will remain allocated. This is
+generally regarded as correct behavior. If you decide you want to
+get rid of the root image to free up resources, or simply because
+you're sick of seeing it, the quickest route is to run '<tt>xv
+-clear</tt>', which will clear the root window, release any
+allocated colors, and exit. Alternately, <i>xsetroot</i> or any
+other X program that puts things in the root window should be
+able to do the trick as well.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-3.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

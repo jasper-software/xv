@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Load Window</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Load Window</h1>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><a name="load-window"><img
+        src="images/fig-166.gif" width="364" height="430"></a></td>
+        <td valign="top">The <i>xv load</i> window lets you load
+        and view images interactively, without specifying them on
+        the command line when you start <i>xv</i> . While it has
+        been made somewhat obsolete by the <i>Visual Schnauzer</i>,
+        the <i>xv load</i> window is considerably quicker.<p>The
+        load window shows the contents of the current directory
+        in a scrolling window. The files will be sorted
+        alphabetically, with a small icon for each indicating the
+        type of file (directory, executable, or normal file).</p>
+        <p>This list window operates in the same way that the one
+        in the <i>xv controls</i> window works. (See &quot;<a
+        href="control-window-6.html#operating-list-window">Operating
+        a List Window</a>&quot; for details.) In short, you can
+        operate the scroll bar, drag the highlight bar around the
+        window, and use the <b>&lt;Up&gt;</b>, <b>&lt;Down&gt;</b>,
+        <b>&lt;Home&gt;</b>, <b>&lt;End&gt;</b>, <b>&lt;PageUp&gt;</b>,
+        and <b>&lt;PageDown&gt;</b> keys on your keyboard.</p>
+        </td>
+    </tr>
+</table>
+
+<p>Whenever you click on a name in the list (or otherwise change
+the position of the highlight bar), the name of the highlighted
+file is copied to the &quot;Load file&quot; text entry region,
+located below the list window. Pressing the <b>Ok</b> button (or
+hitting <b>&lt;Return&gt;</b> ) will make <i>xv</i> attempt to
+load the specified file. If the load attempt is successful, the
+load window will disappear, and the new image will be displayed.
+Otherwise, an error message will be displayed, and the load
+window will remain visible. </p>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><a name="browse"><img
+        src="images/fig-167.gif" width="64" height="17"></a></td>
+        <td valign="top">The <b>Browse</b> checkbox overrides
+        this behavior, and keeps the load window visible until
+        explicitly closed (via the <b>Cancel</b> button). This is
+        handy if you're using <i>xv</i> to 'wander around a
+        directory tree', and plan to be using the <b>Load</b>
+        command quite often. (Though a better way would probably
+        involve using the <b>Visual Schnauzer</b>.)</td>
+    </tr>
+</table>
+
+<p>If the image is successfully loaded, its name will be added to
+the <i>xv controls</i> window list. This will let you quickly
+reload it later without have to go through the <i>xv load</i>
+window again.</p>
+
+<p>You can also load a file by double-clicking on its name in the
+file list.</p>
+
+<p>If the specified filename begins with a '!' or '|' character,
+the filename will be interpreted as a shell command to run. The
+leading '!' or '|' is dropped, and the rest of the line is fed to
+the default system shell. The command is expected to generate an
+image in one of the <i>xv</i> -recognized formats as its standard
+output. If the command returns non-zero, <i>xv</i> assumes it
+failed, and doesn't try to read the output produced. You can pipe
+multiple commands together. For example loading &quot;<tt>! xwd |
+xwdtopnm</tt>&quot; would run <i>xwd</i> to generate a window
+dump, pipe that to <i>xwdtopnm</i> to convert it to a PPM file,
+and that file would be piped to <i>xv</i>. Which, as examples go,
+made a lot more sense back before <em>xv</em> was able to read
+XWD files directly.</p>
+
+<p>If the specified file is a directory, <i>xv</i> will figure
+that out and (instead of loading it) will <i>cd</i> to that
+directory, and display its contents in the list window.</p>
+
+<p>Above the list window is a pop-up menu button. It normally
+displays the name of the current directory. If you click this
+button, and hold the mouse down, the complete path will be shown,
+one directory per line. You can go 'up' the directory tree any
+number of levels, all the way up to the root directory, by simply
+selecting a directory name in this list.</p>
+
+<p>For those who prefer the direct approach, you can simply type
+file or directory names in the &quot;Load file&quot; text entry
+region. If you type a directory name and hit <b>&lt;Return&gt;</b>,
+<i>xv</i> will <i>cd</i> to that directory and display its
+contents in the list window. If you type a file name and hit <b>&lt;Return&gt;</b>,
+<i>xv</i> will attempt to load the file. You can enter relative
+paths (relative to the currently displayed directory), absolute
+paths, and even paths that begin with a '~'.</p>
+
+<p><a name="text-editing-keys">The</a> &quot;Load file&quot; text
+entry region supports a number of <i>emacs</i>-like editing keys:
+</p>
+
+<dl>
+    <dt><b>&lt;Ctrl&gt; f</b> </dt>
+    <dd>moves the cursor forward one character </dd>
+    <dt><b>&lt;Ctrl&gt; b</b></dt>
+    <dd>moves the cursor backward one character</dd>
+    <dt><b>&lt;Ctrl&gt; a</b></dt>
+    <dd>moves the cursor to the beginning of the line</dd>
+    <dt><b>&lt;Ctrl&gt; e</b></dt>
+    <dd>moves the cursor to the end of the line</dd>
+    <dt><b>&lt;Ctrl&gt; d</b></dt>
+    <dd>deletes the character to the right of the cursor</dd>
+    <dt><b>&lt;Ctrl&gt; u</b></dt>
+    <dd>clears the entire line</dd>
+    <dt><b>&lt;Ctrl&gt; k</b></dt>
+    <dd>clears from the cursor position to the end of the line.</dd>
+    <dt><b>&lt;Tab&gt;</b></dt>
+    <dd>Filename completion. Note: it can only complete 'simple'
+        filenames (no '/' chars)</dd>
+</dl>
+
+<p>If the filename is so long that it cannot be completely
+displayed in the text entry region, a thick line will appear on
+the left or right side (or both sides) of the region to show that
+&quot;there's more over this way&quot;. </p>
+
+<dl>
+    <dt><img src="images/fig-168.gif" width="81" height="25"></dt>
+    <dd>Pressing the <b>Rescan</b> button will rescan the current
+        directory. While the contents of the current directory
+        are read each time the load window is opened, it is
+        perfectly possible (given a multitasking operating
+        system) that some other program may add, delete, or
+        rename files in the current directory. <i>xv</i> would
+        not know if this happened. The <b>Rescan</b> button gives
+        you an easy way of 'kicking' <i>xv</i> into looking
+        again. </dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-169.gif" width="81" height="25"></dt>
+    <dd>The <b>Load All</b> button simply copies the names of all
+        'plain files' found in the current directory into the <i>xv
+        controls</i> filename list, where you have the <b>Next</b>
+        and <b>Prev</b> buttons to help you look at a list of
+        files. </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="save-window-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="textview-window.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

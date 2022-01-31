@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 4/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="cropping-commands">Cropping Commands</a></h2>
+
+<dl>
+    <dt><a name="crop"><img src="images/fig-064.gif" width="72"
+        height="25"></a></dt>
+    <dd>Crops the image to the current selection rectangle. This
+        command is only available when a cropping rectangle has
+        been drawn on the image. See &quot;<a
+        href="image-window.html#cropping">Cropping</a>&quot; for
+        further information.<br>
+        Keyboard Equivalent: <b>c</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="uncrop"><img src="images/fig-065.gif" width="72"
+        height="25"></a></dt>
+    <dd>Returns the image to its normal, uncropped state. This
+        command is only available after the image has been
+        cropped. See &quot;<a href="image-window.html#cropping">Cropping</a>&quot;
+        for further information.<br>
+        Keyboard Equivalent: <b>u</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="autocrop"><img src="images/fig-066.gif"
+        width="72" height="25"></a></dt>
+    <dd>Crops off any constant-color borders that exist in the
+        image. It will crop to the smallest rectangle that
+        encloses the 'interesting' section of the image. It may
+        not always appear to work because of minor invisible
+        color changes in the image. As such, it works best on
+        computer-generated images, and not as well on scanned
+        images. In an attempt to get around this problem, if you <b>AutoCrop</b>
+        while in <b>24-bit Mode</b> , it will crop off portions
+        that change by a little bit, not just portions that are
+        exactly the same. Not that it works all that well.<br>
+        Keyboard Equivalent: <b>C</b> </dd>
+</dl>
+
+<p>Also, you can 'fine-crop' an image, by holding the <b>&lt;Ctrl&gt;</b>
+key and pressing the arrow keys on your keyboard. Each press of
+the keys will remove one row (or column) of pixels from the
+appropriate edge. For example, pressing <b>&lt;Ctrl&gt;&lt;Up&gt;</b>
+will crop off the bottom row of the image. Likewise, <b>&lt;Ctrl&gt;&lt;Down&gt;</b>
+will crop off the top row, <b>&lt;Ctrl&gt;&lt;Left&gt; </b>will
+crop off the right edge, and <b>&lt;Ctrl&gt;&lt;Right&gt;</b>
+will crop off the left edge. It may sound backwards, but it does
+the Right Thing. </p>
+
+<p>This 'fine-cropping' will work regardless of whether or not
+there is a selection rectangle currently drawn. If you
+accidentally crop too much off the image, you can use the <b>UnCrop</b>
+command described above to get the original image back.</p>
+
+<p>Note that cropping never actually changes the image, only what
+portions are displayed. The original image can always be restored
+using the <b>UnCrop</b> command. Also, note that the 'cropping'
+commands and the 'zoom' commands (See &quot;<a
+href="image-window.html#zooming">Zooming</a>&quot; ) are related,
+in that both affect the 'visible portion' of the image. The
+cropping commands maintain the same expansion factors by making
+the window larger or smaller, while the zooming commands maintain
+the same window size, and stretch the relevant portion of the
+image to fit. As such, the <b>UnCrop</b> command will also undo
+an zooming that you may have done.</p>
+
+<h2><a name="cut-paste-commands">Image Cut and Paste Commands</a></h2>
+
+<p>A new feature added to Version 3.10 is the ability to cut and
+paste arbitrary rectangular portions of images. You can cut (and
+copy) and paste within a single image, between two different
+images, or even between two running copies of <i>xv.</i> You can
+even cut or copy a portion of an image, exit <i>xv</i>, go out
+for dinner, come back, restart <i>xv</i> , and paste the
+previously-copied portion into the current image.</p>
+
+<p>Copied image data is normally stored within the X Server's
+memory (in the '<tt>XV_CLIPBOARD</tt>' property), and remains
+there until some other data is copied, or until the X Server is
+reset (i.e., when you log off). This allows you to transfer image
+data between different copies of <i>xv</i>, and the <i>xv</i>'s
+can even be running on different machines.</p>
+
+<p>If there is not enough server memory available to hold the
+copied image data (this can happen if you copy a large amount of
+data, and you're using an X Terminal, as opposed to a
+workstation), <i>xv</i> will detect this, and fall back to using
+a file ('<tt>.xvclip</tt>') in your home directory. Needless to
+say, this precludes transferring data between <i>xv</i>'s running
+on different machines, but it's better than nothing. </p>
+
+<dl>
+    <dt><a name="copy"><img src="images/fig-067.gif" width="36"
+        height="25"></a></dt>
+    <dd><b>Copy</b> . First, you must select a region to copy,
+        via the selection rectangle mechanism (See &quot;<a
+        href="image-window.html#selection-rectangle">Selection
+        Rectangle</a>&quot; ). Then, use this command to copy the
+        selected data to the 'clipboard'.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; c</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cut"><img src="images/fig-068.gif" width="36"
+        height="25"></a></dt>
+    <dd><b>Cut</b> . Operates just like the <b>Copy</b> command,
+        except that it also clears the selection to the 'current
+        color', which is set using the pixel measurement tool.
+        See &quot;<a
+        href="image-window.html#displaying-pixel-values">Displaying
+        Pixel Values</a>&quot; for further information.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; x</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="paste"><img src="images/fig-069.gif" width="36"
+        height="25"></a></dt>
+    <dd><b>Paste</b> . If there is no selection rectangle
+        currently drawn, the first time you issue the <b>Paste</b>
+        command, it will create a selection rectangle the size
+        and shape of the image data that will be pasted. You may
+        move and resize this rectangle as you see fit (See &quot;<a
+        href="image-window.html#selection-rectangle">Selection
+        Rectangle</a>&quot; ). Then, when you have the selection
+        appropriately adjusted, hit <b>Paste</b> a second time to
+        actually paste the clipboard contents onto the image. <p>On
+        the other hand, if you have a selection rectangle drawn
+        when you hit <b>Paste</b> the first time, the image will
+        be pasted into the selected area immediately.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; v</b> </p>
+    </dd>
+    <dt><a name="clear"><img src="images/fig-070.gif" width="36"
+        height="25"></a></dt>
+    <dd><b>Clear</b> . Clears the selected region to the 'current
+        color', which is set using the pixel measurement tool.
+        See &quot;<a
+        href="image-window.html#displaying-pixel-values">Displaying
+        Pixel Values</a>&quot; .<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; d</b> </dd>
+</dl>
+
+<h2><a name="pad-command">The Pad Command</a></h2>
+
+<p>The <b>Pad</b> command is the opposite of the <b>Crop</b>
+command. Sort of. It lets you add a border of a specified size to
+the edges of the image. It also lets you resize images to some
+desired size without manually expanding or cropping the image.
+But it goes further than that. There are a whole slew of
+interesting effects available, as described below:</p>
+
+<dl>
+    <dt><a name="pad"><img src="images/fig-071.gif" width="36"
+        height="25"></a></dt>
+    <dd><b>Pad</b> . Brings up the dialog box shown below.<br>
+        Keyboard Equivalent: <b>P</b></dd>
+</dl>
+
+<p><a name="pad-window"><img src="images/fig-072.gif" width="494"
+height="245"> </a></p>
+
+<h3><a name="pad-methods">Pad Methods</a></h3>
+
+<table border="0" cellpadding="4">
+    <tr>
+        <td valign="top"><a name="pad-method-menu"><img
+        src="images/fig-074.gif" width="145" height="52"></a></td>
+        <td>There are three primary <b>Pad</b> methods, as shown
+        to the left. These methods are accessible via the 'Pad
+        Method' menu, which says 'Solid Fill' in the dialog box
+        shown above. In all cases, the <b>Pad</b> command
+        operates in the same basic way: A new image of the
+        desired size is created, it is filled as specified, and
+        the original image is pasted onto this new image,
+        centered. If the new image is smaller than the original
+        image, the original image will be cropped. Otherwise, the
+        area outside the original image will have the new
+        background.</td>
+    </tr>
+</table>
+
+<p>Note: The new, padded image will have the same 8/24-bit mode
+as the original. As such, you <i>probably</i> want to switch to <b>24-bit
+Mode</b> <i>before</i> issuing the <b>Pad</b> command,
+particularly if you intend to modify the image further. (See
+&quot;<a href="control-window-3.html#bit-menu">The 24/8 Bit Menu</a>&quot;
+.)</p>
+
+<p>The 'Pad Method' menu gives you three different ways of
+filling the background:</p>
+
+<dl>
+    <dt><a name="solid-fill"><img src="images/fig-073.gif"
+        width="141" height="16"></a></dt>
+    <dd>The background is filled with a solid color. The color
+        may be specified by name, (as specified in the X11 ' <tt>rgb.txt</tt>
+        ' file), by RGB values in the range 0- 255, separated by
+        commas (e.g. '0,255,128'), or by RGB values in
+        hexadecimal (e.g. '0x00ff80'). In each case, the string
+        you enter is parsed, and the background is filled solid
+        with the specified color. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="run-bggen"><img src="images/fig-075.gif"
+        width="141" height="16"></a></dt>
+    <dd>The external program <i>bggen</i> is executed to generate
+        the background. This program is normally distributed with
+        <i>xv</i>, and <i>xv</i> assumes that the executable is
+        located somewhere in your search path (such as ' <tt>/usr/local/bin/bggen</tt>
+        '). <i>bggen</i> can generate background gradients, at a
+        specified angle. The gradient can be the entire size of
+        the background, or it can repeat multiple times. See
+        &quot;<a href="external-programs.html">External Programs</a>&quot;
+        for a complete description of the <i>bggen</i> command. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="load-image"><img src="images/fig-076.gif"
+        width="141" height="16"></a></dt>
+    <dd>An image file in any of the <i>xv</i>-supported formats
+        may be loaded and used as the background. In this case,
+        the background size (and therefore the size of the padded
+        image) is equal to the size of the loaded background
+        image. If you want a different size, you can load the
+        background image (as a regular image), resize it as you
+        see fit, save it, and use the newly saved version as the
+        background for the original image. </dd>
+</dl>
+
+<h3><a name="size-dials">Image Size Dials</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-077.gif"
+        width="157" height="123"></td>
+        <td valign="top">These dials let you specify the size of
+        the new, padded image in the &quot;Solid&quot; and
+        &quot;Run 'bggen'&quot; modes. In the &quot;Load
+        Image&quot; mode, the dials are disabled, as the new
+        image size is dictated by the size of the loaded image.<p>If
+        the image size dials are enabled, the small button above
+        them resets them to the size of the currently-loaded
+        image. Note that padding with the 'new' size equal to the
+        current size won't actually <i>do</i> anything, unless
+        you change the &quot;Opaque&quot; dial, described below.</p>
+        </td>
+    </tr>
+</table>
+
+<h3><a name="opaque-ness">Opaque-ness</a></h3>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-078.gif" width="81"
+        height="123"></td>
+        <td valign="top">This dial sets the 'opaque-itude' of the
+        foreground (the original image). Normally, this is set to
+        '100%', which simply means that everywhere the original
+        image and the background overlap, the original image is
+        what you'll see. If you set the dial to '0%', then
+        wherever the original image and the background overlap,
+        the background is what you'll see. In any case, at points
+        where the foreground image does <i>not</i> overlap the
+        background, you'll see the background, unmodified.
+        (Practical upshot: at '0%' you will <i>only</i> see the
+        background.)</td>
+    </tr>
+</table>
+
+<p>Of course, most of the interesting effects happen when the
+dial is set to intermediate values, where the foreground image
+will appear semi-transparent.</p>
+
+<p>There are four modes the 'Opaque' dial can operate in. They
+are selected by clicking the button located above the 'Opaque'
+dial.</p>
+
+<h4><a name="rgb">RGB</a></h4>
+
+<p>The two images are blended together in the most obvious way.
+Each RGB color component in the new image is computed by taking a
+weighted average of the RGB components from the appropriate
+pixels in the foreground and background images. Like so:</p>
+
+<dl>
+    <dd><i>R</i> <i>new</i> <i>= </i>( <i>opaque%</i> * <i>R</i> <i>fg</i>
+        ) + ( (100 - <i>opaque%</i> ) * <i>R</i> <i>bg</i> ) <i>(same
+        for G and B)</i> </dd>
+</dl>
+
+<h4><a name="int">INT</a></h4>
+
+<p>On overlapping pixels, only the <i>Intensity</i> components
+(the 'V' in the HSV colorspace, see &quot;<a
+href="rgb-hsv-colorspaces.html">RGB &amp; HSV Colorspaces</a>&quot;
+) of the pixels are blended, using the same weighted average
+calculation shown above. If you set the 'Opaque' value to '0%',
+brightness of overlapping pixels will be completely determined by
+the 'background' pixel. It's possible to get some interesting
+'masking' effects and whatnot by playing around with
+black&amp;white backgrounds.</p>
+
+<h4><a name="sat">SAT</a></h4>
+
+<p>Similar to <b>INT</b>, except that it is the <i>Saturation</i>
+component (the 'S' in the HSV colorspace, see &quot;<a
+href="rgb-hsv-colorspaces.html">RGB &amp; HSV Colorspaces</a>&quot;
+) of the two pixels that will be blended together, again using
+the weighted average calculation. The effects possible with this
+one are considerably more subtle, and not necessarily
+interesting. It is mainly included for completeness.</p>
+
+<h4><a name="hue">HUE</a></h4>
+
+<p>In this case, the colors of the two overlapping pixels are
+blended. You can get some interesting effects by setting 'Opaque'
+to '0%', and loading a colorful rainbow background. In this case,
+at all overlapping pixels, it will be as if the foreground image
+were a greyscale transparency, as the brightness and saturation
+will be controlled by the foreground, and the color will be
+controlled by the background.</p>
+
+<p>Technical Note: The <b>HUE</b> case does <i>not</i> simply do
+a weighted average of the two hue components. Instead, it plots
+the two points on the edge of a standard color wheel, draws a
+straight line between them, and picks a point along this line
+based on the 'Opaque' value (i.e., the larger the value, the
+closer it is to the 'foreground' endpoint of the line). As a
+result, the <b>HUE</b> setting can affect <i>both</i> the hue and
+saturation components of the computed pixel. While this makes
+this 'Opaque' mode somewhat unlike the others, once again it is a
+fine example of xv's trademark &quot;Do The Right Thing&quot;
+technology.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-5.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-3.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: RGB &amp; HSV Colorspaces</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>RGB &amp; HSV Colorspaces</h1>
+
+<p>Both the RGB and HSV Colorspaces define a method of uniquely
+specifying colors via three numbers.</p>
+
+<p>The RGB colorspace is the more commonly used of the two. For
+example, most color monitors operate on RGB inputs. In RGB
+colorspace, each color is represented by a three number 'triple'.
+The components of this triple specify, respectively, the amount
+of red, the amount of green, and the amount of blue in the color.
+In most computer graphics systems (and in <i>xv</i>), these
+values are represented as 8-bit unsigned numbers. Thus, each
+component has a range of 0-255, inclusive, with 0 meaning 'no
+output', and 255 meaning 'full output'.</p>
+
+<p>The eight 'primary' colors in the RGB colorspace, and their
+values in the standard 8-bit unsigned range are:</p>
+
+<blockquote>
+    <pre><font size="2">Black    (  0,  0,  0)
+Red      (255,  0,  0)
+Green    (  0,255,  0)
+Yellow   (255,255,  0)
+Blue     (  0,  0,255)
+Magenta  (255,  0,255)
+Cyan     (  0,255,255)
+White    (255,255,255)</font></pre>
+</blockquote>
+
+<p>Other colors are specified by intermediate values. For
+example, <i>orange</i> is chromatically between red and yellow on
+the color spectrum. To get an <i>orange</i>, you can simply
+average <i>red</i> (255,0,0) and <i>yellow</i> (255,255,0) on a
+component-by-component basis resulting in (255,127,0), which will
+be some <i>orange</i>-ish color.</p>
+
+<p>You can change the brightness of the colors by raising or
+lowering all of their components by some factor. For example, if
+(0,255,255) is <i>cyan</i> (it is), then (0,128,128) would be a <i>dark
+cyan</i>.</p>
+
+<p>Saturation of a color is a measure of how 'pure' the color is.
+Desaturated colors will appear washed-out, or pastel, whereas
+saturated colors will be bold and vibrant, the sort of colors
+you'd paint a sports car. In the RGB colorspace, you can
+desaturate colors by adding <i>white</i> to them. For example, if
+you take <i>red</i> (255,0,0), and add a <i>medium grey</i> to it
+(128,128,128), you'll get a shade of <i>pink</i> (255,128,128).
+Note that the component values are 'clipped' to remain in the
+range 0-255.</p>
+
+<p>The HSV colorspace works somewhat differently. It is
+considered by many to be more intuitive to use, closer to how an
+artist actually mixes colors.</p>
+
+<p>In the HSV colorspace, each color is again determined by a
+three-component 'triple'. The first component, <i>Hue</i>,
+describes the basic color in terms of its angular position on a
+'color wheel'. In this particular implementation, Hue is
+described in terms of degrees.</p>
+
+<p>Unfortunately, since this document isn't printed in color, it
+is not possible to show this 'color wheel' in any meaningful way.
+Here is where the 'primary' colors live:</p>
+
+<blockquote>
+    <pre>Red       0
+Yellow   60
+Green   120
+Cyan    180
+Blue    240
+Magenta 300
+</pre>
+</blockquote>
+
+<p>The colors appear in the same order that they do on a standard
+color spectrum, except that they form a circle, with magenta
+looping back to red.</p>
+
+<p>As with the RGB space, in-between colors are represented by
+in-between values. For example, <i>orange</i> would have a Hue
+value of 30, being situated roughly halfway between <i>red</i>
+and <i>yellow</i>. </p>
+
+<p>The second component of the HSV triple is <i>Saturation</i>,
+which, as described above, can be thought of as &quot;how pure
+the color is&quot;. In this implementation, saturation can range
+between 0 and 100, inclusive. Colors with a saturation of 100 are
+fully-saturated, whereas colors with a saturation of 0 are
+completely desaturated (in other words, <i>grey</i>).</p>
+
+<p>The third component of the HSV triple is <i>Value</i> , which
+really should be called <i>Intensity</i>. It is a measure of how
+'bright' the color is. In this implementation, Value can range
+between 0 and 100, inclusive. A color with a Value component of
+100 will be as bright as possible, and a color with a Value
+component of 0 will be as dark as possible (i.e., <i>black</i>). </p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="color-allocation.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="mouse-keyboard-usage.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Command Line Options</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1><a name="command-line-options">Command Line Options</a></h1>
+
+<dl>
+    <dt><b>-/+</b></dt>
+    <dd>Tells <i>xv</i> to read an image from <tt>&lt;stdin&gt;</tt>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+24</b></dt>
+    <dd>Lock <i>xv</i> into <b>24-bit Mode</b>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+2x</b><tt>limit</tt></dt>
+    <dd>Allow image windows to be twice the size of the screen.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+4</b><tt>x3</tt></dt>
+    <dd>Issue <b>4x3</b> command when an image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+8</b></dt>
+    <dd>Lock <i>xv</i> into <b>8-bit Mode</b>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+ac</b><tt>rop</tt></dt>
+    <dd>Issue an <b>AutoCrop</b> command when an image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-as</b><tt>pect</tt><i> w:h</i></dt>
+    <dd>Sets the default ratio used by the <b>Aspect</b> command.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-be</b><tt>st24</tt></dt>
+    <dd>Use the 'best' (read: slowest) 24-bit to 8-bit color
+        algorithm.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-bg </b><i>color</i></dt>
+    <dd>Sets the background color.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-bl</b><tt>ack </tt><i>color</i></dt>
+    <dd>Sets the 'black' color used in B/W dithering.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-bw</b><i> width</i></dt>
+    <dd>Sets the border width of the windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+cec</b><tt>map</tt></dt>
+    <dd>Install image's colormap in the <i>xv color editor</i>
+        window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-ceg</b><tt>eometry</tt><i> geom</i></dt>
+    <dd>Sets the initial position of the <i>xv color editor</i>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+cem</b><tt>ap</tt></dt>
+    <dd>Automatically open the <i>xv color editor</i> on startup.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-cga</b><tt>mma</tt><i> rv gv bv</i></dt>
+    <dd>Sets <i>Red, Green, </i>and <i>Blue</i> graphs to
+        specified gamma values.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-cge</b><tt>ometry</tt><i> geom</i></dt>
+    <dd>Sets the initial position of the <i>xv controls</i>
+        window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+cle</b><tt>ar</tt></dt>
+    <dd>Clears out the root window and exits.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+clo</b><tt>se</tt></dt>
+    <dd>Automatically close <i>xv</i> windows when image window
+        is iconified.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+cma</b><tt>p</tt></dt>
+    <dd>Automatically open the <i>xv controls</i> window on
+        startup.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-cmtg</b><tt>eometry</tt><i> geom</i></dt>
+    <dd>Sets the initial position and size of the <i>xv comments</i>
+        window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+cmtm</b><tt>ap</tt></dt>
+    <dd>Automatically open the <i>xv comments</i> window on
+        startup.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-cr</b><tt>op</tt><i> x y w h</i></dt>
+    <dd>Automatically do a <b>Crop</b> command when an image is
+        loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-cu</b><tt>rsor</tt><i> curs</i></dt>
+    <dd>Sets the cursor used in the image window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-D</b><tt>EBUG</tt><i> level</i></dt>
+    <dd>Displays debugging information.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-dir</b><i> directory</i></dt>
+    <dd>Sets the initial directory for the <i>visual schnauzer</i>
+        and <i>xv load</i> windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-dis</b><tt>play</tt><i> disp</i></dt>
+    <dd>Specifies which X display to use.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+dit</b><tt>her</tt></dt>
+    <dd>Automatically do a <b>Dither</b> command when an image is
+        loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-dr</b><tt>ift</tt><i> dx dy</i></dt>
+    <dd>Kludge to keep image window from 'drifting' around
+        screen.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-e</b><tt>xpand</tt><i> exp</i></dt>
+    <dd>Automatically expand or contract images by the given
+        factor, or factors.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-fg</b><i> color</i></dt>
+    <dd>Sets the foreground color.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+fi</b><tt>xed</tt></dt>
+    <dd>Sets 'fixed aspect ratio' mode.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-fl</b><tt>ist</tt><i> name</i></dt>
+    <dd>Loads a list of image filenames from a file. </dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-ga</b><tt>mma</tt><i> val</i></dt>
+    <dd>Sets the <i>Intensity</i> graph to the given gamma value.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-ge</b><tt>ometry</tt><i> geom</i></dt>
+    <dd>Specifies initial size and position of image window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-gr</b><tt>abdelay</tt><i> secs</i></dt>
+    <dd>Sets time to wait before starting <b>Grab</b> command.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-gsd</b><tt>ev</tt><i> str</i></dt>
+    <dd>Type of file <i>ghostscript</i> should produce.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-gsg</b><tt>eom</tt><i> geom</i></dt>
+    <dd>Size of page <i>ghostscript</i> should produce, in 72nds
+        of an inch.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-gsr</b><tt>es</tt><i> res</i></dt>
+    <dd>Resolution of file <i>ghostscript</i> should produce, in
+        dpi.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-he</b><tt>lp</tt></dt>
+    <dd>Prints a list of valid command-line options.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+hf</b><tt>lip</tt></dt>
+    <dd>Issue a 'horizontal flip' command when image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-hi</b><i> color</i></dt>
+    <dd>Sets the 'highlight' color used by the buttons.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+his</b><tt>t</tt></dt>
+    <dd>Issue a<b> HistEq</b> command when image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+hs</b><tt>v</tt></dt>
+    <dd>Puts the colormap editing dials into HSV mode.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-icg</b><tt>eometry</tt><i> geom</i></dt>
+    <dd>Specifies position of icon when run in <tt>-iconic</tt>
+        mode.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+ico</b><tt>nic</tt></dt>
+    <dd>Starts up <i>xv</i> with the image window iconified.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-ig</b><tt>eometry</tt> <em>geom</em></dt>
+    <dd>Specifies initial position of <i>xv info</i> window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+ima</b><tt>p</tt></dt>
+    <dd>Automatically open <i>xv info</i> window on startup.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+lb</b><tt>rowse</tt></dt>
+    <dd>Keep the <i>xv load</i> window open until deliberately
+        closed.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-lo</b><i> color</i></dt>
+    <dd>Sets the 'lowlight' color used by the buttons.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+loa</b><tt>dclear</tt></dt>
+    <dd>Clear window to avoid 'rainbow' effect on <i>PseudoColor</i>
+        displays.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+max</b></dt>
+    <dd>Make the image as large as possible.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+maxp</b><tt>ect</tt></dt>
+    <dd>Make the image as large as possible, preserving aspect
+        ratio.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-mf</b><tt>n</tt><i> font</i></dt>
+    <dd>Mono-spaced font used in TextView windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+mo</b><tt>no</tt></dt>
+    <dd>Display all pictures in greyscale.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-na</b><tt>me</tt><i> str</i></dt>
+    <dd>Set string displayed in image window's titlebar.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-nc</b><tt>ols</tt><i> num</i></dt>
+    <dd>Specifies maximum number of different colors to use.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+ni</b><tt>nstall</tt></dt>
+    <dd>Don't 'install' colormaps. Have the WM do it for us.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nod</b><tt>ecor</tt></dt>
+    <dd>Remove decorations from <i>xv image </i>window frame.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nof</b><tt>reecols</tt></dt>
+    <dd>Don't free colors for old image when loading new image.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nol</b><tt>imits</tt></dt>
+    <dd>Turn off all 'maximum size' limitations on the image.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nop</b><tt>os</tt></dt>
+    <dd>Don't automatically position the <i>xv</i> windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+noq</b><tt>check</tt></dt>
+    <dd>Suppress quick-check when doing 24-&gt;8 bit algorithms.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+norm</b></dt>
+    <dd>Issue <b>Norm</b> command when image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nore</b><tt>setroot</tt></dt>
+    <dd>Don't clear root when going back to 'window' display
+        mode.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+nos</b><tt>tat</tt></dt>
+    <dd>Speed up directory changing in load/save windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+o</b><tt>wncmap</tt></dt>
+    <dd>Always use and install a private colormap. </dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+pe</b><tt>rfect</tt></dt>
+    <dd>Use and install a private colormap if necessary.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+po</b><tt>ll</tt></dt>
+    <dd>Reload image files if they change.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-pr</b><tt>eset</tt><i> set</i></dt>
+    <dd>Makes preset # <i>set</i> the default preset.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-quic</b><tt>k24</tt></dt>
+    <dd>Use the quickest 24-bit to 8-bit color algorithm.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+quit</b></dt>
+    <dd>Exit after displaying first image.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+ran</b><tt>dom</tt></dt>
+    <dd>Show images in random order.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+raw</b></dt>
+    <dd>Issue a <b>Raw</b> command when image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-rb</b><tt>g</tt><i> color</i></dt>
+    <dd>Root background color, used on some root display modes.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-rf</b><tt>g</tt><i> color</i></dt>
+    <dd>Root foreground color, used on some root display modes.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+rg</b><tt>b</tt></dt>
+    <dd>Puts colormap editing dials in RGB mode.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-R</b><tt>M</tt></dt>
+    <dd>Deletes files listed on command line when <i>xv</i>
+        exits.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-rm</b><tt>ode</tt><i> num</i></dt>
+    <dd>Use specified display mode when using root window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+roo</b><tt>t</tt></dt>
+    <dd>Display images on root window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-rot</b><tt>ate</tt><i> deg</i></dt>
+    <dd>Rotate image when it is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+rv</b></dt>
+    <dd>Reverses RGB values when image is loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+rw</b></dt>
+    <dd>Use read/write color cells for faster color editing.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-sl</b><tt>ow24</tt></dt>
+    <dd>Use 'in-between' 24-bit to 8-bit color compression
+        algorithm</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+sm</b><tt>ooth</tt></dt>
+    <dd>Automatically<b> Smooth</b> image on initial load.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+st</b><tt>dcmap</tt></dt>
+    <dd>Use Standard Colormap.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-t</b><tt>geometry</tt><i> geom</i></dt>
+    <dd>Initial position and size for TextView window.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+vf</b><tt>lip</tt></dt>
+    <dd>Automatically do a 'vertical flip' command when image is
+        loaded.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+vie</b><tt>wonly</tt></dt>
+    <dd>Ignore all user input.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-vis</b><tt>ual</tt><i> type</i></dt>
+    <dd>Use a non-default visual of your X display.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+vsd</b><tt>isable</tt></dt>
+    <dd>Disable <i>Visual Schnauzer</i>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-vsg</b><tt>eometry</tt><i> geom</i></dt>
+    <dd>Initial size and position for <i>Visual Schnauzer</i>
+        windows.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+vsm</b><tt>ap</tt></dt>
+    <dd>Automatically open a <i>Visual Schnauzer</i> window on
+        startup.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+vsp</b><tt>erfect</tt></dt>
+    <dd>Prevent <i>Visual Schnauzer</i> from installing its own
+        private colormap.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-wa</b><tt>it</tt><i> sec</i></dt>
+    <dd>Specifies time delay in slide show.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-wh</b><tt>ite</tt><i> color</i></dt>
+    <dd>Sets the 'white' color used in B/W stippling.</dd>
+    <dt>&nbsp;</dt>
+    <dt><b>-/+wl</b><tt>oop</tt></dt>
+    <dd>When in slide show mode, loop to start after last image.</dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="x-resources.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="credits.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>
+
+
+

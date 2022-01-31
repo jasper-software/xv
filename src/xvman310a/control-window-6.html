@@ -1,0 +1,399 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 6/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="working-with-multiple-files">Working With Multiple
+Files</a></h2>
+
+<p><i>xv</i> provides a set of controls that let you conveniently
+operate on a list of images. To use the following commands,
+you'll have to start up <i>xv</i> with a list of filenames. For
+example, you could type ' <tt>xv *.gif</tt> ' (assuming, of
+course, that you have a bunch of files that end with the suffix
+'.gif' in the current directory). </p>
+
+<p>The filenames are listed in a scrollable window, as shown
+below. The current selection is shown in reverse video. If there
+are more names than will fit in the window, the scrollbar will be
+enabled.</p>
+
+<p><img src="images/fig-082.gif" width="434" height="186"> </p>
+
+<h3><a name="operating-list-window">Operating a List Window</a></h3>
+
+<p>The scrollbar operates as follows:</p>
+
+<ul>
+    <li>clicking in the top or bottom arrow of the scrollbar
+        scrolls the list by one line in the appropriate
+        direction. It will continue to scroll the list as long as
+        you hold the mouse down.</li>
+</ul>
+
+<ul>
+    <li>The thumb (the small rectangle in the middle of the
+        scrollbar) shows roughly where in the list you are. You
+        can change your position in the list by clicking and
+        dragging the thumb to another position in the scrollbar.
+        The list will scroll around as you move the thumb.</li>
+</ul>
+
+<ul>
+    <li>You can scroll the list up or down a page at a time by
+        clicking in the grey region between the thumb and the top
+        or bottom arrows.</li>
+</ul>
+
+<ul>
+    <li>If you click on a name in the list, that name will become
+        highlighted. You can drag the highlight bar up and down,
+        and the list will scroll appropriately.</li>
+</ul>
+
+<ul>
+    <li>It is also possible to control the list window from the
+        keyboard. In all cases, you must make sure that the
+        window sees the keypress. Generally, this means you have
+        to have the cursor inside the window, though your window
+        manager may also require you to click inside the window
+        first.</li>
+</ul>
+
+<ul>
+    <li>The up and down arrow keys move the highlight bar up and
+        down. If the bar is at the top or bottom of the window,
+        the list will scroll one line.</li>
+</ul>
+
+<ul>
+    <li>The <b>&lt;PageUp&gt;</b> and <b>&lt;PageDown&gt;</b>
+        keys scroll the list up or down a page at a time. These
+        keys may be called <b>&lt;Previous&gt;</b> and <b>&lt;Next&gt;</b>
+        on your keyboard. You can probably also page up and down
+        by typing <b>&lt;Shift&gt;-&lt;Up&gt;</b> and <b>&lt;Shift&gt;-&lt;Down&gt;</b>
+        .</li>
+</ul>
+
+<ul>
+    <li>Pressing the <b>&lt;Home&gt; </b>key will jump to the
+        beginning of the list. Pressing the <b>&lt;End&gt;</b>
+        key will jump to the bottom of the list. If you don't
+        have <b>&lt;Home&gt; </b>and <b>&lt;End&gt;</b> keys on
+        your keyboard, you may be able to emulate them by holding
+        <b>&lt;Shift&gt;</b> and typing the <b>&lt;PageUp&gt;</b>
+        and <b>&lt;PageDown&gt;</b> keys.</li>
+</ul>
+
+<h3><a name="file-commands">The File Commands</a></h3>
+
+<p>You can directly view any image in the list by double-clicking
+on its filename. If <i>xv</i> is unable to load the file (for any
+of a variety of reasons), it'll display an appropriate error
+message.</p>
+
+<dl>
+    <dt><a name="next"><img src="images/fig-083.gif" width="72"
+        height="22"></a></dt>
+    <dd>Attempts to load the next file in the list. If it is
+        unable to load the next file, it will continue down the
+        list until it successfully loads a file. If it gets to
+        the bottom of the list without successfully loading a
+        file, it will put up the default image.<br>
+        Keyboard Equivalent: <b>&lt;Space&gt;</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="prev"><b><img src="images/fig-084.gif"
+        width="72" height="22"></b></a></dt>
+    <dd>Attempts to load the previous file in the list. If it is
+        unable to load the previous file, it will continue up the
+        list until it successfully loads a file. If it gets to
+        the top of the list without successfully loading a file,
+        it will put up the default image.<br>
+        Keyboard Equivalent: <b>&lt;backspace&gt;</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="delete"><b><img src="images/fig-085.gif"
+        width="72" height="22"></b></a></dt>
+    <dd>This command lets you delete the currently selected file
+        from the list (and optionally delete the associated disk
+        file). Note that the currently selected file is the one
+        with the highlight bar on it. While this is generally the
+        same as the currently displayed image, it doesn't have to
+        be.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; d</b><p>The <b>Delete</b>
+        command will pop up a window asking you what you want to
+        delete. Your choices are:</p>
+        <ul type="disc">
+            <li>List Entry , which will remove the highlighted
+                name from the list. (Keyboard Equivalent: <b>&lt;Enter&gt;</b>
+                )</li>
+            <li>Disk File , which will remove the highlighted
+                name from the list and also delete the associated
+                disk file. This removes unwanted images, just
+                like manually typing ' <tt>rm &lt;filename&gt;</tt>
+                ' in another window. (Keyboard Equivalent: <b>&lt;Ctrl&gt;
+                d</b> )</li>
+            <li>Cancel , which lets you get out of the <b>Delete</b>
+                command without actually deleting anything.
+                (Keyboard Equivalent: <b>&lt;Esc&gt;</b></li>
+        </ul>
+    </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="load"><b><img src="images/fig-086.gif"
+        width="72" height="22"></b></a></dt>
+    <dd>Opens the <i>xv load</i> window, which lets you load
+        images that weren't specified on the original
+        command-line. See &quot;<a href="load-window.html">The
+        Load Window</a>&quot; for more details. Note: this
+        function has been mostly taken over by the <i>visual
+        schnauzer</i> (See &quot;<a
+        href="visual-schnauzer-1.html">The Visual Schnauzer</a>&quot;
+        ) but remains for largely historical reasons. (It <i>is</i>
+        considerably faster than the <i>schnauzer</i>,
+        however...)<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; l</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="save"><b><img src="images/fig-087.gif"
+        width="72" height="22"></b></a></dt>
+    <dd>Opens the <i>xv save</i> window, which lets you save the
+        current image (or current selected area) in a variety of
+        image formats. See &quot;<a href="save-window-1.html">The
+        Save Window</a>&quot; for more details.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; s</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="print"><img src="images/fig-088.gif" width="72"
+        height="22"></a></dt>
+    <dd>Prints the current image to a PostScript 2 device.. This
+        command takes a somewhat Unix-centric approach to
+        printing, but it may work on other operating systems.
+        When you issue this command, it opens a dialog box which
+        prompts you for the 'print' command to use. Normally,
+        this is just ' <tt>lpr</tt> ', but if you'd like to send
+        the output to another printer, you could use something
+        like ' <tt>lpr -Pelsewhere</tt> '. (And right after you
+        do that, you should change the name of that printer!) You
+        change the default command the appears in this window by
+        using the ' <tt>xv.print</tt> ' X resource. See &quot;<a
+        href="modifying-behavior-4.html#resources">Other
+        Resources</a>&quot; .<p>Anyway, enter some command that
+        will have the desired effect. <i>xv</i> will open up the <i>xv
+        postscript</i> window, where you can fine-tune the size,
+        position, and rotation of your image. See &quot;<a
+        href="postscript-window.html">The PostScript Window</a>&quot;
+        for more information. When you press the <b>Ok</b>
+        button, <i>xv</i> will generate the appropriate
+        PostScript, and feed it as ' <tt>stdin</tt> ' to the
+        command you entered earlier.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; p</b></p>
+    </dd>
+</dl>
+
+<h3><a name="reloading">Image Reloading</a></h3>
+
+<p>It is occasionally desirable to reload an image file because
+the contents of the file have changed. For example, you could be
+downloading a file, and you might want to keep reloading the file
+to check on the progress of the download. Or perhaps you have a
+program that generates images, and you'd like to view these
+images without any manual intervention.</p>
+
+<p><i>xv</i> provides a way to reload an image via an external
+signal. If you send the <i>xv</i> process a <tt>SIGQUIT</tt>
+signal (' <tt>kill -QUIT &lt;pid&gt;</tt> ', or ' <tt>kill -3
+&lt;pid&gt;</tt> ' on most systems), the program will reload the
+currently selected file. (The one that is currently highlighted
+in the <i>xv controls</i> window filename list.) This behavior is
+exactly the same as hitting <b>&lt;Return&gt;</b> in the <i>xv
+controls</i> window. If <i>xv</i> is currently in a state where
+hitting <b>&lt;Return&gt;</b> in the controls window won't load
+an image (i.e., some pop-up dialog box is grabbing all such
+events), then sending this signal won't work either.</p>
+
+<p>An idea: You could write a 'clock' program that, once a
+minute, generates a really spiffy looking picture of the current
+time (with color gradations, 3-d extruded numbers, whatever),
+then sends <i>xv</i> the signal to reload the generated image. If
+anyone ever does this, I'd like to hear about it.</p>
+
+<p>Note: This will not work if the current file was read from <tt>&lt;stdin&gt;</tt>
+.</p>
+
+<p><i>xv</i> also has a 'polling mode', enabled by the '<tt>-poll</tt>'
+option. When it is turned on, <i>xv</i> will attempt to recognize
+when the currently displayed file changes on disk. (What with
+UNIX being a multi-tasking OS, it's perfectly possible to have
+another process modify a file while <i>xv</i> is displaying it.)
+When the current file changes, <i>xv</i> will reload it.</p>
+
+<p>You can use this feature to get <i>xv</i> to monitor all sorts
+of things. For example, if you have one of those programs that
+automatically goes out and <i>ftps</i> the latest version of the
+US weather map, (and you do, in the <tt>unsupt</tt> directory),
+then you can have <i>xv</i> automatically reload the map whenever
+a new one is downloaded.</p>
+
+<p>It probably goes without saying that 'PostScript' is a
+registered trademark of Adobe Systems, Inc. </p>
+
+<p>You could even use <i>xv</i> as a sort of frame buffer, to
+allow otherwise non-X programs to display graphics. Just have
+your program draw on its own internal 'frame buffer' (just an
+appropriately sized hunk of memory), and periodically write it
+out to a file in some <i>xv</i>-supported format. The PBM/PGM/PPM
+formats are trivial to write. See the documentation in the <tt>doc</tt>
+subdirectory of the <i>xv</i> distribution. Anyhow, periodically
+write the image to a file, and have <i>xv</i> display the file
+with the ' <tt>-poll</tt> ' option turned on. Voila! An instant
+output-only frame buffer for X workstations, albeit a fairly slow
+one.</p>
+
+<h2><a name="windows-menu">The Windows Menu</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-093.gif"
+        width="138" height="153"></td>
+        <td valign="top">As an obvious result of <i>xv</i>'s
+        patented &quot;Keep-Adding-Code-Until-It-Breaks&quot;
+        Technology, there are considerably more commands,
+        features, cool gizmos, and dubious design decisions than
+        will comfortably fit in the <i>xv controls</i> window.<p>Luckily,
+        this is nothing that bolting-on a couple more top-level
+        windows won't fix, which is the method that has been
+        used.</p>
+        </td>
+    </tr>
+</table>
+
+<p>This is where the <b>Windows </b>menu comes into play, though
+in practice you'll probably just use the keyboard equivalents to
+open the other windows. I know <i>I</i> do.</p>
+
+<dl>
+    <dt><a name="visual-schnauzer"><img src="images/fig-089.gif"
+        width="134" height="16"></a></dt>
+    <dd>Opens up a <i>xv visual schnauzer</i> window (you can
+        have up to four of them). The <i>visual schnauzer</i>
+        lets you manipulate your image file collection in a nifty
+        Point'n'Click, Drag'n'Drop, What You See Is What You Get,
+        Graphical User Interface. Despite all that, it's actually
+        a useful thing. See &quot;<a
+        href="visual-schnauzer-1.html">The Visual Schnauzer</a>&quot;
+        for more info.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; v</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="color-editor"><b><img src="images/fig-090.gif"
+        width="134" height="16"></b></a></dt>
+    <dd>Opens and closes the <i>xv color editor</i> window. The <i>color
+        editor</i> provides you with an interesting collection of
+        color manipulation doodads, including a colormap editor,
+        hue remapping controls, arbitrary R, G, B, and I gamma
+        correction curves, and so on. See &quot;<a
+        href="color-editor-1.html">The Color Editor </a>&quot;
+        for more info.<br>
+        Keyboard Equivalent: <b>e</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="image-info"><b><img src="images/fig-091.gif"
+        width="134" height="16"></b></a></dt>
+    <dd>Opens and closes the <i>xv info</i> window. This window
+        gives you detailed information about the current image,
+        the current selection, the success/failure of the color
+        allocation code, and such. See &quot;<a
+        href="info-window.html">The Info Window</a>&quot; for
+        more info.<br>
+        Keyboard Equivalent: <b>I</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="image-comments"><b><img src="images/fig-092.gif"
+        width="134" height="16"></b></a></dt>
+    <dd>Opens the <i>xv image comments</i> window. This lets you
+        view any comments that may be encoded in the current
+        image. It does <i>not</i> let you add or edit any
+        comments, as that's a project for a later release. Note
+        that, currently, the vast majority of images do <i>not</i>
+        have comments in them. My fault, no doubt. See &quot;<a
+        href="textview-window.html#comment-window">The Comment
+        Window</a>&quot; for more details.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; c</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="text-view"><img src="images/fig-094.gif"
+        width="134" height="16"></a></dt>
+    <dd>Opens the <i>xv text viewer</i> window. Displays the
+        contents of the currently selected file (i.e., the file
+        selected in the filename list in the <i>xv controls</i>
+        window), as ASCII text, or as a hexadecimal dump. This
+        happens automatically when <i>xv</i> tries to load a file
+        in a format it doesn't recognize. See &quot;<a
+        href="textview-window.html">The TextView Window</a>&quot;
+        for more info.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; t</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="about-xv"><b><img src="images/fig-095.gif"
+        width="134" height="16"></b></a></dt>
+    <dd>Opens the <i>xv text viewer</i> window, and displays
+        version information, copyright notice, licensing
+        information, the author's email addresses, and such.
+        Basically, it's the text of the first two (or so) pages
+        of this manual.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; a</b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="xv-keyboard-help"><b><img
+        src="images/fig-096.gif" width="134" height="16"></b></a></dt>
+    <dd>Opens the <i>xv text viewer</i> window, and displays a
+        summary of all the keyboard equivalents and mouse button
+        permutations.</dd>
+</dl>
+
+<h2><a name="commands">Other Commands</a></h2>
+
+<dl>
+    <dt><img src="images/fig-097.gif" width="72" height="25"></dt>
+    <dd>Does exactly the same thing as the <b>About XV</b>
+        command described in &quot;<a href="#windows-menu">The
+        Windows Menu</a>&quot; : displays version number,
+        licensing info, etc.</dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-098.gif" width="83" height="41"></dt>
+    <dd><a name="xv-logo">'Reloads'</a> and displays the <i>xv
+        logo</i> image, which not only contains the version
+        number and revision date of this copy, it <i>also </i>has
+        some nifty 3-D fish.<p>The logo image also displays who,
+        if anyone, this particular copy of <i>xv</i> is licensed
+        to. If it still says &quot;UNREGISTERED COPY&quot;, you
+        should probably do something about that.<br>
+        Keyboard Equivalent: &lt;none whatsoever&gt;</p>
+    </dd>
+    <dt><a name="quit"><img src="images/fig-099.gif" width="72"
+        height="25"></a></dt>
+    <dd>Quits <i>xv</i>. Quite possibly the most useful command
+        of them all.<br>
+        Keyboard Equivalents: <b>q</b> and <b>&lt;Ctrl&gt; q</b></dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="info-window.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-5.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>
+
+

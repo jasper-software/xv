@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Save Window, part 2/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Save Window</h1>
+
+<h2><a name="format-notes">Format Notes</a></h2>
+
+<dl>
+    <dt><a name="gif"><img src="images/fig-179.gif" width="151"
+        height="16"></a></dt>
+    <dd>While <i>xv</i> can read both the GIF87a and GIF89a
+        variants of the GIF format, it will normally write
+        GIF87a. <i>xv</i> will only write a GIF89a file if there
+        are image comments to be saved (comment blocks being a
+        GIF89a extension).. This is in keeping with the GIF89
+        specification, which states that if you don't need any of
+        the features added in GIF89, you should continue to write
+        GIF87, for greater compatibility with old GIF87-only
+        readers. <p>Since GIF only supports one format (up to 8
+        bits per pixel, with a colormap), there will be no file
+        size difference between a <b>Full Color</b> and a <b>Greyscale</b>
+        image. A <b>B/W Dithered</b> image, on the other hand,
+        will be considerably smaller.</p>
+        <p>If you are currently in <b>24-bit mode</b> , and you
+        are saving in any color mode other than <b>B/W Dithered</b>
+        , the currently selected 24-&gt;8 conversion algorithm
+        will be used to generate an 8-bit version of the current
+        image, and that image will be written. (See &quot;<a
+        href="control-window-3.html#bit-menu">The 24/8 Bit Menu</a>&quot;
+        for more info.) </p>
+    </dd>
+    <dt><a name="jpeg"><img src="images/fig-180.gif" width="151"
+        height="16"></a></dt>
+    <dd>One minor clarification: 'JPEG' is an image compression
+        algorithm, <i>not</i> an image file format. 'JFIF' is a
+        file format created by the fine folks at the Independent
+        JPEG Group for the storage and interchange of 'JPEG'-ed
+        image data. As such, it is the de-facto standard for
+        'JPEG' images. So, technically, when folks talk about
+        'JPEG' files, what they probably mean is 'JFIF' files,
+        but it's not <i>necessarily</i> so. Therefore, it is
+        possible to run across 'JPEG' files that <i>xv</i> can't
+        read, because they don't adhere to the 'JFIF' file format
+        standard. Just thought you'd like to know. <p><b>Full
+        Color</b> images are written in a 24-bit RGB format, and <b>Greyscale</b>
+        images are written in an 8-bit greyscale format. <b>B/W
+        Dithered</b> images should <i>not</i> be used, as they
+        will probably wind up being larger than <b>Greyscale</b>
+        versions of the same images, due to the way JPEG works.
+        Note: You cannot write a <b>Reduced Color</b> JPEG file.
+        Trust me, given the method that JPEG uses to compress,
+        it's not in your best interest to save <b>Reduced Color</b>
+        JPEG files. If you attempt to do so, a <b>Full Color</b>
+        JPEG file will be saved. </p>
+        <p><a name="jpeg-dialog"><img src="images/fig-181.gif"
+        width="414" height="230"> </a></p>
+        <p>When you save in the JPEG format, the dialog box shown
+        above will pop up and ask you for a quality setting and a
+        smoothing value. '75%' is the default quality value, and
+        really, it's a fine choice. You shouldn't have to change
+        it under normal circumstances. The lower you set the
+        quality, the higher the compression ratio will be (i.e.,
+        the JPEG file will be smaller). Note that setting the
+        quality setting to '100%' will <i>not</i> result in
+        'lossless JPEG' (i.e., the original and the JPEG'd images
+        will <i>not</i> be exactly the same, just very close). </p>
+        <p>The smoothing value is used to 'blur' images before
+        saving them. It's often a good idea to blur GIF (and
+        other 8-bit color) images before saving them, as you'll
+        get better compression that way, and it also may
+        partially undo the dithering that been done to many 8-bit
+        images. On the downside, you'll also get somewhat blurred
+        images. Something you have to decide for yourself.</p>
+        <p>Note: The JPEG support in <i>xv</i> is optional. While
+        it is normally enabled, it is possible that it may not be
+        enabled on your system (due to problems compiling the
+        JPEG library, or something). If this is the case, you
+        won't have a <b>JPEG</b> selection in the <b>Format</b>
+        menu. Please feel free to complain to whomever built the
+        binary that you're using. </p>
+    </dd>
+    <dt><a name="tiff"><img src="images/fig-182.gif" width="151"
+        height="16"></a></dt>
+    <dd><b>Full Color</b> and <b>Reduced Color</b> images are
+        written in a 24-bit RGB format, and <b>Greyscale</b>
+        images are written in an 8-bit greyscale format. <b>B/W
+        Dithered</b> images are written in a 1-bit B/W format.<p><a
+        name="tiff-dialog"><img src="images/fig-183.gif"
+        width="294" height="190"> </a></p>
+        <p>When you save in the TIFF format, the dialog box shown
+        above will pop up and ask you which type of image
+        compression it should use. <b>None</b>, <b>LZW</b>, and <b>PackBits</b>
+        compression types are available for use with all the
+        Color modes. In addition, there are two <b>B/W Dithered</b>-only
+        algorithms, <b>CCITT Group3</b> and <b>CCITT Group4</b> .
+        </p>
+        <p>Note: The TIFF support in <i>xv</i> is optional. While
+        it is normally enabled, it is possible that it may not be
+        enabled on your system (due to problems compiling the
+        TIFF library, or something). If this is the case, you
+        won't have a <b>TIFF</b> selection in the <b>Format</b>
+        menu. Please feel free to complain to whomever built the
+        binary that you're using. </p>
+    </dd>
+    <dt><a name="postscript"><img src="images/fig-184.gif"
+        width="151" height="16"></a></dt>
+    <dd><b>Full Color</b> and <b>Reduced Color</b> images are
+        stored in a 24-bit RGB format, <b>Greyscale</b> images
+        are stored in an 8-bit greyscale format, and <b>B/W
+        Dithered</b> images are stored in a 1-bit B/W format. <p><i>xv</i>
+        writes Encapsulated PostScript, so you can incorporate <i>xv</i>-generated
+        PostScript into many desktop-publishing programs. <i>xv</i>
+        also prepends some color-to-greyscale code, so even if
+        your printer doesn't support color, you can still print
+        'color' PostScript images. These images will be three
+        times larger (in file size) than their greyscale
+        counterparts, so it's a good idea to save <b>Greyscale</b>
+        PostScript, unless you know you may be printing the file
+        on a color printer at some point.</p>
+        <p>Also, you should probably never need to generate <b>B/W
+        Dithered</b> PostScript, as every PostScript printer I've
+        ever heard of can print greyscale images. The only valid
+        cases I can think of are: A) doing it for a special
+        effect, and B) doing it to generate a much smaller
+        (roughly 1/8th the size) PostScript file.</p>
+        <p>Note: When you try to save a PostScript file, the <i>xv
+        postscript</i> window will pop up to let you specify how
+        you want the image printed. (See &quot;<a
+        href="postscript-window.html">The PostScript Window</a>&quot;
+        for details.) </p>
+    </dd>
+    <dt><a name="pbmraw"><img src="images/fig-185.gif"
+        width="151" height="16"></a></dt>
+    <dd><b>Full Color</b> images are saved in <b>PPM</b> format. <b>Greyscale</b>
+        images are saved in <b>PGM</b> format. <b>B/W Dithered</b>
+        images are saved in <b>PBM</b> format. Each of these
+        formats are tailored to the data that they save, so PPM
+        images are larger than PGM images, which are in turn
+        larger than PBM images. <p>In the <b>raw</b> variation of
+        the PBM formats, the header information is written in
+        plain ASCII text, and the image data is written as binary
+        data. This is the more popular of the two dialects of
+        PBM, as it produces considerably smaller image files. </p>
+    </dd>
+    <dt><img src="images/fig-186.gif" width="151" height="16"></dt>
+    <dd>Like <b>PBM/PPM (raw)</b>, only the image data is written
+        as ASCII text. As such, images written in this format
+        will be several times larger than images written in <b>PBM/PGM/PPM
+        (raw)</b>. This is a pretty good format for interchange
+        between systems because it is easy to parse. Also, since
+        they are pure, printable ASCII text, images saved in this
+        format can be mailed, without going through a <i>uuencode</i>-like
+        program. <p>Note that <i>xv</i>-created PBM files (both <b>raw
+        </b>and <b>ascii </b>variants) may break some PBM readers
+        that do not correctly parse comments. If your PBM reader
+        cannot parse comments, you can easily edit the PBM file
+        and remove the comment lines. A comment is everything
+        from a &quot;#&quot; character to the end of the line. </p>
+    </dd>
+    <dt><a name="xbm"><img src="images/fig-187.gif" width="151"
+        height="16"></a></dt>
+    <dd>Saves files in the format used by the <i>bitmap</i>
+        program, which is part of the standard X11 distribution.
+        Since bitmap files are inherently 1-bit per pixel, you
+        can only select the <b>B/W Dithered</b> option for this
+        format. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="xpm"><img src="images/fig-188.gif" width="151"
+        height="16"></a></dt>
+    <dd>New to <i>xv </i>version 3.10, you can now load and save
+        images in the XPM (X PixMap) format. Such files are best
+        suited to small-ish images with a small number of colors,
+        such as multi-color icons, and the like. One nifty
+        feature of this format is that images can be created and
+        edited using a text editor. All color choices work as
+        expected. One warning: <i>xv</i> will not write out an
+        XPM file with more than 256 different colors. If you are
+        viewing a 24-bit image and save it as an XPM file, <i>xv</i>
+        will first compute an 8-bit version of the image using
+        the current 24-&gt;8 conversion algorithm (see &quot;<a
+        href="control-window-3.html#bit-menu">The 24/8 Bit Menu</a>&quot;),
+        and then save that. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="bmp"><img src="images/fig-189.gif" width="151"
+        height="16"></a></dt>
+    <dd><i>xv</i> will write a number of different types of BMP
+        files depending on the 8/24 bit mode that you're in, the
+        number of colors in the image, and the current 'Colors'
+        choice. <p>If you are currently in <b>8-bit Mode</b>, and
+        you select <b>Full Color</b>, <b>Reduced Color,</b> or <b>Greyscale</b>,
+        <i>xv</i> will write out an uncompressed 4- or 8-bits per
+        pixel BMP file, based on the number of different colors
+        in the current image.</p>
+        <p>If you are in <b>24-bit Mode</b> and you select <b>Full
+        Color</b>, the program will write out an uncompressed
+        24-bits per pixel image.</p>
+        <p>If you are in <b>24-bit Mode</b> and you select <b>Greyscale</b>,
+        an uncompressed 8-bit per pixel BMP file will be written.</p>
+        <p>If you select <b>B/W Dither</b>, a 1-bit per pixel BMP
+        file will be written. </p>
+    </dd>
+    <dt><a name="rasterfile"><img src="images/fig-190.gif"
+        width="151" height="16"></a></dt>
+    <dd><b>Full Color</b> and <b>Reduced Color</b> images are
+        stored in a 24-bit RGB format, <b>Greyscale</b> images
+        are stored in an 8-bit greyscale format, and <b>B/W
+        Dithered</b> images are stored in a 1-bit B/W format. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="sgi-rgb"><img src="images/fig-191.gif"
+        width="151" height="16"></a></dt>
+    <dd>If you select <b>Full Color</b> or <b>Reduced Color</b> ,
+        the program will write a 24-bit image. Otherwise, it will
+        write out an 8-bit image. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="targa"><img src="images/fig-192.gif" width="151"
+        height="16"></a></dt>
+    <dd>Another new format added to <i>xv</i> version 3.10. <i>xv</i>
+        can now read and write 24-bit uncompressed Targa files.
+        As such files are about the only reason folks still use
+        the Targa format, this shouldn't be a problem. The color
+        choices will do what you'd expect, but given that <i>xv</i>
+        only reads/writes 24-bit Targa files, saving anything but
+        <b>Full Color</b> would be a waste. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="fits"><img src="images/fig-193.gif" width="151"
+        height="16"></a></dt>
+    <dd>Saves images in the FITS format, a greyscale-only format
+        used primarily by astronomers. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="pm"><img src="images/fig-194.gif" width="151"
+        height="16"></a></dt>
+    <dd>Note: This format is was developed at Penn, and is rarely
+        seen outside of Penn. If you don't know anything about
+        it, trust me, you don't want to. <p><b>Full Color</b>
+        images are saved in the 3-plane, 1-band, PM_C format. <b>Greyscale</b>
+        and <b>B/W Dithered</b> images are both saved in the
+        1-plane, 1-band, PM_C format. As such, there is no size
+        advantage to saving in the <b>B/W Dithered</b> format. </p>
+    </dd>
+    <dt><a name="filename-list"><img src="images/fig-195.gif"
+        width="151" height="16"></a></dt>
+    <dd>This is not an 'image file format' at all, which is why
+        it appears separate from the rest of the formats in the <b>Format
+        </b>menu. Instead of saving the current image, what this
+        does is save a list of all the filenames in the <i>xv </i>controls
+        window file list. This file list can be used in
+        conjunction with the '<tt>-flist</tt>' option. See &quot;<a
+        href="modifying-behavior-3.html#miscellaneous-options">Modifying
+        xv Behavior</a>&quot; for more details. </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="postscript-window.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="save-window-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

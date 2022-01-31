@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Info Window</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1><a name="info-window">The Info Window</a></h1>
+
+<p><img src="images/fig-100.gif" width="514" height="300"> </p>
+
+<h2><a name="overview">Overview</a></h2>
+
+<p>This window displays information about the current image,
+color allocation, expansion, cropping, and any error messages. It
+can be opened by issuing the <b>Image Info</b> command. (Select <b>Image
+Info</b> from the <b>Windows</b> menu in the <i>xv controls</i>
+window, or type <b>i</b> in any open <i>xv</i> window.) You can
+close the window by using the <b>Image Info</b> command while the
+window is open. You can also close the window by clicking
+anywhere inside of it.</p>
+
+<p>The top portion of the window displays the program name,
+version number, and revision date. It also shows the University
+of Pennsylvania shield, the PennNet logo, the copyright notice,
+and of course, the author's name.</p>
+
+<h2><a name="fields">The Fields</a></h2>
+
+<p>The &quot;Filename&quot; field displays the name of the
+currently loaded file. The name is displayed without any leading
+pathname. If there is no currently loaded image (i.e., you're
+looking at the default image, or a grabbed image) this field will
+display &quot;&lt;none&gt;&quot;.</p>
+
+<p>The &quot;Format&quot; field displays information describing
+what image format the file is stored in, and how large the file
+is (in bytes).</p>
+
+<p>The &quot;Resolution&quot; field shows the width and height
+(in image pixels) of the loaded image. Note that this does not
+necessarily have anything to do with the size of the image
+currently displayed on your screen. These numbers do not change
+as you modify the display image.</p>
+
+<p>The &quot;Cropping&quot; field displays the current state of
+any cropping/selection activity. If you are looking at the entire
+(uncropped) image, this field will show &quot;&lt;none&gt;&quot;.
+If you are viewing a cropped portion of an image, this field will
+display something like &quot;247x128 rectangle starting at
+132,421&quot;. See &quot;<a href="image-window.html#cropping">Cropping</a>&quot;
+for more details. </p>
+
+<p>The &quot;Expansion&quot; field gives you information about
+how the image is displayed. It can display something like
+&quot;158.00% x 137.00% (505 x 273)&quot;. This tells you that
+the current displayed image is 505 pixels wide and 273 pixels
+high, and that it is 1.58 times wider and 1.37 times higher than
+the original image (which, in this case, had a size of 320x200).</p>
+
+<p>The &quot;Selection&quot; field displays the size and position
+of the currently-drawn selection rectangle. If there isn't a
+current selection, this field will show &quot;&lt;none&gt;&quot;.</p>
+
+<p>The &quot;Colors&quot; field gives you detailed information on
+how well (or poorly) color allocation went. If everything went
+reasonably well it will display something like:</p>
+
+<p>Got all 67 desired colors. (66 unique)</p>
+
+<p>This means that 67 entries in the image's colormap were used
+in the image, but that only 66 of these colors were different, as
+far as the X server is concerned. (e.g., if 'white' (255,255,255)
+was listed twice in the image's colormap, it would only allocate
+one X colorcell, but would still count as 2 successful color
+allocations).</p>
+
+<p>See &quot;<a href="color-allocation.html">Color Allocation</a>&quot;
+for a complete discussion of how colors are allocated, and what
+the &quot;Colors&quot; field can tell you.</p>
+
+<p>Note that the fields are filled in as information becomes
+available. As such, they can be used as a rough 'progress
+indicator' when loading images. When you begin loading, all the
+fields are cleared. Once the image has been successfully loaded,
+the top three fields (Filename, Format, Resolution) are filled
+in. Once the colors have been allocated, and the display image
+generated, the bottom four fields are shown (Cropping, Expansion,
+Selection, and Colors).</p>
+
+<h2><a name="status-lines">Status Lines</a></h2>
+
+<p>The bottom two lines in the info window display various error
+messages, warnings, and status information. These two lines are
+also duplicated in the <i>xv controls</i> window.</p>
+
+<p>The upper line is the more commonly used. It normally displays
+a one-line summary of the current image and color allocation
+success. If an error occurs, it will be displayed on this line as
+well.</p>
+
+<p>The lower line is used to display warning messages.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="color-editor-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-6.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

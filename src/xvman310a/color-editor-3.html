@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Color Editor, part 3/3</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="rgb-modification-tool">The RGB Modification Tool</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><img src="images/fig-126.gif" width="187"
+        height="502"></td>
+        <td>The <i>RGB Modification</i> tool is a collection of
+        three graph windows, each of which operate on one of the
+        components of the RGB colorspace. This tool lets you
+        perform global color-correction on the image by boosting
+        or cutting the values of one or more of the RGB color
+        components. You can use this to correct for color screens
+        that are 'too blue', or for color printers that produce
+        'brownish' output, or whatever.<p>The graphs work exactly
+        as explained in &quot;<a
+        href="color-editor-2.html#intensity-graph">The Intensity
+        Graph&quot;</a> .</p>
+        <p>Neat Trick: In addition to color-correction, you can
+        use the RGB modification tool to add color to images that
+        didn't have color to begin with. For instance, you can
+        'pseudo-color' a greyscale image.</p>
+        </td>
+    </tr>
+</table>
+
+<p>An example of pseudo-coloring:</p>
+
+<ol>
+    <li>Adjust the <i>Red</i> graph so that there is a strong red
+        presence on the right side of the graph, and none on the
+        left, or in the middle.</li>
+    <li>Adjust the <i>Green</i> graph so that there is a strong
+        green presence in the middle of the graph, and none on
+        the left or right.</li>
+    <li>Adjust the <i>Blue</i> graph so that there is a strong
+        blue presence on the left side of the graph, and none on
+        the left, or in the middle.</li>
+    <li>The graphs should look roughly like this:<br>
+        <img src="images/fig-123.gif" width="167" height="149"> <img
+        src="images/fig-124.gif" width="167" height="149"> <img
+        src="images/fig-125.gif" width="167" height="149"> </li>
+</ol>
+
+<p>You now have a transformation that will take greyscale images
+and display them in pseudo-color, using a 'temperature' color
+scheme. Neato! </p>
+
+<h2><a name="color-editor-controls">The Color Editor Controls</a></h2>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-133.gif"
+        width="212" height="97"></td>
+        <td valign="top">These buttons provide general control
+        over the whole <i>xv color editor</i> window. You can
+        display the image with or without color modification,
+        save and recall presets, and undo/redo changes. Also,
+        convenience controls are given for performing some of the
+        most common operations on the Intensity graph.</td>
+    </tr>
+</table>
+
+<dl>
+    <dt><a name="apply"><img src="images/fig-127.gif" width="53"
+        height="24"></a></dt>
+    <dd>Displays the image using the current HSV and RGB
+        Modifications. Also turns the '<b>Display with HSV/RGB
+        mods</b>' checkbox on. (See below.) This is only useful
+        when the '<b>Auto-apply HSV/RGB mods</b>' checkbox is
+        off.<br>
+        Keyboard Equivalent: <b>&lt;Meta&gt; a </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="nomod"><img src="images/fig-128.gif" width="53"
+        height="24"></a></dt>
+    <dd>Displays the image without any HSV or RGB Modifications.
+        Also turns the '<b>Display with HSV/RGB mods</b>'
+        checkbox off. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="undo"><img src="images/fig-129.gif" width="53"
+        height="24"></a></dt>
+    <dd>Undoes the last change to the HSV or RGB controls. <p>It
+        may be helpful to think of <i>xv</i> as maintaining a
+        series of 32 'snapshots' of the HSV and RGB controls. You
+        are normally looking at the last frame in this series.
+        The <b>Undo</b> control moves you backwards in the
+        series. </p>
+    </dd>
+    <dt><a name="redo"><img src="images/fig-130.gif" width="53"
+        height="24"></a></dt>
+    <dd>Only available after you've hit <b>Undo</b> . Moves you
+        forward in the 'snapshot' series described above. Note
+        that if you have hit <b>Undo</b> a few times (i.e.,
+        you're now looking at some frame in the middle of the
+        series), and you change an HSV or RGB control, all
+        subsequent frames in the series are thrown away, and the
+        current state becomes that last frame in the series. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="reset"><img src="images/fig-131.gif" width="53"
+        height="24"></a></dt>
+    <dd>Resets all HSV and RGB controls to their default
+        settings. Doesn't affect the <b>Colormap Editing</b>
+        tool. Note that these default settings can be changed
+        using the <b>Set</b> command described below.<br>
+        Keyboard Equivalents: <b>R</b> , <b>&lt;Meta&gt; r</b> ,
+        and <b>&lt;Meta&gt; 0 </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="color-editor-presets"><img
+        src="images/fig-132.gif" width="53" height="48"></a></dt>
+    <dd>Pressing any of these buttons recalls a preset (a
+        complete set of values for the HSV and RGB controls). By
+        default, the presets are: <ol>
+            <li>Binary intensity. Every color in the image is
+                either at full brightness, or black. Gives images
+                a neat 'neon' sort of look, much like the <i>Saturday
+                Night Live</i> credits of the late-70's.</li>
+            <li>Binary colors. The image will be shown using only
+                the 8 binary combinations of red, green, and
+                blue. (e.g. black, blue, green, cyan, red,
+                magenta, yellow, white) </li>
+            <li>Temperature pseudo-color. (For use on greyscale
+                images) Maps intensity values 0-255 into a
+                'temperature' color scheme where blue is
+                'coldest' and red is 'hottest'.</li>
+            <li>Map pseudo-color. (For use on greyscale images)
+                Maps intensity values 0- 255 into something akin
+                to the standard 'elevation map' color scheme
+                (blue, green, yellow, brown)</li>
+        </ol>
+        <p>Of course, you can replace these defaults with your
+        own. See &quot;<a
+        href="modifying-behavior-4.html#color-editor-resources">Modifying
+        <em>xv</em> Behavior</a>&quot; for more details.<br>
+        Keyboard Equivalents: <b>&lt;Meta&gt; 1</b> , <b>&lt;Meta&gt;
+        2</b> , <b>&lt;Meta&gt; 3</b> , and <b>&lt;Meta&gt; 4 </b></p>
+    </dd>
+    <dt><a name="set"><img src="images/fig-134.gif" width="53"
+        height="24"></a></dt>
+    <dd>Used in conjunction with the <b>Reset</b>, <b>1</b>, <b>2</b>,
+        <b>3</b>, or <b>4</b> buttons to store the current
+        settings of the HSV and RGB controls into a preset. To do
+        so, press the <b>Set</b> button, and then press one of
+        the <b>Reset</b>, <b>1</b>, <b>2</b>, <b>3</b>, or <b>4</b>
+        buttons. The current HSV and RGB control settings will be
+        stored in that preset, as long as <i>xv</i> continues
+        running. The values will be lost when the program exits.
+        It is also possible to save these values permanently. See
+        the <b>CutRes</b> button (below) and &quot;<a
+        href="modifying-behavior-4.html#color-editor-resources">Modifying
+        <em>xv</em> Behavior</a>&quot; for more details. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cutres"><img src="images/fig-135.gif" width="53"
+        height="24"></a></dt>
+    <dd>Copies the current settings of the HSV and RGB controls,
+        as text, into the X server's cut buffer. You can then use
+        a text editor to paste these values into your '<tt>.Xdefaults</tt>'
+        (or '<tt>.Xresources</tt>') file. This lets you save the
+        current settings 'permanently'. See &quot;<a
+        href="modifying-behavior-4.html#color-editor-resources">Modifying
+        <em>xv</em> Behavior</a>&quot; for more details. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="close"><img src="images/fig-136.gif" width="53"
+        height="24"></a></dt>
+    <dd>This button closes the <i>xv color editor</i> window. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="brite"><img src="images/fig-137.gif" width="53"
+        height="24"></a></dt>
+    <dd>Brightens the image by moving all the handles in the <i>Intensity</i>
+        graph up by a constant amount. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="dim"><img src="images/fig-138.gif" width="53"
+        height="24"></a></dt>
+    <dd>Darkens the image by moving all the handles in the <i>Intensity</i>
+        graph down by a constant amount. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="sharp"><img src="images/fig-139.gif" width="53"
+        height="24"></a></dt>
+    <dd>Increases the contrast of the image by moving handles on
+        the left side of the <i>Intensity</i> graph down, and
+        handles on the right side up. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="dull"><img src="images/fig-140.gif" width="53"
+        height="24"></a></dt>
+    <dd>Decreases the contrast of the image by moving handles on
+        the left side of the <i>Intensity</i> graph up, and
+        handles on the right side down. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="norm"><img src="images/fig-141.gif" width="53"
+        height="24"></a></dt>
+    <dd>Normalizes the image so that the darkest pixels in the
+        image are given an intensity of '0', and the brightest
+        pixels are given an intensity of '255'. Intermediate
+        colors are interpolated accordingly. This forces the
+        image to have the full (maximum) dynamic range.<br>
+        Keyboard Equivalent: <b>N</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="histeq"><img src="images/fig-142.gif" width="53"
+        height="24"></a></dt>
+    <dd>Runs a histogram equalization algorithm on the currently
+        displayed region of the image. That is, if you're
+        cropped, it will only run the algorithm on the cropped
+        section. Note, however, that the only modification it
+        makes to the image is to generate a bizarre corrective <i>Intensity</i>
+        curve. As such, if you <b>HistEq</b> a section of the
+        image, the rest of the image will probably not be what
+        you'd want. Also note that the histogram curve will 'go
+        away' if you touch any of the handles in the <i>Intensity</i>
+        graph window, just like a 'gamma' curve would.<br>
+        Keyboard Equivalent: <b>H</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="display-with-mods"><img src="images/fig-143.gif"
+        width="208" height="17"></a></dt>
+    <dd>The '<b>Display with HSV/RGB mods</b>' checkbox tells you
+        whether or you're looking at a modified image (checked)
+        or the 'raw', unmodified image (unchecked). The <b>Apply</b>
+        and <b>NoMod</b> buttons change the setting of this
+        checkbox, and you can also change the checkbox directly
+        by clicking on it. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="auto-apply-hsv"><img src="images/fig-144.gif"
+        width="208" height="17"></a></dt>
+    <dd>The '<b>Auto-apply HSV/RGB mods</b>' checkbox controls
+        whether or not the program regenerates and redisplays the
+        image after each change to an HSV or RGB control. By
+        default, this checkbox is turned on, so that you can
+        easily see the results of your modifications. However, if
+        you want to make a large number of changes at once, it
+        might be preferable to turn automatic redisplay off for a
+        while, to speed things up. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="auto-apply-drag"><img src="images/fig-145.gif"
+        width="208" height="17"></a></dt>
+    <dd>The '<b>Auto-apply while dragging</b>' checkbox controls
+        whether or not the image colors are changed automatically
+        as you manipulate the various <i>xv color editor</i>
+        dials and graphs. This button is normally turned on, but
+        for it to have any effect, you must be in '<b>Read/Write
+        Colors</b>' mode. See &quot;<a
+        href="control-window-2.html#color-allocation-commands">Color
+        Allocation Commands</a>&quot; and the '<tt>-rw</tt>' mode
+        described in &quot;<a
+        href="modifying-behavior-1.html#color-allocation-options">Color
+        Allocation Options</a>&quot; for more information. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="auto-reset"><img src="images/fig-146.gif"
+        width="208" height="17"></a></dt>
+    <dd>The '<b>Auto-reset on new image</b>' checkbox controls
+        whether or not the HSV and RGB controls are <b>Reset</b>
+        back to their default values whenever a new image is
+        loaded up. By default, this is also turned on, as when
+        you're playing with the HSV/RGB controls, you probably
+        only want to affect the current image, and not all
+        subsequently loaded images as well. </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="visual-schnauzer-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="color-editor-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>
+
+
+

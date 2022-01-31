@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The TextView Window</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The TextView Window</h1>
+
+<p><a name="text-view-window"><img src="images/fig-164.gif"
+width="612" height="230"></a> </p>
+
+<h2><a name="overview">Overview</a></h2>
+
+<p><i>xv</i> now has the ability to display arbitrary text data.
+While there are several different ways to cause a <i>TextView</i>
+window to appear, (such as opening an unrecognized type of file,
+using the <b>Text view</b> command in the <i>Visual Schnauzer</i>,
+or the <b>TextView</b>, <b>Comments</b>, or <b>License</b>
+commands in the <i>xv controls</i> window) all of the windows
+behave the same.</p>
+
+<p>The TextView window has two primary modes of operation. It can
+display data as ASCII text, or it can display data in hexadecimal
+format.</p>
+
+<p>There are a total of two TextView windows available. One is
+reserved for the <b>Comments</b> command. The other is used for
+all other text data.</p>
+
+<p>As you might suspect, you can scroll the TextView windows by
+using the mouse in the scroll bars (as described in &quot;<a
+href="control-window-6.html#operating-list-window">Operating a
+List Window</a>&quot;). Likewise, you can scroll the window
+around using the arrow keys on your keyboard, the <b>&lt;PageUp&gt;</b>
+and <b>&lt;PageDown&gt;</b> keys (sometimes labeled <b>&lt;Prev&gt;</b>
+and <b>&lt;Next&gt;</b> ) and the <b>&lt;Home&gt;</b> and <b>&lt;End&gt;</b>
+keys. It behaves as you would expect.</p>
+
+<p>You can switch modes by pressing the nice friendly <b>Ascii</b>
+and <b>Hex</b> buttons. <b>Close</b> (or pressing <b>&lt;Esc&gt;</b>)
+will close the TextView window.</p>
+
+<h3><a name="ascii-mode">ASCII Mode</a></h3>
+
+<p>This is the default mode for the TextView windows. It will
+display text of any width and length. The only limitation is that
+all of the text must fit into memory. If it doesn't, you'll get
+an appropriate error message, and the text will not be displayed.</p>
+
+<p>TextView windows are resizable. When you change the size of
+the main window, the inner text display window will change size
+appropriately, and display more (or less) data. While the default
+size of all TextView windows (except for the <b>Comments</b>
+window) is 80 characters wide by 24 lines high, there is nothing
+magical about these numbers. They're only chosen out of a sense
+of tradition.</p>
+
+<p>When in ASCII mode, the TAB character (ctrl-I) and the NL
+character (ctrl-J) are interpreted as is normal on a UNIX system
+(e.g. tab stops every 8 characters, NL marks end of line). The CR
+character (ctrl-M) is not displayed.</p>
+
+<p>All other control characters (characters with an ASCII value
+less than '32') are displayed with a caret (^) and the
+appropriate upper-case letter. For example, character number 17
+(decimal) will be displayed as '^Q'.</p>
+
+<p>All characters with an ASCII value greater than 127 are
+displayed as octal numbers with a leading backslash. As an
+example, character number 128 (decimal) will display as '\'.</p>
+
+<p>All other characters are displayed with the appropriate
+standard glyph.</p>
+
+<h3><a name="hex-mode">Hex Mode<br>
+</a><img src="images/fig-165.gif" width="612" height="230"></h3>
+
+<p>This mode is useful for displaying binary data. In fact, if
+you have some binary data to display, you might want to start up <i>xv</i>
+just to display it, as this mode beats the heck out of using the
+standard UNIX command '<tt>od -ha</tt>'.</p>
+
+<p>The data is shown 16 bytes to a line. The first number on each
+line is the offset (in hex) from the beginning of the file. This
+is followed by 16 bytes, shown in hex, and then in ASCII. Bytes
+which have a value less than 0x20 or greater than 0x7f are shown
+as a '.' in the ASCII section.</p>
+
+<p>While you can resize the window while in <b>Hex</b> mode,
+changing the width will not be of any use, as the output is
+formatted for an 80 character wide TextView window. Making the
+window wider will just put unused space on the right side. Making
+the window narrower will just enable the horizontal scroll bar.
+Changing the height of the window may prove useful, however.</p>
+
+<h2><a name="comment-window">The Comment Window</a></h2>
+
+<p>The <i>xv comments</i> window (opened by the <b>Comments</b>
+command in the <i>xv controls</i> window) operates in exactly the
+same way as the TextView window. You can even display image
+comments in <b>Hex</b> mode, though that doesn't sound all that
+useful.</p>
+
+<p>The <i>xv comments</i> window displays any comments found in
+the currently-loaded image file. If there are no comments, the
+window will be empty. Note that only certain image formats
+support comment fields (GIF89, JPEG, TIFF, and PBM/PGM/PPM are
+the most likely formats to have comments).</p>
+
+<p>Whenever a new image is loaded, the <i>xv comments</i> window
+is updated to reflect the new image comments, or lack thereof.</p>
+
+<p>Whenever you save an image in a format that supports comments,
+the comments from the last loaded image will be written out as
+well. This lets you read a file (say a GIF) which has comments,
+and write it out in another format (say, JPEG) preserving the
+comments.</p>
+
+<p>Currently, <i>xv</i> does <i>not</i> give you a way to
+directly edit the image comments. Given how few images actually
+have comments in them, it seemed like a lot of work for very
+little gain. (Yeah, I know, if something actually let you edit
+the comments, perhaps people would start entering some...)
+Whatever. Seems likely enough that this feature will make it into
+a future version of <i>xv</i>. Of course, that's exactly what I
+said in the 3.00 documentation, a year and a half ago, so you may
+want to take that statement with a grain of salt...</p>
+
+<p>Until then, if you <i>really</i> want to add or edit the
+comments in an image file, write it out as a PBM/PGM/PPM file.
+This format has a plain-text header (comments simply begin with a
+'#' character, which is not part of the comment), and you can
+edit it very easily with <i>emacs</i>, or any other reasonable
+text editor. Once that's done, you can use <i>xv</i> to convert
+the file back into the desired format.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="load-window.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="visual-schnauzer-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>
+
+

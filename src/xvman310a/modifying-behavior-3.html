@@ -1,0 +1,531 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Modifying xv Behavior, part 3/4</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="manipulation-options">Image Manipulation Options</a></h2>
+
+<dl>
+    <dt><a name="dither"><b>-</b>/<b>+dit</b><tt>her</tt></a></dt>
+    <dd>When specified, tells <i>xv</i> to automatically issue a <b>Dither</b>
+        command whenever an image is first displayed. Useful on
+        displays with limited color capabilities (4-bit and 6-bit
+        displays), or in conjunction with the '<tt>-ncols'</tt>
+        option. </dd>
+    <dd>(Resource name: <tt>autoDither</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="smooth"><b>-</b>/<b>+sm</b><tt>ooth</tt></a></dt>
+    <dd>When specified, tells <i>xv</i> to automatically issue a <b>Smooth</b>
+        command whenever an image is first displayed. This is
+        useful when you are using one of the image sizing options
+        (such as '<tt>-expand'</tt> or '<tt>-max'</tt>). </dd>
+    <dd>(Resource name: <tt>autoSmooth</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="raw"><b>-</b>/<b>+ra</b><tt>w</tt></a></dt>
+    <dd>Forces <i>xv</i> to display the image in <b>Raw</b> mode.
+        Mainly used to override the <tt>autoDither</tt> or <tt>autoSmooth</tt>
+        resources. Can also be used to turn off the automatic
+        dithering and smoothing that occurs when you are using <b>Use
+        Std. Colormap</b> mode or when an image is shrunk to fit
+        the screen. </dd>
+    <dd>(Resource name: <tt>autoRaw</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="crop"><b>-cr</b><tt>op</tt> <i>x y w h</i></a></dt>
+    <dd>Tells <i>xv</i> to automatically crop the specified
+        region of the image. The rectangle is specified in <i>image</i>
+        coordinates, which remain constant (regardless of any
+        expansion/compression of the <i>displayed</i> image).
+        This is useful if you want to view a series of images,
+        and you only want to see one common area of the images.
+        For example, you may have the GIF weather maps of the
+        United States, but only want to display your general
+        region of the country. </dd>
+    <dd>(Resource name: &lt;none&gt;) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="acrop"><b>-</b>/<b>+ac</b><tt>rop</tt></a></dt>
+    <dd>When specified, tells <i>xv</i> to automatically issue an
+        <b>AutoCrop</b> command whenever an image is first
+        displayed. </dd>
+    <dd>(Resource name: <tt>autoCrop</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="4x3"><b>-</b>/<b>+4</b><tt>x3</tt></a></dt>
+    <dd>Automatically issues a <b>4x3</b> command whenever an
+        image is loaded. </dd>
+    <dd>(Resource name: <tt>auto4x3</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="hflip"><b>-</b>/<b>+hf</b><tt>lip</tt></a></dt>
+    <dd>Automatically issues a 'horizontal flip' command whenever
+        an image is loaded. </dd>
+    <dd>(Resource name: <tt>autoHFlip</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="vflip"><b>-</b>/<b>+vf</b><tt>lip</tt></a></dt>
+    <dd>Automatically issues a 'vertical flip' command whenever
+        an image is loaded. </dd>
+    <dd>(Resource name: <tt>autoVFlip</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rotate"><b>-rot</b><tt>ate</tt> <i>deg</i></a></dt>
+    <dd>Automatically rotates the image by the specified amount
+        whenever an image is loaded. <i>deg</i> can be 0, 90,
+        180, or 270. Positive values rotate the image clockwise,
+        negative values rotate the image counter-clockwise. </dd>
+    <dd>(Resource name: <tt>autoRotate</tt> . Type: integer)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="norm"><b>-</b>/<b>+norm</b></a></dt>
+    <dd>Automatically issues a <b>Norm</b> command (to normalize
+        the contrast of an image) whenever an image is loaded. </dd>
+    <dd>(Resource name: <tt>autoNorm</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="hist"><b>-</b>/<b>+his</b><tt>t</tt></a></dt>
+    <dd>Automatically issues a <b>HistEq</b> command (to do
+        histogram equalization) whenever an image is loaded. </dd>
+    <dd>(Resource name: <tt>autoHist</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="gamma"><b>-ga</b><tt>mma</tt> <i>val</i></a></dt>
+    <dd>Sets the <i>Intensity</i> graph (in the <i>xv color
+        editor</i> window) to the gamma function of the specified
+        value. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cgamma"><b>-cga</b><tt>mma</tt> <i>rv gv bv</i></a></dt>
+    <dd>Sets the <i>Red, Green, </i>and <i>Blue</i> graphs in the
+        <i>xv color editor</i> window to the gamma functions of
+        the specified values. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="preset"><b>-pr</b><tt>eset</tt> <i>preset</i></a></dt>
+    <dd>Makes the specified <i>preset</i> (in the <i>xv color
+        editor</i>) the default. It does this by swapping the
+        specified preset ( <b>1</b> , <b>2</b> , <b>3</b> , or <b>4</b>
+        ) with the settings associated with the <b>Reset</b>
+        button. </dd>
+    <dd>(Resource name: <tt>defaultPreset</tt> . Type: integer)</dd>
+</dl>
+
+<h2><a name="miscellaneous-options">Miscellaneous Options</a></h2>
+
+<dl>
+    <dt><a name="mono"><b>-</b>/<b>+mo</b><tt>no</tt></a></dt>
+    <dd>Forces the image to be displayed in greyscale. This is
+        most useful when you are using certain greyscale X
+        displays. While <i>xv</i> attempts to determine if it's
+        running on a greyscale display, many X displays <i>lie</i>,
+        and claim to be able to do color. (This is often because
+        they have color graphics boards hooked up to b/w
+        monitors. The computer, of course, has no way of knowing
+        what type of monitor is attached.) On these displays, if
+        you don't specify <tt>-mono</tt> , what you will see is a
+        greyscale representation of one of the RGB outputs of the
+        system. (For example, you'll see the 'red' output on
+        greyscale Sun 3/60s.) The <tt>-mono</tt> option corrects
+        this behavior. </dd>
+    <dd>(Resource name: <tt>mono</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rv"><b>-</b>/<b>+rv</b></a></dt>
+    <dd>Makes <i>xv</i> display a 'negative' of the loaded image.
+        White becomes black, and black becomes white. Color
+        images will have 'interesting' effects, as the RGB
+        components are individually reversed. For example, red
+        (255,0,0) will become cyan (0,255,255), yellow will
+        become blue, and so on. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="white"><b>-wh</b><tt>ite</tt> <i>color</i></a></dt>
+    <dd>Specifies the 'white' color used when the picture is b/w
+        stippled. (When '<tt>-ncols 0'</tt> has been specified,
+        or when viewing a b/w image.) </dd>
+    <dd>(Resource name: <tt>white</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="black"><b>-bl</b><tt>ack</tt> <i>color</i></a></dt>
+    <dd>Specifies the 'black' color used when the picture is b/w
+        stippled. (When '<tt>-ncols 0'</tt> has been specified,
+        or when viewing a b/w image.) Try something like: '<tt>xv
+        -ncols 0 -bl red -wh yellow &lt;filename&gt;'</tt> for
+        some interesting, late-60's- <i>style</i> psychedelia
+        effects.</dd>
+    <dd>(Resource name: <tt>black</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="wait"><b>-wa</b><tt>it</tt> <i>secs</i></a></dt>
+    <dd>Turns on a 'slide-show' feature. Normally, if you specify
+        multiple input files, <i>xv</i> will display the first
+        one, and wait for you to give the <b>Next</b> command (or
+        whatever). The <tt>-wait</tt> option makes <i>xv</i> wait
+        for the specified number of seconds, and then go on to
+        the next picture, without any user intervention. The
+        program still accepts commands, so it's possible to
+        'abort' the current picture without waiting the full
+        specified time by using the <b>Next</b> command. <p>Note:
+        If you are in <b>Use Std. Colormap</b> mode, and you use <tt>-wait
+        0</tt> , the images will <i>not</i> be dithered (as they
+        normally are when you are in <b>Use Std. Colormap</b>
+        mode). It's assumed that if you said '<tt>-wait 0'</tt>
+        that you want the images displayed at maximum speed. You
+        can still turn the dithering on if you desire by using
+        the <tt>-dither</tt> option.</p>
+        <p>(Resource name: &lt;none&gt;)</p>
+    </dd>
+    <dt><a name="wloop"><b>-</b>/<b>+wl</b><tt>oop</tt></a></dt>
+    <dd>Normally, when running a slide-show with the <tt>-wait</tt>
+        option, <i>xv</i> will terminate after displaying the
+        last image. If you also specify the <tt>-wloop</tt>
+        option, the program will loop back to the first image and
+        continue the slide-show until the user issues the <b>Quit</b>
+        command. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="random"><b>-</b>/<b>+ra</b><tt>ndom</tt></a></dt>
+    <dd>Makes <i>xv</i> display multiple image files in a random
+        order. Useful for breaking up the monotony of having
+        slide-shows always display in the same order. Also, if
+        you also use the <tt>-quit</tt> option, you can have <i>xv</i>
+        display a single, random file from a list of files. This
+        may be useful if you'd like <i>xv</i> to pick a random
+        'background image' from some set of files. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="loadclear"><b>-</b>/<b>+loa</b><tt>dclear</tt></a></dt>
+    <dd>If you were on a PseudoColor display, <i>xv</i> used to
+        automatically clear the image window (and the root
+        window, if using a root mode) whenever you loaded a new
+        image. This was to prevent the potentially
+        annoying/confusing 'rainbow' effect that happens when
+        colormap entries are freed and reallocated with different
+        colors. This has changed. By default, <i>xv</i> no longer
+        clears the image/root window. This is for two reasons:
+        I've decided the rainbow effect is semi-entertaining, in
+        that it gives you something to look at while the next
+        image is being loaded. Secondly, if you are viewing a
+        series of images that have the same colors in them, it's
+        possible for <i>xv</i> to animate them (by using the '<tt>-wait'</tt>
+        command line option), albeit no faster than one frame
+        every 1-2 seconds. For example, you can go get the
+        satellite radar images from <tt>vmd.cso.uiuc.edu</tt> (in
+        the directory <tt>wx</tt>), run '<tt>xv -wait 0 SA*'</tt>,
+        and voila! Just like the evening news! </dd>
+    <dd>(Resource name: <tt>clearOnLoad</tt> Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="nofreecols"><b>-</b>/<b>+nof</b><tt>reecols</tt></a></dt>
+    <dd>Whenever you load a new image, <i>xv</i> normally frees
+        the colors it was using for the previous image, and
+        allocates new colors for the new image. This can cause
+        'rainbow' effects on PseudoColor displays as the colors
+        are changed. You can avoid this problem entirely by using
+        the <tt>-nofreecols</tt> option, which suppresses the
+        normal freeing of old colors. This is most useful when
+        doing slide-shows. Note, however that there will be fewer
+        colors available for 'later' images. These images will
+        wind up being displayed with whatever colors were
+        allocated for the earlier images. As such, they may or
+        may not look that hot... (And allow me to reiterate: <i>xv</i>
+        is <i>not</i> an image animator, despite options like
+        these that let it do so, albeit poorly.) </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rgb"><b>-</b>/<b>+rg</b><tt>b</tt></a></dt>
+    <dd>Specifies that, by default, the colormap editing dials in
+        the <i>xv color editor</i> window should be in RGB mode.
+        This is the normal default behavior. </dd>
+    <dd>(Resource name: <tt>hsvMode</tt> . Type: boolean ( <i>false</i>))</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="hsv"><b>-</b>/<b>+hs</b><tt>v</tt></a></dt>
+    <dd>Specifies that, by default, the colormap editing dials in
+        the <i>xv color editor</i> window should be in HSV mode. </dd>
+    <dd>(Resource name: <tt>hsvMode</tt> . Type: boolean ( <i>true</i>))</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="lbrowse"><b>-</b>/<b>+lb</b><tt>rowse</tt></a></dt>
+    <dd>Turns on the <b>Browse</b> checkbox in the <i>xv load</i>
+        window. This keeps the window from being automatically
+        closed whenever you successfully load an image. </dd>
+    <dd>(Resource name: <tt>loadBrowse</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="nostat"><b>-</b>/<b>+nos</b><tt>tat</tt></a></dt>
+    <dd>Speeds up the performance of the <i>xv load</i> and <i>xv
+        save</i> windows. (Which are really the same window...)
+        It keeps <i>xv </i>from doing a <tt>stat()</tt> system
+        call for each file in the current directory whenever you
+        change directories. This is handy on systems with a lot
+        remote files, where doing the <tt>stat()</tt> calls takes
+        too long. One downside: subdirectories will not be shown
+        with the little folder icons, as it requires a <tt>stat()</tt>
+        call to determine whether a file is a subdirectory or a
+        data file. This will not affect the operation of the
+        program, just the 'niceness'. </dd>
+    <dd>(Resource name: <tt>nostat</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="visual"><b>-vis</b><tt>ual</tt> <i>vistype</i></a></dt>
+    <dd>Normally, <i>xv</i> uses the 'best' visual model it can
+        get. It looks for a 24 or 32-bit deep <i>TrueColor</i>,
+        or <i>DirectColor</i> visual. If it can get one, that's
+        what it uses. Otherwise, it will fall back to using the
+        'default' visual provided by your X server. You can
+        override this bit of cleverness by explicitly selecting a
+        visual to use. Valid types are <i>StaticGray</i>, <i>StaticColor</i>,
+        <i>TrueColor</i>, <i>GrayScale</i>, <i>PseudoColor</i>, <i>DirectColor</i>,
+        and <i>default.</i> All of these modes are not
+        necessarily provided on any given X display. Run <i>xdpyinfo</i>
+        on your display to find out what visual types are
+        supported. You can also specify a specific visual by
+        using its numeric visual ID, in the case that you have
+        multiple instances of a given visual type available ( <i>xv</i>
+        will pick the 'deepest' one by default) </dd>
+    <dd>(Resource name: <tt>visual</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cursor"><b>-cu</b><tt>rsor</tt> <i>curs</i></a></dt>
+    <dd>Specifies an alternate cursor to use in the image window
+        (instead of the normal 'arrow' cursor). <i>curs</i>
+        values are obtained by finding the character number of a
+        cursor you like in the 'cursor' font. (Run '<tt>xfd -fn
+        cursor</tt>' to display the cursor font.) For example, a <i>curs</i>
+        value of '56' corresponds to the (singularly useless)
+        'Gumby' cursor.</dd>
+    <dd>(Resource name: <tt>cursor</tt> . Type: integer)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="2xlimit"><b>-</b>/<b>+2x</b><tt>limit</tt></a></dt>
+    <dd>By default, <i>xv</i> prevents the image window from ever
+        getting larger than the screen. Unfortunately, because of
+        this, if you load an image that is larger than your
+        screen, the image will be shrunk until it fits on your
+        screen. Some folks find this undesirable behavior.
+        Specifying the <tt>-2xlimit</tt> option doubles the size
+        limitations. The image window will be kept from getting
+        larger than 2x the width and height of your screen. <p>Just
+        in case you're wondering why there <i>are</i> any size
+        limitations: it's fairly easy to accidentally ask for a
+        huge image to be generated. Simply <b>Crop</b> a section
+        of the image, zoom so you can see the individual pixels,
+        and <b>UnCrop</b> . If there were no size limitations,
+        the (expanded many times) image could be huge, and might
+        crash your X server. At the very least, it would take a
+        long time to generate and transmit to your X server, and
+        would freeze up your X server during part of it.
+        Generally undesirable behavior.</p>
+        <p>(Resource name: <tt>2xlimit</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="nolimits"><b>-</b>/<b>+nol</b><tt>imits</tt></a></dt>
+    <dd>For the truly daring, this turns off all limitations on
+        the maximum size of an image. (Well, there's still an
+        X-imposed maximum size of 64K by 64K, but that really
+        shouldn't be a problem.) Warning: as mentioned above, it
+        is fairly easy to accidentally generate a huge image when
+        you do an <b>UnCrop</b> command, and you may well crash <i>xv</i>,
+        your X server, the host machine, or all three. Use At
+        Your Own Risk!!! </dd>
+    <dd>(Resource name: <tt>nolimits</tt> Type: boolean) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="close"><b>-</b>/<b>+clo</b><tt>se</tt></a></dt>
+    <dd>If specified, iconifying the <i>xv image</i> window will
+        automatically close all the other <i>xv</i> windows.
+        De-iconifying the <i>xv image</i> window will re-open the
+        other <i>xv</i> windows. </dd>
+    <dd>(Resource name: <tt>autoClose</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="iconic"><b>-</b>/<b>+ico</b><tt>nic</tt></a></dt>
+    <dd>Starts <i>xv</i> with its image window iconified. </dd>
+    <dd>(Resource name: <tt>iconic</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="icgeom"><b>-icg</b><tt>eometry</tt> <i>geom</i></a></dt>
+    <dd>Specifies the screen position of the icon (when you use
+        the <tt>-iconic</tt> option). </dd>
+    <dd>(Resource name: <tt>iconGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="dir"><b>-dir</b> <i>directory</i> </a></dt>
+    <dd>Specifies an initial directory for <i>xv</i> to switch to
+        when run. Also specifies the default directory used for
+        the <i>visual schnauzer</i> and the <i>xv load</i> and <i>xv
+        save </i>windows.</dd>
+    <dd>(Resource name: <tt>searchDirectory</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="flist"><b>-fl</b><tt>ist</tt> <i>fname</i></a></dt>
+    <dd>Tells <i>xv</i> to read a file <i>fname</i> that consists
+        of a list of names of image files to load, one per line.
+        This file is in the same format generated by the <b>File
+        list</b> checkbox in the <i>xv save</i> window. You can
+        use this to get around shell 'command-length' limitations
+        (which can hit you if you try '<tt>xv *'</tt> in a
+        directory with a thousand or two files), or you could
+        have <i>find</i> (or whatever) generate this file based
+        on some type of criteria (age, size, etc.) </dd>
+    <dd>(Resource name: <tt>fileList</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="drift"><b>-dr</b><tt>ift</tt> <i>dx dy</i></a></dt>
+    <dd>A kludge. In order to do certain operations, <i>xv</i>
+        needs to be able to precisely position the contents of an
+        image window on the screen. Unfortunately, window
+        managers disagree wildly on exactly how the &quot;where's
+        the window&quot; information will be presented to the
+        program. The practical upshot is that, despite a sizable
+        effort to the contrary, <i>xv</i> may very will have its
+        image window 'drift' on the screen as you resize it. This
+        option lets you specify correction factors to cancel out
+        the drift. If the window drifts down and to the right,
+        use negative values to cancel the drifting. If the window
+        drifts up and to the left, use positive values to cancel
+        the drifting. </dd>
+    <dd>(Resource name: <tt>driftKludge</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="mfn"><b>-mf</b><tt>n</tt> <i>font</i></a></dt>
+    <dd>Lets you specify the mono-spaced font used in the <i>TextView
+        </i>windows, and a few other places. Be sure you use a
+        mono-spaced font, or you may well get 'interesting'
+        effects. </dd>
+    <dd>(Resource name: <tt>monofont</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="name"><b>-na</b><tt>me</tt> <i>string</i></a></dt>
+    <dd>Lets you change what string is displayed in the titlebar
+        of the image window. Normally, <i>xv</i> will display the
+        version number and the filename. If you're calling <i>xv</i>
+        from another program, you may prefer to have it print a
+        more descriptive string, or perhaps something like
+        '&lt;click mouse to quit&gt;' if you're also using the <tt>-quit</tt>
+        option. </dd>
+    <dd>(Resource name: &lt;none&gt;) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="viewonly"><b>-</b>/<b>+vie</b><tt>wonly</tt></a></dt>
+    <dd>For use when calling <i>xv</i> from some other program.
+        Forces all user input to be ignored. This keeps the
+        untrained (or inquisitive) user from nosing around,
+        creating files, or just generally misbehaving. Also note
+        that there's no way for the user to quit the program. It
+        is up to the calling process to manually kill <i>xv</i>
+        when it feels that the image has been displayed long
+        enough. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="grabdelay"><b>-</b>/<b>+gr</b><tt>abdelay</tt> <i>seconds</i></a></dt>
+    <dd>Sets the default 'grab delay' in the <b>Grab</b> dialog
+        box. See &quot;<a
+        href="control-window-5.html#grab-command">The Grab
+        Command</a>&quot; . </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="poll"><b>-</b>/<b>+po</b><tt>ll</tt></a></dt>
+    <dd>Turns file polling on. If enabled, <i>xv</i> will notice
+        when the currently displayed image file changes (due to
+        some other process rewriting it, or something like that),
+        and it will automatically reload the image file once it
+        appears to have settled down (once the file size stops
+        changing for a few seconds). See &quot;<a
+        href="control-window-6.html#reloading">Image Reloading</a>&quot;
+        for further details. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="vsperfect"><b>-</b>/<b>+vsp</b><tt>erfect</tt></a></dt>
+    <dd>Normally, the <i>visual schnauzer</i> uses its own
+        private colormap. This is necessary in order to get a
+        good set of colors to display the image icons, and not
+        steal colors away from the actual image window. However,
+        you may find the colormap install/deinstall very
+        annoying. I do. You can specify this option ( <tt>+vsperfect</tt>
+        ) to turn the 'perfect' behavior off. If you do so, the <i>visual
+        schnauzer</i> windows will steal away a small (64-entry)
+        part of the colormap (unless you are in <b>Use Std.
+        Colormap</b> mode, in which case they will share the
+        standard colormap). The downside is that neither the
+        schnauzer <i>nor</i> the image will look as good. </dd>
+    <dd>(Resource name: <tt>vsPerfect</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="vsdisable"><b>-</b>/<b>+vsd</b><tt>isable</tt></a></dt>
+    <dd>Completely disables the <i>visual schnauzer</i>. This is
+        mainly so, if you have <tt>vsPerfect</tt> turned off, you
+        can disable the schnauzer and keep it from stealing any
+        colors from the image. In the default setting ( <tt>vsPerfect</tt>
+        is turned on), this option will have no useful effect. </dd>
+    <dd>(Resource name: <tt>vsDisable</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="gsdev"><b>-gsd</b><tt>ev</tt> <i>str</i></a></dt>
+    <dd>Sets the 'device' that the <i>ghostscript</i> package
+        will generate output for, which is used whenever you read
+        a PostScript file in <i>xv</i>. Currently, the default
+        device is <b>ppmraw</b> , which means all PostScript will
+        be converted to either a 24-bit color PPM file, an 8-bit
+        greyscale PGM file, or a 1-bit black- and-white PBM file,
+        as appropriate (based on the particular PostScript file
+        in question). Note that your copy of <i>ghostscript</i>
+        must be configured to support this device, and any other
+        values you may wish to set this option to. See the <i>xv</i>
+        <tt>Makefile</tt> for further information. <p>Also note:
+        Be very careful when using these options, as it's pretty
+        easy to have <i>ghostscript</i> generate <i>enormous</i>
+        data files. For example, for normal 8&quot; by 11&quot;
+        pages, at 72dpi, a PBM file will require ~60K per page, a
+        PGM file will require ~500K per page, and a PPM file will
+        require ~1.5M per page. If you have it generate images at
+        300 dpi (see below), these sizes explode to roughly 1, 8,
+        and 24 megabytes per page. As such, you should forget
+        about viewing color pages at 300 dpi, and you may also
+        want to forget about viewing multi-page PostScript files
+        at 300 dpi.</p>
+        <p>(Resource name: <tt>gsDevice</tt> . Type: string)</p>
+    </dd>
+    <dt><a name="gsres"><b>-gsr</b><tt>es</tt> <i>res</i></a></dt>
+    <dd>Specifies the resolution of the page files generated by <i>ghostscript</i>,
+        in dots per inch. Defaults to 72 dpi. You can set it to
+        any value, but be careful about generating enormous
+        intermediate datafiles. </dd>
+    <dd>(Resource name: <tt>gsResolution</tt> . Type: integer)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="gsgeom"><b>-gsg</b><tt>eom</tt> <i>geom</i></a></dt>
+    <dd>Sets the page size of the files generated by <i>ghostscript</i>.
+        Normally, this defaults to '612x792', which is the size
+        of 8&quot; by 11&quot; paper, as measured in 72nds of an
+        inch. Note that these numbers are in 72nds of an inch
+        regardless of the resolution (dpi) value set by <tt>gsResolution</tt>
+        . </dd>
+    <dd>(Resource name: <tt>gsGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="nodecor"><b>-</b>/<b>+nod</b><tt>ecor</tt></a></dt>
+    <dd>Turns off certain decorations on the <i>xv image </i>window's
+        frame, maybe. Works for <i>mwm</i>, at least. There is no
+        way to do this trick with <i>olwm</i>, and <i>twm</i>
+        doesn't need it. Anyway, if you turn off the titlebar and
+        such on the <i>xv image</i> window, it removes the <i>minimum
+        size</i> constraint/problem that I talk about in &quot;<a
+        href="image-window.html#cropping">Cropping</a>&quot; ,
+        and elsewhere. </dd>
+    <dd>(Resource name: <tt>nodecor</tt> Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rm"><b>-R</b><tt>M</tt></a></dt>
+    <dd>If specified, <i>deletes</i> all files specified on the <i>xv</i>
+        command line when <i>xv</i> exits. This can be handy if
+        you're using <i>xv</i> as an external viewer, and you'd
+        like to hand it a file, have it displayed, and then have
+        it go away. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="debug"><b>-D</b><tt>EBUG</tt> <i>level</i></a></dt>
+    <dd>Turns on some debugging information. You shouldn't need
+        this. If everything worked perfectly, <i>I</i> wouldn't
+        need this. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="stdin"><b>-</b></a></dt>
+    <dd>Specifying '-' all by itself tells <i>xv</i> to take its
+        input from <tt>stdin</tt> , rather than from a file. This
+        lets you put <i>xv</i> on the end of a Unix pipe. </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="modifying-behavior-4.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="modifying-behavior-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

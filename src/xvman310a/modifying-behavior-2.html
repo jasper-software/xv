@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Modifying xv Behavior, part 2/4</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="bit-options">8/24-Bit Options</a></h2>
+
+<p>See &quot;<a href="control-window-3.html#bit-menu">The 24/8
+Bit Menu</a>&quot; for further information about the following
+options.</p>
+
+<dl>
+    <dt><a name="8"><b>-</b>/<b>+8</b></a></dt>
+    <dd>Locks <i>xv</i> into <b>8-</b> bit <b>Mode</b> . </dd>
+    <dd>(Resource name: <tt>force8</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="24"><b>-</b>/<b>+24</b></a></dt>
+    <dd>Locks <i>xv</i> into <b>24-bit Mode</b> . </dd>
+    <dd>(Resource name: <tt>force24</tt> . Type: boolean)</dd>
+</dl>
+
+<p>The following three options only come into play if you are
+using <i>xv</i> to display 24-bit RGB data (PPM files, color PM
+files, JPEG files, the output of <i>bggen</i>, etc.), and you
+have <i>xv</i> locked into <b>8-bit Mode</b> , or you save 24-bit
+image data into an 8-bit graphics file format (such as GIF). They
+have no effect whatsoever on how GIF pictures or 8-bit greyscale
+images are displayed.</p>
+
+<dl>
+    <dt><a name="quick24"><b>-quic</b><tt>k24</tt></a></dt>
+    <dd>Forces <i>xv</i> to use the 'quick' 24-bit to 8-bit
+        conversion algorithm. This algorithm dithers the picture
+        using a fixed set of colors that span the entire RGB
+        colorspace. In versions of <i>xv</i> prior to 2.10, this
+        was the default algorithm. It no longer is. <p>(Resource
+        name: <tt>quick24</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="slow24"><b>-sl</b><tt>ow24</tt></a></dt>
+    <dd>Forces <i>xv</i> to use the 'slow' 24-bit to 8-bit
+        conversion algorithm. This algorithm uses a version of
+        Heckbert's median cut algorithm to pick the 'best' colors
+        on a per-image basis, and dithers with those. This is the
+        current default conversion algorithm. <p>Advantages: The <tt>-slow24</tt>
+        algorithm often produces better looking pictures than the
+        <tt>-quick24</tt> algorithm.</p>
+        <p>Disadvantages: The <tt>-slow24</tt> algorithm is about
+        half as fast as the <tt>-quick24</tt> algorithm. Also,
+        since the colors are chosen on a per-image basis, it
+        can't be used to display multiple images simultaneously,
+        as each image will almost certainly want a different set
+        of 256 colors. The <tt>-quick24</tt> algorithm, however,
+        uses the same exact colors for all images, so it can
+        display many images simultaneously, without running out
+        of colors.</p>
+        <p>(Resource name: <tt>slow24</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="best24"><b>-be</b><tt>st24</tt></a></dt>
+    <dd>Forces <i>xv</i> to use the same algorithm used in the
+        program <i>ppmquant</i>, written by Jef Poskanzer. This
+        algorithm also uses a version of Heckbert's median cut
+        algorithm, but is capable of picking 'better' colors than
+        the <tt>- slow24</tt> algorithm, and it doesn't dither. <p>Advantages:
+        Generally produces slightly better images than the <tt>-slow24</tt>
+        algorithm. Also, the images are undithered, so they look
+        better when expanded.</p>
+        <p>Disadvantages: Much slower than the <tt>-slow24</tt>
+        algorithm. Like, 5 to 10 times slower. The images
+        produced aren't <i>that</i> much better than those
+        produced by the <tt>-slow24</tt> algorithm.</p>
+        <p>(Resource name: <tt>best24</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="noqcheck"><b>-noq</b><tt>check</tt></a></dt>
+    <dd>Turns off a 'quick check' that is normally made.
+        Normally, before running any of the 24-bit to 8-bit
+        conversion algorithms, <i>xv</i> determines whether the
+        picture to be displayed has more than 256 unique colors
+        in it. If the picture doesn't, it will treat the picture
+        as an 8-bit colormapped image (i.e., GIF), and won't run
+        either of the conversion algorithms. <p>Advantages: The
+        pictures will be displayed 'perfectly', whereas if they
+        went through one of the conversion algorithms, they'd
+        probably be dithered.</p>
+        <p>Disadvantages: Often uses a lot of colors, which
+        limits the ability to view multiple images at once. (See
+        the <tt>-slow24</tt> option above for further info about
+        color sharing.)</p>
+        <p>(Resource name: <tt>noqcheck</tt>. Type: boolean)</p>
+    </dd>
+</dl>
+
+<h2><a name="root-window-options">Root Window Options</a></h2>
+
+<p><i>xv</i> has the ability to display images on the root window
+of an X display, rather than opening its own window (the default
+behavior). When using the root window, the program is somewhat
+limited, because the program cannot receive input events
+(keypresses and mouse clicks) from the root window. As a result,
+you cannot track pixel values, nor crop, nor can you use keyboard
+commands while the mouse is in the root window.</p>
+
+<dl>
+    <dt><a name="root"><b>-</b>/<b>+roo</b><tt>t</tt></a></dt>
+    <dd>Directs <i>xv</i> to display images in the root window,
+        instead of opening its own window. Exactly how the images
+        will be displayed in the root window is determined by the
+        setting of the <tt>-rmode</tt> option. Defaults to style
+        '0' if <tt>- rmode</tt> is not specified. <p>(Resource
+        name: &lt;none&gt;)</p>
+    </dd>
+    <dt><a name="rmode"><b>-rm</b><tt>ode</tt> <i>mode</i></a></dt>
+    <dd>Determines how images are to be displayed on the root
+        window, when <tt>-root</tt> has been specified. You can
+        find the current list of 'modes' by using a mode value of
+        '-1'. <i>xv</i> will complain, and show a list of valid
+        modes. The current list at of the time of this writing
+        is: <pre>0:  tiling
+1:  integer tiling
+2:  mirrored tiling
+3:  integer mirrored tiling
+4:  centered tiling
+5:  centered on a solid background
+6:  centered on a 'warp' background
+7:  centered on a 'brick' background
+8:  symmetrical tiling
+9:  symmetrical mirrored tiling</pre>
+        <p>The default mode is '0'. See &quot;<a
+        href="control-window-2.html#root-display-modes">Root
+        Display Modes</a>&quot; for a description of the
+        different display modes. Also, if you specify a '<tt>-rmode'</tt>
+        option on the command line, it is not necessary to also
+        specify the '<tt>-root'</tt> option.</p>
+        <p>(Resource name: <tt>rootMode</tt> . Type: integer)</p>
+    </dd>
+    <dt><a name="noresetroot"><b>-</b>/<b>+nore</b><tt>setroot</tt></a></dt>
+    <dd>Lets you turn off the clearing of the root window that
+        happens when you switch from a 'root' display mode back
+        to the 'window' display mode. Handy if you're trying to
+        create a neat mirrored root tile, and you have to keep
+        adjusting your cropping. Or something like that. <p>(Resource
+        name: <tt>resetroot</tt> . Type: boolean)</p>
+    </dd>
+    <dt><a name="rfg"><b>-rf</b><tt>g</tt> <i>color</i></a></dt>
+    <dd>Sets the 'foreground' color used in some of the root
+        display modes. </dd>
+    <dd>(Resource name: <tt>rootForeground</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rbg"><b>-rb</b><tt>g</tt> <i>color</i></a></dt>
+    <dd>Sets the 'background' color used in some of the root
+        display modes. </dd>
+    <dd>(Resource name: <tt>rootBackground</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="max"><b>-</b>/<b>+max</b></a></dt>
+    <dd>Makes <i>xv</i> automatically stretch the image to the
+        full size of the screen. This is mostly useful when you
+        want <i>xv</i> to display a background. While you could
+        just as well specify the dimensions of your display
+        ('-geom 1152x900' for example), the <tt>-max</tt> option
+        is display-independent. If you decide to start working on
+        a 1280x1024 display the same command will still work.
+        Note: If you specify <tt>-max</tt> when you aren't using <tt>-root</tt>
+        , the behavior is slightly different. In this case, the
+        image will be made as large as possible while still
+        preserving the normal aspect ratio. <p>(Resource name:
+        &lt;none&gt;)</p>
+    </dd>
+    <dt><a name="maxpect"><b>-</b>/<b>+maxp</b><tt>ect</tt></a></dt>
+    <dd>Makes the image as large as possible while preserving the
+        aspect ratio, whether you're in a 'root' mode or not. </dd>
+    <dd>(Resource name: &lt;none&gt;)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="quit"><b>-</b>/<b>+quit</b></a></dt>
+    <dd>Makes <i>xv</i> display the (first) specified file and
+        exit, without any user intervention. Since images
+        displayed on the root window remain there until
+        explicitly cleared, this is very useful for having <i>xv</i>
+        display background images on the root window in some sort
+        of start-up script. <p>If you aren't using a 'root' mode,
+        this option will make <i>xv</i> exit as soon as the user
+        clicks any mouse button in the image window. This is
+        useful if you are calling <i>xv</i> from some other
+        program to display an image.</p>
+        <p>(Resource name: &lt;none&gt;)</p>
+    </dd>
+    <dt><a name="clear"><b>-</b>/<b>+cle</b><tt>ar</tt></a></dt>
+    <dd>Clears the root window of any <i>xv</i> images. Note: it
+        is not necessary to do an '<tt>xv -clear'</tt> before
+        displaying another picture in the root window. <i>xv</i>
+        will detect that there's an old image in the root window
+        and automatically clear it out (and free the associated
+        colors). <p>(Resource name: &lt;none&gt;)</p>
+    </dd>
+</dl>
+
+<h2><a name="window-options">Window Options</a></h2>
+
+<p><i>xv</i> currently consists has several top-level windows,
+plus one window for the actual image. These windows (the <i>xv
+controls</i> window, the <i>xv info</i> window, the <i>xv color
+editor</i> window, the <i>xv comments</i> window, the <i>xv text</i>
+<i>viewer</i> window, and the <i>xv visual schnauzer</i>) may be
+automatically mapped and positioned when the program starts.</p>
+
+<dl>
+    <dt><a name="cmap"><b>-</b>/<b>+cma</b><tt>p</tt></a></dt>
+    <dd>Maps the <i>xv controls</i> window. </dd>
+    <dd>(Resource name: <tt>ctrlMap</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cgeom"><b>-cge</b><tt>om</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry of the <i>xv controls</i>
+        window. Note: only the position information is used. The
+        window is of fixed size. </dd>
+    <dd>(Resource name: <tt>ctrlGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="imap"><b>-</b>/<b>+im</b><tt>ap</tt></a></dt>
+    <dd>Maps the <i>xv info</i> window. </dd>
+    <dd>(Resource name: <tt>infoMap</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="igeom"><b>-ig</b><tt>eom</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry of the <i>xv info</i> window.
+        Note: only the position information is used. The window
+        is of fixed size. </dd>
+    <dd>(Resource name: <tt>infoGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cemap"><b>-</b>/<b>+cem</b><tt>ap</tt></a></dt>
+    <dd>Maps the <i>xv color editor</i> window. </dd>
+    <dd>(Resource name: <tt>ceditMap</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cegeom"><b>-ceg</b><tt>eom</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry of the <i>xv color editor</i>
+        window. Note: only the position information is used. The
+        window is of fixed size. </dd>
+    <dd>(Resource name: <tt>ceditGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cmtmap"><b>-</b>/<b>+cmtm</b><tt>ap</tt></a></dt>
+    <dd>Maps the <i>xv comments</i> window. </dd>
+    <dd>(Resource name: <tt>commentMap</tt> . Type: boolean) </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="cmtgeom"><b>-cmtg</b><tt>eometry</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry of the <i>xv comments</i>
+        window. </dd>
+    <dd>(Resource name: <tt>commentGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="tgeom"><b>-tg</b><tt>eometry</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry for any <i>TextView</i> windows
+        (other than the <i>xv comments</i> window). </dd>
+    <dd>(Resource name: <tt>textviewGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="vsmap"><b>-</b>/<b>+vsm</b><tt>ap</tt></a></dt>
+    <dd>Maps an <i>xv visual schnauzer</i> window. </dd>
+    <dd>(Resource name: <tt>vsMap</tt> . Type: boolean)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="vsgeom"><b>-vsg</b><tt>eometry</tt> <i>geom</i></a></dt>
+    <dd>Sets the initial geometry of the <i>xv visual schnauzer</i>
+        windows. </dd>
+    <dd>(Resource name: <tt>vsGeometry</tt> . Type: string)</dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="nopos"><b>-</b>/<b>+nop</b><tt>os</tt></a></dt>
+    <dd>Turns off the 'default' positioning of the various <i>xv</i>
+        windows. Every time you open a window, you will be asked
+        to position it. (Assuming your window manager asks you
+        such things. <i>mwm</i>, for instance, doesn't seem to
+        ask) </dd>
+    <dd>(Resource name: <tt>nopos</tt> . Type: boolean)</dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="modifying-behavior-3.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="modifying-behavior-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

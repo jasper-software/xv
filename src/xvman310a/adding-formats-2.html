@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Adding Other Image Formats to xv, part 2/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="adding-code-writing-new-file-format">Adding Code for
+Writing a New File Format</a></h2>
+
+<p>Note: Despite the wide variety of displays and file formats <i>xv</i>
+deals with, internally it only manipulates <i>either </i>8-bit
+colormapped images <i>or</i> 24-bit RGB images. Your <tt>Write()</tt>
+routine must be prepared to take either sort of image, and
+convert it (if necessary) to the image format that your file
+format dictates.</p>
+
+<p>If you haven't already done so (if/when you created the <tt>Load()</tt>
+function):</p>
+
+<p>Make a copy of <tt>xvpbm.c</tt> , calling it something
+appropriate. For the rest of this appendix, mentally replace the
+string ' <tt>xvpbm.c</tt> ' with the name of your new file.</p>
+
+<p>Edit the <tt>Makefile</tt> and/or the <tt>Imakefile</tt> so
+that your new module will be compiled. In the <tt>Makefile</tt> ,
+add &quot; <tt>xvpbm.o</tt> &quot; to the &quot; <tt>OBJS = ...</tt>
+&quot; macro definition. In the <tt>Imakefile</tt> , add &quot; <tt>xvpbm.o</tt>
+&quot; to the end of the &quot; <tt>OBJS1 = ...</tt> &quot; macro
+definition, and &quot; <tt>xvpbm.c&quot;</tt> to the end of the <tt>&quot;SRCS1
+= ...&quot;</tt> macro definition.</p>
+
+<p>Edit the new module.</p>
+
+<p>You'll need to <tt>#include &quot;xv.h&quot;</tt> , of course.</p>
+
+<p>The module should have one externally callable function that
+does the work of writing the file. The function is called with a
+large number of arguments, described below. The function should
+return '0' if everything succeeded, and '-1' on failure.</p>
+
+<blockquote>
+    <pre><font size="2">/*******************************************/
+int WritePBM(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,raw,comment)
+     FILE *fp;
+     byte *pic;
+     int   ptype, w,h;
+     byte *rmap, *gmap, *bmap;
+     int   numcols, colorstyle, raw;
+     char *comment;
+/*******************************************/</font></pre>
+</blockquote>
+
+<dl>
+    <dt><font size="2" face="Courier New">file *fp;</font></dt>
+    <dd>This is a pointer to an already- <tt>fopen()</tt> 'd
+        stream. Your function should neither open nor close this
+        stream, as that all gets handled elsewhere in <tt>xvdir.c</tt>
+        .</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">byte *pic;</font></dt>
+    <dd>This points to the image data that will be written. In
+        the case of a <tt>PIC8</tt> image, <tt>pic</tt> will
+        point to a <tt>w*h</tt> long array of bytes, one byte per
+        pixel, starting at the top-left, and proceeding in normal
+        scan-line order. There is no padding of any sort at the
+        end of the lines.</dd>
+    <dt>&nbsp;</dt>
+    <dd>In the case of a <tt>PIC24</tt> image, <tt>pic</tt> will
+        point to a <tt>w*h*3</tt> long array of bytes. There are
+        three bytes per pixel, in red, green, blue order. The
+        pixels start at the top-left, and proceed in normal scan
+        line order. There is no padding of any sort at the end of
+        the lines.</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">int ptype, w, h;</font></dt>
+    <dd>These variables describe the format of <tt>pic</tt> . <tt>ptype</tt>
+        can be set to either <tt>PIC8</tt> or <tt>PIC24</tt> . <tt>w</tt>
+        and <tt>h</tt> are the width and height of the image, in
+        pixels.</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">byte *rmap, *gmap,
+        *bmap;<br>
+        int numcols;</font></dt>
+    <dd>These pointers point to the colormap associated with the
+        image. They are only relevant when <i>ptype</i> is PIC8,
+        meaning that <i>pic</i> is an 8-bit per pixel colormapped
+        image. These arrays will each be <tt>numcols</tt> entries
+        long, with a maximum length of 256. Do not attempt to
+        access entries &gt;= <tt>numcols</tt> , as the colormaps
+        are <i>not necessarily</i> 256 entries long. You are
+        guaranteed that pixel values found in <tt>pic</tt> will
+        be within the range [0..numcols-1], so you don't have to
+        check each pixel value. Also, do not attempt to access
+        these arrays at all if <tt>ptype</tt> is PIC24, as these
+        pointers will probably be NULL in that case.</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">int colorstyle;</font></dt>
+    <dd>The <i>Colors</i> choice selected in the <i>xv save</i>
+        window. It can be either <tt>F_FULLCOLOR</tt> , <tt>F_GREYSCALE</tt>
+        , or <tt>F_BWDITHER</tt> . It will <i>not</i> be <tt>F_REDUCED</tt>
+        . If the user selects <b>Reduced Color</b> in the <i>xv
+        save</i> window, the appropriate image will be computed,
+        and you'll be given that image, and <i>colorstyle</i>
+        will be set to <tt>F_FULLCOLOR</tt> .</dd>
+    <dt>&nbsp;</dt>
+    <dd>Likewise, if the user has selected <b>B/W Dithered</b> in
+        the <i>xv save</i> window, an appropriate black-and-white
+        image will have been generated before your <tt>Write()</tt>
+        routine is called, so you won't have to worry about that.
+        Such an image will be a <tt>PIC8</tt> image, with a
+        2-entry colormap. It is up to you to decide which of the
+        two colors should be written as <i>black</i>, and which
+        should be written as <i>white</i>. You should do this by
+        comparing the values of <font size="2"><tt>MONO(rmap[0],gmap[0],bmap[0])</tt></font>
+        and <font size="2"><tt>MONO(rmap[1],gmap[1],bmap[1])</tt></font>.
+        Whichever value is smaller is the darker of the two, and
+        should be written as <i>black</i>.</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">int raw;</font></dt>
+    <dd>This is a value passed in specifically for the <tt>WritePBM()</tt>
+        function, as PBM has two closely-related subformats (raw,
+        and ascii) both of which are written by this one
+        function. Your function won't need this, nor should it be
+        passed in to your function.</dd>
+    <dt>&nbsp;</dt>
+    <dt><font size="2" face="Courier New">char *comment;</font></dt>
+    <dd>This will point to a zero-terminated character string
+        which contains the comments that should be written into
+        the image file. Note that this string can be of <i>any</i>
+        length, and it may contain any number of lines (separated
+        by '<tt>\n</tt>' characters). If your image format
+        supports comments in the file, you should write this
+        information to the file. If it doesn't, you should just
+        ignore this variable. Also, this variable may be <tt>NULL</tt>,
+        (signifying 'no comments'), in which case it should not
+        be used.</dd>
+</dl>
+
+<p>You may pass more parameters, since you're going to be adding
+the call to this function later on. For example, in my PBM code,
+I pass one more parameter, 'raw' (whether to save the file as
+'raw' or 'ascii') to handle two very similar formats. (Rather
+than having to write <tt>WritePBMRaw</tt>() and <tt>WritePBMAscii</tt>()
+functions.)</p>
+
+<p>Write the function as you deem appropriate. See <tt>xvpbm.c</tt>
+for an example of a <tt>Write()</tt> routine that writes
+different formats for 1-bit per pixel images, 8-bit per pixel
+images, and 24-bit per pixel images, based on <tt>ptype</tt> and <tt>colorstyle</tt>
+.</p>
+
+<p>Note: If your file format can only handle 8-bit images, and <tt>ptype</tt>
+is set to <tt>PIC24</tt> , you will have to call <tt>Conv24to8()</tt>
+to convert the 24-bit image into an 8-bit colormapped image that
+you can write to the file. See <tt>xvgifwr.c</tt> for an example
+of how this is done.</p>
+
+<p>That done, edit ' <tt>xv.h</tt> ' and add a function
+declaration for your new function. Search for ' <tt>WritePBM()</tt>
+' in the file for a sample declaration to copy.</p>
+
+<p>Also find the block that begins with:</p>
+
+<blockquote>
+    <pre><font size="2">#define F_GIF       0
+#define F_JPEG      ( 0 + F_JPGINC)</font></pre>
+</blockquote>
+
+<p>and add a definition for your format. Note that it'll be
+easiest to tack it on at the end.</p>
+
+<p>These numbers <i>must</i> be contiguous, as they are used as
+indices into the <tt>fmtMB</tt> menu in <tt>xvdir.c</tt> .</p>
+
+<p>Edit '<tt>xvdir.c</tt>'. This is the module that controls the <i>xv
+save</i> window.</p>
+
+<p>Add another format name, in the appropriate position, to the <tt>saveFormats[]</tt>
+string array.</p>
+
+<p>In the function <tt>DoSave()</tt> , find the following block:</p>
+
+<blockquote>
+    <pre><font size="2">switch (fmt) {
+  case F_GIF:
+    rv = WriteGIF(fp, thepic, ptype, w, h, rp, gp, bp, nc, col,
+picComments);
+  break;
+  case F_PM:
+    rv = WritePM (fp, thepic, ptype, w, h, rp, gp, bp, nc, col,
+picComments);
+  break;</font></pre>
+</blockquote>
+
+<p>and add a case for your function.</p>
+
+<p>Finally, if your format has a common 3 or 4 letter filename
+suffix (like, &quot;.gif&quot;, &quot;.jpg&quot;, etc.), you
+should modify the <tt>changeSuffix()</tt> routine in <tt>xvdir.c</tt>
+so that it recognizes your suffix, and puts your suffix on when
+someone selects your format.</p>
+
+<p>And It's just that easy!</p>
+
+<h3><a name="writing-complex-formats">Writing Complex Formats</a></h3>
+
+<p>Okay, maybe it's not <i>that</i> easy...</p>
+
+<p>If your format requires some additional information to specify
+how the file should be saved (such as the 'quality' setting in
+JPEG, or position/size parameters in PostScript), then your task
+is somewhat more difficult. You'll have to create some sort of
+pop-up dialog box to get the additional information that you
+want. You'll also have to change the way your <tt>Write()</tt>
+function gets called (as it will now get called from your pop-up
+dialog box). (Though, if you only feel like doing a quick hack,
+you can probably just use the <tt>GetStrPopUp()</tt> function to
+get a one-line character string from the user, and avoid the
+complication of writing your own dialog box.)</p>
+
+<p>This is not recommended for anyone who doesn't understand Xlib
+programming. Frankly, it's not recommended for those who <i>do</i>,
+either, but they at least stand some chance of success.</p>
+
+<p>The more adventurous types who wish to pursue this should take
+a look at the <tt>xvjpeg.c</tt> code, which implements an
+extremely simple pop-up dialog. A considerably more complicated
+dialog box is implemented in <tt>xvps.c</tt>. In addition to
+writing a module like these for your format, you'll also have to
+add the appropriate hooks to the <tt>DoSave()</tt> function (in <tt>xvdir.c</tt>)
+and the <tt>HandleEvent()</tt> function (in <tt>xvevent.c</tt> ).
+'<tt>grep PS *.c</tt>' will be helpful in finding places where
+the <tt>xvps.c</tt> module is called. </p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="adding-algorithms.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="adding-formats-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

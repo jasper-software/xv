@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Control Window, part 5/6</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+
+<h2><a name="text-annotation">Text Annotation</a></h2>
+
+<p>Starting in <i>xv</i> version 3.10, it is now possible to do <i>text
+annotation</i>, or what we in the business call &quot;putting
+words on the picture&quot;. There is one thing to note, before
+you go diving in: <i>xv</i>'s text annotation ability is Really
+Lame. I mean, <i>Big Time</i> Lame. It's awkward to use (to say
+the least), and not very powerful. Frankly, it's an
+embarrassment. But <i>maybe</i> it'll be useful to someone.</p>
+
+<p>Now that your expectations are suitably low, here's how it
+works:</p>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-079.gif" width="36"
+        height="25"></td>
+        <td><b>Text Annotation</b> . First, if you have a
+        selection rectangle drawn, get rid of it. Click this
+        button to bring up a dialog box, where you can enter a
+        single-line string. After you enter the string and press <b>&lt;Return</b>
+        &gt; (or the <b>Ok</b> button in the dialog box), you
+        will be presented with an appropriately-sized selection
+        rectangle. You may reposition and resize this rectangle
+        as you see fit. When you have the rectangle <i>just so</i>,
+        use the <b>Paste</b> command to put the text on the
+        image. The text will be pasted in the <i>current color</i>
+        (See &quot;<a
+        href="image-window.html#displaying-pixel-values">Displaying
+        Pixel Values</a>&quot; ). The text will be stretched to
+        fit the selection rectangle.<br>
+        Keyboard Equivalent: <b>A</b></td>
+    </tr>
+</table>
+
+<p>Note: if you want to change the color of the pasted text, pick
+a new color (via the 'eyedropper' described in &quot;<a
+href="image-window.html#displaying-pixel-values">Displaying Pixel
+Values</a>&quot; ), and issue the <b>Text Annotation</b> command
+again. (It is not sufficient to simply <b>Paste</b> again.) Note
+that if you have a selection rectangle drawn, the <b>Text
+Annotation</b> command will not change the position or shape of
+the rectangle to reflect the new text, which lets you easily re-<b>Paste</b>
+over your last attempt.</p>
+
+<h2><a name="grab-command">The Grab Command</a></h2>
+
+<p>The <b>Grab</b> command in <i>xv</i> version 3.10 has been
+extensively improved. It is now possible to do <i>delayed grabs</i>,
+which can give you time to shuffle some windows around before the
+grab takes place. You can also do <i>delayed auto-grabs</i>,
+which gives you a way to grab pull-down menus and other actions
+that take place while a mouse-button is being held down.</p>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-080.gif" width="72"
+        height="25"></td>
+        <td valign="top"><b>Grab</b> command. Clicking this
+        button brings up the <i>xv grab</i> dialog box shown (and
+        described) below.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; g</b></td>
+    </tr>
+</table>
+
+<p><a name="grab-window"><img src="images/fig-081.gif"
+width="414" height="200"> </a></p>
+
+<p>A normal grab operation (issued by hitting the <b>Grab</b>
+button in the <i>xv grab</i> dialog box) operates as follows:</p>
+
+<p>You can grab the entire contents of a window (including its
+frame) by clicking the Left mouse button in a window. If you
+click the Left button somewhere on the root window, the entire
+screen will be loaded into <i>xv</i>. Note: if you Left- click
+somewhere inside a window whose contents are drawn in a different
+visual than the frame (as happens on many 24-bit graphics
+systems, where the default visual is an 8-bit PseudoColor, but
+the window contents may be drawn in 24-bit TrueColor), the window
+frame will <i>not</i> be included in the grabbed image. (It is
+not possible to grab data from two different visuals
+simultaneously.)</p>
+
+<p>You can grab an arbitrary region of the screen by clicking the
+Middle mouse button and dragging a rectangle in exactly the same
+way you draw a cropping rectangle. When you release the mouse
+button, the contents of this rectangle will be read from the
+screen and loaded into <i>xv</i>. Note: the image will be grabbed
+with respect to the visual of the outermost window that
+completely encloses the grabbed rectangle. (Practical upshot: on
+24-bit systems, if you try to grab the contents of a 24-bit
+window, plus some of the (8-bit) root window, window frames,
+etc., you will <i>not</i> get what you probably wanted. Sorry.) </p>
+
+<p>Or, alternately, you can simply abort the <b>Grab</b> command
+by clicking the Right mouse button anywhere on the screen.</p>
+
+<p>A <i>delayed grab</i> is very similar to a normal grab, except
+that <i>xv</i> will wait for the specified number of seconds, and
+then beep once to signify the start of the grab. You can then
+press the Left, Middle, or Right mouse buttons, as described
+above. To do a delayed grab, simply enter a non-zero number in
+the 'Delay' field, and press the <b>Grab</b> button in the <i>xv
+grab</i> dialog box.</p>
+
+<p>A <i>delayed auto-grab</i> is another matter entirely. When
+you issue this command (by entering a non-zero number in the
+'Delay' field, and pressing the <b>AutoGrab</b> button), <i>xv</i>
+will sleep for the specified number of seconds, and then <i>automatically</i>
+grab the full contents of whatever top-level window the mouse is
+positioned inside of. This makes it possible to grab things like
+pull-down menus that cannot be captured using the normal grab
+method. For example, to grab a pull-down menu in another program,
+set the 'Delay' field to something small (say, '5' seconds), hit
+the <b>AutoGrab</b> button, go to your other program, and open up
+the pull-down menu. Continue holding the menu open until <i>xv</i>
+beeps once (signifying the start of the grab), and then beeps
+twice (signifying the end of the grab). The entire top-level
+window containing your menu will be copied into <i>xv</i>. If you
+get more than you want, you can easily crop off the rest, using
+the cropping commands. (See &quot;<a
+href="image-window.html#cropping">Cropping</a>&quot; )</p>
+
+<p>Note: You may not be able to <b>Grab</b> all of the <i>xv</i>
+windows, at least not windows owned by the <i>xv</i> doing the
+grabbing. If you run into this minor inconvenience, simply start
+a second copy of <i>xv</i> and use it to grab the windows from
+the first <i>xv</i> (or vice-versa).</p>
+
+<p>You can use the <b>Grab</b> command for a wide variety of
+purposes. For example, you can use it to print the contents of
+any window (or the whole screen) by grabbing the appropriate
+image, and then saving it as a PostScript file.</p>
+
+<p>You can use the <b>Grab</b> command, in conjunction with <i>xv's</i>
+<b>Zoom</b> and <b>UnZoom</b> commands, as a reasonable, albeit
+overpowered and none-too-quick, replacement for the <i>xmag</i>
+program.</p>
+
+<p>You can also use the <b>Grab</b> command to pick 'just the
+right colors' for any application. Simply start the application
+in question, <b>Grab</b> the window into <i>xv</i>, and use the <i>xv
+color editor</i> to twiddle the colors around to your heart's
+content.</p>
+
+<p>Note: the <b>Grab</b> command does not work on Macintoshes
+running <i>MacX</i> in a 'rootless' mode, which isn't too
+surprising, if you think about it...</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-6.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="control-window-4.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

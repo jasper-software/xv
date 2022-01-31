@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Visual Schnauzer, part 2/2</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h2><a name="commands">The Commands</a></h2>
+
+<p>There are more commands available in the schnauzer than are
+normally displayed in the buttons at the bottom of the window.
+The additional buttons will be displayed if you make the window
+larger. </p>
+
+<table border="0" cellpadding="4" width="525">
+    <tr>
+        <td valign="top"><a name="misc-commands-menu"><img
+        src="images/fig-151.gif" width="165" height="281"></a></td>
+        <td valign="top">Alternately, all commands are always
+        available via the <b>Misc. Commands</b> menu shown to the
+        left.<p>Note that the keyboard equivalent for all
+        commands that have one is listed in the menu, next to the
+        command. ('^' means <b>&lt;Ctrl&gt;</b> )</p>
+        <p>Also note that the bottom two commands, <b>Show hidden
+        files</b> , and <b>Select files</b>, do not appear as
+        buttons, ever. They're only accessible via the <b>Misc.
+        Commands</b> menu. </p>
+        </td>
+    </tr>
+</table>
+
+<dl>
+    <dt><a name="change-directory"><img src="images/fig-148.gif"
+        width="161" height="16"></a></dt>
+    <dd>Pops open a dialog box that prompts you for a directory
+        name to <i>cd</i> to. This can be handy if the directory
+        you want to go to is far away in the directory tree.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; c </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="delete-files"><img src="images/fig-149.gif"
+        width="161" height="16"></a></dt>
+    <dd>This command can only be issued when one or more files
+        (or directories) are selected. It will pop up a
+        confirmation box to make sure you didn't accidentally
+        issue the command. At the confirmation box, you can type <b>&lt;Ctrl&gt;
+        d</b> a second time to say <b>Ok</b> , or press <b>&lt;Esc&gt;</b>
+        to <b>Cancel</b> the deletion. (Of course, you can just
+        click on the appropriate button, as well.) Also, note
+        that if you delete a subdirectory, all files and
+        directories in that subdirectory will be recursively
+        deleted. Finally, note that you can't delete the <tt>&lt;parent&gt;</tt>
+        directory... for your own protection.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; d </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="new-directory"><img src="images/fig-150.gif"
+        width="161" height="16"></a></dt>
+    <dd>When you issue this command you'll be prompted for a
+        plain filename for the new directory. You can only create
+        subdirectories in the current directory.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; n</b> </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rename-file"><img src="images/fig-152.gif"
+        width="161" height="16"></a></dt>
+    <dd>This command can only be used when a single file (or
+        subdirectory) is selected. You'll be prompted for the new
+        name. Also, note that you can't rename the <tt>&lt;parent&gt;</tt>
+        directory, again, for your own good.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; r </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="rescan-directory"><img src="images/fig-153.gif"
+        width="161" height="16"></a></dt>
+    <dd>Rescans the current directory. Since other programs may
+        be creating or deleting files in the current directory,
+        the contents shown in the schnauzer may not always be
+        up-to-date. Use the <b>ReScan</b> command to re-read the
+        current directory.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; s </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="update-icons"><img src="images/fig-154.gif"
+        width="161" height="16"></a></dt>
+    <dd>Like the <b>ReScan</b> command, but more serious about
+        it. In addition to re-reading the current directory
+        contents, it will also look for files that don't have
+        icons created (or files that have later modification
+        times than their associated icon files) and generate
+        icons for them. After that, it will look for icon files
+        that no longer have associated image files (which can
+        happen if you delete the image files without using the
+        schnauzer), and deletes them. Note that this command is <i>not</i>
+        limited to the selected files, unlike the <b>Generate
+        icon(s)</b> command listed below.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; u </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="open-new-window"><img src="images/fig-155.gif"
+        width="161" height="16"></a></dt>
+    <dd>Opens a new schnauzer window, up to a maximum of 4. The
+        new schnauzer opened will display the same directory that
+        the opening- schnauzer was displaying.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; w </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="generate-icons"><img src="images/fig-156.gif"
+        width="161" height="16"></a></dt>
+    <dd>Unconditionally generates icons for all the currently
+        selected files. As such, you can only issue this command
+        when one or more files are selected.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; g </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="select-all-files"><img src="images/fig-157.gif"
+        width="161" height="16"></a></dt>
+    <dd>Selects all files in the current directory.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; a </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="text-view"><img src="images/fig-158.gif"
+        width="161" height="16"></a></dt>
+    <dd>Displays the currently-selected file in a TextView
+        window. This command can only be used when there is
+        exactly one file currently selected. Note that if you
+        double-click on a file in an unrecognized format, <i>xv</i>
+        will automatically display it in a TextView window. This
+        command lets you view recognized image files in text
+        mode.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; t </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="recursive-update"><img src="images/fig-159.gif"
+        width="161" height="16"></a></dt>
+    <dd>Recursively walks its way down a directory tree, starting
+        from the current directory, and does an <b>Update</b>
+        command in each subdirectory. It will follow symbolic
+        links, if you have any, and it's smart enough to avoid
+        circular links. It gives you a nifty way to generate
+        icons for an entire hierarchy of image files. It can also
+        take a Good Long Time, depending on your particular
+        situation, so it pops up an annoying &quot;Are You
+        Sure?&quot; dialog box before it starts working its
+        magic.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; e </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-160.gif" width="161" height="16"></dt>
+    <dd>Exits the <i>xv</i> program.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; q </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-161.gif" width="161" height="16"></dt>
+    <dd>Closes this particular schnauzer window.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; c </b></dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="show-hidden-files"><img src="images/fig-162.gif"
+        width="161" height="16"></a></dt>
+    <dd>Toggles whether or not 'hidden' files (in Unix, files
+        that have a '.' as their first character) should be
+        displayed.<br>
+        Keyboard Equivalent: &lt;none&gt; </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="select-files"><img src="images/fig-163.gif"
+        width="161" height="16"></a></dt>
+    <dd>Opens a dialog box that lets you select files by name.
+        Wildcards are accepted. It does <i>not</i> clear any
+        previously selected files.<br>
+        Keyboard Equivalent: <b>&lt;Ctrl&gt; f</b> </dd>
+</dl>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="textview-window.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="visual-schnauzer-1.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

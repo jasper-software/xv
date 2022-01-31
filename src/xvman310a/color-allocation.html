@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Color Allocation in xv</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Color Allocation in <i>xv</i></h1>
+
+<p>Allocating colors on an X11 display is not as trivial a matter
+as it might seem on first glance. <i>xv</i> goes to a lot of
+trouble to allocate colors from what is essentially a scarce
+resource. This appendix is provided for those inquisitive types
+who'd be interested in learning how to successfully 'argue' with
+an X server.</p>
+
+<p>Note: If you're using a <i>TrueColor</i> display, you can
+safely ignore this appendix, as none of the following actually
+happens on your system. On a <i>TrueColor</i> system, there is no
+colormap. Pixel values directly correspond to displayed color
+values. For example, in a typical 24-bit <i>TrueColor</i>
+display, each pixel value is a 24-bit unsigned number, which
+corresponds to an 8-bit <i>Red</i> component, an 8-bit <i>Green</i>
+component, and an 8-bit <i>Blue</i> component, bitwise shifted
+and OR-ed together to form a 24-bit number. As a result, all
+displayable colors are always available for use.</p>
+
+<h2><a name="problem-with-pseudocolor-displays">The Problem with
+PseudoColor Displays</a></h2>
+
+<p>Most color X displays use a 'visual' model called <i>PseudoColor</i>.
+On a <i>PseudoColor</i> display, pixel values are small unsigned
+integers which point into a 'colormap', which contains an RGB
+triple for each possible pixel value. As an example, on a typical
+8-bit color X display, pixel values can range between 0 and 255,
+inclusive. There is a 256-entry colormap which contains an RGB
+triple for each possible pixel value. When the video display
+hardware sees a pixel value of '7', for instance, it looks up
+color #7 in the colormap, and sends the RGB components found in
+that position of the colormap to the video monitor for display.</p>
+
+<p>In the X Window System, entries on the display's colormap
+(called colorcells) are a scarce resource. At any time, out of
+the 256 colors available (in an 8-bit <i>PseudoColor</i> system),
+several of these colors may already be in use by your window
+manager, the cursor, and other applications. As such, <i>xv</i>
+cannot assume that it has 256 colors at its disposal, because it
+generally doesn't.</p>
+
+<p>A word on the <i>xv</i> color allocation policy: The overall
+goal is to &quot;make this one image being displayed right now
+look as good as possible, without changing the colors of any
+other applications.&quot; You can modify this goal slightly to
+suit your purposes, on the off chance that your goal isn't the
+same as my goal. See &quot;<a
+href="control-window-2.html#color-allocation-commands">Color
+Allocation Commands</a>&quot; for further details.</p>
+
+<h2><a name="s-default-color-allocation-algorithm"><i>xv</i>'s
+Default Color Allocation Algorithm</a></h2>
+
+<p>By default, <i>xv</i> will allocate 'read-only' colorcells.
+Since these colorcells cannot be changed by the application, they
+can be freely shared among applications. This is the default
+behavior because it is the most likely to succeed in getting the
+colors it needs. It does, however, slow down any color changes
+made in the <i>xv color editor</i> window. If you intend to be
+doing any serious color modification, you should probably run <i>xv</i>
+with the '<tt>-rw</tt>' option.</p>
+
+<p>When allocating read-only colorcells, <i>xv</i> uses a
+four-step process to acquire the colors it wants.</p>
+
+<p>The first step is to sort the desired colors by order of
+'importance', so that we ask for the most 'important' colors
+first. See &quot;<a href="diversity-algorithm.html">The Diversity
+Algorithm</a>&quot; for more details on this step.</p>
+
+<p>The next step (Phase 1 Color Allocation) is to ask for each
+color in the list. Colors that we failed to get (presumably
+because there are no more entries available in the colormap) are
+marked for use in the Phase 2 and Phase 3 Color Allocation steps.</p>
+
+<p>If we successfully allocated all the desired colors in Phase
+1, the algorithm exits at this time. Otherwise, it goes on to
+Phase 2. In Phase 2, the display's colormap is examined. For each
+color that went unallocated in Phase 1, the program looks for the
+color in the display's colormap that is the 'nearest' match to
+the originally desired color. It then tries to allocate these
+'nearest' colors as read-only colorcells. The number of
+successful allocations in Phase 2 will be displayed in the string
+&quot;Got ## 'close' colors.&quot;, visible in the <i>xv info</i>
+window.</p>
+
+<p>If all the colors have been successfully allocated by this
+point, the algorithm exits. Otherwise, it continues on the Phase
+3. In Phase 3, any colors still unallocated are simply mapped
+into the 'nearest' colors that <i>were</i> allocated in Phase 1
+or Phase 2.</p>
+
+<h2><a name="perfect-color-allocation">'Perfect' Color Allocation</a></h2>
+
+<p>If you'd like the image displayed &quot;as nicely as possible
+on this display, and everything else be damned&quot;, you can run
+<i>xv</i> in 'perfect' mode, by specifying the '<tt>-perfect</tt>'
+option on the command line.</p>
+
+<p>In 'perfect' mode, color allocation proceeds much like it does
+in 'imperfect' mode. The colors are sorted in decreasing order of
+'importance'. Each of these colors is then requested, as in the
+Phase 1 color allocation code described above.</p>
+
+<p>The big change comes on a failed allocation request. If a
+color is not successfully allocated in Phase 1, and this is the
+first failed request, we assume that the colormap is full. The
+program frees all the colors allocated so far, creates and
+installs a completely new colormap. When a new colormap is
+installed, everything else on the screen (including other <i>xv</i>
+windows) will go to hell. Only the image window will look
+correct. Generally, the colormap will remain installed as long as
+your mouse is inside the image window. It is, however, up to your
+particular window manager to decide how multiple colormaps are
+handled..</p>
+
+<p>After the colormap has been installed, the program starts
+Phase 1 over again, allocating colors from the new, empty
+colormap. If any color allocation requests still fail, they are
+marked and dealt with in Phase 2. (It is possible for allocation
+requests from the new, empty colormap to fail, as the program may
+be asking for more colors than are available in a colormap. For
+example, you could be running <i>xv</i> on a 4- or 6-bit display,
+which only would have 16 or 64 colors (respectively) in a
+colormap.)</p>
+
+<p>Phase 2 operates as described above, except that it looks for
+'nearest' matches in the newly created colormap. Also, since xv
+already owns every color in this colormap, we don't technically
+have to 'allocate' any of them in this Phase. We already have
+allocated them once.</p>
+
+<p>Note that 'perfect' mode only creates and installs a new
+colormap if it was necessary. If all the Phase 1 color allocation
+requests succeeded, a new colormap will not be created.</p>
+
+<h2><a name="allocating-read-write-colors">Allocating Read-Write
+Colors</a></h2>
+
+<p>It is sometimes desirable to allocate read-write colorcells
+instead of read-only colorcells. Read-write colorcells cannot be
+shared among programs. As such, unless you use 'perfect' mode as
+well, you are likely to successfully allocate fewer colors.
+That's the disadvantage. The advantage is that, since <i>xv</i>
+completely owns these colorcells, it can do what it wishes with
+them. Color changes (as controlled by the <i>xv color editor</i>
+window) will happen almost instantaneously, as the program only
+has to store new RGB values in the colorcells, rather than free
+all the colors and reallocate new <i>different</i> colors.</p>
+
+<p>To allocate read-write colorcells, start <i>xv</i> with the ' <tt>-rw</tt>
+' option. Colorcells are allocated one at a time. If an
+allocation request fails, the code stops allocating new
+colorcells. (Unless you've also specified 'perfect' mode. In
+'perfect' mode, the first time an allocation request fails, all
+allocated colors are freed, a new, empty colormap is created and
+installed, and all colors are reallocated. If there is an
+allocation error in this second pass, the code stops allocating
+new colorcells.)</p>
+
+<p>If there are still unallocated color remaining, these colors
+are simply mapped into the closest colors that were allocated. </p>
+
+<p>For further information, and actual code that does everything
+described in this appendix, see the functions '<tt>AllocROColors()</tt>'
+and '<tt>AllocRWColors()</tt>', both of which can be found in the
+source module '<tt>xvcolor.c</tt>'. </p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="diversity-algorithm.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="rgb-hsv-colorspaces.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: External Programs</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>External Programs</h1>
+
+<h2><a name="bggen">bggen</a></h2>
+
+<p>Syntax: <b>bggen</b> [-h <i>high</i>] [-w <i>wide</i>] [-b <i>bits</i>]
+[-g <i>geom</i>] [-d <i>disp</i>] [-a] [-r <i>rot</i>] [-G <i>rptgeom</i>]
+<i>color1 </i>[<i>color2</i> ... <i>colorN</i>]</p>
+
+<p><i>bggen</i> generates background gradients for use with <i>xv</i>.
+It does not directly display anything itself. Instead, it
+generates an appropriately sized PPM file, which <i>xv</i> can
+display. It is also used by the <i>xv</i>'s <b>Pad</b> command,
+for a similar purpose.</p>
+
+<p>By default, <i>bggen </i>will generate a screen-sized PPM file
+with a vertical color gradient. The top of the image will be in <i>color1</i>,
+the bottom of the image will be in <i>colorN</i>, and
+intermediate positions will have an appropriate intermediate
+color. You can list as many colors as you'd like. If you only
+list one color, the entire image will be that single color.</p>
+
+<p>Color specifications can be in one of three formats:</p>
+
+<ul>
+    <li>A color name (e.g. 'lightblue') known to your X server.
+        Use the <i>showrgb</i> command to get a (gigantic) list
+        of known colors.</li>
+    <li>An X11-style hexadecimal RGB color specification (e.g.
+        '#00ff00'), where the first two hex digits specify the
+        red value, the middle two specify the green value, and
+        the last two specify the blue value. Note that the '#'
+        character is treated specially in some shells, and to be
+        on the safe side you should either protect it by putting
+        a '\\' character in front of it, or wrap the whole color
+        specification in single-quotes.</li>
+    <li>Three integers, in the 0-255 range, separated by spaces
+        (e.g. 0 255 0). This is mainly for backward
+        compatibility, as it was the only format understood by
+        previous versions of <i>bggen</i>.</li>
+</ul>
+
+<h3>Options:</h3>
+
+<dl>
+    <dt>-d <i>disp</i></dt>
+    <dd>Specifies the name of the X display that the program
+        should talk to. <i>bggen</i> needs to connect to an X
+        display to determine the screen size (which is used as
+        the default image size), and to parse color names. It is
+        not <i>necessary</i> for <i>bggen</i> to connect to an X
+        display. If it can't, you will have to specify an image
+        size (see below), and you'll have to use the numeric
+        format to enter color specifications.</dd>
+    <dt>&nbsp;</dt>
+    <dt>-g <i>geom</i></dt>
+    <dd>Specifies the size of the generated image. <i>geom</i>
+        should be in the format: <i>wide</i> <b>x</b> <i>high</i>
+        (e.g. '1024x768'). If you don't specify a size, the image
+        will default to the size of your display, assuming it was
+        able to connect to your display.</dd>
+    <dt>&nbsp;</dt>
+    <dt>-w <i>wide</i> -h <i>high</i></dt>
+    <dd>Another way to specify the size of the generated image.
+        Provided for backward compatibility.</dd>
+    <dt>&nbsp;</dt>
+    <dt>-G <i>rptgeom</i></dt>
+    <dd>Sets the size of the gradient. Normally, the gradient
+        will be the size of the image. However, if you wish, you
+        make the gradient smaller than the image; the gradient
+        will repeat as often as necessary to fill the image</dd>
+    <dt>&nbsp;</dt>
+    <dt>-r <i>rot</i></dt>
+    <dd>Lets you rotate the gradient. Normally, the gradient is
+        aligned vertically, with the first color at the top, and
+        the last color at the bottom. Using this option, you can
+        rotate the whole mess by an arbitrary amount. <i>rot</i>
+        should be specified in degrees. Positive values rotate
+        the gradient counter- clockwise. </dd>
+    <dt>&nbsp;</dt>
+    <dt>-a</dt>
+    <dd>If supplied, <i>bggen</i> will generate a PPM 'ascii'
+        file, rather than the default PPM 'raw' format.</dd>
+    <dt>&nbsp;</dt>
+    <dt>-b <i>bits</i></dt>
+    <dd>Specifies the number of significant bits to use in the
+        RGB color specifications in the output image. It must
+        range between 1 and 8, inclusive. Use values less than 8
+        (the default) to limit color use by increasing the color
+        granularity. Since <i>xv</i> can do this sort of thing
+        better, this is of dubious value.</dd>
+</dl>
+
+<h2><a name="xcmap">xcmap</a></h2>
+
+<p>This is a little X program I wrote years ago to help me debug <i>xv</i>'s
+color allocation code. It displays the contents of the default
+colormap as (typically) a 16x16 grid of colored rectangles. Run
+it, and then run something that allocates colors (such as <i>xv</i>),
+and you'll see the color cells changing color. It can give you an
+indication of how full your colortable is, and whatnot. It only
+works on displays where the default visual is a PseudoColor
+visual, but that's nearly all of them, so it shouldn't be a
+problem.</p>
+
+<p>There are two standard X options: '-d <i>display</i>' to set
+the X display, and '-g <i>geom</i>', to set the default window
+size and position.</p>
+
+<p>You can click in the window to examine the RGB values of
+various color cells. I have not found a useful purpose for this
+feature, but there must have been one at one time...</p>
+
+<p>Type 'q' in the window to exit the program.</p>
+
+<h2><a name="pictoppm">xvpictoppm</a></h2>
+
+<p>This program is a standard Unix filter that reads the
+'thumbnail' files created by the <i>visual schnauzer</i> (from <tt>stdin</tt>)
+and writes standard PPM versions of same (to <tt>stdout</tt>).
+The thumbnail files are small (80x60 maximum) 8-bit versions of
+your image files and are used as the icons in the <i>visual
+schnauzer</i>. These files are stored in my own weird format (one
+optimized for my purposes), but many folks have asked for a way
+to turn them into standard image files, for use on their WWW
+pages, or whatever.</p>
+
+<p>Anyway, assuming you've done an <b>Update</b> or <b>Generate
+Icons</b> command in the <i>visual schnauzer</i>, you'll find the
+thumbnail version of an image stored with the same name in the '<tt>.xvpics</tt>'
+subdirectory. For example, if you have a file '<tt>/pics/gif/foobie.gif</tt>',
+you would find the thumbnail version of it in the file '<tt>/pics/gif/.xvpics/foobie.gif</tt>
+'.</p>
+
+<h2><a name="cjpeg-djpeg">cjpeg and djpeg</a></h2>
+
+<p>These two programs are distributed as part of the Independent
+JPEG Group's software, located in the <tt>jpeg</tt> subdirectory
+of the <i>xv</i> source. They perform command-line conversion
+between JPEG and the PPM/PGM, GIF, BMP and Targa formats. Since <i>xv</i>
+has absolutely no command-line or 'batch' conversion abilities,
+you may find these useful if you want to convert a lot of images,
+or automatically convert images from a script. If this is the
+case, you should probably get Jef Poskanzer's most-excellent <i>netpbm</i>
+package, which you can get via anonymous ftp on <a
+href="ftp://ftp.x.org/R5contrib/netpbm-1mar1994.tar.gz"><tt>ftp.x.org</tt></a>
+and elsewhere..</p>
+
+<h2><a name="vdcomp">vdcomp</a></h2>
+
+<p>Uncompresses compressed PDS and VICAR images. Beyond that, I
+know nothing.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="modifying-behavior-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="postscript-window.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Release Notes</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Release Notes</h1>
+
+<p>The following is a short synopsis of the major features that
+have been added to <i>xv</i> since Version 3.00. See the <tt>CHANGELOG</tt>
+file in the <i>xv</i> source directory for complete details, and
+up-to-the-minute information.</p>
+
+<ul>
+    <li>Image cut and paste capabilities.</li>
+    <li>Minimal image editing (line drawing, text annotation, and
+        smudging).</li>
+    <li>Additional choices in the <b>Algorithms</b> menu. Also,
+        algorithms now operate on the selected region of the
+        image, if any.</li>
+    <li>Image padding.</li>
+    <li>Added a <b>Print</b> command.</li>
+    <li>Additional file formats: XPM files and 24-bit Targa files
+        can both be read and written, as can a variety of the
+        Amiga ILBM formats (commonly called 'IFF' files). <i>xv </i>can
+        read (but not write) the XWD (X Window Dump) format.
+        Also, <i>xv</i> can now read 16-bit greyscale 'pgmraw'
+        files, however, the low-order 8-bits will be discarded.</li>
+    <li>Much improved <b>Grab</b> command. It is now possible to
+        grab pull-down menus in other programs.</li>
+    <li>Much improved selection rectangle handling.</li>
+    <li>Image 'panning' when zoomed in.</li>
+    <li>Improved 24-to-8-bit algorithm.</li>
+    <li>Filename completion in the <i>load</i> and <i>save</i>
+        windows.</li>
+    <li>Changed command-line handling. All the 'flag' arguments
+        ('-perfect', '-smooth', etc.) are forced 'on' if you
+        start them with a '-', and are forced 'off' if you start
+        them with a '+'. (They used to toggle the state, which
+        could lead to unpredictable results.)</li>
+    <li>Support for 'gzip'ed files.</li>
+    <li>Sniffs out the 'best' visual type to use, rather than
+        simply using the default visual.</li>
+    <li>New versions of Sam Leffler's <i>libtiff</i> TIFF i/o
+        library (version 3.3) and the Independent JPEG Group's
+        JPEG i/o library (version 5a) have been merged in.</li>
+    <li>When viewing 24-bit images (in 24-bit mode) on an 8-bit
+        display, <i>xv</i> now uses a 4*8*4 standard RGB
+        colormap, rather than the 6*6*6 colormap it used in 3.00.
+        This colormap uses fewer colors, and produces better
+        looking results, on average.</li>
+    <li>Of course, there have been plenty of bug fixes and minor
+        enhancements. It would probably be safe to say that
+        there's some exciting new bugs, too!</li>
+</ul>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="overview.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="availability.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

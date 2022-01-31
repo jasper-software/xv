@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The Image Window</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The Image Window</h1>
+
+<p>Note: unless explicitly stated otherwise, the term <i>click</i>
+means &quot;click with the Left mouse button.&quot;</p>
+
+<p>Start the program up by typing ' <tt>xv</tt> '. After a short
+delay, a window will appear with the default image (the <i>xv</i>
+logo, credits and revision date) displayed in it. If you change
+the size of the window (using whatever method your window manager
+provides), the image will be automatically stretched to fit the
+window.</p>
+
+<p><img src="images/fig-002.gif" width="494" height="300"><br>
+</p>
+
+<h2><a name="displaying-pixel-values">Displaying Pixel Values</a></h2>
+
+<p>Clicking (and optionally dragging) the Middle mouse button
+inside this window will display pixel information in the
+following format:</p>
+
+<p><tt>196, 137 = 191,121,209 #bf79d1 (287 42 81 HSV) [ 0, 0]</tt></p>
+
+<p>The first pair of numbers (196,137) are the <i>x</i> and <i>y</i>
+positions of the cursor, in image <a name="pixel-coordinates">coordinates</a>.
+These numbers remain the same regardless of any image resizing,
+or cropping; a 320x200 image remains a 320x200 image, regardless
+of what size it is displayed on the screen.</p>
+
+<p>The first triplet of numbers (191,121,209) are the RGB values
+of the selected pixel. The components will have integer values in
+the range 0-255. The values displayed are prior to any HSV/RGB
+modification, but after any colormap changes. See &quot;<a
+href="color-editor-1.html">The Color Editor</a>&quot; for
+details.</p>
+
+<p>The next item is a six-digit value expressing the RGB values
+of the selected pixel in hex, in the #rrggbb format. This is the
+same format used to specify colors to other X programs, which may
+be useful.</p>
+
+<p>The second triplet of numbers (287 42 81) are the HSV values
+of the selected pixel. The first component will have integer
+values in the range 0-359, and the second and third components
+will have integer values in the range 0-100. The values displayed
+are prior to any HSV/RGB modification, but after any colormap
+changes. See &quot;<a href="color-editor-1.html">The Color Editor</a>&quot;
+for details. Also, see &quot;<a href="rgb-hsv-colorspaces.html">RGB
+&amp; HSV Colorspaces</a>&quot; for more information about what
+these numbers mean.</p>
+
+<p>Finally, the last pair of numbers is the <a
+name="pixel-distance">distance</a> (dx, dy) between the current
+mouse position and where the mouse was originally clicked. </p>
+
+<p>Note: If you actually want to measure some pixels, it will
+probably help to zoom in on a the relevant portion of the image,
+to the point that you can see the individual pixels. See &quot;<a
+href="image-window.html#zooming">Zooming</a>&quot; below.</p>
+
+<p>Note: This also sets the 'current color' value used by various
+painting tools. (See &quot;<a href="image-window.html#editing">Image
+Editing</a>&quot; .)</p>
+
+<p>This string is automatically copied to your X server's cut
+buffer whenever you measure pixel values. This lets you easily
+feed this information to another program, useful if you're doing
+manual feature extraction, or something. Try it: measure a
+pixel's value, and then go click your Middle mouse button in an <i>xterm</i>
+window.</p>
+
+<h2><a name="selection-rectangle">Selection Rectangle</a></h2>
+
+<p>Bring up the <i>xv controls</i> window by pressing the <b>?</b>
+key or clicking the Right mouse button inside the image window.</p>
+
+<p>Clicking and dragging the Left button of the mouse inside the
+image window will allow you to draw a selection rectangle on the
+image. If you're unhappy with the one you've drawn, simply click
+the Left button and draw another. If you'd like the rectangle to
+go away altogether, click the Left button and release it without
+moving the mouse.</p>
+
+<p>Double-clicking the Left button inside the image window will
+create a selection rectangle the size of the currently displayed
+area of the image, or remove the previous selection as
+appropriate.</p>
+
+<p>Once a selection rectangle has been drawn, it can be <a
+name="selection-resize">fine-tuned </a>by clicking and dragging
+any of the handles that appear on its edge. If you press the &lt;<b>Shift</b>&gt;
+key while dragging a handle, the selection rectangle is kept
+square. If you press the &lt;<b>Ctrl</b>&gt; key while dragging a
+handle, the selection rectangle maintains the same aspect ratio
+it originally had.</p>
+
+<p>You can <a name="selection-move">move</a> the selection
+rectangle by Left-clicking inside it and dragging it around.
+Pressing the &lt;<b>Shift</b>&gt; key while doing so will
+constrain the motion to the horizontal and vertical axes.</p>
+
+<p>You can determine how large the selection rectangle is (in
+image coordinates) by bringing up the <i>xv info</i> window. Do
+this selecting <b>Image Info</b> from the <b>Windows</b> menu <i>xv
+controls</i> window or by pressing the <b>i</b> key inside any
+open <i>xv</i> window.</p>
+
+<p>The <i>xv info</i> window will display, among other things,
+the current size and position of the selection rectangle in terms
+of image coordinates. For example, if it says:</p>
+
+<blockquote>
+    <p><tt>114x77 rectangle starting at 119,58</tt></p>
+</blockquote>
+
+<p>it means that the current selection rectangle is 114 image
+pixels wide, 77 image pixels high, and that its top-left corner
+is located 119 image pixels in from the left edge of the image,
+and 58 image pixels in from the top edge. These values will be
+updated as you drag the cropping rectangle around.</p>
+
+<p>If you want to set the size or position of the selection
+rectangle <a name="selection-fine-tune">precisely</a>, you can
+use the arrow keys on your keyboard. First, make the <i>xv info</i>
+window visible as described above. Second, use the mouse to draw
+a rough approximation of the selection rectangle that you want.
+You can now use the arrow keys to move the selection rectangle
+around the image. Once you've gotten the top and left sides of
+the selection rectangle precisely where you want them, you can
+move the bottom-right corner of the selection rectangle by
+holding the <b>&lt;Shift&gt;</b> key down while using the arrow
+keys. Pressing the up arrow will make the rectangle shorter, and
+pressing the down arrow will make the rectangle taller. </p>
+
+<h2><a name="cropping">Cropping</a></h2>
+
+<p>Once you have a selection rectangle that you can live with,
+you can proceed with the actual cropping operation. Click the <b>Crop</b>
+button in the <i>xv controls</i> window, or press the <b>c</b>
+key in any open <i>xv</i> window. The image window will shrink to
+show only portions of the image that were inside the cropping
+rectangle.</p>
+
+<p>Note: if you are running a window manager such as <i>mwm</i>,
+which decorates windows with a title bar, resizing regions, and
+such, it is quite possible that the aspect ratio of the cropped
+image will get screwed up. This is because certain window
+managers enforce a minimum window size. If you try to crop to a
+rectangle that is too small, the window manager will create the
+smallest window it can, and the image will be stretched to fit
+this window. If this happens, you can press the <b>Aspect</b>
+button in the <i>xv controls</i> window, or press the <b>a</b>
+key in any open <i>xv</i> window. This will expand the image so
+that it will once again have the correct aspect ratio. (Also, see
+the ' <tt>-nodecor</tt> ' option, in &quot;<a
+href="modifying-behavior-3.html#miscellaneous-options">Miscellaneous
+Options</a>&quot;.)</p>
+
+<p>You can crop a cropped image by repeating the same steps
+(drawing a new selection rectangle and issuing the <b>Crop</b>
+command), ad infinitum.</p>
+
+<p>You can return to the original, uncropped image by using the <b>UnCrop</b>
+command. Simply click the <b>UnCrop</b> button or press the <b>u</b>
+key in any open <i>xv</i> window. Note that using the <b>UnCrop</b>
+command will turn off image smoothing (the <b>Smooth</b>
+command), due to the potentially long time it can take to
+generate a large, smoothed image.</p>
+
+<p>Note that if you try to make the selection rectangle too small
+in either width or height (under 5 screen pixels), it'll just
+turn itself off. If you want to crop a very small portion of an
+image, you'll probably have to do it in two passes. First, crop
+to a smallish rectangle, expand that image, then crop again.</p>
+
+<p>You can also <a name="cropping-fine">fine-crop</a> the image
+by pressing the <b>&lt;Ctrl&gt;</b> key and one of the arrow
+keys. This will crop off one pixel from the edge of the image,
+based on the arrow key pressed. The <b>Up</b> key moves the
+bottom edge up one pixel, the <b>Down</b> key moves the top edge
+down one pixel, and so on.</p>
+
+<h2><a name="zooming">Zooming</a></h2>
+
+<p>You can <a name="zoom-in"><b>Zoom In</b></a> by a factor of
+two (or four, or eight, etc.) on any rectangular region of the
+image by holding down the &lt;<b>Ctrl</b>&gt; key on your
+keyboard and clicking the Left mouse button in the image window.
+A rectangle will appear, centered around the cursor position,
+showing you what portion of the image will be expanded. Move the
+rectangle as you see fit, release the mouse button, and the
+region inside the rectangle will be redrawn at twice its previous
+size. The image window should remain the same size. You can
+repeat this operation to zoom in by a factor of four, or eight,
+or whatever, as many times as you wish.</p>
+
+<p>While zoomed-in, you can <a name="panning"><b>Pan</b></a> the
+image around by holding down the &lt;<b>Ctrl</b>&gt; key,
+clicking the Middle mouse button in the image window, and
+dragging it around. A rectangle will appear around the mouse,
+indicating where the currently-displayed portion of the image
+will be moved to.</p>
+
+<p>You can <a name="zoom-out"><b>Zoom Out</b></a> by a factor of
+two (if possible) by holding down the <b>&lt;Ctrl&gt;</b> key and
+clicking the Right mouse button inside the image window. You can
+not zoom out beyond the point where the entire image fills the
+window. </p>
+
+<h2><a name="multi-page-documents">Multi-Page Documents</a></h2>
+
+<p><i>xv</i> now has the ability to display multi-page image
+files, though currently this is only implemented for PostScript
+files (using the <i>ghostscript</i> interpreter). If you are
+viewing a multi-page document, a &quot;page <i>n</i> of <i>m&quot;</i>
+string will be added to the <i>xv image</i> window's title bar.</p>
+
+<p>You can walk through the document by pressing the <b>&lt;PageUp&gt;</b>
+and <b>&lt;PageDown&gt;</b> keys on your keyboard (they may be
+labeled &lt;<strong>Prev</strong>&gt; and &lt;<strong>Next</strong>&gt;'
+instead) while the keyboard focus is on the <i>xv image</i>
+window. Pressing <b>&lt;Shift-Up&gt;</b> and <b>&lt;Shift-Down&gt;</b>
+may also work.</p>
+
+<p>You can also jump directly to any given page by typing '<b>p</b>'
+into the <i>xv image </i>window. This will pop up a dialog window
+which will ask you what page you'd like to go to.</p>
+
+<h2><a name="editing">Image Editing</a></h2>
+
+<p><i>xv</i> now features a number of rudimentary image-editing
+tools. While it isn't about to compete with Adobe's <i>PhotoShop</i>
+anytime soon, you may still find what it does to be of some use.
+You now have the ability to do pixel-editing, freehand
+'scribbling', line drawing, and pixel-level 'smudging'. Also, <i>xv</i>
+now supports cut, paste, copy, and clear of rectangular
+selections, as described in &quot;<a
+href="control-window-4.html#cut-paste-commands">Image Cut and
+Paste Commands</a>&quot; . Also, <i>xv</i> now has a 'text
+annotation' tool, described in &quot;<a
+href="control-window-5.html#text-annotation">Text Annotation</a>&quot;
+.</p>
+
+<p>The major weakness: the various drawing tools listed above <i>can</i>
+<i>only draw in colors that already exist in the image</i>. At
+this time, these tools (and <i>xv</i>) are primarily focused on
+the 'image editing' job, rather than on the 'arbitrary paint
+program' job. Needless to say, there's still a way to paint in
+whatever color you'd like. It's just a matter of getting the
+desired color(s) into the picture. The best way is probably to
+use the <b>Pad</b> command (see &quot;<a
+href="control-window-4.html#pad-command">The Pad Command</a>&quot;).</p>
+
+<h3><a name="pixel-editing-line-drawing">Pixel Editing and Line
+Drawing</a></h3>
+
+<p>All of the following drawing commands use the concept of the
+'current color'. The current color is set by using the Middle
+mouse button in the image window to 'pick up' the desired color.</p>
+
+<p>You can edit individual pixels by doing a shift-middle-click
+with the mouse. (Hold a &lt;<b>Shift</b>&gt; key, and
+Middle-click somewhere in the image window.) The selected pixel
+will change to the desired color. It will probably help to zoom
+in on the relevant section of the image first. Anyway, if you
+drag the mouse around, you will be able to draw arbitrary
+'scribbles' all over the image. This probably isn't desirable, so
+be careful!</p>
+
+<p>You can also draw straight lines by holding down the &lt;<b>Ctrl</b>&gt;
+key along with the shift-middle combination.</p>
+
+<h3><a name="pixel-smudging">Pixel Smudging</a></h3>
+
+<p>You can 'smudge' specific areas of the image by doing a
+shift-right-click with the mouse, in the image window. The
+clicked-on pixel will be replaced with the average color of the 9
+pixels in the 3x3 square centered on said pixel. This can be used
+to manual edit out 'salt and pepper' noise. It can also be used
+to soften edges. As with the pixel editing tool, you can drag the
+'smudger' around.</p>
+
+<p>Note: This only works in '24-bit' mode. If you are viewing an
+8-bit image, it will be automatically converted up to a 24-bit
+version of itself.</p>
+
+<p>Note: While this tool is similar to the <b>Blur</b> and <b>DeSpeckle</b>
+algorithms, those algorithms operate on <i>every</i> pixel in a
+rectangular region, whereas this tool operates only on those
+pixels that you click or drag on.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="control-window-1.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="overview.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+
+</body>
+</html>

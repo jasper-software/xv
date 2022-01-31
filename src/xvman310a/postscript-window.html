@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: The PostScript Window</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>The PostScript Window</h1>
+
+<p><a name="postscript-window"><img src="images/fig-196.gif"
+width="445" height="380"> </a></p>
+
+<p>The <i>xv postscript</i> window lets you describe how your
+image should look when printed. You can set the paper size and
+the image size, position the image on the paper, and print in
+'portrait' or 'landscape' mode.</p>
+
+<p>The majority of the <i>xv postscript</i> window is taken up by
+a window that shows a white rectangle (the page) with a black
+rectangle (the image) positioned on it. You can position the
+image rectangle anywhere on the page. The only constraint is that
+the center of the image (where the two diagonal lines meet) must
+remain on the page. Only the portion of the image that is on the
+page will actually be printed.</p>
+
+<p>The image can be (roughly) positioned on the page by clicking
+in the image rectangle and dragging it around. As you move the
+image, the &quot;Top&quot; and &quot;Left&quot; position displays
+will show the size of the top and left margins (the distance
+between the top-left corner of the page and the top-left corner
+of the image).</p>
+
+<p>You'll note that you have limited placement resolution with
+the mouse. If you want to fine-position the image, you can use
+the arrow keys to move the image around. The arrow keys will move
+the image in .001&quot; increments. You can hold them down, and
+they will auto-repeat. You can also hold a <b>&lt;Shift&gt;</b>
+key down while using the arrow keys. This will move the image in
+.010&quot; increments.</p>
+
+<p>You can change the size of the printed image by adjusting the <i>Width</i>
+or <i>Height</i> dials. Normally, the dials are locked together,
+to keep the aspect ratio of the image constant. You can unlock
+the dials by turning the off the checkbox located below the
+dials. As you change the dials, the size of the image (when
+printed) is displayed below, in inches and in millimeters. The
+current resolution of the image is also displayed below. The
+&quot;Resolution&quot; numbers tell you how many image pixels
+will be printed per inch. </p>
+
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td valign="top"><img src="images/fig-197.gif"
+        width="177" height="125"></td>
+        <td valign="top">One note on the 'Resolution' setting: I
+        get a fair number of complaints about the default of
+        '100% = 72 dpi'. Many folks wonder why they can't set the
+        resolution to 300 dpi, given that most PostScript
+        printers are 300 dpi. The answer, of course, is that they
+        can. While you are constrained to integral percentage
+        scaling factors, all the <i>good</i> resolutions (72, 75,
+        100, 150, 300, and 600 dpi) are attainable with
+        appropriate settings of the scaling factors (100, 96, 72,
+        48, 24, and 12%, respectively).</td>
+    </tr>
+</table>
+
+<p>Now, one other thing to note is that, <i>unless</i> you are
+printing a black-and-white (not greyscale) image, you almost
+certainly do <i>not</i> want to print at 300 dpi (or whatever
+your printer's resolution is). At this time, all but the most
+enormous and expensive PostScript printers (&gt; $20K) are
+fundamentally <i>bitonal</i>. That is, they can either put a dot
+at a certain position on a page, or <i>not</i> put a dot there.
+They have no ability (or nearly none) to adjust the size or
+darkness of the dot. As such, they cannot put an arbitrary 8-bit
+shade of gray (or 24-bit RGB color) at each 300 (or 600) dpi
+pixel position. They approximate grays (and colors) by dithering
+over a larger area. For example, if you print at 75 dpi onto a
+300 dpi printer, each arbitrarily colored pixel in your source
+image will be represented by a 4x4 grid of bitonal dots on the
+page. This is why you should print non-bitonal images at low
+resolutions, such as 72 dpi. If you try to print them at higher
+resolutions, you will lose shades of gray (or different colors).</p>
+
+<p>Located below the 'page' rectangle are a set of radio buttons
+that let you specify the current paper size (8.5&quot;x11&quot;,
+8.5&quot;x14&quot;, 11&quot;x17&quot;, A3, A4, B5,
+4&quot;x5&quot;, and 35mm), and orientation (Portrait and
+Landscape). </p>
+
+<dl>
+    <dt><img src="images/fig-198.gif" width="56" height="23"></dt>
+    <dd>This button will center the image on the page. </dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-199.gif" width="56" height="23"></dt>
+    <dd>This button will align the bottom-left of the image with
+        the bottom-left of the page. (Which is the origin in the
+        standard PostScript coordinate system.) This may be
+        useful if you are generating Encapsulated PostScript
+        files for use in some desktop-publishing package. </dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-200.gif" width="56" height="23"></dt>
+    <dd>This button will make the image as large as possible
+        (maintaining half-inch margins on all sides) without
+        changing the aspect ratio. </dd>
+    <dt>&nbsp;</dt>
+    <dt><img src="images/fig-201.gif" width="172" height="42"></dt>
+    <dd>There are a pair of small buttons located next to the
+        &quot;Left&quot; and &quot;Top&quot; displays. Clicking
+        the &quot;Left&quot; one will cycle between displaying
+        the &quot;Left&quot; margin, the &quot;Right&quot;
+        margin, and the &quot;Center X&quot; position (the
+        distance from the left edge of the paper to the center of
+        the image). <p>Clicking the &quot;Top&quot; display's
+        button will cycle between displaying the size of the
+        &quot;Top&quot; margin, the size of the
+        &quot;Bottom&quot; margin, and the &quot;Center Y&quot;
+        position (the distance from the top edge of the paper to
+        the center of the image). </p>
+    </dd>
+    <dt><a name="preview"><img src="images/fig-202.gif"
+        width="70" height="17"></a></dt>
+    <dd>This checkbox lets you specify whether or not to include
+        a b/w preview of the image in the PostScript file.
+        Certain desktop publishing programs may make use of such
+        a preview. </dd>
+    <dt>&nbsp;</dt>
+    <dt><a name="compress"><img src="images/fig-203.gif"
+        width="78" height="17"></a></dt>
+    <dd>Specifies whether or not to generate compressed 8-bit per
+        pixel PostScript. This is particularly handy if you're
+        generating color PostScript, and you are currently in <b>8-bit
+        Mode</b>, as color PostScript files are normally three
+        times larger than their greyscale counterparts.
+        Compression can shrink these color PostScript files by a
+        factor of 4:1. It has a lesser effect on greyscale
+        images. It should be noted, however, that compressed
+        PostScript files may take 2-3 times longer to print than
+        uncompressed PostScript files. However, if you are
+        connected to your laser printer via a slow 9600 baud
+        serial line, the decreased transmission time due to
+        compression may make up for the increased execution time.
+        Also note that the '<b>compress</b>' checkbox is not
+        available when you are in <b>24-bit Mode</b> </dd>
+</dl>
+
+<p>Click the <b>Ok</b> button when you're done. If everything is
+successful, the <i>xv postscript</i> and the <i>xv save</i>
+window will both close. If <i>xv</i> was unable to write the
+PostScript file, the <i>xv postscript</i> window will close, but
+the <i>xv save</i> window will remain open, to give you a chance
+to enter a different filename.</p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="external-programs.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="save-window-2.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>
+
+

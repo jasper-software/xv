@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>XV: Credits</title>
+<meta name="FORMATTER" content="Microsoft FrontPage 2.0">
+</head>
+
+<body background="images/blutxtr2.jpg" bgcolor="#ABABD6">
+<p>
+<a href="http://www.trilon.com/xv">
+<img src="images/small_banner.gif" width="630" height="25" border="0"></a>
+</p>
+
+<h1>Credits</h1>
+
+<p>Thanks go out to the following wonderful folks:</p>
+
+<p>First and foremost, <b>John Hagan</b>, best friend, lead
+beta-tester, and guy who got me a new job. He's been the driving
+force behind much of <i>xv</i>. Nearly all the major differences
+between the <i>xv</i> that you see today, and the <i>xgif</i> of
+four (five? six?) years ago can be traced to the years of
+continual harassment because of alleged (and actual) weaknesses
+in <i>xgif</i>. <i>xv</i> probably never would've been written,
+were it not for his input. Many of the features in the code were
+his idea. For example, he'd been asking for a <i>Visual Schnauzer</i>
+for <i>years</i> now...</p>
+
+<p><b>Filip Fuma</b>, my former boss, deserves a great deal of
+thanks for seeing the value of <i>xv</i>, and allowing, (if not
+actually encouraging) me to write it. I also owe him an eternal
+debt of gratitude (if not actual money) for being the genius who
+said &quot;You know, you should make this into shareware...&quot;</p>
+
+<p><b>Helen Anderson</b> has provided many fine ideas over the
+years, and has continued to be amused by <i>xv</i> for much of
+that time, more than I can occasionally say for myself. She also
+proofread the 2.20 version of this document, much of which
+remains verbatim.</p>
+
+<p><b>Patrick J. Naughton</b> (naughton@wind.sun.com) provided
+'gif2ras.c', a program that converts GIF files to Sun
+Rasterfiles. This program provided the basis for the original <i>xgif</i>,
+which eventually grew into <i>xv</i>. As such, it would be safe
+to say that he &quot;started it all.&quot; This code, now
+somewhat modified, is still in use in the module <tt>xvgif.c</tt>.</p>
+
+<p><b>Michael Mauldin</b> (mlm@cs.cmu.edu) provided a short,
+understandable version of the GIF writing code. This code,
+essentially unmodified, is in the module <tt>xvgifwr.c</tt> .</p>
+
+<p><b>Dave Heath</b> (heath@cs.jhu.edu) provided the Sun
+Rasterfile i/o support in the module <tt>xvsunras.c</tt> . <b>Ken
+Rossman</b> (ken@shibuya.cc.columbia.edu) fixed it up somewhat.</p>
+
+<p><b>Tom Lane</b> (tgl@sss.pgh.pa.us), for much advice and
+assistance on 24-&gt;8 bit quantization, color allocation, and,
+of course, JPEG issues.</p>
+
+<p>Of course, many thanks go out to Tom and all the rest of the
+folks in the Independent JPEG Group for providing a
+freely-distributable version of the JPEG software, thereby
+providing the rest of us with the new standard graphics format
+(replacing GIF).</p>
+
+<p><b>Sam Leffler</b> (sam@sgi.com) has not only come up with a
+freely-distributable library for doing TIFF file i/o (the <i>libtiff</i>
+package), but also wrote the <i>xv</i> interface modules <tt>xvtiff.c</tt>
+and <tt>xvtiffwr.c</tt> . Thanks Sam!</p>
+
+<p><b>Paul Haeberli</b> (paul@manray.asd.sgi.com) provided me
+with nice clean, portable code to read and write IRIS 'rgb'
+files.</p>
+
+<p><b>Jef Poskanzer</b> (jef@well.sf.ca.us) is responsible for
+coming up with several cool/whizzo general image formats (pbm,
+pgm, ppm), and a package of programs for image manipulation and
+format conversion. Part of this code has been snarfed and
+incorporated into <i>xv</i> in the form of the <tt>-best24</tt>
+algorithm and the XWD format support. </p>
+
+<p><b>Rick Dyson</b> (dyson@iowasp.physics.uiowa.edu) has been
+doing the VMS ports of <i>xv</i> for the past couple years now.
+All you VMS users owe him a great big &quot;Thank you,&quot;
+because you wouldn't have <i>xv </i>if it weren't for his
+efforts. I won't go <i>near</i> a VMS system. Rick also gets a
+&quot;Thanks&quot; from me for doing a good deal of beta-testing,
+as well.</p>
+
+<p><b>David Elliot</b> (dce@smsc.sony.com) gets a special thanks
+for being the guy who has submitted more bug fixes and feature
+requests than anybody else. You'd almost think he has more time
+to work on <i>xv</i> than I do!</p>
+
+<p><b>Bernie McIlroy</b> (berniem@microsoft.com) for providing me
+with information on the BMP format. (Which is included in the <tt>docs</tt>
+subdirectory, so please don't bother him!)</p>
+
+<p><b>Anthony Datri</b> (aad@scr.siemens.com) for writing the
+PDS/VICAR i/o module.</p>
+
+<p><b>Thomas Meyer </b>(i03a@alf.zfn.uni-bremen.de) for writing
+the IFF i/o module.</p>
+
+<p><b>Chris Ross</b> (cross@eng.umd.edu), for writing the XPM i/o
+module, and in the process, inadvertently making me think about a
+great number of things...</p>
+
+<p><b>David Robinson</b> (drtr@mail.ast.cam.ac.uk) for writing
+the FITS i/o module.</p>
+
+<h2><a name="hall-fame">The Hall of Fame</a></h2>
+
+<p>The following folks have all contributed to the development of
+<i>xv</i> in the form of bug reports, bug fixes, patches, support
+for additional systems, and/or good ideas. See the <tt>CHANGELOG</tt>
+file for specifics:</p>
+
+<blockquote>
+    <p><font size="2">Jimmy Aitken (<tt>jimmy@pyra.co.uk</tt>)<br>
+    Satoshi Asami (<tt>asami@is.s.u-tokyo.ac.jp</tt>)<br>
+    Leon Avery (<tt>leon@eatworms.swmed.edu</tt>)<br>
+    Tim Ayers (<tt>ayers@mermaid.micro.umn.edu</tt>)<br>
+    Bill Barabash (<tt>barabash@rachel.enet.dec.com</tt>)<br>
+    Markus Baur (<tt>mbaur@ira.uka.de</tt>)<br>
+    Jason Berri (<tt>berri@aero.org</tt>)<br>
+    Richard Bingle (<tt>bingle@cs.purdue.edu</tt>)<br>
+    Alan Blanchard (<tt>alan@abraxas.mbt.washington.edu</tt>)<br>
+    Bob Boag (<tt>boag@marshall.wvnet.edu</tt>)<br>
+    David Boulware (<tt>dgb@landau.phys.washington.edu</tt>)<br>
+    Thomas Braeunl (<tt>braeunl@informatik.uni-stuttgart.de</tt>)<br>
+    Jon Brinkmann (<tt>jvb7u@astro.virginia.edu</tt>)<br>
+    Andrew Brooks (<tt>arb@comp.lancs.ac.uk</tt>)<br>
+    David Brooks (<tt>dbrooks@osf.org</tt>)<br>
+    Kevin Brown (<tt>brown@hpbsm15.boi.hp.com</tt>)<br>
+    Elaine Chen (<tt>eychen@athena.mit.edu</tt>)<br>
+    Jeff Coffler (<tt>coffler@jeck.amherst.nh.us</tt>)<br>
+    Reg Clemens (<tt>clemens@plk.af.mil</tt>)<br>
+    Paul Close (<tt>pdc@lunch.wpd.sgi.com</tt>)<br>
+    David A. Clunie (<tt>dclunie@flash.us.com</tt>)<br>
+    Jan D. (<tt>jhd@irfu.se</tt>)<br>
+    Anthony Datri (<tt>datri@convex.com</tt>)<br>
+    Berthold Dettlaff (<tt>dettlaff@informatik.uni-stuttgart.de</tt>)<br>
+    L. Peter Deutsch (<tt>ghost@aladdin.com</tt>)<br>
+    Derek Dongray (<tt>dongray@genrad.com</tt>)<br>
+    Rick Dyson (<tt>dyson@iowasp.physics.uiowa.edu</tt>)<br>
+    Dean Elhard (<tt>elhard@system-m.za05.bull.com</tt>)<br>
+    David Elliot (<tt>dce@smsc.sony.com</tt>)<br>
+    Scott Erickson (<tt>sources@sherlock.ics.uci.edu</tt>)<br>
+    Stefan Esser (<tt>se@ikp.uni-koeln.de</tt>)<br>
+    Bob Finch (<tt>bob@gli.com</tt>)<br>
+    Robert Forsman (<tt>thoth@raybans.cis.ufl.edu</tt>)<br>
+    Peter Glassenbury (<tt>pete@cosc.canterbury.ac.nz</tt>)<br>
+    Michael Gleicher (<tt>mkg@stealth.plk.af.mil</tt>)<br>
+    Robert Goodwill (<tt>robert@earth.cs.jcu.edu.au</tt>)<br>
+    Dave Gregorich (<tt>dtg@csula-ps.calstatela.edu</tt>) Brian
+    Gregory (<tt>bgregory@megatest.com</tt>)<br>
+    Ted Grzesik (<tt>tedg@apollo.hp.com</tt>)<br>
+    Harald Hanche-Olsen (<tt>hance@ams.sunysb.edu</tt>)<br>
+    Charles Hannum (<tt>mycroft@gnu.ai.mit.edu</tt>)<br>
+    Dave Heath (<tt>heath@cs.jhu.edu</tt>)<br>
+    Scott D. Heavner (<tt>sdh@po.cwru.edu</tt>)<br>
+    Bill Hess (<tt>hess@tethys.apl.washington.edu</tt>)<br>
+    Dave Hill (<tt>ddhill@zk3.dec.com</tt>)<br>
+    Tom Hinds (<tt>rocker@cs.bu.edu</tt>)<br>
+    Ricky KeangPo Ho (<tt>kpho@sabina.berkeley.edu</tt>)<br>
+    Mark Horstman (<tt>mh2620@sarek.sbc.com</tt>)<br>
+    Tetsuya Ikeda (<tt>tetsuya@is.s.u-tokyo.ac.jp</tt>)<br>
+    Yasuhiro Imoto (<tt>tomo@sonytek.co.jp</tt>)<br>
+    Lester Ingber (<tt>ingber@umiacs.umd.edu</tt>)<br>
+    Dana Jacobsen (<tt>jacobsd@solar.cor2.epa.gov</tt>)<br>
+    Roy Johnson (<tt>rjohnson@shell.com</tt>)<br>
+    Dave Jones (<tt>jonesd@kcgl1.eng.ohio-state.edu</tt>)<br>
+    Kjetil Jorgensen (<tt>jorgens@lise.unit.no</tt>)<br>
+    Jonathan Kamens (<tt>jik@pit-manager.mit.edu</tt>)<br>
+    Vivek Khera (<tt>khera@cs.duke.edu</tt>)<br>
+    Tero Kivinen (<tt>kivinen@joker.cs.hut.fi</tt>)<br>
+    Rainer Klute (<tt>klute@irb.informatik.uni-dortmund.de</tt>)<br>
+    Marc Kossa (<tt>M.Kossa@frec.bull.fr</tt>)<br>
+    Bill Kucharski (<tt>kucharsk@solbourne.com</tt>)<br>
+    ( Bruce Labow (<tt>labow@itd.nrl.navy.mil</tt>)<br>
+    Dave Lampe (<tt>djl@ptc.timeplex.com</tt>)<br>
+    Tom Lane (<tt>tom_lane@g.gp.cs.cmu.edu</tt>)<br>
+    Peder Langlo (<tt>respl@mi.uib.no</tt>)<br>
+    Jeremy Lawrence (<tt>jeremy@snrc.uow.edu.au</tt>)<br>
+    Sam Leffer (<tt>sam@sgi.com</tt>)<br>
+    Jim Lick (<tt>jim@pi-chan.ucsb.edu</tt>)<br>
+    Jean Liddle (<tt>jliddle@mrcnext.cso.uiuc.edu</tt>)<br>
+    Michael Lipscomb (<tt>lipscomb@visionl.engr.utk.edu</tt>)<br>
+    Eam Lo (<tt>eam@netcom.com</tt>)<br>
+    Rolf Mayer (<tt>rz90@rz.uni-karlsruhe.de</tt>)<br>
+    Stephen Mautner (<tt>stephen@cs.utexas.edu</tt>)<br>
+    Tom McConnel (<tt>tmcconne@sedona.intel.com</tt>)<br>
+    Craig McGregor (<tt>craig@csdvax.csd.unsw.edu.au</tt>)<br>
+    Thomas Meyer (<tt>i03a@alf.zfn.uni-bremen.de</tt>)<br>
+    Peter Miller (<tt>pmiller@topaz.bmr.gov.au</tt>)<br>
+    Erwan Moysan (<tt>erwan.moysan@irisa.fr</tt>)<br>
+    Chris Newman (<tt>chrisn+@cmu.edu</tt>)<br>
+    Lars Bo Nielsen (<tt>lbn@hugin.dk</tt>)<br>
+    James Nugent (<tt>james@ironbark.bcae.oz.au</tt>)<br>
+    Arthur Olson (<tt>ado@elsie.nci.nih.gov</tt>)<br>
+    Machael Pall (<tt>pall@rz.uni-karlsruhe.de</tt>)<br>
+    Mike Patnode (<tt>mikep@sco.com</tt>)<br>
+    Nigel Pearson (<tt>nigel@socs.uts.edu.au</tt>)<br>
+    Joe Peterson (<tt>joe@avs.com</tt>)<br>
+    Colin Plumb (<tt>colin@nyx10.cs.du.edu</tt>)<br>
+    Daniel Pommert (<tt>daniel@ux1.cso.uiuc.edu</tt>)<br>
+    Robert Potter (<tt>rpotter@grip.cis.upenn.edu</tt>)<br>
+    Werner Randolf (<tt>evol@brian.uni-koblenz.de</tt>)<br>
+    Eric Raymond (<tt>eric@snark.thyrsus.com</tt>)<br>
+    Eric Rescorla (<tt>erk@eitech.com</tt>)<br>
+    Phil Richards (<tt>pgr@prg.oxford.ac.uk</tt>)<br>
+    Declan A. Rieb (<tt>darieb@sandia.gov</tt>)<br>
+    David Robinson (<tt>drtr@mail.ast.cam.ac.uk</tt>)<br>
+    R. P. Rodgers (<tt>rodgers@nlm.nih.gov</tt>)<br>
+    Chris P. Ross (<tt>cross@eng.umd.edu</tt>)<br>
+    Eckhard Rueggeberg (<tt>eckhard.rueggeberg@ts.go.dlr.de</tt>)<br>
+    Arvind Sabharwal (<tt>arvind@brutus.ct.gmr.com</tt>)<br>
+    Hitoshi Saji (<tt>saji@is.s.u-tokyo.ac.jp</tt>)<br>
+    Nick Sayer (<tt>mrapple@quack.kfu.com</tt>)<br>
+    Klaus Schnepper (<tt>df40@master.df.op.dlr.de</tt>)<br>
+    Steven Schoch (<tt>schoch@starnet.com</tt>)<br>
+    Bill Silvert (<tt>silvert@biome.bio.ns.ca</tt>)<br>
+    Ben Simons (<tt>ben@lewis.vislab.su.edu.au</tt>)<br>
+    Cameron Simpson (<tt>cameron@cse.unsw.edu.au</tt>)<br>
+    Mark Snitily (<tt>mark@zok.sgcs.com</tt>)<br>
+    Karsten Spang (<tt>krs@kampsax.dk</tt>)<br>
+    Greg Spencer (<tt>greg@longs.lance.colostate.edu</tt>)<br>
+    Matthew Stier (<tt>matthew@sunpix.east.sun.com</tt>)<br>
+    Andreas Stolcke (<tt>stolcke@icsi.Berkeley.edu</tt>)<br>
+    Rod Summers (<tt>rsummers@ard.fbi.gov</tt>)<br>
+    Steve Swales (<tt>steve@bat.lle.rochester.edu</tt>)<br>
+    Tony Sweeney (<tt>sweeney@ingres.com</tt>)<br>
+    Matt Thomas (<tt>thomas@netrix.lkg.dec.com</tt>)<br>
+    Rich Thomson (<tt>rthomson@dsd.es.com</tt>)<br>
+    Bill Turner (<tt>bturner@cv.hp.com</tt>)<br>
+    Larry W. Virden (<tt>lwv26@cas.org</tt>)<br>
+    John Walker (<tt>kelvin@autodesk.com</tt>)<br>
+    Doug Washburn (<tt>washburn@hpmpea2.cup.hp.com</tt>)<br>
+    Drew Watson (<tt>dwatson@encore.com</tt>)<br>
+    Chris Weikart (<tt>weikart@prl.dec.com</tt>)<br>
+    Michael Weller (<tt>eowmob@exp-math.uni-essen.de</tt>)<br>
+    Kenny Zalewski (<tt>zalewk@rpi.edu</tt>)<br>
+    Jamie Zawinski (<tt>jwz@lucid.com</tt>)<br>
+    Dan Zheme (<tt>dan@mordor.webo.dg.com</tt>)<br>
+    </font></p>
+</blockquote>
+
+<h2><a name="beta-testers">The Beta Testers</a></h2>
+
+<p>Eric Demerling (AIX)<br>
+Rick Dyson (VAX VMS, VMS on Alpha, SunOS)<br>
+Tom Lane (HP systems)<br>
+Sam Leffler (SGI systems)<br>
+Chris Ross (Solaris, SunOS, Ultrix, NetBSD)<br>
+Michael Weller (Linux)<br>
+Me (OSF/1, SunOS)</p>
+
+<p>Thanks to these folks we can be pretty sure that <i>xv</i>
+will at least compile cleanly on the vast majority of systems.
+Any bugs that have slipped through are entirely my fault, as, in
+all fairness, I haven't given these guys much time to test it. As
+such, the only platform that I can say <i>xv</i> has been
+seriously tested on is OSF/1 running on a DEC Alpha, as that's
+been my most recent development environment.</p>
+
+<h2><a name="miscellaneous-ramblings">Miscellaneous Ramblings</a></h2>
+
+<p>And, of course, thanks to everyone else. If you contributed to
+the developement of <i>xv </i>in some way, and I somehow forgot
+to put you in the big list, my humble apologies. Documentation
+and careful record- keeping are <i>not </i>my strong suits.
+&quot;Heck,&quot; why do you think it takes me a year and a half
+to come up with a minor new release? Because, while I love to add
+new features to the code, I dread <i>documenting</i> the dumb
+things. Besides, we all know that writing the documentation is
+the hardest part of any program. (Particularly once the good
+folks at id Software <i>insisted</i> upon releasing DOOM II...)</p>
+
+<p>And finally, thanks to all the folks who've written in from
+hundreds of sites world-wide. You're the ones who've made <i>xv</i>
+a real success. (Well, that's not <i>actually</i> true. My love
+of nifty user-interfaces, all the wonderful code I've gotten from
+the folks listed above, and the fact that <i>xv </i>actually
+serves a useful purpose (&quot;displaying pictures of naked
+women&quot;) are the things that have made <i>xv</i> a real
+success. You folks who've written in have given me a way to <i>measure
+</i>how successful <i>xv</i> is.) But I digress. Thanks!</p>
+
+<p>By the way, when I last counted (in October 1992), <i>xv</i>
+was in use at 180 different Universities, and dozens of
+businesses, goverment agencies, and the like, in 27 countries on
+6 of the 7 continents. Since then, I've received messages from
+hundreds of new sites. And <i>xv</i> has been spotted in
+Antartica, bringing the total to 7 of 7 continents, and allowing
+me to claim that <i>xv </i>is, in fact, truly <i>global</i>
+software. That's probably a good thing. Does anybody know if
+there's a Unix workstation in the Space Shuttle?... <tt>:-)</tt> </p>
+
+<hr color="#000080">
+
+<p>
+<MAP NAME="FrontPageMap">
+<AREA SHAPE="RECT" COORDS="393, 0, 453, 24" HREF="command-line-options.html">
+<AREA SHAPE="RECT" COORDS="331, 0, 387, 24" HREF="modifying-behavior-4.html">
+<AREA SHAPE="RECT" COORDS="263, 0, 323, 24" HREF="manindex.html">
+<AREA SHAPE="RECT" COORDS="164, 0, 254, 24" HREF="index.html#Table+of+Contents">
+</MAP>
+<img src="images/navbar.gif" width="630" ismap usemap="#FrontPageMap"
+height="25" border="0">
+</p>
+</body>
+</html>
+
+
+
+
+
+
