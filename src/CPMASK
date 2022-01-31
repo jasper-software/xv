@@ -1,21 +1,21 @@
-[CPMASK�ˤĤ���]
-	���� patch �ˤ�äƤ�����줿 CPmask �� FLMASK �ץ��������
-	�Ǥ�������ΤȤϰ㤤file �� passwd �ξ����Ĥ��ޤ���
+[CPMASKについて]
+	この patch によってかけられた CPmask は FLMASK プログラム等
+	でかけたものとは違いfile に passwd の情報を残しません。
 
-	xv �� jpeg file �� save �������
-	��CREATOR: XV Version 3.10a Rev: 12/29/94 Quality = 75, 
-	  Smoothing = 0��
-	�Ȥ����褦�ʾ����ä��ޤ���
+	xv は jpeg file を save する時に
+	「CREATOR: XV Version 3.10a Rev: 12/29/94 Quality = 75, 
+	  Smoothing = 0」
+	というような情報を加えます。
 
-	CPmask �Ϥ�����ʬ�ˤ��ä���passwd�����񤭹���ΤǤ�������
-	�줬������ CPmask �Τ�����줿 file �� xv ���ɤ߹���Ǥ���
-	�ޤ� save ���ʤ����� passwd ��Ĵ�٤� tool �Ȥ���Ƚ��Ǥ��ʤ�
-	file ������夬��櫓�Ǥ���
+	CPmask はこの部分にこっそりpasswd情報を書き込むのですが、こ
+	れが原因で CPmask のかけられた file を xv で読み込んでその
+	まま save しなおすと passwd を調べる tool とかで判定できない
+	file が出来上がるわけです。
 
-	���Τ���ˡ����� version �Ǥ� CPmask ���������Ƥ��ʤ� file
-	�ξ��� error pop up ����褦�ˤ��Ƥ����ΤǤ��������ؤǤ���
-	�Ȥ� mail �������������Τ��Ѥ��뤳�Ȥˤ��ޤ�����
+	そのために、前の version では CPmask がかけられていない file
+	の場合は error pop up するようにしていたのですが、不便である
+	との mail を沢山受けたので変えることにしました。
 
-	�Ǥ����顢���� patch �ǤϿ����� CPmask �򤫤����ˡ��Ϥ�����
-	���ˤ��Ʋ�������
+	ですから、この patch では新しく CPmask をかけずに、はずすだ
+	けにして下さい。
 

@@ -3,99 +3,99 @@
 
 	   	     97.09.14.
 	     matu@alice.lb.u-tokai.ac.jp.
-                  �ޤĤ�餷���롣��
+                  まつむらしげる。。
 
 
-[���Υѥå��ϲ�?]
-	�ʤ���������ʤˤ����顣
-	���äȵ��ޤ���Ǻ��줿��ΤǤ���(^^)
+[このパッチは何?]
+	なんだろう。なにかしら。
+	きっと気まぐれで作られたものです。(^^)
 
 
-[���Υ��������֤��ޤ���]
-	README 			���Υե����롣
-	XV+FLmask.v2.1.patch	�ѥå���
+[このアーカイブが含むもの]
+	README 			このファイル。
+	XV+FLmask.v2.1.patch	パッチ。
 
 
-[�����]
-	(1)�ޤ��������򽸤�ޤ��礦��
+[作り方]
+	(1)まず、材料を集めましょう。
 		xv-3.10a.tar.gz
 		libjpeg-6a.tar.gz
 		xv310a-jp-extension-rev5.3.3.tar.gz
 
-	(2)�����ˡ�
+	(2)これらに、
 		XV+FLmask.v2.1.patch
-	   ��ä��Ƥ��Ĥ��ļѹ��ߤޤ��礦��(jvim����)
+	   を加えてぐつぐつ煮込みましょう。(jvim風。)
 
-	(3)�ʾ塣(���������
-
-
-[���Ѥˤ����ä�]
-	FLmask menu �� Mask button �������Ƥ�������Ǥ���
-	�񤷤��Ȥ�����̵���Ǥ��礦��
-	Mask button �Ͼ��˻Ȥ��������Ǥ���
+	(3)以上。(これだけ）
 
 
-[�ٹ�]
-	���� patch �Ϥ��ʤ����Ȥ���Ǥ�Τ�Ȥ˻��Ѥ��Ʋ�
-	�������⤷������ patch ����Ѥ�����ˤ�äơ���
-	�ʤ��� HDD �� data �������ä��Ƥ��ޤä��ꡢ�ϡ�
-	�ɥ����������᡼����������ꡢ���ʤ��θ�������
-	���ޤäƤ⡢�����ϰ��ڴ��Τ��ޤ���(mgetty����)
+[使用にあたって]
+	FLmask menu と Mask button が増えているだけです。
+	難しいところは無いでしょう。
+	Mask button は上手に使うと便利です。
 
 
-[ư��Ķ�]
-	��ȯ�Ķ��� Linux-2.0.30 �Ǥ��������֤� original 
-	�� xv ��ư���Ķ��Ǥ��������̵��ư���Ǥ��礦��
-	(���֤�)
+[警告]
+	この patch はあなた自身の責任のもとに使用して下
+	さい。もし、この patch を使用する事によって、あ
+	なたの HDD の data が全部消えてしまったり、ハー
+	ドウェアがダメージを受けたり、あなたの犬が死んで
+	しまっても、当方は一切関知しません。(mgetty風。)
 
 
-[����¾]
-	���Υѥå��ϥ������������Ǥ���
-	500���顣��˳�ʳ����ʤΤǡ�free �ˤ��ޤ���Ǥ�����
-	Ʊ��������ζ줷�����ϡ��Ƚ��פ��ޤ�����
-	����¾�� software �μ�ͳ�����դ����󤿤餫�󤿤�
-	�Ǥɤ��Ȥ������Ȥ������ͤ�ʧ��ʤ��Ƥ��ɤ��Ǥ�����
+[動作環境]
+	開発環境は Linux-2.0.30 ですが、たぶん original 
+	の xv が動く環境であれば問題無く動くでしょう。
+	(たぶん)
+
+
+[その他]
+	このパッチはシェアウエアです。
+	500円也。貧乏な学生なので、free にしませんでした。
+	同じく生活の苦しい方は、免除致します。。
+	その他、 software の自由な配付がうんたらかんたら
+	でどうとかこうとか言う人も払わなくても良いです。。
 	                                           (^^;;;
 
-	���Ĥ����������ˤ�P����Ϥޤ�CPU��Ƴ���������̴
-	���ơ���(K�Ǥ�褤��D�Ϥ⤦���䡣��)
+	いつの日かうちにもPから始まるCPUを導入する事を夢
+	見て。。(Kでもよい。Dはもういや。。)
 
-	�����˻�ʧ�äƤ��������
+	本当に支払ってくれる方は
 		E-mail: matu@alice.lb.u-tokai.ac.jp
-	�ޤ� Mail ���Ʋ�������(^^)
+	まで Mail して下さい。(^^)
 
 
-	�Զ���, �׵�, ���ۤʤɤʤ�Ǥ�, ��Υ��ɥ쥹�ޤ�
-	���ꤤ���ޤ���
-	(v2.0 �λ� mail ���äƲ����ä�����������ͭ�񤦤���
-	���ޤ�����ո�ȿ�ǤǤ���褦���Ϥ��Ƥߤޤ�����)
+	不具合や, 要求, 感想などなんでも, 上のアドレスまで
+	お願いします。
+	(v2.0 の時 mail 送って下さった沢山の方、有難うござ
+	います。御意見反映できるよう努力してみます。。)
 
 
-	�ޤ���XV+FLmask Home Page.��
+	また「XV+FLmask Home Page.」
 	http://www.lb.u-tokai.ac.jp/~matu/flmask/
-	�ˤ� Version UP �Τ��Τ餻�������뤫���Τ�ޤ���
+	にて Version UP のお知らせ等があるかも知れません。
 
 
-[�ռ�]
-	���Υѥå����åȤ��������ˤ����äơ��ʲ�������
-	�θ涨�Ϥ����ޤ����� ����괶���פ��ޤ���
+[謝辞]
+	このパッチキットを作成するにあたって、以下の方々
+	の御協力を得ました。 心より感謝致します。
 
-	  o Gmask �κ�ԤθŹ� �� �͡�
-	  o ���ο͡�
-	  o ���ο͡�
-	  o ����¾��
+	  o Gmask の作者の古溝 剛 様。
+	  o あの人。
+	  o この人。
+	  o その他。
 
 
 --
-o `XV'��, X Window System��β���ɽ���ץ������Ǥ�.
+o `XV'は, X Window System上の画像表示プログラムです.
    XV is Copyright 1989, 1994 by John Bradley.
    X Window System is a trademark of X Consortium, Inc.
-o MEKOMASK �� �޽��� ���󤵤��Υޥ����ġ��롣
-o WINMASK  �� ��¼ ��Ϥ����Υޥ����ġ��롣
-o FLMASK   �� ��enesis �����Υޥ����ġ��롣
-o CPMASK   �� �����ȣ�enesis ������Υޥ�����ˡ��
-o Gmask    �� �Ź¹䤵��Υޥ����ġ��롣
+o MEKOMASK は 五十嵐 洋二さん作のマスクツール。
+o WINMASK  は 外村 高章さん作のマスクツール。
+o FLMASK   は Ｇenesis さん作のマスクツール。
+o CPMASK   は 内野さんとＧenesis さん合作のマスク技法。
+o Gmask    は 古溝剛さんのマスクツール。
 
-(jp-extension���� README)
+(jp-extension風の README)
 
 
