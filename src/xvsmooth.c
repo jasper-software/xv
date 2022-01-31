@@ -254,7 +254,7 @@ int   is24, swide, shigh, dwide, dhigh;
   bperpix = (is24) ? 3 : 1;
 
   for (j=0; j<=swide; j++)
-    pixarr[j] = (j*dwide + (15*swide)/16) / swide;
+    pixarr[j] = ((2 * j + 1 ) * dwide) / ( 2 * swide);
 
   cptr = pic824;  cptr1 = cptr + swide * bperpix;
 
@@ -369,25 +369,9 @@ int   is24, swide, shigh, dwide, dhigh;
 
   lastline = linecnt = 0;
 
-  for (i=0, clptr=pic824; i<=shigh; i++, clptr+=swide*bperpix) {
+  for (i=0, clptr=pic824; i<shigh; i++, clptr+=swide*bperpix) {
     ProgressMeter(0, shigh, i, "Smooth");
     if ((i&15) == 0) WaitCursor();
-
-    thisline = (i * dhigh + (15*shigh)/16) / shigh;
-
-    if (thisline != lastline) {  /* copy a line to pic24 */
-      for (j=0; j<dwide; j++) {
-	*pic24++ = lbufR[j] / linecnt;
-	*pic24++ = lbufG[j] / linecnt;
-	*pic24++ = lbufB[j] / linecnt;
-      }
-
-      xvbzero( (char *) lbufR, dwide * sizeof(int));  /* clear out line bufs */
-      xvbzero( (char *) lbufG, dwide * sizeof(int));
-      xvbzero( (char *) lbufB, dwide * sizeof(int));
-      linecnt = 0;  lastline = thisline;
-    }
-
 
     for (j=0, cxptr=cxarr; j<dwide; j++, cxptr++) {
       cptr  = clptr + *cxptr * bperpix;
@@ -407,6 +391,21 @@ int   is24, swide, shigh, dwide, dhigh;
     }
 
     linecnt++;
+
+    thisline = ((2 * i + 3) * dhigh) / (2 * shigh);
+
+    if (thisline != lastline) {  /* copy a line to pic24 */
+      for (j=0; j<dwide; j++) {
+	*pic24++ = lbufR[j] / linecnt;
+	*pic24++ = lbufG[j] / linecnt;
+	*pic24++ = lbufB[j] / linecnt;
+      }
+
+      xvbzero( (char *) lbufR, dwide * sizeof(int));  /* clear out line bufs */
+      xvbzero( (char *) lbufG, dwide * sizeof(int));
+      xvbzero( (char *) lbufB, dwide * sizeof(int));
+      linecnt = 0;  lastline = thisline;
+    }
   }
 
 
@@ -463,7 +462,7 @@ int   is24, swide, shigh, dwide, dhigh;
   bperpix = (is24) ? 3 : 1;
 
   for (j=0; j<=swide; j++)
-    pixarr[j] = (j*dwide + (15*swide)/16) / swide;
+    pixarr[j] = ((2 * j + 1) * dwide) / (2 * swide);
 
   lastline = linecnt = pixR = pixG = pixB = 0;
   cptr = pic824;
@@ -472,7 +471,7 @@ int   is24, swide, shigh, dwide, dhigh;
     ProgressMeter(0, shigh, i, "Smooth");
     if ((i&15) == 0) WaitCursor();
 
-    thisline = (i * dhigh + (15*shigh)/16 ) / shigh;
+    thisline = ((2 * i + 1) * dhigh) / (2 * shigh);
 
     if ((thisline != lastline)) {      /* copy a line to pic24 */
       pixR = pixG = pixB = pixcnt = lastpix = 0;
