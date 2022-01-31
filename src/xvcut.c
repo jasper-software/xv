@@ -678,9 +678,9 @@ static byte *getSelection()
 	}
 	if (k==nc) {
 	  nc++;
-	  cimg[CIMG_CMAP + nc*3    ] = pr;
-	  cimg[CIMG_CMAP + nc*3 + 1] = pg;
-	  cimg[CIMG_CMAP + nc*3 + 2] = pb;
+	  cimg[CIMG_CMAP + k*3    ] = pr;
+	  cimg[CIMG_CMAP + k*3 + 1] = pg;
+	  cimg[CIMG_CMAP + k*3 + 2] = pb;
 	}
 
 	*dp++ = (byte) k;
