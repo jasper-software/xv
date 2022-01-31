@@ -10,3 +10,8 @@ This source code originates from:
 
   - <http://www.gregroelofs.com/code/xv-3.10a-enhancements.20070520-20081216.diff>
     (obtained 2022-01-30)
+
+The xv software was originally written by John Bradley.
+John Bradley's web site for the xv software can be found at:
+
+  - <http://www.trilon.com/xv>
