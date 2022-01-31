@@ -1387,7 +1387,11 @@ void SetDirFName(st)
 static void setFName(st)
      const char *st;
 {
-  strncpy(filename, st, (size_t) MAXFNLEN-1);
+  /* Prevent an ASan failure. */
+  /* Why is this code being called with filename == st??? */
+  if (filename != st) {
+    strncpy(filename, st, (size_t) MAXFNLEN-1);
+  }
   filename[MAXFNLEN-1] = '\0';  /* make sure it's terminated */
   curPos = strlen(st);
   stPos = 0;  enPos = curPos;

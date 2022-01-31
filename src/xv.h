@@ -17,8 +17,9 @@
 /* GRR 3rd public jumbo F+E patches:	20050501 */
 /* GRR 4th public jumbo F+E patch:  	20070520 */
 /* GRR 5th public jumbo F+E patch:  	200xxxxx (probably mid-2009) */
-#define REVDATE   "version 3.10a-jumboFix+Enh of 20081216 (interim!)"
-#define VERSTR    "3.10a-20081216"
+/* MDA 6th patch: 20220127 */
+#define REVDATE   "version 3.10a-20220127"
+#define VERSTR    "3.10a-20220127"
 
 /*
  * uncomment the following, and modify for your site, but only if you've

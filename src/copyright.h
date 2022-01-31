@@ -100,6 +100,9 @@
  *   Tavis Ormandy (taviso gentoo.org)
  *   Werner Fink (http://www.suse.de/~werner/)
  *
+ * Portions copyright 2022 by the following contributors:
+ *   Michael D. Adams (http://github.com/mdadams)
+ *
  * Other credits are as listed on the XV Downloads page or in the respective
  * patches (e.g., the jp-extension patches or within the PNG patch).
  *
