@@ -54,8 +54,6 @@ int         start24bitAlg  PARM((byte **, byte **));
 void        end24bitAlg    PARM((byte *, byte *));
 void        printUTime     PARM((const char *));
 
-byte *origPic = (byte *) NULL;
-int  origPicType;
 static byte origrmap[256], origgmap[256], origbmap[256];
 
 

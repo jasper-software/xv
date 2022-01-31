@@ -214,7 +214,7 @@ int main(argc, argv)
   visualstr = monofontname = flistName = NULL;
   winTitle = NULL;
 
-  pic = egampic = epic = cpic = NULL;
+  pic = egampic = epic = cpic = origPic = NULL;
   theImage = NULL;
 
   picComments = (char *) NULL;

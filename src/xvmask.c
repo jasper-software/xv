@@ -42,8 +42,6 @@ void end24bitAlg 		PARM ((byte *, byte *));
 void saveOrigPic 		PARM ((void));
 void printUTime 		PARM ((char *));
 
-byte *origPic;
-
 #undef TIMING_TEST
 
 #ifdef TIMING_TEST

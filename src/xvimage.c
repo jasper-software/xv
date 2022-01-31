@@ -348,9 +348,6 @@ int w,h;
   CreateXImage();
 }
 
-byte *origPic;
-int  origPicType;
-
 /********************************************/
 void GenerateCpic()
 {
