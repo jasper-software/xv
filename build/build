@@ -1,0 +1,23 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $*"
+	exit 1
+}
+
+program_dir=$(dirname "$0") || exit 1
+top_dir="$program_dir/.."
+
+build_dir="$top_dir/tmp_cmake"
+
+configure_options=()
+configure_options+=(-DCMAKE_INSTALL_PREFIX=/tmp/xv)
+configure_options+=(-DCMAKE_VERBOSE_MAKEFILE=1)
+configure_options+=(-DXV_ENABLE_ASAN=1)
+configure_options+=(-DXV_ENABLE_UBSAN=1)
+
+cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \
+  panic "configure failed"
+
+cmake --build "$build_dir" || panic "build failed"
