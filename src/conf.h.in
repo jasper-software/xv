@@ -3,5 +3,6 @@
 
 #define XV_VERSION "@XV_VERSION@"
 #cmakedefine XV_HAVE_STRERROR
+#cmakedefine XV_HAVE_SYSERRLISTDECL
 
 #endif

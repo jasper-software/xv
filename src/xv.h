@@ -166,7 +166,9 @@
 #  ifndef __NetBSD__
 #    if !(defined(__GLIBC__) && __GLIBC__ >= 2)
        extern int   errno;         /* SHOULD be in errno.h, but often isn't */
-       extern char *sys_errlist[]; /* this too... */
+#      ifndef XV_HAVE_SYSERRLISTDECL
+         extern char *sys_errlist[]; /* this too... */
+#      endif
 #    endif
 #  endif
 #endif

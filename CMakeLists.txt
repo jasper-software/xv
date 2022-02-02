@@ -74,6 +74,14 @@ int main() {
 " XV_TRY_COMPILE_STRERROR)
 set(XV_HAVE_STRERROR ${XV_TRY_COMPILE_STRERROR})
 
+check_c_source_compiles("
+#include <errno.h>
+int main() {
+	const char *p = sys_errlist[0];
+}
+" XV_TRY_COMPILE_SYSERRLIST)
+set(XV_HAVE_SYSERRLISTDECL ${XV_TRY_COMPILE_SYSERRLIST})
+
 ################################################################################
 # Find libraries.
 ################################################################################
