@@ -24,6 +24,8 @@ option(XV_ENABLE_PDS  "Enable PDF Support" ON)
 option(XV_ENABLE_PNG  "Enable PNG Support" ON)
 option(XV_ENABLE_TIFF "Enable TIFF Support" ON)
 
+option(XV_STRICT "Treat compiler warnings as errors" OFF)
+
 ################################################################################
 # Include modules and set policies.
 ################################################################################
@@ -35,6 +37,30 @@ include(GNUInstallDirs)
 
 include(CheckCCompilerFlag)
 include(Sanitizers)
+
+################################################################################
+# Compiler settings.
+################################################################################
+
+# Customize the compiler flags for warning messages.
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	add_compile_options(-Wall)
+	add_compile_options(-pedantic)
+	add_compile_options(-W)
+	add_compile_options(-Wmissing-prototypes)
+	add_compile_options(-Wstrict-prototypes)
+	add_compile_options(-Wmissing-declarations)
+	if(XV_STRICT)
+		# Treat all compiler warnings as errors.
+		add_compile_options(-pedantic-errors)
+		add_compile_options(-Werror)
+	endif()
+elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+	if(XV_STRICT)
+		# Treat all compiler warnings as errors.
+		add_compile_options(/WX)
+	endif()
+endif()
 
 ################################################################################
 # Find libraries.

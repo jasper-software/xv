@@ -16,8 +16,11 @@ configure_options+=(-DCMAKE_INSTALL_PREFIX=/tmp/xv)
 configure_options+=(-DCMAKE_VERBOSE_MAKEFILE=1)
 configure_options+=(-DXV_ENABLE_ASAN=1)
 configure_options+=(-DXV_ENABLE_UBSAN=1)
+#configure_options+=(-DXV_STRICT=1)
 
 cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \
   panic "configure failed"
 
 cmake --build "$build_dir" || panic "build failed"
+
+cmake --build "$build_dir" --target install || panic "install failed"

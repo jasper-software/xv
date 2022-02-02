@@ -106,8 +106,30 @@ target_link_libraries(xcmap ${xv_libs})
 
 add_executable(xvpictoppm xvpictoppm.c)
 
-# Install of the the programs that were built.
 install(
   TARGETS xv bggen vdcomp xcmap xvpictoppm
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
+
+set(man_pages
+	xv.man
+	bggen.man
+	xcmap.man
+	xvp2p.man
+	vdcomp.man
+)
+foreach(file ${man_pages})
+	string(REGEX REPLACE "\\.[^.]*$" "" base ${file})
+	install(
+		FILES docs/${file} RENAME ${base}.1
+		DESTINATION "${CMAKE_INSTALL_MANDIR}/man1"
+	)
+endforeach()
+
+install(
+	FILES
+	README.jumbo
+	docs/manuals/xvdocs.pdf
+	docs/manuals/xvdocs.ps
+	DESTINATION ${CMAKE_INSTALL_DOCDIR}
 )
