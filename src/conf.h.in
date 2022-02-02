@@ -5,5 +5,6 @@
 #cmakedefine XV_HAVE_STRERROR
 #cmakedefine XV_HAVE_SYSERRLISTDECL
 #cmakedefine XV_HAVE_NAMEMAX
+#cmakedefine XV_HAVE_LIMITS_H
 
 #endif

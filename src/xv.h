@@ -9,6 +9,9 @@
 #include "copyright.h"
 #include "config.h"
 
+#ifdef XV_HAVE_LIMITS_H
+#include <limits.h>
+#endif
 
 /* xv 3.10a:				19941229 */
 /* PNG patch 1.2d:			19960731 */

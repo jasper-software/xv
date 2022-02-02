@@ -35,6 +35,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/build/cmake/modules)
 # Adhere to GNU filesystem layout conventions.
 include(GNUInstallDirs)
 
+include(CheckIncludeFiles)
 include(CheckCCompilerFlag)
 include(Sanitizers)
 
@@ -65,6 +66,8 @@ endif()
 ################################################################################
 #
 ################################################################################
+
+check_include_files(limits.h XV_HAVE_LIMITS_H)
 
 check_c_source_compiles("
 #include <string.h>
