@@ -43,6 +43,21 @@ include(Sanitizers)
 # Compiler settings.
 ################################################################################
 
+# Prefer C99 (if available) but do not require it.
+set(CMAKE_C_STANDARD 99)
+
+if(APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	set(MACOS TRUE)
+else()
+	set(MACOS FALSE)
+endif()
+
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+	set(LINUX TRUE)
+else()
+	set(LINUX FALSE)
+endif()
+
 # Customize the compiler flags for warning messages.
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	add_compile_options(-Wall)
