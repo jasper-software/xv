@@ -93,9 +93,14 @@
 /*                                                                  */
 /********************************************************************/
 
+#include "conf.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
+/* All of this seems unecessary.  Does any reasonable system not
+have declarations for malloc and friends in stdlib.h? */
+#if 0
 /* include a malloc.h of some sort (if needed...most systems use stdlib.h) */
 #ifndef VMS   /* VMS hates multi-line "#if"s */
    /*
@@ -129,7 +134,7 @@
 
 #  endif /* !most modern systems */
 #endif /* !VMS */
-
+#endif
 
 #include <X11/Xos.h>
 

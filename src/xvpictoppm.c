@@ -31,6 +31,7 @@
  *    #END_OF_COMMENTS
  */
 
+#include "conf.h"
 
 #include "xv.h"
 #include "copyright.h"

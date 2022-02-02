@@ -9,7 +9,7 @@
  *      Rev: 7/7/94    -  added '-G' option
  */
 
-
+#include "conf.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xos.h>

@@ -5,6 +5,8 @@
  *                (bradley@cis.upenn.edu)
  */
 
+#include "conf.h"
+
 #define REVDATE   "Rev: 2/13/89"
 
 /* include files */
