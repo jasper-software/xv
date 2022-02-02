@@ -9,13 +9,46 @@ panic()
 program_dir=$(dirname "$0") || exit 1
 top_dir="$program_dir/.."
 
-build_dir="$top_dir/tmp_cmake"
+verbose=0
+build_dir=
+install_dir=
+tmp_dir=
+
+while getopts vb:i:t: opt; do
+	case $opt in
+	b)
+		build_dir="$OPTARG";;
+	i)
+		install_dir="$OPTARG";;
+	v)
+		verbose=$((verbose + 1));;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$tmp_dir" ]; then
+	tmp_dir="$top_dir/tmp_cmake"
+fi
+if [ -z "$build_dir" ]; then
+	build_dir="$tmp_dir/build"
+fi
+if [ -z "$install_dir" ]; then
+	install_dir="$tmp_dir/install"
+fi
 
 configure_options=()
-configure_options+=(-DCMAKE_INSTALL_PREFIX=/tmp/xv)
-configure_options+=(-DCMAKE_VERBOSE_MAKEFILE=1)
-configure_options+=(-DXV_ENABLE_ASAN=1)
-configure_options+=(-DXV_ENABLE_UBSAN=1)
+
+configure_options+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
+
+if [ "$verbose" -ge 1 ]; then
+	configure_options+=(-DCMAKE_VERBOSE_MAKEFILE=1)
+fi
+
+#configure_options+=(-DXV_ENABLE_ASAN=1)
+#configure_options+=(-DXV_ENABLE_UBSAN=1)
 #configure_options+=(-DXV_STRICT=1)
 
 cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \

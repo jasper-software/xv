@@ -1,0 +1,27 @@
+name: ci
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+        #include:
+        #  - os: [windows-2022]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    ############################################################
+    - name: prebuild
+      shell: bash
+      run: build/github/prebuild
+    ############################################################
+    - name: testing
+      env:
+        CC: ${{ matrix.compiler }}
+      shell: bash
+      run: build/build -t '${{runner.temp}}'
+    ############################################################

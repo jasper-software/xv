@@ -1,0 +1,65 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $@"
+	exit 1
+}
+
+usage()
+{
+	echo "bad usage: $@"
+	exit 2
+}
+
+verbose=0
+os=
+
+while getopts vs: opt; do
+	case $opt in
+	s)
+		os="$OPTARG";;
+	v)
+		verbose=$((verbose + 1));;
+	\?)
+		usage
+		break;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$out_file" ]; then
+	panic "no output file specified"
+fi
+
+if [ -z "$os" ]; then
+	if [ -n "$RUNNER_OS" ]; then
+		case "$RUNNER_OS" in
+		MacOS|macOS)
+			os=macos;;
+		Linux|linux)
+			os=linux;;
+		Windows|windows)
+			os=windows;;
+		*)
+			os=unknown;;
+		esac
+	fi
+fi
+
+echo "OS: $os"
+
+case "$os" in
+linux)
+	;;
+macos)
+	#brew install XXXX || panic "cannot install findutils"
+	;;
+windows)
+	;;
+*)
+	panic "invalid OS"
+	;;
+esac
+
+exit 0
