@@ -1,0 +1,7 @@
+#ifndef XV_CONF_H
+#define XV_CONF_H
+
+#define XV_VERSION "@XV_VERSION@"
+#cmakedefine XV_HAVE_STRERROR
+
+#endif

@@ -4,6 +4,8 @@
  *  Author:    John Bradley  (bradley@cis.upenn.edu)
  */
 
+#include "conf.h"
+
 #include "copyright.h"
 #include "config.h"
 
@@ -19,8 +21,8 @@
 /* GRR 5th public jumbo F+E patch:  	200xxxxx (probably mid-2009) */
 /* FLMask 2.1 (modified) patch:		20090820 */
 /* MDA 6th patch: 20220127 */
-#define REVDATE   "version 3.10a-20220127"
-#define VERSTR    "3.10a-20220127"
+#define REVDATE   XV_VERSION
+#define VERSTR    XV_VERSION
 
 /*
  * uncomment the following, and modify for your site, but only if you've
@@ -162,7 +164,7 @@
 #ifndef VMS
 #  include <errno.h>
 #  ifndef __NetBSD__
-#    if !(defined __GLIBC__ && __GLIBC__ >= 2)
+#    if !(defined(__GLIBC__) && __GLIBC__ >= 2)
        extern int   errno;         /* SHOULD be in errno.h, but often isn't */
        extern char *sys_errlist[]; /* this too... */
 #    endif
@@ -171,16 +173,19 @@
 
 
 /* not everyone has the strerror() function, or so I'm told */
-#ifdef VMS
-#  define ERRSTR(x) strerror(x, vaxc$errno)
-#else
-#  if defined(__BEOS__) || defined(__linux__) /* or all modern/glibc systems? */
-#    define ERRSTR(x) strerror(x)
+#if !defined(XV_HAVE_STRERROR)
+#  ifdef VMS
+#    define ERRSTR(x) strerror(x, vaxc$errno)
 #  else
-#    define ERRSTR(x) sys_errlist[x]
+#    if defined(__BEOS__) || defined(__linux__) /* or all modern/glibc systems? */
+#      define ERRSTR(x) strerror(x)
+#    else
+#      define ERRSTR(x) sys_errlist[x]
+#    endif
 #  endif
+#else
+#  define ERRSTR(x) strerror(x)
 #endif
-
 
 
 

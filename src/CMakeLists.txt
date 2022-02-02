@@ -1,3 +1,10 @@
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/conf.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/conf.h"
+)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 set(xv_libs)
 
 add_compile_definitions(DOCDIR="${CMAKE_INSTALL_DOCDIR}")
