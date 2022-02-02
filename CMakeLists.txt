@@ -83,6 +83,14 @@ int main() {
 " XV_TRY_COMPILE_SYSERRLIST)
 set(XV_HAVE_SYSERRLISTDECL ${XV_TRY_COMPILE_SYSERRLIST})
 
+check_c_source_compiles("
+#include <limits.h>
+int main() {
+	char x[NAME_MAX + 1];
+}
+" XV_TRY_COMPILE_NAMEMAX)
+set(XV_HAVE_NAMEMAX ${XV_TRY_COMPILE_NAMEMAX})
+
 ################################################################################
 # Find libraries.
 ################################################################################

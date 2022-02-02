@@ -59,6 +59,9 @@
 
 #define ENABLE_FIXPIX_SMOOTH	/* GRR 19980607 */
 
+#ifndef XV_HAVE_NAMEMAX
+#  define NAME_MAX 256
+#endif
 
 /* Things to make xv more likely to just build, without the user tweaking
    the makefile */
