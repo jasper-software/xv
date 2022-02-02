@@ -6,6 +6,7 @@ configure_file(
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(xv_libs)
+set(programs)
 
 add_compile_definitions(DOCDIR="${CMAKE_INSTALL_DOCDIR}")
 set(xv_libs ${xv_libs} X11::X11 X11::Xt)
@@ -102,19 +103,26 @@ set(xv_sources
 
 add_executable(xv ${xv_sources})
 target_link_libraries(xv ${xv_libs})
+set(programs ${programs} xv)
 
 add_executable(bggen bggen.c)
 target_link_libraries(bggen ${xv_libs})
+set(programs ${programs} bggen)
 
+if(NOT MACOS)
 add_executable(vdcomp vdcomp.c)
+set(programs ${programs} vdcomp)
+endif()
 
 add_executable(xcmap xcmap.c)
 target_link_libraries(xcmap ${xv_libs})
+set(programs ${programs} xcmap)
 
 add_executable(xvpictoppm xvpictoppm.c)
+set(programs ${programs} xvpictoppm)
 
 install(
-  TARGETS xv bggen vdcomp xcmap xvpictoppm
+  TARGETS ${programs}
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
