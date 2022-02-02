@@ -49,7 +49,11 @@ case "$os" in
 linux)
 	;;
 macos)
-	#brew install XXXX || panic "cannot install findutils"
+	packages=()
+	packages+=(libx11)
+	packages+=(libxt)
+	echo "installing packages ${packages[*]}"
+	brew install "${packages[@]}" || panic "cannot install packages"
 	;;
 windows)
 	;;
