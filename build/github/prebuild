@@ -28,10 +28,6 @@ while getopts vs: opt; do
 done
 shift $((OPTIND - 1))
 
-if [ -z "$out_file" ]; then
-	panic "no output file specified"
-fi
-
 if [ -z "$os" ]; then
 	if [ -n "$RUNNER_OS" ]; then
 		case "$RUNNER_OS" in
