@@ -67,6 +67,9 @@ endif()
 ################################################################################
 
 find_package(X11 REQUIRED)
+if (NOT TARGET X11::X11 OR NOT TARGET X11::Xt)
+	message(FATAL_ERROR "X11/Xt library is missing")
+endif()
 
 find_library(MATH_LIBRARY m)
 if(NOT MATH_LIBRARY)
