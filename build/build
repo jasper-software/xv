@@ -39,6 +39,8 @@ if [ -z "$install_dir" ]; then
 	install_dir="$tmp_dir/install"
 fi
 
+cmake --version || panic "cannot run cmake"
+
 configure_options=()
 
 configure_options+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
