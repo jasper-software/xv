@@ -75,6 +75,7 @@ int main() {
 set(XV_HAVE_STRERROR ${XV_TRY_COMPILE_STRERROR})
 
 check_c_source_compiles("
+#include <stdio.h> /* MacOS */
 #include <errno.h>
 int main() {
 	const char *p = sys_errlist[0];
