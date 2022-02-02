@@ -109,17 +109,21 @@ add_executable(bggen bggen.c)
 target_link_libraries(bggen ${xv_libs})
 set(programs ${programs} bggen)
 
+# This causes problems on MacOS due to missing X11/Xos.h
 if(NOT MACOS)
-add_executable(vdcomp vdcomp.c)
-set(programs ${programs} vdcomp)
+	add_executable(vdcomp vdcomp.c)
+	set(programs ${programs} vdcomp)
 endif()
 
 add_executable(xcmap xcmap.c)
 target_link_libraries(xcmap ${xv_libs})
 set(programs ${programs} xcmap)
 
-add_executable(xvpictoppm xvpictoppm.c)
-set(programs ${programs} xvpictoppm)
+# This causes problems on MacOS due to missing X11/Xos.h
+if(NOT MACOS)
+	add_executable(xvpictoppm xvpictoppm.c)
+	set(programs ${programs} xvpictoppm)
+endif()
 
 install(
   TARGETS ${programs}
