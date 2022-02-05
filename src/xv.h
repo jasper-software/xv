@@ -5,14 +5,16 @@
  */
 
 #ifdef XV_CMAKE_BUILD
-#include "conf.h"
+#  include "conf.h"
 #endif
 
 #include "copyright.h"
 #include "config.h"
 
-#ifdef XV_HAVE_LIMITS_H
-#include <limits.h>
+#ifdef XV_CMAKE_BUILD
+#  ifdef XV_HAVE_LIMITS_H
+#    include <limits.h>
+#  endif
 #endif
 
 /* xv 3.10a:				19941229 */
@@ -27,11 +29,11 @@
 /* FLMask 2.1 (modified) patch:		20090820 */
 /* MDA 6th patch: 20220127 */
 #ifdef XV_CMAKE_BUILD
-#define REVDATE   XV_REVDATE
-#define VERSTR    XV_VERSTR
+#  define REVDATE   XV_REVDATE
+#  define VERSTR    XV_VERSTR
 #else
-#define REVDATE   "version 3.10a-20220127"
-#define VERSTR    "3.10a-20220127"
+#  define REVDATE   "version 3.10a-20220127"
+#  define VERSTR    "3.10a-20220127"
 #endif
 
 /*
@@ -69,8 +71,10 @@
 
 #define ENABLE_FIXPIX_SMOOTH	/* GRR 19980607 */
 
-#ifndef XV_HAVE_NAMEMAX
-#  define NAME_MAX 256
+#ifdef XV_CMAKE_BUILD
+#  if !defined(XV_HAVE_NAMEMAX)
+#    define NAME_MAX 256
+#  endif
 #endif
 
 /* Things to make xv more likely to just build, without the user tweaking
