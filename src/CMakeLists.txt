@@ -13,27 +13,27 @@ set(xv_libs ${xv_libs} X11::X11 X11::Xt)
 set(xv_libs ${xv_libs} ${MATH_LIBRARY})
 
 if(XV_ENABLE_TIFF)
-	add_compile_definitions(DDOTIFF DUSE_TILED_TIFF_BOTLEFT_FIX)
+	add_compile_definitions(DOTIFF USE_TILED_TIFF_BOTLEFT_FIX)
 	set(xv_libs ${xv_libs} TIFF::TIFF)
 endif()
 
 if(XV_ENABLE_PNG)
-	add_compile_definitions(DDOPNG)
+	add_compile_definitions(DOPNG)
 	set(xv_libs ${xv_libs} PNG::PNG)
 endif()
 
 if(XV_ENABLE_JPEG)
-	add_compile_definitions(DDOJPEG)
+	add_compile_definitions(DOJPEG)
 	set(xv_libs ${xv_libs} JPEG::JPEG)
 endif()
 
 if(XV_ENABLE_JP2K)
-	add_compile_definitions(DDOJP2K)
+	add_compile_definitions(DOJP2K)
 	set(xv_libs ${xv_libs} Jasper::Jasper)
 endif()
 
 if(XV_ENABLE_PDS)
-	add_compile_definitions(DDOPDS)
+	add_compile_definitions(DOPDS)
 	#set(xv_libs ${xv_libs} XXX::XXX)
 endif()
 
