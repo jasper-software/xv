@@ -93,7 +93,9 @@
 /*                                                                  */
 /********************************************************************/
 
+#ifdef XV_CMAKE_BUILD
 #include "conf.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

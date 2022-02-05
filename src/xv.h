@@ -4,7 +4,9 @@
  *  Author:    John Bradley  (bradley@cis.upenn.edu)
  */
 
+#ifdef XV_CMAKE_BUILD
 #include "conf.h"
+#endif
 
 #include "copyright.h"
 #include "config.h"
@@ -24,8 +26,13 @@
 /* GRR 5th public jumbo F+E patch:  	200xxxxx (probably mid-2009) */
 /* FLMask 2.1 (modified) patch:		20090820 */
 /* MDA 6th patch: 20220127 */
-#define REVDATE   XV_VERSION
-#define VERSTR    XV_VERSION
+#ifdef XV_CMAKE_BUILD
+#define REVDATE   XV_REVDATE
+#define VERSTR    XV_VERSTR
+#else
+#define REVDATE   "version 3.10a-20220127"
+#define VERSTR    "3.10a-20220127"
+#endif
 
 /*
  * uncomment the following, and modify for your site, but only if you've

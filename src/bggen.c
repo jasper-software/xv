@@ -9,7 +9,9 @@
  *      Rev: 7/7/94    -  added '-G' option
  */
 
+#ifdef XV_CMAKE_BUILD
 #include "conf.h"
+#endif
 
 #include <X11/Xlib.h>
 #include <X11/Xos.h>

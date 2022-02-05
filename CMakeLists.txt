@@ -8,9 +8,13 @@ cmake_minimum_required(VERSION 3.12)
 set(XV_VERSION_MAJOR 4)
 set(XV_VERSION_MINOR 0)
 set(XV_VERSION_PATCH 0)
+set(XV_VERSION_DATE "20220127")
 
 # Generate the project version.
 set(XV_VERSION "${XV_VERSION_MAJOR}.${XV_VERSION_MINOR}.${XV_VERSION_PATCH}")
+
+set(XV_VERSTR "${XV_VERSION}-${XV_VERSION_DATE}")
+set(XV_REVDATE "version ${XV_VERSION}-${XV_VERSION_DATE}")
 
 project(xv VERSION ${XV_VERSION} LANGUAGES C)
 
@@ -46,6 +50,8 @@ include(Sanitizers)
 # Prefer C99 (if available) but do not require it.
 set(CMAKE_C_STANDARD 99)
 
+set(CMAKE_C_EXTENSIONS ON)
+
 if(APPLE AND CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(MACOS TRUE)
 else()
@@ -57,6 +63,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 else()
 	set(LINUX FALSE)
 endif()
+
+add_compile_definitions(XV_CMAKE_BUILD)
 
 # Customize the compiler flags for warning messages.
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")

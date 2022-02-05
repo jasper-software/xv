@@ -2,6 +2,10 @@
 #define XV_CONF_H
 
 #define XV_VERSION "@XV_VERSION@"
+
+#define XV_VERSTR "@XV_VERSTR@"
+#define XV_REVDATE "@XV_REVDATE@"
+
 #cmakedefine XV_HAVE_STRERROR
 #cmakedefine XV_HAVE_SYSERRLISTDECL
 #cmakedefine XV_HAVE_NAMEMAX

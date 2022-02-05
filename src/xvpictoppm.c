@@ -31,7 +31,9 @@
  *    #END_OF_COMMENTS
  */
 
+#ifdef XV_CMAKE_BUILD
 #include "conf.h"
+#endif
 
 #include "xv.h"
 #include "copyright.h"

@@ -5,7 +5,9 @@
  *                (bradley@cis.upenn.edu)
  */
 
+#ifdef XV_CMAKE_BUILD
 #include "conf.h"
+#endif
 
 #define REVDATE   "Rev: 2/13/89"
 
