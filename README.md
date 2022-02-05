@@ -9,8 +9,8 @@ Other additional sources of information on the XV software include:
 
   - <https://en.wikipedia.org/wiki/Xv_(software)>
 
-Origin
-======
+History of This Code
+====================
 
 This source code was originally derived from the following:
 
@@ -23,6 +23,14 @@ This source code was originally derived from the following:
   - <http://www.gregroelofs.com/code/xv-3.10a-enhancements.20070520-20081216.diff>
     (obtained 2022-01-30)
 
+Many changes/improvements have been made on top of the original code.
+Some of these changes/improvements include (but are not limited to):
+
+  - adding support for CMake-based builds
+
+  - adding a continuous integration (CI) workflow based on GitHub Actions,
+    which builds xv using a combination of platforms/compilers
+    (e.g., GCC/Clang on Ubuntu/MacOS).
 
 Acknowledgments
 ===============
