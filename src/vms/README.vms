@@ -1,0 +1,188 @@
+                                                             23-DEC-1994
+
+        First, read the various INSTALL and README  files  for  the Unix
+    version of XV as well as these.   You  can  ignore the Unix specific
+    comments,  but there are references to the config.h file  for  local
+    configurations  and general use of the program that are relevant  to
+    VMS users as well.
+
+        Release notes  for  building XV (v3.10) on a VMS platform.  This
+    includes the newer  ALPHA/VMS machines.  As in the previous release,
+    it is no longer  necessary  to  apply  any  patches,  etc.    to the
+    original Unix code from John  Bradley (thanks John!!!).  All that is
+    needed  is  to  copy  all  of    the  files  in  this  (the  [.VMS])
+    sub-directory  to  the  main XV directory This  will  give  you  two
+    methods of building the XV package:  a  DCL  command procedure and a
+    MMS description file.
+
+The installation instructions are at the bottom of this file. PLEASE READ!
+
+    MAKE_*.COM
+        These  command  procedures are a "poor-person's" version of MMS.
+        PLEASE  NOTE:  You should look through the command procedure  to
+        see if any customizing is necessary before executing it!  If you
+        have MMS you WILL want to use that method instead.
+
+    SETUP.COM
+        A simple  command  procedure  to  setup  the  final  compiled XV
+        package of programs.    It helps the aux programs of XV be found
+        by DCL foreign symbols.    If  you don't want to use the names I
+        have chosen for them, you  should  be able to alter the CONFIG.H
+        file to point to the names  you  want  to use instead.  This has
+        not been tested by me, so let  me  know  if  you  try  this.  It
+        should work!  :) It can be executed  by itself or used with many
+        of  the  commonly  available  SETUP packages (i.e., the FERMILAB
+        version).  If it is kept in the same directory  as the binaries,
+        it will be able to get the necessary symbols setup anywhere  the
+        directory structure  is  located  WITHOUT  the  need to edit the
+        command procedure.   Move  them all around together and you will
+        be OK.
+
+    MAKEFILE.MMS (in the top level directory)
+        This is a description file for  the  VMS  MMS  (or  the  PD MMK)
+        utility.    YOU SHOULD  BROWSE  THE  FILE FIRST TO MAKE SURE THE
+        CUSTOMIZING FEATURES ARE APPROPRIATE FOR YOUR SYSTEM.  For users
+        without MMS (MMK) you will need to use MAKE_XV.COM instead.
+
+Installation Instructions:
+
+        Step 0:
+            You need to  have  installed  the  DECWindows programmer kit
+        with the C language  file  selected.    You  need  a  C compiler
+        compatible with the VAX C  or DEC C installed as well, including
+        the .h files in Sys$Library.
+
+            NOTE:    It  has been reported that the  VAX  C  v2.4
+            compiler  will  not  work with XV.  A reason  is  not
+            available.  Personal experience only extends to VAX C
+            (v3.2-044) and DEC  C  (v4.0-000)  for both Alpha and
+            VAX.
+
+            There are also *rumors* that it  will build with the VMS GCC
+        compilers.  If anyone has experience in  these  regards,  please
+        send me some info!
+
+        Step 1:
+            The  first step in getting XV (v3.10) running  on  your  VMS
+        system  is  to get the Unix source files on  your  disk  in  the
+        structure intended by the Unix environment.  This should be like
+        the following:
+
+            [XV-3_10]---+---[.BITS]
+                        |
+                        +---[.DOCS]
+                        |
+                        +---[.JPEG]
+                        |
+                        +---[.TIFF]
+                        |
+                        +---[.UNSUPT]
+                        |
+                        +---.[VMS]
+
+            The  original  Unix compressed tar file can be obtained from
+        ftp.cis.upenn.edu (make  sure  you  get  version 3.10!).  If you
+        don't have the  tools  to  decompress/detar it, you will need to
+        ask around at various VMS specific Anomymous FTP sites.  I would
+        suggest   looking  first  at  ftp.spc.edu,    cerritos.edu    or
+        acfcluster.nyu.edu
+
+            One note for some VAX/VMS systems.    The  default  XV image
+        file (xvdflt.h) has very long lines and  may  have an error when
+        it is included on the compile step.   To  fix  this, convert the
+        file from it's (probable) STREAM_LF format to a variable  length
+        "text" file.  This may be as easy as reading  in  with  a "good"
+        editor and simply  exiting.    Any  fail-proof  suggestions  are
+        welcomed.  If you  can't  get  this changed, change the config.h
+        define for the "USEOLDPIC" to be true.
+
+Step 2:
+            You are now ready to build the code.  IF you DON'T have MMS,
+        go to Step 3.
+
+            Since you have MMS, you should look through the MAKEFILE.MMS
+        and the appropriate *_Options.OPT files to check  for  any local
+        customizing changes.  XUI vs.  MOTIF is  an  issue you will have
+        to  resolve  first!!!  Note specifically the references to  JPEG
+        and TIFF.  This is also true for the MAKEFILE.MMS  in  the  JPEG
+        sub-directory  and  the    MAKEFILE.MMS    file    in  the  TIFF
+        sub-directory.
+        
+            EXCEPT for the  destination  of the binaries, and X11 Window
+        interface, I *think* it  should  work  for  everyone without any
+        modifications.  (famous last words...)
+
+            When you  are  satisfied that everything is correct for your
+        site, just type
+
+                         MMS /Description = MAKEFILE.MMS
+
+        if you have  a  traditional  VAX  with  VAX  C.    If  you  have
+        traditional VAX with DEC C (v4.0-000) then type
+
+               MMS /Description = MAKEFILE.MMS /Macro = (DECC=1)
+
+        or if you have an Alpha with DEC C (v4.0-000), type
+
+              MMS /Description = MAKEFILE.MMS /Macro = (Alpha=1)
+
+        Any of these commands  may need the DEC_XUI=1 macro as well.  If
+        you don't have MOTIF, you  should add it.  Now just sit back and
+        watch XV being built.  This  may take quite a while depending on
+        your system's speed/load.  It may also  require that your system
+        have it's virtual memory increased.  If you get an error message
+        of this type, see a system guru for help!  If it occurs, it will
+        probably  happen  with the TIFF code for FAX support.   You  can
+        always  undefine  the  HAVE_TIFF  symbol in the top Makefile and
+        dump the TIFF support.
+
+            When you are successfully finished, go to Step 4.
+
+        Step 3:
+            If you  don't have MMS you will need to execute the supplied
+        command procedure to  build  the  XV  package.   You should look
+        through  the  MAKE_XV.COM file  to  check  for  any  customizing
+        changes.  Note specifically the references to JPEG, and TIFF.
+
+            When you are satisfied that  your  site changes are correct,
+        execute the MAKE_XV.COM and watch it  build  the  package.    If
+        there are any problems you will want  to  delete  the  offending
+        .OBJ file so the command procedure will try  to  build  it again
+        instead of skipping to the next one.  This  stuff is trickier to
+        'restart' it, so be careful if you need do.
+
+        Step 4:
+            If  there  were no errors, you should be finished and  would
+        just  need  to  execute SETUP.COM to start viewing images!!!  If
+        you want  to  use GUnZip, make sure it is available as well.  It
+        is referenced via the UnCompress.com procedure.
+
+        Step 5:
+            Send John Bradley  a  short note telling him you love his XV
+        program on VMS machines.  The VMS part is crucial!  :) We should
+        all  thank  him  for  including    the    VMS    support  in  XV
+        'out-of-the-box'!  I would also encourge  you  to  send  in  the
+        registration amounts if they are appropriate to your suggestion.
+        This program is one hell of a lot of work...
+
+        Step 6:
+            There  are  two  environment  (logical)  names that the  VMS
+        version  of  XV  uses.  One is XV_Root_Device which  helps  move
+        across VMS devices like the Unix FileSystem does naturally.   It
+        is just a little hack that is provided with no support.   :) The
+        other  one  is XV_Queue which should point to a PostScript print
+        queue if  you  have  GhostScript  installed  and  defined in the
+        config.h file.
+                
+        Step 7:
+            IF you had any problems or just want to make a comment about
+        my installation instructions or  VMS port, please send me e-mail
+        at any of the addresses below.
+
+--
+Richard L. Dyson               INTERNET:  Dyson@IowaSP.Physics.UIowa.EDU
+ _   _      _____    Senior Programmer Analyst           O: 319/335-1879
+| | | |    |_   _|   Department of Physics & Astronomy   H: 319/338-6117
+| | | | of   | |     Van Allen Hall                    FAX: 319/335-1753
+| \_/ |     _| |_    University of Iowa        NSI/DECnet: IOWASP::DYSON
+ \___/     |_____|   Iowa City, IA 52242-1479         or :   7231::DYSON

@@ -1,0 +1,649 @@
+1 XV
+        An interactive  image  display for the X Window System.  XV is
+    an X11 program that displays images in the GIF, PBM, PGM, PPM, X11
+    bitmap, JPEG, TIFF, Sun  Rastefile, RLE, and PM formats on 1-, 4-,
+    6-, 8-, 16-, 24-, and  32-bit  X  displays.    xv  will  also read
+    compress-ed versions of these files.
+
+    NOTE:  This   man  page  is  merely  the  text  portion  of    the
+    (PostScript)  XV  docs,  without  the  figures,  and  without  the
+    appendicies.   As such, it is highly recommended that you get your
+    hands on the *real* documentation.
+
+    ALSO NOTE:  This file documents XV 2.21, *not* XV 3.00.
+
+        Execution Format:
+            xv [options] [filename [filename ...]]
+
+
+2 OVERVIEW
+        XV lets you do a large number of things (many of them actually
+    useful), including, but not limited to, the following:
+    
+        o display an image in a window on the screen
+        o display an image on the root window, in a variety of styles
+        o grab any rectangular portion of the screen and turn it into
+          an image
+        o arbitrarily stretch or compress the image
+        o rotate the image in 90--degree steps
+        o flip the image around the horizontal or vertical axes
+        o crop a rectangular portion of the image
+        o magnify any portion of  the  image  by any amount, up to the
+          size of the screen
+        o determine pixel values and x,y coordinates in the image
+        o adjust image brightness and contrast with a gamma correction
+          function
+        o apply different gamma functions  to the Red, Green, and Blue
+          color components, to correct for non-linear color response
+        o adjust global image saturation
+        o perform global hue remapping
+        o edit an image's colormap
+        o reduce the number of colors in an image
+        o dither in color and b&w
+        o smooth an image
+        o crop off solid borders automatically
+        o convert image formats
+        o generate Encapsulated PostScript
+
+        Unfortunately the Automatic Checkbook  Balancing  Module still
+    isn't  completely  debugged,  and  is    not    included  in  this
+    distribution. 
+
+2 Starting_XV
+        NOTE: Unless  explicitly  stated  otherwise, the term  "click"
+    means "click with the Left mouse button."
+
+        Start the program up by typing 'xv'.    After a short delay, a
+    window will appear with the default image (the  XV  logo,  credits
+    and revision date) displayed in it.  If you change the size of the
+    window  (using  whatever method your window manager provides), the
+    image will be automatically stretched to fit the window.
+
+2 Options
+        XV supports  literally  dozens of command line options and X11
+    resources.  Fortunately,  it  is doubtful that you'll ever need to
+    use more than a  small few.  The rest are provided mainly for that
+    'one special case' application of XV ...
+
+        If you start XV with  the command 'xv -help', the current list
+    of options will be displayed:
+    
+       xv [-] [-2xlimit]  [-aspect  w:h] [-best24] [-bg color] [-black
+          color] [-browse] [-bw width]  [-cecmap]  [-cegeometry  geom]
+          [-cemap] [-cgeometry geom] [-clear] [-cmap]  [-cursor char#]
+          [-DEBUG level] [-display disp] [-dither] [-expand  exp] [-fg
+          color] [-fixed] [-geometry geom] [-help] [-hi color]  [-hsv]
+          [-igeometry  geom]    [-imap]    [-keeparound]  [-lo  color]
+          [-loadclear] [-max] [-maxpect] [-mono] [-ncols #] [-nglobal]
+          [-ninstall] [-nolimits] [-nopos] [-noqcheck]  [-noresetroot]
+          [-nostat]  [-owncmap]  [-perfect]  [-quick24] [-quit]  [-rbg
+          color] [-rfg color] [-rgb] [-rmode #]  [-root]  [-rv]  [-rw]
+          [-slow24]  [-smooth]  [-visual type] [-wait seconds] [-white
+          color] [-wloop] [filename ...]
+
+3 General_Options
+       -help
+        Print  usage  instructions,   listing  the  current  available
+        command-line options.  Any unrecognized option will do this as
+        well.
+
+        -display  disp
+        Specifies the display that XV  should  attempt  to connect to.
+        If you don't specify a display,  XV  will  use the environment
+        variable $DISPLAY.
+
+        -fg  color (Resource name: foreground  string)
+        Sets the foreground color used by the windows.
+
+        -bg  color   (Resource name: background  string)
+        Sets the background color used by the windows.
+
+        -hi  color  (Resource name: highlight  string)
+        Sets the highlight color used for the  top-left  edges  of the
+        control buttons.
+
+        -lo  color (Resource name: lowlight  string)
+        Sets the lowlight color used for the bottom-right edges of the
+        control buttons, and also the background of some windows.
+
+        -bw  bwidth (Resource name: borderWidth  integer)
+        Sets  the  width of the border on the windows.    Your  window
+        manager may choose to ignore this, however.
+
+3 Image_Sizing_Options
+        -geometry geom (Resource name: geometry string)
+        Lets you specify the size and placement of the 'image' window.
+        It's most useful when you only specify a  position, and let XV
+        choose  the  size.  If you specify a size  as  well,  XV  will
+        create a window of that size, unless -fixed is specified.  The
+        geom  argument  is  in the form of a normal X geometry  string
+        (e.g.  ``300x240'' or ``+10+10'' or ``400x300+10+10'').
+
+        -fixed  (Resource name: fixed  boolean)
+        Only used  in  conjunction  with the -geometry option.  If you
+        specify a window  size  with  the  -geometry  option,  XV will
+        normally stretch the picture  to  exactly  that size.  This is
+        not always desirable, as it  may  seriously distort the aspect
+        ratio of the picture.  Specifying  the  -fixed option corrects
+        this behavior by instructing XV to use  the specified geometry
+        size as a maximum window size.  It will, however, preserve the
+        original aspect ratio of the picture.
+
+        For example, if you give a rectangular geometry of  '320x240',
+        and  you  try  to  display  a  square picture with a  size  of
+        '256x256', the window opened will actually be '240x240', which
+        is  the largest  square  that  still  fits  in  the  '320x240'
+        rectangle that was specified.
+
+        -expand  exp  (Resource name: expand  floating-point)
+        Lets you specify an  initial  expansion  or compression factor
+        for  the  picture.  You  can  specify  floating-point  values.
+        Values larger than zero multiply the  picture's  dimensions by
+        the given factor.  ( i.e., an expand factor of '3' will make a
+        320x200 image display as 960x600).
+
+        Factors less than zero are treated as reciprocals.  (i.e.,  an
+        expand factor of  '-4'  makes  the  picture  1/4th  its normal
+        size.).  '0' is not a valid expansion factor.
+
+        -aspect  w:h  (Resource name: aspect  string)
+        Lets you set an initial aspect ratio, and also sets  the value
+        used by the Aspect control.  The aspect ratio of nearly  every
+        X display  (and,  in  fact, any civilized graphics display) is
+        1:1.  What this means is that pixels appear to be 'square'.  A
+        100 pixel wide by 100 pixel high box will appear on the screen
+        as a square.  Unfortunately,  this  is  not the case with some
+        screens and digitizers.  The -aspect  option  lets you stretch
+        the  picture  so that the picture appears  correctly  on  your
+        display.    Unlike  the  other size-related options, this  one
+        doesn't  care  what the size of the overall picture  is.    It
+        operates on  a  pixel-by-pixel  basis,  stretching  each image
+        pixel slightly, in  either  width  or height, depending on the
+        ratio.
+
+        Aspect  ratios  greater  than  '1:1'  (e.g.,  '4:3')  make the
+        picture  wider  than  normal.    Aspect ratios less than '1:1'
+        (e.g.   '2:3')  make  the picture taller than normal.  (Useful
+        aspect ratio:   A  512x480  image  that was supposed to fill a
+        standard 4x3 video screen  (produced by many video digitizers)
+        should be displayed with an aspect ratio of '5:4')
+
+3 Color_Allocation_Options
+        -ncols nc  (Resource name: ncols  integer)
+        Sets the maximum number of colors that XV will use.  Normally,
+        this is set to 'as many  as it can get'.  However, you can set
+        this to smaller values for interesting effect.   Most notably,
+        if you set it to '0', it will display the picture by dithering
+        with 'black' and 'white'.  (The actual colors used  can be set
+        by the -black and -white options, below.)
+
+        -nglobal (Resource name: nglobal  boolean)
+        Adjusts the way the program behaves when it is unable  to  get
+        all  the  colors  it  requested.  Normally, it will search the
+        display's default  colormap,  and 'borrow' any colors it deems
+        appropriate.  These borrowed colors are, however, not owned by
+        XV, and as such,  can  changed  without  xv's  permission,  or
+        knowledge.    If  this happens,  the  displayed  picture  will
+        change, in a less-than-desirable direction.   If  you  specify
+        the -nglobal option, XV will not use 'global' colors.  It will
+        only use colors that it successfully allocated, which makes it
+        immune to any color changes.
+
+        It should  be  noted  that  'use global colors' is the default
+        because color changes  aren't  generally  a problem if you are
+        only using XV to  display  a  picture for a short time.  Color
+        changes only really become a  problem if you use XV to display
+        a picture that you will be  keeping  around for a while, while
+        you go and do some other work  (such  as using XV to display a
+        background).  In such cases you will want to specify -nglobal.
+        Note:  using the -ncols or -root options automatically turn on
+        -nglobal.
+
+        -rw  (Resource name: rwColor  boolean)
+        Tells  XV  to  use  read/write  color  cells.    Normally,  XV
+        allocates  colors read-only, which allows it to  share  colors
+        with other programs.  If you use read/write  color  cells,  no
+        other  program  can  use  the  colors  that XV is  using,  and
+        vice-versa.    The only reason you'd do such a thing  is  that
+        using  read/write color cells allows the Apply function in the
+        xv color editor window to operate much faster.
+
+        -perfect  (Resource name: perfect  boolean)
+        Makes XV  try 'extra hard' to get all the colors it wants.  In
+        particular, when -perfect  is  specified, XV will allocate and
+        install its own colormap  if  (and  only  if) it was unable to
+        allocate all the desired colors.    This option is not allowed
+        in conjunction with the -root option.
+
+        -owncmap  (Resource name: ownCmap  boolean)
+        Like '-perfect', only this option forces XV to always allocate
+        and  install  its  own colormap, thereby leaving  the  default
+        colormap untouched.
+
+        -cecmap (Resource name: ceditColorMap boolean)
+        Specifies whether xv installs the  image's  colormap in the xv
+        color editor window, as well as  in  the  image's  window.  By
+        default, the program does install the colormap  in  the  color
+        editor  window,  however this can occasionally make the  color
+        editor  window unreadable.  (This option only apples when  the
+        '-perfect' or '-owncmap' options create their own colormaps.)
+
+        -ninstall  (Resource name: ninstall  boolean)
+        Prevents  XV  from  'installing'  its  own colormap, when  the
+        -perfect  or  -owncmap  options  are  in  effect.  Instead  of
+        installing  the  colormap,  it  will  merely  'ask  the window
+        manager, nicely'  to take care of it.  This is the correct way
+        to  install  a    colormap  (i.e.,  ask  the  WM  to  do  it),
+        unfortunately, it doesn't actually seem to work in many window
+        managers,  so  the  default  behavior  is  for  XV  to  handle
+        installation itself.  However, this has been seen to annoy one
+        window manager (dxwm), so this option is  provided  if your WM
+        doesn't like programs installing their own colormaps.
+
+3 24-bit_Conversion_Options
+        The following options only come  into play if you are using XV
+    to display 24-bit RGB data (PPM files, color PM files, JPEG files,
+    and the output of bggen).  They  have  no effect whatsoever on how
+    GIF pictures or 8-bit greyscale images are displayed.
+
+        -quick24 (Resource name: quick24 boolean)
+        Forces  xv  to  use  the  'quick'  24-bit  to 8-bit conversion
+        algorithm.   This  algorithm dithers the picture using a fixed
+        set of colors  that  span  the  entire  RGB  colorspace.    In
+        versions of xv prior  to 2.10, this was the default algorithm.
+        It no longer is.
+
+        -slow24  (Resource name: slow24  boolean)
+        Specifies that the 'slow' 24-bit to 8-bit conversion algorithm
+        is to be used  by  the program.  This algorithm uses a version
+        of Heckbert's median cut algorithm  to  pick the 'best' colors
+        on a per-image basis, and dithers  with  those.    This is the
+        current default conversion algorithm.
+
+        Advantages:    The  -slow24  algorithm  often produces  better
+        looking pictures than the -quick24 algorithm.
+
+        Disadvantages:  The -slow24 algorithm is about half  the speed
+        of the -quick24 algorithm.  Also, since the colors  are chosen
+        on  a  per-image  basis, it can't be used to display  multiple
+        images simultaneously, as  each  image  will  almost certainly
+        want a different set  of  256 colors.  The -quick24 algorithm,
+        however, uses the same exact  colors for all images, so it can
+        display  many  images simultaneously, without running  out  of
+        colors.
+
+        -best24  (Resource name: best24 boolean)
+        Forces xv to use  the  same  algorithm  used  in  the  program
+        ppmquant, written by Jef Poskanzer.   This algorithm also uses
+        a version of Heckbert's median cut  algorithm,  but is capable
+        of picking 'better' colors than the -slow24  algorithm, and it
+        doesn't dither.
+
+        Advantages:   Generally  produces  slightly better images than
+        the -slow24 algorithm.    Also,  the images are undithered, so
+        they look better when expanded.
+
+        Disadvantages:  Much slower than the -slow24 algorithm.  Like,
+        5 to 10 times slower.  The images  produced  aren't  that much
+        better than those produced by the -slow24 algorithm.
+
+        -noqcheck  (Resource name: noqcheck  boolean)
+        Turns off a 'quick check'  that  is  normally made.  Normally,
+        before  running  either  of  the 24-bit  to  8-bit  conversion
+        algorithms, XV  determines whether the picture to be displayed
+        has more than  256  unique  colors  in  it.    If  the picture
+        doesn't, it will treat  the  picture  as  an 8-bit colormapped
+        image (i.e., GIF), and won't  run  either  of  the  conversion
+        algorithms.
+
+        Advantages:    The  pictures  will  be displayed  'perfectly',
+        whereas  if  they  went  through  either  of  the   conversion
+        algorithms, they'd be dithered.
+
+        Disadvantages:  Often uses a lot of colors, which  limits  the
+        ability  to  view  multiple images at once.  (See the  -slow24
+        option above for further info about color sharing.)
+
+3 Root_Window_Options
+        XV has the ability to display images on  the root window of an
+    X  display,  rather  than  opening  its  own  window (the  default
+    behavior).    When using the root window, the program is  somewhat
+    limited, because  the  program  cannot  receive  input events (key
+    press and mouse  clicks)  from  the root window.  As a result, you
+    cannot track pixel values,  or  crop,  nor  can  you  use keyboard
+    commands while the mouse is in the root window.
+
+        -root  (Resource name:  <none>)
+        Directs  XV  to  display images in the root window, instead of
+        opening its  own  window.    Exactly  how  the  images will be
+        displayed in the  root  window is determined by the setting of
+        the -rmode option.
+
+        -rmode  mode  (Resource name: rootMode  integer)
+        Determines how images are  to be displayed on the root window,
+        when -root has been specified.   You can find the current list
+        of 'modes' by using a mode  value  of '-1'.  XV will complain,
+        and show a list of valid modes.    The  current list at of the
+        time of this writing is:
+
+            0:      tiling
+            1:      integer tiling
+            2:      mirrored tiling
+            3:      integer mirrored tiling
+            4:      centered tiling
+            5:      centered on a solid background
+            6:      centered on a 'warp' background
+            7:      centered on a 'brick' background
+
+        The  default mode is '0'.  See ``Section  3.5:    The  Display
+        Modes Menu'' for a description of the different display modes.
+
+        -noresetroot (Resource name: resetroot)
+        Normally, when changing from root to window display  mode, the
+        root  is  set  to  the standard X crosshatch pattern.    Using
+        -noresetroot or setting resetroot to false will force the root
+        to remain.    This  is useful when comparing between different
+        tiled images.
+        
+        -rfg  color  (Resource name: rootForeground  string)
+        Sets the 'foreground' color used in some of the  root  display
+        modes.
+
+        -rbg  color  (Resource name: rootBackground  string)
+        Sets  the 'background' color used in some of the root  display
+        modes.
+
+        -max  (Resource name: <none>)
+        Makes  XV  automatically stretch the image to the full size of
+        the screen.  This is mostly useful when you want XV to display
+        a background.   While  you  could  just  as  well  specify the
+        dimensions of your display ('-geom 1152x900' for example), the
+        -max option is display-independent.  If you suddenly decide to
+        start working on a 1280x1024 display  (ferinstance)  the  same
+        command will still work.  Note:   If you specify -max when you
+        aren't using -root, the behavior is slightly different.    The
+        image will be made as large as possible while still preserving
+        the normal aspect ratio.
+
+        -maxpect  (Resource name: <none>)
+        Makes  the  image  as  large  as possible while preserving the
+        aspect ratio.
+
+        -quit  (Resource name: <none>)
+        Makes  XV display the (first) specified file and exit, without
+        any user  intervention.    Since  images displayed on the root
+        window remain there  until  explicitly  cleared,  this is very
+        useful for having XV  display  background  images  on the root
+        window in some sort of start-up script.  Needless to say, this
+        is only useful if you are using -root.
+
+        -clear  (Resource name: <none>)
+        Clears the root window of any extraneous XV images.  Note:  it
+        is  not  necessary  to  do an 'xv  -clear'  before  displaying
+        another  picture  in  the root window.  XV  will  detect  that
+        there's  an  old  image  in the root window and  automatically
+        clear it out (and free the associated colors).
+
+3 Window_Options
+        XV currently  consists  of three main windows, plus one window
+    for the actual  image.    These  three  windows  (the  xv controls
+    window, the xv info window, and the xv color editor window) may be
+    automatically mapped and positioned when the program starts.
+
+        -cmap  (Resource name: ctrlMap  boolean)
+        Maps the xv controls window.
+
+        -cgeom  geom  (Resource name: ctrlGeometry  string)
+        Sets  the  initial geometry of the xv controls window.   Note:
+        only the position information is used.  The window is of fixed
+        size.
+
+        -imap  (Resource name: infoMap  boolean)
+        Maps the xv info window.
+
+        -igeom  geom  (Resource name: infoGeomet  string)
+        Sets  the initial geometry of the xv info window.  Note:  only
+        the position  information  is  used.    The window is of fixed
+        size.
+
+        -cemap  (Resource name: ceditMap  boolean)
+        Maps the xv color editor window.
+
+        -cegeom  geom  (Resource name: ceditGeometry  string)
+        Sets the initial  geometry  of  the  xv  color  editor window.
+        Note:  only the  position  information is used.  The window is
+        of fixed size.
+
+        -nopos  (Resource name: nopos  boolean)
+        Turns off the 'default' positioning of the various XV windows.
+        Every time you open a window,  you  will  be asked to position
+        it.  (Assuming your window manager asks you such things.  mwm,
+        for instance doesn't seem to ask.)
+
+3 Miscellaneous_Options
+        -mono  (Resource name: mono  boolean)
+        Forces the image to be displayed as a greyscale.  This is most
+        useful when you are using certain greyscale X displays.  While
+        XV  attempts  to  determine  if  it's  running  on a greyscale
+        display,  many  X  displays  lie,  and claim to be able to  do
+        color.  (This is often because they have color graphics boards
+        hooked up to  b/w  monitors.   The computer, of course, has no
+        way of knowing what  type  of  monitor  is attached.) On these
+        displays, if you don't specify  -mono,  what you will see is a
+        greyscale  representation of one of the  RGB  outputs  of  the
+        system.   (For example, you'll see the  'red'  output  on  our
+        greyscale Sun 3/60s.) The -mono option corrects this behavior.
+
+        -white  color  (Resource name: white  string)
+        Specifies  the  'white'  color  used when the picture  is  b/w
+        stippled.  (When '-ncols 0' has been specified.)
+
+        -black  color  (Resource name: black  string)
+        Specifies  the  'black'  color  used  when the picture is  b/w
+        stippled.  (When '-ncols 0' has been specified.)
+
+        Try  something  like:    'xv  -ncols  0  -bl  red  -wh  yellow
+        <filename>' for  some interesting, late-'60s-style psychodelia
+        effects.
+
+        -wait  secs  (Resource name: <none>)
+        Turns on a  'slide-show'  feature.    Normally, if you specify
+        multiple input files, XV  will display the first one, and wait
+        for you to give the  Next  command  (or  whatever).  The -wait
+        option makes XV wait the specified number of seconds, and then
+        go on to the next picture, without any user intervention.  The
+        program  still  accepts commands, so it's possible to  'abort'
+        the current picture without waiting the full specified time by
+        using the Next command.
+
+        -wloop  (Resource name: <none>)
+        Normally,  when running a slide-show with the -wait option, XV
+        will  terminate  after displaying the last image.  If you also
+        specify the  -wloop  option, the program will loop back to the
+        first image and  continue the slide-show until the user issues
+        the Quit command.
+
+        -rgb  (Resource name: hsvMode boolean)
+        Specifies that, by default,  the colormap editing dials in the
+        xv color editor window should  be  in  RGB  mode.  This is the
+        normal default behavior.
+
+        -hsv  (Resource name: hsvMode  boolean)
+        Specifies that, by default, the colormap  editing dials in the
+        xv color editor window should be in HSV mode.
+
+        -dither  (Resouce name: autoDither  boolean)
+        When  specified,  tells  XV  to automatically issue  a  Dither
+        command  whenever  an  image  is first displayed.   Useful  on
+        displays  with  limited  color  capabilities  (4-bit and 6-bit
+        displays.)
+
+        -smooth  (Resource name:  autoSmooth  boolean)
+        When specified,  tells  XV  to  automatically  issue  a Smooth
+        command whenever an  image is first displayed.  This is useful
+        when you are using  one  of  the image sizing options (such as
+        '-expand' or '-max').
+
+        -crop  (Resource name: autoCrop boolean)
+        When specified, tells  xv  to  automatically issue an AutoCrop
+        command whenever an image is first displayed.
+    
+        -visual  vistype  (Resource name: visual  string)
+        Normally, XV uses the default  visual model provided by your X
+        server.    You can override this  by  explicitly  selecting  a
+        visual  to  use.    Valid types are  StaticGray,  StaticColor,
+        TrueColor,  GrayScale,  PseudoColor, and DirectColor.  Not all
+        of these are necessarily provided on any given X display.  Run
+        xdpyinfo on your  display  to  find  out what visual types are
+        supported.
+
+        -cursor  curs  (Resource name: cursor  integer)
+        Specifies an alternate cursor  to  use  in  the  image  window
+        (instead  of the normal 'cross'  cursor).    curs  values  are
+        obtained by finding the character number  of a cursor you like
+        in the 'cursor' font.  (Run 'xfd  -fn  cursor'  to display the
+        cursor font.) For example, a curs value of '56' corresponds to
+        the (singularly useless) 'Gumby' cursor.
+
+        -keeparound  (Resource name: keepAround  boolean)
+        By  default  if you Delete the last file in  the  XV  controls
+        list,  the  program will automatically exit, as a convenience.
+        If you find this an inconvenience.
+
+        -2xlimit  (Resource name: 2xlimit  boolean)
+        By default,  XV  prevents  the  image window from ever getting
+        larger than the  screen.    Unfortunately, because of this, if
+        you load an image  that  is larger than your screen, the image
+        will be shrunk until it  fits on your screen.  Some folks find
+        this  undesirable  behavior.  Specifying the  -2xlimit  option
+        doubles the size limitations.  The image  window  will be kept
+        from  getting  larger  than 2x the width and  height  of  your
+        screen.
+
+        Just    in    case  you're  wondering  why  there's  any  size
+        limitations:  it's fairly easy to accidentally ask for a  huge
+        image  to  be generated.  Simply crop a section of the  image,
+        zoom  so  you  can  see the individual pixels, and uncrop.  If
+        there were  no  size  limitations,  the  (expanded many times)
+        image could be  huge,  and  might crash your X server.  At the
+        very least, it would  take  a  long period of time, and freeze
+        your  X  server during part  of  it.    Generally  undesirable
+        behavior.
+
+        -nolimits (Resource name: nolimites boolean)
+        For  the  truly  daring, this turns off all limitations on the
+        maximum size  of  an  image  window.   (Well, there's still an
+        X-imposed  maximum  size  of  64k  by  64k,  but  that  really
+        shouldn't be a problem.)  Warning:   as mentioned above, it is
+        fairly easy to accidentally generate  a huge image when you do
+        an UnCrop command, and you may  well  crash xv, your X server,
+        the host machine, or all three.  Use At Your Own Risk!!!
+
+        -rv  (Resource name: reverse)
+        Makes  xv display a 'negative' of the  loaded  image.    White
+        becomes  black,  and black becomes white.  Color  images  will
+        have    'interesting'  effects,  as  the  RGB  components  are
+        individually reversed.  For example, red (255,0,0) will become
+        cyan (0,255,255), yellow will become blue, and so on.
+
+        -DEBUG  level   (Resource name: <none>)
+        Turns on some debugging information.  You shouldn't need this.
+        If everything worked perfectly, I wouldn't need  this  either.
+        Specifying '-' all by itself tells XV to  take  its input from
+        stdin, rather then from a file.  This lets  you  put XV on the
+        end of a Un*x pipe.
+
+2 Limitations
+        XV will NOT work on displays that aren't 1-, 4-, 6-,  8-,  16-
+    24-, or  32-bits  deep.    Luckily, that should still cover nearly
+    every display out  there.  It may not work on certain 6- or 24-bit
+    displays.
+
+        It also only displays  the  first image in GIF files that have
+    multiple images in them.
+
+        As for PM pictures, this  program  only displays 1-plane PM_I
+    pictures, or 1-, 3-, or 4-plane PM_C pictures.
+
+2 Authors
+        John Bradley  -  bradley@cis.upenn.edu
+
+        GIF reading code  based  on gif2ras.c, by Patrick J.  Naughton
+    (naughton@wind.sun.com)
+
+        GIF writing code essentially  unchanged  from  code written by
+    Michael Maudlin (mlm@cs.cmu.edu).
+
+        SUN Rasterfile i/o code written by Dave Heath (heath@cs.jhu.edu)
+
+        JPEG interface code written by Markus Baur
+        (s_baur@iravcl.ira.uka.de)
+
+        JPEG i/o code provided by the Independent JPEG Group.
+
+        VMS port by David Jones (jonesd@kcgl1.eng.ohio-state.edu),
+        and Rick Dyson (Dyson@IowaSP.Physics.UIowa.EDU).
+
+1 BGGEN
+        Generates colored backgrounds on X11 displays.    BGGEN  is  a
+    program  that  generates  a width-pixel wide by  size-pixels  high
+    vertical stripe.  The top of the stripe  is  in  color (r1,g1,b1),
+    and the bottom of the stripe is in color (rn,gn,bn).  Intermediate
+    colors are interpolated between these colors.  If you specify more
+    than 2 colors, the stripe passes through all the specified colors,
+    in the order specified.
+
+        The '-b'  option  specifies  the number of significant bits in
+    the (output) color specifications.  It must range between 1 and 8,
+    inclusive.  Use values  less  than  8 (the default) to limit color
+    use by increasing the color granularity.
+
+        Values for 'r', 'g', and  'b'  should range between 0 and 255,
+    inclusive.  0 means 'off', and 255 means 'fully on'.
+
+        BGGEN doesn't actually affect your background directly.  BGGEN
+    merely  generates  a small PPM (Portable Pixmap  Format)  datafile
+    that XV can read and display.
+
+        To use BGGEN , you should pipe its  output into an XV command,
+    such as:  "xv -root -quit -slow24"
+
+        The default 'size' is 1024 pixels, which should be  as tall as
+    your  display.   If your display is taller than that,  you  should
+    specify  its  actual  height,  otherwise  you  will  get a bizarre
+    repeating effect,  that  you  probably didn't want.  Note:  If you
+    specify small values of '-s', you can get some neat effects.
+
+        The '-w' argument has been added to improve the performance of
+    various stippling algorithms (as in XV).  More information to work
+    with, and such.  Try  using  '-w 16' on these command lines to see
+    what is meant.
+
+    Execution format:
+        BGGEN [-w width] [-s size] [-b bits]
+              r1 g1 b1 [r2 g2 b2 ... rn gn bn]
+
+2 Examples
+
+    Light Blue to Dark Blue:
+        BGGEN 100 100 255  50 50 150  | xv -ro -q -sl "-"
+    RGB Rainbow:
+        BGGEN 0 0 255  0 255 0  255 0 0 | xv -ro -q -sl "-"
+    Green Cylinders:
+        BGGEN 0 0 0  0 255 0  0 0 0 -s 128 | xv -ro -q -sl "-"
+    Blue to Magenta:
+        BGGEN 0 0 255  200 0 100 | xv -ro -q -sl "-"
+    Full Rainbow:
+        BGGEN 0 0 255  0 255 255  0 255 0  255 255 0  255 0 0 
+            | xv -ro -q -sl "-"
+    Repeating Rainbow:
+        BGGEN 0 0 255 0 255 255 0 255 0 255 255 0 255 0 0 
+              255 0 255 0 0 255 -s 256 | xv -ro -q -sl "-"
+
+2 Bugs
+        It'd probably be nice if the  program  used  some  X  calls to
+    determine screen size.  It'd also probably  be nice if the program
+    could take colors by 'name', and also by hexadecimal value.
+
+2 Author
+        John Bradley  -  bradley@cis.upenn.edu

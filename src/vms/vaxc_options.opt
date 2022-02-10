@@ -1,0 +1,22 @@
+! XV (v3.10) Linker Options list for VMS VAX C
+!
+Sys$Disk:[]LibXV.OLB /Library
+Sys$Disk:[.JPEG]LibJPEG.OLB /Library
+Sys$Disk:[.TIFF]LibTIFF.OLB /Library
+!
+! Some of the following libraries may not be available on
+! older systems, namely XUI or Motif v1.0/1.1
+! I know they are available for OpenVMS v6.1/Motif v1.2.
+! If you get a report that they can't be found,
+! comment them out and try again...
+Sys$Library:DECW$DXMLibShr12.exe /Share
+Sys$Library:DECW$XMLibShr12.exe /Share
+Sys$Library:DECW$XTLibShrR5.exe /Share
+Sys$Library:DECW$XLibShr.exe /Share
+!
+! These were appropriate for VAX C and XUI in the past.
+!Sys$Library:DECW$DWTLibShr.exe /Share
+!Sys$Library:DECW$XLibShr.exe /Share
+!You may need the next line for VAX C (v3.2-044)
+!But you don't for DEC C (v4.0-000)
+!Sys$Library:VAXCRTL.EXE /Share

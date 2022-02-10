@@ -1,0 +1,7 @@
+! XV (v3.10) Linker Options list for VMS DEC C
+!
+Sys$Disk:[]LibXV.olb /Library
+Sys$Disk:[.JPEG]LibJPEG.olb /Library
+Sys$Disk:[.TIFF]LibTIFF.olb /Library
+Sys$Library:DECW$XTShr.exe /Share
+Sys$Library:DECW$XLibShr.exe /Share
