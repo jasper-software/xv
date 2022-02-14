@@ -356,7 +356,7 @@ OBJS = 	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xvmag.o xvpic.o xvmaki.o xvpi.o xvpic2.o xvvd.o xvmgcsfx.o \
 	xvml.o xvjp2k.o
 
-MISC = README INSTALL CHANGELOG IDEAS
+MISC = README* INSTALL CHANGELOG CPMASK IDEAS BUGS
 
 
 
@@ -431,7 +431,7 @@ install: all
 tar:
 #	tar only local jpeg and tiff dirs, not user's or system's copies:
 	tar cvf xv.tar Makefile* Imakefile *.c *.h bits \
-		docs unsupt vms jpeg tiff $(MISC)
+		docs fi pl xv_mgcsfx.sample unsupt vms jpeg tiff $(MISC)
 
 xvtar:
 	tar cvf xv.tar Makefile* Imakefile *.c *.h bits
