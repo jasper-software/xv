@@ -323,7 +323,7 @@ PDS = -DDOPDS
 # TVL10N = -DX_LOCALE
 
 # Install directory of xv_mgcsfx.sample.
-MGCSFXDIR = $(LIBDIR)
+MGCSFXDIR = $(SYSCONFDIR)
 # Directory of default configuration file.
 MGCSFX = -DMGCSFXDIR=\"$(MGCSFXDIR)\"
 
@@ -429,9 +429,9 @@ install: all
 	chmod 644 $(DESTDIR)$(DOCDIR)/README.jumbo \
 	  $(DESTDIR)$(DOCDIR)/xvdocs.pdf $(DESTDIR)$(DOCDIR)/xvdocs.ps
 #
-	#$(MKDIR) $(DESTDIR)$(SYSCONFDIR)
-	#cp xv_mgcsfx.sample $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
-	#chmod 644 $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
+	$(MKDIR) $(DESTDIR)$(SYSCONFDIR)
+	cp xv_mgcsfx.sample $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
+	chmod 644 $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
 
 
 tar:
