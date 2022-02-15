@@ -370,19 +370,19 @@ all: xv bggen vdcomp xcmap xvpictoppm
 
 #xv: $(OBJS) $(JPEGLIB) $(TIFFLIB)
 xv: $(OBJS)
-	$(CC) -o xv $(CFLAGS) $(OBJS) $(LIBS)
+	$(CC) -o xv $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
 
 bggen: bggen.c
-	$(CC) $(CFLAGS) -o bggen bggen.c $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o bggen bggen.c $(LIBS)
 
 vdcomp: vdcomp.c
-	$(CC) $(CFLAGS) -o vdcomp vdcomp.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o vdcomp vdcomp.c
 
 xcmap:  xcmap.c
-	$(CC) $(CFLAGS) -o xcmap xcmap.c $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o xcmap xcmap.c $(LIBS)
 
 xvpictoppm:  xvpictoppm.c
-	$(CC) $(CFLAGS) -o xvpictoppm xvpictoppm.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o xvpictoppm xvpictoppm.c
 
 
 
