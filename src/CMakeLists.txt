@@ -134,7 +134,7 @@ set(man_pages
 	xv.man
 	bggen.man
 	xcmap.man
-	xvp2p.man
+	xvpictoppm.man
 	vdcomp.man
 )
 foreach(file ${man_pages})

@@ -1,0 +1,22 @@
+Installation
+============
+
+The officially recommended installation method for the XV software is
+based on CMake.
+
+If the CMake software is not installed on your system, this software
+can be obtained from:
+
+    https://cmake.org
+
+In what follows, let $TOP_DIR denote the top-level directory for the
+XV software, and let $INSTALL_DIR denote the directory in which the XV
+software should be installed.
+
+The following sequence of commands can be used to build and install
+the XV software:
+
+cd $TOP_DIR
+cmake -H. -Btmp_cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+cmake --build tmp_cmake
+cmake --build tmp_cmake --target install
