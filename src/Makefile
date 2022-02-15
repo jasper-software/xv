@@ -407,15 +407,21 @@ install: all
 	  $(DESTDIR)$(BINDIR)/xvpictoppm
 #
 	$(MKDIR) $(DESTDIR)$(MANDIR)
+	$(MKDIR) $(DESTDIR)$(MANDIR)/../fi/man1
+	$(MKDIR) $(DESTDIR)$(MANDIR)/../pl/man1
 	cp docs/xv.man     $(DESTDIR)$(MANDIR)/xv.$(MANSUF)
 	cp docs/bggen.man  $(DESTDIR)$(MANDIR)/bggen.$(MANSUF)
 	cp docs/xcmap.man  $(DESTDIR)$(MANDIR)/xcmap.$(MANSUF)
 	cp docs/xvp2p.man  $(DESTDIR)$(MANDIR)/xvpictoppm.$(MANSUF)
 	cp docs/vdcomp.man $(DESTDIR)$(MANDIR)/vdcomp.$(MANSUF)
+	cp fi/man1/xv.1    $(DESTDIR)$(MANDIR)/../fi/man1/xv.$(MANSUF)
+	cp pl/man1/xvpictoppm.1 $(DESTDIR)$(MANDIR)/../pl/man1/xvpictoppm.$(MANSUF)
 	chmod 644 $(DESTDIR)$(MANDIR)/xv.$(MANSUF) \
+	  $(DESTDIR)$(MANDIR)/../fi/man1/xv.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/bggen.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/xcmap.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/xvpictoppm.$(MANSUF) \
+	  $(DESTDIR)$(MANDIR)/../pl/man1/xvpictoppm.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/vdcomp.$(MANSUF)
 #
 	$(MKDIR) $(DESTDIR)$(DOCDIR)		# or $(DESTDIR)$(LIBDIR)
