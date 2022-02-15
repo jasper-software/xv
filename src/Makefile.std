@@ -323,7 +323,7 @@ PDS = -DDOPDS
 # TVL10N = -DX_LOCALE
 
 # Install directory of xv_mgcsfx.sample.
-MGCSFXDIR = $(LIBDIR)
+MGCSFXDIR = $(SYSCONFDIR)
 # Directory of default configuration file.
 MGCSFX = -DMGCSFXDIR=\"$(MGCSFXDIR)\"
 
@@ -342,11 +342,12 @@ CFLAGS = $(CCOPTS) $(PNG) $(PNGINC) $(ZLIBINC) $(JPEG) $(JPEGINC) \
 	-DSYSCONFDIR=\"$(SYSCONFDIR)\" -DXVEXECPATH=\"$(LIBDIR)\"
 
 ### remove -lm for BeOS:
-LIBS = $(TIFFLIB) $(JPEGLIB) $(PNGLIB) $(ZLIBLIB) $(JP2KLIB) -L/usr/X11R6/lib -lX11 -lm
-#LIBS = $(TIFFLIB) $(JPEGLIB) $(PNGLIB) $(ZLIBLIB) $(JP2KLIB) -lX11
+LIBS = $(TIFFLIB) $(JPEGLIB) $(PNGLIB) $(ZLIBLIB) $(JP2KLIB) -L/usr/X11R6/lib -lXt -lX11 -lm
+#LIBS = $(TIFFLIB) $(JPEGLIB) $(PNGLIB) $(ZLIBLIB) $(JP2KLIB) -lXt -lX11
 
 OBJS = 	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xv24to8.o xvgif.o xvpm.o xvinfo.o xvctrl.o xvscrl.o xvalg.o \
+	xvmask.o xvcpmask.o xvmeko.o \
 	xvgifwr.o xvdir.o xvbutt.o xvpbm.o xvxbm.o xvgam.o xvbmp.o \
 	xvdial.o xvgraf.o xvsunras.o xvjpeg.o xvps.o xvpopup.o xvdflt.o \
 	xvtiff.o xvtiffwr.o xvpds.o xvrle.o xviris.o xvgrab.o vprintf.o \
@@ -355,7 +356,7 @@ OBJS = 	xv.o xvevent.o xvroot.o xvmisc.o xvimage.o xvcolor.o xvsmooth.o \
 	xvmag.o xvpic.o xvmaki.o xvpi.o xvpic2.o xvvd.o xvmgcsfx.o \
 	xvml.o xvjp2k.o
 
-MISC = README INSTALL CHANGELOG IDEAS
+MISC = README* INSTALL CHANGELOG CPMASK IDEAS BUGS
 
 
 
@@ -369,19 +370,19 @@ all: xv bggen vdcomp xcmap xvpictoppm
 
 #xv: $(OBJS) $(JPEGLIB) $(TIFFLIB)
 xv: $(OBJS)
-	$(CC) -o xv $(CFLAGS) $(OBJS) $(LIBS)
+	$(CC) -o xv $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
 
 bggen: bggen.c
-	$(CC) $(CFLAGS) -o bggen bggen.c $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o bggen bggen.c $(LIBS)
 
 vdcomp: vdcomp.c
-	$(CC) $(CFLAGS) -o vdcomp vdcomp.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o vdcomp vdcomp.c
 
 xcmap:  xcmap.c
-	$(CC) $(CFLAGS) -o xcmap xcmap.c $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o xcmap xcmap.c $(LIBS)
 
 xvpictoppm:  xvpictoppm.c
-	$(CC) $(CFLAGS) -o xvpictoppm xvpictoppm.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o xvpictoppm xvpictoppm.c
 
 
 
@@ -406,31 +407,40 @@ install: all
 	  $(DESTDIR)$(BINDIR)/xvpictoppm
 #
 	$(MKDIR) $(DESTDIR)$(MANDIR)
+	$(MKDIR) $(DESTDIR)$(MANDIR)/../fi/man1
+	$(MKDIR) $(DESTDIR)$(MANDIR)/../pl/man1
 	cp docs/xv.man     $(DESTDIR)$(MANDIR)/xv.$(MANSUF)
 	cp docs/bggen.man  $(DESTDIR)$(MANDIR)/bggen.$(MANSUF)
 	cp docs/xcmap.man  $(DESTDIR)$(MANDIR)/xcmap.$(MANSUF)
 	cp docs/xvp2p.man  $(DESTDIR)$(MANDIR)/xvpictoppm.$(MANSUF)
 	cp docs/vdcomp.man $(DESTDIR)$(MANDIR)/vdcomp.$(MANSUF)
+	cp fi/man1/xv.1    $(DESTDIR)$(MANDIR)/../fi/man1/xv.$(MANSUF)
+	cp pl/man1/xvpictoppm.1 $(DESTDIR)$(MANDIR)/../pl/man1/xvpictoppm.$(MANSUF)
 	chmod 644 $(DESTDIR)$(MANDIR)/xv.$(MANSUF) \
+	  $(DESTDIR)$(MANDIR)/../fi/man1/xv.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/bggen.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/xcmap.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/xvpictoppm.$(MANSUF) \
+	  $(DESTDIR)$(MANDIR)/../pl/man1/xvpictoppm.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/vdcomp.$(MANSUF)
 #
-	$(MKDIR) $(DESTDIR)$(DOCDIR)		# or $(DESTDIR)$(LIBDIR)
-	cp README.jumbo docs/xvdocs.pdf docs/xvdocs.ps $(DESTDIR)$(DOCDIR)/.
-	chmod 644 $(DESTDIR)$(DOCDIR)/README.jumbo \
-	  $(DESTDIR)$(DOCDIR)/xvdocs.pdf $(DESTDIR)$(DOCDIR)/xvdocs.ps
-#
-	#$(MKDIR) $(DESTDIR)$(SYSCONFDIR)
-	#cp xv_mgcsfx.sample $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
-	#chmod 644 $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
+	$(MKDIR) $(DESTDIR)$(SYSCONFDIR)
+	cp xv_mgcsfx.sample $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
+	chmod 644 $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
 
+install-docs: all
+	$(MKDIR) $(DESTDIR)$(DOCDIR)
+	cp -rp BUGS CHANGELOG copyright.h CPMASK IDEAS README \
+	  docs/README.docs README.FLmask README.jumbo README.pcd \
+	  docs/bigxv.jpg docs/formats docs/manuals \
+	  $(DESTDIR)$(DOCDIR)/.
+	find $(DESTDIR)$(DOCDIR) -type d -exec chmod 755 {} \;
+	find $(DESTDIR)$(DOCDIR) -type f -exec chmod 644 {} \;
 
 tar:
 #	tar only local jpeg and tiff dirs, not user's or system's copies:
 	tar cvf xv.tar Makefile* Imakefile *.c *.h bits \
-		docs unsupt vms jpeg tiff $(MISC)
+		docs fi pl xv_mgcsfx.sample unsupt vms jpeg tiff $(MISC)
 
 xvtar:
 	tar cvf xv.tar Makefile* Imakefile *.c *.h bits
