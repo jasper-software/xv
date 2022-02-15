@@ -424,15 +424,18 @@ install: all
 	  $(DESTDIR)$(MANDIR)/../pl/man1/xvpictoppm.$(MANSUF) \
 	  $(DESTDIR)$(MANDIR)/vdcomp.$(MANSUF)
 #
-	$(MKDIR) $(DESTDIR)$(DOCDIR)		# or $(DESTDIR)$(LIBDIR)
-	cp README.jumbo docs/xvdocs.pdf docs/xvdocs.ps $(DESTDIR)$(DOCDIR)/.
-	chmod 644 $(DESTDIR)$(DOCDIR)/README.jumbo \
-	  $(DESTDIR)$(DOCDIR)/xvdocs.pdf $(DESTDIR)$(DOCDIR)/xvdocs.ps
-#
 	$(MKDIR) $(DESTDIR)$(SYSCONFDIR)
 	cp xv_mgcsfx.sample $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
 	chmod 644 $(DESTDIR)$(SYSCONFDIR)/xv_mgcsfx
 
+install-docs: all
+	$(MKDIR) $(DESTDIR)$(DOCDIR)
+	cp -rp BUGS CHANGELOG copyright.h CPMASK IDEAS README \
+	  docs/README.docs README.FLmask README.jumbo README.pcd \
+	  docs/bigxv.jpg docs/formats docs/manuals \
+	  $(DESTDIR)$(DOCDIR)/.
+	find $(DESTDIR)$(DOCDIR) -type d -exec chmod 755 {} \;
+	find $(DESTDIR)$(DOCDIR) -type f -exec chmod 644 {} \;
 
 tar:
 #	tar only local jpeg and tiff dirs, not user's or system's copies:
