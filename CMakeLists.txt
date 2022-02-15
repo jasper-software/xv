@@ -64,6 +64,8 @@ else()
 	set(LINUX FALSE)
 endif()
 
+message("CMake version: ${CMAKE_VERSION}")
+
 add_compile_definitions(XV_CMAKE_BUILD)
 
 # Customize the compiler flags for warning messages.
@@ -132,6 +134,31 @@ if(NOT MATH_LIBRARY)
 endif()
 
 find_package(Jasper)
+if(JASPER_FOUND OR TARGET Jasper::Jasper)
+	message("JASPER_INCLUDE_DIR: ${JASPER_INCLUDE_DIR}")
+	message("JASPER_INCLUDE_DIRS: ${JASPER_INCLUDE_DIRS}")
+	message("JASPER_LIBRARY: ${JASPER_LIBRARY}")
+	message("JASPER_LIBRARIES: ${JASPER_LIBRARIES}")
+else()
+	message("JasPer library not found")
+endif()
+# CMake 3.22 or newer is required for the Jasper::Jasper imported target to
+# be defined.  So, if the JasPer library is found but no imported target has
+# been created, create one.
+if(NOT TARGET Jasper::Jasper)
+	if(JASPER_FOUND)
+		add_library(Jasper::Jasper UNKNOWN IMPORTED)
+		if(JASPER_INCLUDE_DIR)
+			set_target_properties(Jasper::Jasper PROPERTIES
+			  INTERFACE_INCLUDE_DIRECTORIES "${JASPER_INCLUDE_DIR}")
+		endif()
+		if(EXISTS "${JASPER_LIBRARY}")
+			set_target_properties(Jasper::Jasper PROPERTIES
+			  IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+			  IMPORTED_LOCATION "${JASPER_LIBRARY}")
+		endif()
+	endif()
+endif()
 if(XV_ENABLE_JP2K AND NOT TARGET Jasper::Jasper)
 	message(WARNING "Disabling JPEG-2000 Support.")
 	set(XV_ENABLE_JP2K OFF)
