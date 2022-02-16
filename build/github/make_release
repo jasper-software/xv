@@ -13,6 +13,19 @@ warn()
 	echo "WARNING: $@"
 }
 
+tag_to_version()
+{
+	local tag="$1"
+	pattern='^v[0-9]+\.[0-9]+\.[0-9]+.*$'
+	local version
+	if [[ "$tag" =~ $pattern ]]; then
+		version="${tag:1}"
+	else
+		version="$tag"
+	fi
+	echo "$version" || return 1
+}
+
 usage()
 {
 	echo "bad usage: $@"
@@ -70,7 +83,7 @@ commit="$(git -C "$workspace_dir" rev-parse HEAD)" || \
   panic "cannot get commit"
 tag="$(awk -v FS="/" '{print $3;}' <<< "$github_ref")" || \
   panic "cannot get tag"
-version="$(awk -v FS="-" '{print $2;}' <<< "$tag")" || \
+version="$(tag_to_version "$tag")" || \
   panic "cannot get version"
 name="xv-3.10a-js-$version"
 
