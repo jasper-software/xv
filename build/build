@@ -6,6 +6,32 @@ panic()
 	exit 1
 }
 
+usage()
+{
+	if [ $# -ne 0 ]; then
+		echo "BAD USAGE: $*"
+	fi
+	cat <<- EOF
+	Usage
+	=====
+
+	$0 [options]
+
+	Options
+	=======
+
+	-b \$build_dir
+	    Set the build directory to \$build_dir.
+	-i \$install_dir
+	    Set the install directory to \$install_dir.
+	-v
+	    Enable verbose mode.
+	-h
+	    Print help information and exit.
+	EOF
+	exit 2
+}
+
 program_dir=$(dirname "$0") || exit 1
 top_dir="$program_dir/.."
 
@@ -22,9 +48,10 @@ while getopts vb:i:t: opt; do
 		install_dir="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
+	h)
+		usage;;
 	\?)
-		usage
-		break;;
+		usage;;
 	esac
 done
 shift $((OPTIND - 1))
