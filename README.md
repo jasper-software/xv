@@ -26,7 +26,10 @@ This source code was originally derived from the following:
 Many changes/improvements have been made on top of the original code.
 Some of these changes/improvements include (but are not limited to):
 
-  - adding support for CMake-based builds
+  - merging numerous patches from the Fedora Linux RPM for the XV software
+    on RPM Fusion;
+
+  - adding support for CMake-based builds; and
 
   - adding a continuous integration (CI) workflow based on GitHub Actions,
     which builds xv using a combination of platforms/compilers
