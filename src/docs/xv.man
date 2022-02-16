@@ -40,3 +40,7 @@ This version has been patched with the XV Jumbo Patches, available from
 .PP
 .SH AUTHOR
 John Bradley (and many contributors)
+
+.SH XV GITHUB REPOSITORY
+The source code for this release of the XV software can be found on GitHub
+at <https://github.com/jasper-software/xv>.

@@ -12,3 +12,6 @@ that.
 .SH AUTHOR
 John Bradley  -  bradley@dccs.upenn.edu
 
+.SH XV GITHUB REPOSITORY
+The source code for this release of the XV software can be found on GitHub
+at <https://github.com/jasper-software/xv>.

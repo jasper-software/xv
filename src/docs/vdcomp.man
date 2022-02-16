@@ -80,3 +80,7 @@ JUN89 Fixed READVAR, to get length on 16-bit unswapped hosts.
 .PP
 JUL88 C driver to decompress standard Voyager Compressed images by
 Mike Martin 1989/12/02.
+
+.SH XV GITHUB REPOSITORY
+The source code for this release of the XV software can be found on GitHub
+at <https://github.com/jasper-software/xv>.
