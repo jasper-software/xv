@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.12)
 set(XV_VERSION_MAJOR 4)
 set(XV_VERSION_MINOR 0)
 set(XV_VERSION_PATCH 0)
-set(XV_VERSION_DATE "20220127")
+set(XV_VERSION_DATE "20220216")
 
 # Generate the project version.
 set(XV_VERSION "${XV_VERSION_MAJOR}.${XV_VERSION_MINOR}.${XV_VERSION_PATCH}")

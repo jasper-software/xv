@@ -1,0 +1,9 @@
+4.0.0 (2022-02-16)
+==================
+
+* Applied jumbo patch set and numerous other patches including those from the
+  Fedora Linux RPM for the XV software.
+* Added support for CMake-based builds.
+* Added GitHub Actions CI framework.
+* Added support for JasPer 3.0.0.
+
