@@ -1,0 +1,2 @@
+The license for the XV software can be found in the file src/README.
+(See the section titled "XV Licensing Information".)
