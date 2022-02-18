@@ -851,7 +851,11 @@ METHODDEF boolean  xv_process_app1(cinfo)
     exifInfo = (byte *) malloc((size_t) length);
     exifInfoSize = 0;
   }
-  else exifInfo = (byte *) realloc(exifInfo, exifInfoSize + length);
+  else {
+    /* one APP1 data struct only, ignore extra stuff */
+    while (length-- > 0)
+      (void)j_getc(cinfo);
+  }
   if (!exifInfo) FatalError("out of memory in xv_process_app1 (EXIF info)");
   
   sp = exifInfo + exifInfoSize;
