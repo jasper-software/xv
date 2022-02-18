@@ -87,6 +87,8 @@ static int   colorType;
 static DIAL  qDial, smDial;
 static BUTT  jbut[J_NBUTTS];
 
+char errbuffer[JMSG_LENGTH_MAX];
+
 
 
 
@@ -418,7 +420,7 @@ static void writeJPEG()
 
   if (pfree) free(inpix);
 
-  if (CloseOutFile(fp, filename, rv) == 0) DirBox(0);
+  if (CloseOutFileWhy(fp, filename, rv, errbuffer) == 0) DirBox(0);
   SetCursors(-1);
 }
 
@@ -444,7 +446,7 @@ METHODDEF void  xv_error_exit(cinfo)
   my_error_ptr myerr;
 
   myerr = (my_error_ptr) cinfo->err;
-  (*cinfo->err->output_message)(cinfo);     /* display error message */
+  (*cinfo->err->format_message)(cinfo, errbuffer);     /* fmt error message */
   longjmp(myerr->setjmp_buffer, 1);         /* return from error */
 }
 

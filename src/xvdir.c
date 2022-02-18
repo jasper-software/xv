@@ -1879,18 +1879,23 @@ FILE *OpenOutFile(filename)
 
 
 /***************************************/
-int CloseOutFile(fp, filename, failed)
+int CloseOutFileWhy(fp, filename, failed, why)
      FILE *fp;
      const char *filename;
      int   failed;
+     const char *why;
 {
   char buf[64];
 
   /* close output file, and if piping, deal... Returns '0' if everything OK */
 
   if (failed) {    /* failure during format-specific output routine */
-    char  str[512];
-    sprintf(str,"Couldn't write file '%s'.", outFName);
+    char  str[2048];
+    if (why)
+	    snprintf(str, 2048, "Couldn't write file '%s' (%s).", outFName, 
+		why);
+    else
+	    snprintf(str, 2048, "Couldn't write file '%s'.", outFName);
     ErrPopUp(str, "\nBummer!");
     unlink(outFName);   /* couldn't properly write file:  delete it */
     return 1;
