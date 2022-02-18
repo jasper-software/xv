@@ -3,7 +3,10 @@
 
 * Applied jumbo patch set and numerous other patches including those from the
   Fedora Linux RPM for the XV software.
+* Applied several patches for the XV software from OpenBSD.
 * Added support for CMake-based builds.
-* Added GitHub Actions CI framework.
+* Added a GitHub Actions CI framework for performing test builds on each
+  repository push.
+* Added a GitHub Actions workflow for generating release tarballs on each
+  repository tag corresponding to a release.
 * Added support for JasPer 3.0.0.
-
