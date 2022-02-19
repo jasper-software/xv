@@ -556,6 +556,10 @@ int x,y;
       if (XTextWidth(mfinfo, &filename[stPos], 1+pos-stPos) > tx)
         break;
     }
+
+    if (pos == 0)
+	return -1;
+
     /* if we are more than halfway past this char, put the insertion point after it */
     dx = tx - XTextWidth(mfinfo, &filename[stPos], pos-stPos);
     if (dx > XTextWidth(mfinfo, &filename[pos], 1)/2)
