@@ -4,6 +4,7 @@
 * Applied jumbo patch set and numerous other patches including those from the
   Fedora Linux RPM for the XV software.
 * Applied several patches for the XV software from OpenBSD.
+* Applied several patches for the XV software from OpenSUSE.
 * Added support for CMake-based builds.
 * Added a GitHub Actions CI framework for performing test builds on each
   repository push.

@@ -31,6 +31,8 @@ Some of these changes/improvements include (but are not limited to):
 
   - merged several patches for the XV software from OpenBSD;
 
+  - merged several patches for the XV software from OpenSUSE;
+
   - added support for CMake-based builds;
 
   - added a continuous integration (CI) workflow based on GitHub Actions,
