@@ -89,6 +89,7 @@ int EventLoop()
 #ifdef USE_TICKS
   clock_t waitsec_ticks=0L, orgtime_ticks=0L, curtime_ticks;
   clock_t elapsed_ticks=0L, remaining_interval;
+  clock_t clock_ticks = sysconf(_SC_CLK_TCK);
 #else
   time_t orgtime=0L, curtime;
 #endif
@@ -135,7 +136,7 @@ int EventLoop()
 	 all pending events (ie, drawing the image the first time)
 	 have been dealt with:  START WAITING */
 #ifdef USE_TICKS
-      waitsec_ticks = (clock_t)(waitsec * CLK_TCK);
+      waitsec_ticks = (clock_t)(waitsec * clock_ticks);
       orgtime_ticks = times(NULL);  /* unclear if NULL valid, but OK on Linux */
 #else
       orgtime = time(NULL);
@@ -181,11 +182,11 @@ int EventLoop()
         } else
           elapsed_ticks = curtime_ticks - orgtime_ticks;
         remaining_interval = waitsec_ticks - elapsed_ticks;
-        if (remaining_interval >= (clock_t)(1 * CLK_TCK))
+        if (remaining_interval >= (clock_t)(1 * clock_ticks))
           sleep(1);
         else {
           /* less than one second remaining:  do delay in msec, then return */
-          Timer((remaining_interval * 1000L) / CLK_TCK);  /* can't overflow */
+          Timer((remaining_interval * 1000L) / clock_ticks);  /* can't overflow */
           return waitloop? NEXTLOOP : NEXTQUIT;
         }
 #else
