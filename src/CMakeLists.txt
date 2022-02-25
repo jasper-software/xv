@@ -145,10 +145,50 @@ foreach(file ${man_pages})
 	)
 endforeach()
 
-install(
-	FILES
-	README.jumbo
-	docs/manuals/xvdocs.pdf
-	docs/manuals/xvdocs.ps
-	DESTINATION ${CMAKE_INSTALL_DOCDIR}
-)
+install(FILES
+  pl/man1/xvpictoppm.1
+  DESTINATION "${CMAKE_INSTALL_MANDIR}/pl/man1")
+
+install(FILES
+  fi/man1/xv.1
+  DESTINATION "${CMAKE_INSTALL_MANDIR}/fi/man1")
+
+# Install files into DOCDIR.
+install(FILES
+  docs/bigxv.jpg
+  BUGS
+  CHANGELOG
+  copyright.h
+  CPMASK
+  IDEAS
+  README
+  docs/README.docs
+  README.FLmask
+  README.jumbo
+  README.pcd
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+
+# Install files into DORDIR/formats.
+install(FILES
+  docs/formats/bmp.doc
+  docs/formats/epsf.ps
+  docs/formats/gif87.doc
+  docs/formats/gif89.doc
+  docs/formats/gif.ack
+  docs/formats/gif.aspect
+  docs/formats/pbm.5
+  docs/formats/pgm.5
+  docs/formats/ppm.5
+  docs/formats/xpm.ps
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}/formats")
+
+# Install files into DOCDIR/manuals.
+install(FILES
+  docs/manuals/xvdocs.pdf
+  docs/manuals/xvdocs.ps
+  docs/manuals/xvtitle.ps
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}/manuals")
+
+# Install directories into DOCDIR/manuals.
+install(DIRECTORY docs/manuals/html
+  DESTINATION "${CMAKE_INSTALL_DOCDIR}/manuals")
