@@ -153,6 +153,11 @@ install(FILES
   fi/man1/xv.1
   DESTINATION "${CMAKE_INSTALL_MANDIR}/fi/man1")
 
+# Install files into SYSCONFDIR.
+install(FILES
+  xv_mgcsfx.sample
+  DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}")
+
 # Install files into DOCDIR.
 install(FILES
   docs/bigxv.jpg
@@ -168,7 +173,7 @@ install(FILES
   README.pcd
   DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
-# Install files into DORDIR/formats.
+# Install files into DOCDIR/formats.
 install(FILES
   docs/formats/bmp.doc
   docs/formats/epsf.ps
