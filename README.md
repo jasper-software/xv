@@ -3,6 +3,11 @@ XV Software
 
 This directory hierarchy contains the source code for the XV software.
 
+This software is maintained using the following Git repository hosted
+by GitHub:
+
+  - <https://github.com/jasper-software/xv.git>
+
 Other additional sources of information on the XV software include:
 
   - <http://www.trilon.com/xv/>
