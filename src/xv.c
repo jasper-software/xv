@@ -400,6 +400,11 @@ int main(argc, argv)
 #endif
 #endif
 
+#ifdef XV_SYSCONFDIR
+  if (DEBUG) {
+    fprintf(stderr, "SYSCONFDIR: %s\n", XV_SYSCONFDIR);
+  }
+#endif
 
   /*****************************************************/
   /*** X Setup                                       ***/

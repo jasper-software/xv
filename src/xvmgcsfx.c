@@ -115,6 +115,9 @@ typedef struct _mgcsfxtab
 } mgcsfxtab;
 
 
+#ifdef XV_SYSCONFDIR
+#define MGCSFXDIR XV_SYSCONFDIR
+#endif
 #ifndef MGCSFXDIR
 #  define MGCSFXDIR       "/usr/local/lib"
 #endif

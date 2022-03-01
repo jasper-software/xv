@@ -156,6 +156,8 @@ install(FILES
 # Install files into SYSCONFDIR.
 install(FILES
   xv_mgcsfx.sample
+  RENAME
+  xv_mgcsfx
   DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}")
 
 # Install files into DOCDIR.
