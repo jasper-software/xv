@@ -75,7 +75,6 @@ static boolean Interlace, HasGlobalColormap;
 static byte *RawGIF;		/* The heap array to hold it, raw */
 static byte *Raster;		/* The raster data stream, unblocked */
 static byte *pic8;
-static size_t rasterSize;
 
     /* The hash table used by the decompressor */
 static int Prefix[4096];
@@ -146,8 +145,7 @@ int LoadGIF(fname, pinfo)
 
   /* the +256's are so we can read truncated GIF files without fear of
      segmentation violation */
-  rasterSize = filesize+256;
-  if (!(Raster = (byte *) calloc(rasterSize, (size_t) 1)))
+  if (!(dataptr = RawGIF = (byte *) calloc((size_t) filesize+256, (size_t) 1)))
     FatalError("LoadGIF: not enough memory to read GIF file");
 
   if (!(Raster = (byte *) calloc((size_t) filesize+256,(size_t) 1)))
@@ -798,8 +796,6 @@ static int readCode()
   int RawCode, ByteOffset;
 
   ByteOffset = BitOffset / 8;
-  if (ByteOffset >= rasterSize-2)
-    return 0;
   RawCode = Raster[ByteOffset] + (Raster[ByteOffset + 1] << 8);
   if (CodeSize >= 8)
     RawCode += ( ((int) Raster[ByteOffset + 2]) << 16);
