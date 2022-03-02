@@ -42,7 +42,12 @@ if [ -z "$install_dir" ]; then
 	install_dir="$tmp_dir/install"
 fi
 
-"$build" -b "$build_dir" -i "$install_dir" || panic "build/install failed"
+build_options=()
+build_options+=(-d)
+"$build" "${build_options[@]}" \
+  -b "$build_dir" \
+  -i "$install_dir" || \
+  panic "build/install failed"
 
 images_dir="$top_dir/data/images"
 xv="$install_dir/bin/xv"

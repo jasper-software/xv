@@ -39,9 +39,17 @@ verbose=0
 build_dir=
 install_dir=
 tmp_dir=
+mode=release
+strict=0
 
-while getopts vb:i:t: opt; do
+while getopts vb:i:t:drs opt; do
 	case $opt in
+	s)
+		strict=1;;
+	r)
+		mode=release;;
+	d)
+		mode=debug;;
 	b)
 		build_dir="$OPTARG";;
 	i)
@@ -76,9 +84,14 @@ if [ "$verbose" -ge 1 ]; then
 	configure_options+=(-DCMAKE_VERBOSE_MAKEFILE=1)
 fi
 
-#configure_options+=(-DXV_ENABLE_ASAN=1)
-#configure_options+=(-DXV_ENABLE_UBSAN=1)
-#configure_options+=(-DXV_STRICT=1)
+if [ "$mode" = debug ]; then
+	configure_options+=(-DCMAKE_BUILD_TYPE=Debug)
+	configure_options+=(-DXV_ENABLE_ASAN=1)
+	configure_options+=(-DXV_ENABLE_UBSAN=1)
+fi
+if [ "$strict" -ne 0 ]; then
+	configure_options+=(-DXV_STRICT=1)
+fi
 
 cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \
   panic "configure failed"
