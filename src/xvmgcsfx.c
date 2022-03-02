@@ -19,45 +19,45 @@
  */
 
 /*
- * Known Bugs and Todo  /  $B$"$l$3$l5$$K$J$k$3$H(B
+ * Known Bugs and Todo  /  あれこれ気になること
  *
- *  ~/.xv_mgcsfx $BFb(B
- *    $B!&Dj5A$,IT40A4$@$H%(%i!<(B (':'$B$N?t(B)$B!#(B
- *    $B!&%G%j%_%?$H$7$F(B ':' $B$r;H$&$N$G!"%9%?!<%H%"%C%W%U%!%$%kFb$G(B
- *      ':' $B$rMQ$$$FDj5A$O$G$-$J$$!#(B'\:'$B$G$b%@%a!#(B
- *    $B!&(B magic $B%?%$%W$G!"#8?J?t$O#37eJ,#0!A#7$rD4$Y!"#1#6?J?t$O(B
- *       isxdigit $B$,??$rJV$94VCf=hM}$5$l$k!#$7$+$7!"#1#b#y#t#e$H(B
- *       $B$7$F$7$+I>2A$5$l$J$$!#(B
- *    $B!&%W%j%W%m%;%C%5$r;H$&$H$-$O!"%3%a%s%H$N=q$-J}$KCm0U$7$J$1$l$P$J(B
- *        $B$i$J$$!#%W%j%W%m%;%C%5$K$h$C$F$O%3%a%s%H$,%(%i!<$K$J$k!#(B
- *    $B!&%Q%$%W$X$NF~=PNO$N%U%)!<%^%C%H$N<oN`$,(B PNM $B$N$_(B
- *        $BF~NO(B
- *            $B%U%!%$%k%]%$%s%?$r(B seek $B$7$F$O$$$1$J$$(B
- *            $B%U%!%$%k%5%$%:$rMQ$$$F$O$$$1$J$$(B
- *        $B=PNO(B
- *            $B%U%!%$%k%]%$%s%?$r(B seek $B$7$F$O$$$1$J$$(B
- *            exec $B$G$-$J$/$F=*N;$7$?%W%m%;%9$K=q$-9~$_IT2D(B
- *    $B!&%5%U%#%C%/%9$H%^%8%C%/%J%s%P!<$N;H$$J,$1$r$I$&$9$k$+!#(B
- *        $B%^%8%C%/%J%s%P!<$,F1$8$G!"%5%U%#%C%/%9$,0[$J$k>l9g$rG'$a$k$+!)(B
- *    $B!&(Bcompress(gzip)$B$N%U%!%$%k$O%F%s%]%i%j$G$O(B xvtmp??? $B$H$$$&L>A0$J(B
- *      $B$N$G(B suffix $B$G$O<1JL$G$-$J$$!#(B
+ *  ~/.xv_mgcsfx 内
+ *    ・定義が不完全だとエラー (':'の数)。
+ *    ・デリミタとして ':' を使うので、スタートアップファイル内で
+ *      ':' を用いて定義はできない。'\:'でもダメ。
+ *    ・ magic タイプで、８進数は３桁分０〜７を調べ、１６進数は
+ *       isxdigit が真を返す間中処理される。しかし、１ｂｙｔｅと
+ *       してしか評価されない。
+ *    ・プリプロセッサを使うときは、コメントの書き方に注意しなければな
+ *        らない。プリプロセッサによってはコメントがエラーになる。
+ *    ・パイプへの入出力のフォーマットの種類が PNM のみ
+ *        入力
+ *            ファイルポインタを seek してはいけない
+ *            ファイルサイズを用いてはいけない
+ *        出力
+ *            ファイルポインタを seek してはいけない
+ *            exec できなくて終了したプロセスに書き込み不可
+ *    ・サフィックスとマジックナンバーの使い分けをどうするか。
+ *        マジックナンバーが同じで、サフィックスが異なる場合を認めるか？
+ *    ・compress(gzip)のファイルはテンポラリでは xvtmp??? という名前な
+ *      ので suffix では識別できない。
  *
- *  $BG'<1$9$k;~$K(B MACBINARY $B$K$OIi$1$k(B(in xv.c)$B!#(B
+ *  認識する時に MACBINARY には負ける(in xv.c)。
  *
- *  $BB?=E$K(B pipe $B$rDL$9$3$H$,$G$-$J$$!#(B(pipe $B$,(B seek $B$G$-$J$$$+$i(B)
- *    $B!&(Bsocketpair $B$G!"(Brecv $B$K(B MSG_PEEK $B%U%i%0$r$D$+$C$F6uFI$_$9$k!#(B
- *    $B!&$3$l$r$d$k$H%U%!%$%k$NG'<1$,$a$A$c$a$A$cCY$/$J$k!#(B
+ *  多重に pipe を通すことができない。(pipe が seek できないから)
+ *    ・socketpair で、recv に MSG_PEEK フラグをつかって空読みする。
+ *    ・これをやるとファイルの認識がめちゃめちゃ遅くなる。
  *
- *  $B%j%=!<%9$G@_Dj(B
- *    $B!&%j%=!<%9$G@_Dj$9$kJ}$,LLE]$/$5$$(B
+ *  リソースで設定
+ *    ・リソースで設定する方が面倒くさい
  *
- *  $B%^%8%C%/%J%s%P!<$N@_Dj$K@55,I=8=(B
+ *  マジックナンバーの設定に正規表現
  *
- *  $B%;!<%VMQ%W%m%;%9$,<:GT$9$k>l9g$NBP:v$,:#0l$D(B
+ *  セーブ用プロセスが失敗する場合の対策が今一つ
  *
- *  DEC OSF/1 V3.0 $B$G$O!"%Q%$%W$K%G!<%?$,$^$@$J$$;~$KFI$_9~$b$&$H$9$k$H!"(B
- *  read $B$,IT40A4$K$J$k!#(B(in xvpbm.c)
- *  $BF1MM$K=q$-9~$_;~$K$bLdBj$,@8$8$k$+$b$7$l$J$$!#(B
+ *  DEC OSF/1 V3.0 では、パイプにデータがまだない時に読み込もうとすると、
+ *  read が不完全になる。(in xvpbm.c)
+ *  同様に書き込み時にも問題が生じるかもしれない。
  */
 
 #define  NEEDSDIR               /* for stat() */
@@ -308,7 +308,7 @@ static char *make_preprocessed_file(fname)
 #endif /* USE_MGCSFX_PREPROCESSOR */
 
 /***************************************************/
-/* $BG'<1$G$-$k%U%!%$%k$+$I$&$+D4$Y$k(B */
+/* 認識できるファイルかどうか調べる */
 int is_mgcsfx(fname,buffer,size)
      char          *fname;
      unsigned char *buffer;
@@ -414,9 +414,9 @@ static mgcsfxtab *free_mgcsfx(m)
 
 
 /***************************************************/
-/* char c $B$^$?$O(B '\n' $B$G6h@Z$i$l$?J8;zNs$r<h$j=P$9(B
- *  $B%U%!%$%k$N:G8e$^$GFI$s$@$i(B NULL $B$rJV$9(B
- *  $B2~9T$J$i2~9T$rJV$9(B($B2~9T$G6h@Z$i$l$?>l9g$O(B '\n' $B$r%9%H%j!<%`$KLa$9(B)
+/* char c または '\n' で区切られた文字列を取り出す
+ *  ファイルの最後まで読んだら NULL を返す
+ *  改行なら改行を返す(改行で区切られた場合は '\n' をストリームに戻す)
  */
 #define CBUF_SIZE 1024
 static char *fgettoken(fp, c)
@@ -464,7 +464,7 @@ static char *fgettoken(fp, c)
 
   buf[n] = '\0';
 
-  /* $B:G=i$H:G8e$N6uGrJ8;z$r@Z$j5M$a$k(B */
+  /* 最初と最後の空白文字を切り詰める */
   ss = buf + strspn(buf, " \t\b\r\n"); /* find the first non-white space */
   se = buf + strlen(buf);              /* find the end of the string */
 
@@ -472,15 +472,15 @@ static char *fgettoken(fp, c)
   while ((--se >= ss) && strchr(" \t\b\r\n", *se));
   *(++se) = '\0';
 
-  if(i == EOF && strlen(ss)==0){        /* EOF $B$J$i(B NULL $B$rJV$9(B */
+  if(i == EOF && strlen(ss)==0){        /* EOF なら NULL を返す */
     free(buf);
     return NULL;
-  }else if(i == '\n' && strlen(ss)==0){ /* $B2~9T$N$_$N>l9g(B */
+  }else if(i == '\n' && strlen(ss)==0){ /* 改行のみの場合 */
     static char cr[2] = {'\n','\0'};
     buf2 = strdup(cr);
     free(buf);
     return buf2;
-  }else{                                /* $BDL>o(B */
+  }else{                                /* 通常 */
     if(i == '\n' && strlen(ss)>0) ungetc(i,fp);
     buf2 = strdup(ss);
     free(buf);
@@ -491,7 +491,7 @@ static char *fgettoken(fp, c)
 
 
 /***************************************************/
-/* $BJ8;zNsCf$NFC<l5-9f(B(\)$B$r@5$7$$$b$N$K$9$k(B
+/* 文字列中の特殊記号(\)を正しいものにする
  */
 static int string_fin(string_data)
      char *string_data;
@@ -736,8 +736,8 @@ retry:
       = i_img = i_com = o_img = o_com = NULL;
     reach_end = 0;
 
-    if((s = fgettoken(fp, ':'))==NULL) break; /* EOF $B$J$i=*$j(B */
-    if(*s == '#'){/* $B@hF,$,(B '#' $B$J$iFI$_$H$P$9(B */
+    if((s = fgettoken(fp, ':'))==NULL) break; /* EOF なら終り */
+    if(*s == '#'){/* 先頭が '#' なら読みとばす */
       while((s = fgettoken(fp, '\n'))!=NULL){
 	if(*s == '\n'){
 	  free(s);
@@ -746,14 +746,14 @@ retry:
 	free(s);
       }
       if(s == NULL) break;
-    }else if(*s == '\n'){/* $B6u9T$OL5;k(B */
+    }else if(*s == '\n'){/* 空行は無視 */
       free(s);
       goto retry;
     }
     if(strlen(s) > 0) description = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "data type");
       goto next;
@@ -761,7 +761,7 @@ retry:
     if(strlen(s) > 0) mgcsfx_type = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "byte offset");
       goto next;
@@ -769,7 +769,7 @@ retry:
     if(strlen(s) > 0) offset = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "magic number");
       goto next;
@@ -777,7 +777,7 @@ retry:
     if(strlen(s) > 0) magic = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "suffix");
       goto next;
@@ -785,7 +785,7 @@ retry:
     if(strlen(s) > 0) suffix = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "input image type");
       goto next;
@@ -793,7 +793,7 @@ retry:
     if(strlen(s) > 0) i_img = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "input command");
       goto next;
@@ -801,7 +801,7 @@ retry:
     if(strlen(s) > 0) i_com = s;
     else free(s);
 
-    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, ':'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
       if(s != NULL) free(s);
       mgcsfx_read_error(fname, line_number, "output image type");
       goto next;
@@ -809,7 +809,7 @@ retry:
     if(strlen(s) > 0) o_img = s;
     else free(s);
 
-    if((s = fgettoken(fp, '#'))==NULL || *s == '\n'){/* $B2?$b$J$$$J$i@_Dj%_%9(B */
+    if((s = fgettoken(fp, '#'))==NULL || *s == '\n'){/* 何もないなら設定ミス */
     /*
       free(s);
       mgcsfx_read_error(fname, line_number, "output command");
@@ -826,7 +826,7 @@ retry:
     }
 
     if(reach_end == 0){
-      while((s = fgettoken(fp, '\n'))!=NULL){/* $B9TKv$N%4%_$r<N$F$k(B */
+      while((s = fgettoken(fp, '\n'))!=NULL){/* 行末のゴミを捨てる */
 	if(*s == '\n'){
 	  free(s);
 	  break; /* goto next; */
@@ -1147,7 +1147,7 @@ next3:;
 
 
 /***************************************************/
-/* $B%^%8%C%/%J%s%P!<Dj5A%U%!%$%kL>$rF@$F!"FI$_9~$^$;$k(B */
+/* マジックナンバー定義ファイル名を得て、読み込ませる */
 static void init_mgcsfx ()
 {
   extern char *getenv ();
@@ -1218,8 +1218,8 @@ static void init_mgcsfx ()
 }
 
 /***************************************************/
-/* $B%^%8%C%/%J%s%P!<$rD4$Y$F!"Dj5A$7$F$$$k%F!<%V%k$r8!:w$9$k(B
-   $B%^%8%C%/%J%s%P!<$N%F!<%V%k$rFI$_9~$s$G$$$J$$$J$iFI$_9~$`(B */
+/* マジックナンバーを調べて、定義しているテーブルを検索する
+   マジックナンバーのテーブルを読み込んでいないなら読み込む */
 static mgcsfxtab *find_mgcsfx (fname, buffer, buffer_size)
      char           *fname;
      unsigned char  *buffer;
@@ -1300,7 +1300,7 @@ static mgcsfxtab *find_mgcsfx (fname, buffer, buffer_size)
 
 
 /***************************************************/
-/* $B%^%8%C%/%J%s%P!<$NDj5A$rD4$Y$F!"$=$l$K$"$o$;$?%3%^%s%I$r<B9T$9$k(B */
+/* マジックナンバーの定義を調べて、それにあわせたコマンドを実行する */
 /* if OK return 1, else if ERROR return 0 */
 int
 LoadMGCSFX(file_name, pinfo)
@@ -1553,7 +1553,7 @@ int getOutputCom PARM((void));
 /*--------------------------------------------------------------------------*/
 
 /***************************************************/
-/* $B$I$l$rA*$s$@$+D4$Y$k!##0$O%3%^%s%I$rF~NO$9$k$b$N$H$9$k(B */
+/* どれを選んだか調べる。０はコマンドを入力するものとする */
 static mgcsfxtab *get_mgcsfx(ms_type)
      int ms_type;
 {
@@ -1569,7 +1569,7 @@ static mgcsfxtab *get_mgcsfx(ms_type)
 }
 
 /***************************************************/
-/* $B30It%3%^%s%I$r<B9T$7$F!"$=$l$K=PNO$9$k(B */
+/* 外部コマンドを実行して、それに出力する */
 /* if OK return 0, else if ERROR return -1 */
 static
 int WriteMGCSFX(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,file_name,
@@ -1768,12 +1768,12 @@ void CreateMGCSFXW()
   if (!mgcsfxNameW) FatalError("can't create mgcsfx name window");
   XSelectInput(theDisp, mgcsfxNameW, ExposureMask);
 
-  /* Ok $B%\%?%s(B */
+  /* Ok ボタン */
   BTCreate(&msbut[MS_BOK], mgcsfxW,
 	   MSWIDE-BUTTW-10-BUTTW-10-1, MSHIGH-BUTTH-10-1,
 	   BUTTW, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
-  /* Cancel $B%\%?%s(B*/
+  /* Cancel ボタン*/
   BTCreate(&msbut[MS_BCANC], mgcsfxW,
 	   MSWIDE-BUTTW-10-1, MSHIGH-BUTTH-10-1,
 	   BUTTW, BUTTH,
@@ -1883,7 +1883,7 @@ int MGCSFXSaveParams(fname, col)
 }
 
 /***************************************************/
-/* $B%@%$%"%m%0$rI=<($9$k$H$-$N=hM}(B */
+/* ダイアログを表示するときの処理 */
 static void drawMSD(x,y,w,h)
      int x,y,w,h;
 {
@@ -1910,7 +1910,7 @@ static void drawMSD(x,y,w,h)
 }
 
 /***************************************************/
-/* $B%@%$%"%m%0$r%/%j%C%/$7$?$H$-$N=hM}(B */
+/* ダイアログをクリックしたときの処理 */
 static void clickMSD(x,y)
      int x,y;
 {
@@ -1920,23 +1920,23 @@ static void clickMSD(x,y)
   /* check BUTTs */
 
   /* check the RBUTTS first, since they don't DO anything */
-  if ((i = RBClick(typeRB, x,y)) >= 0) { /* $BA*Br(B(type)$B%\%?%s$N=hM}(B */
-    (void) RBTrack(typeRB, i);  /* $BA*Br(B(type)$B%\%?%s$r2!$7$?$H$-(B */
+  if ((i = RBClick(typeRB, x,y)) >= 0) { /* 選択(type)ボタンの処理 */
+    (void) RBTrack(typeRB, i);  /* 選択(type)ボタンを押したとき */
     changeSuffix(i);
     return;
   }
 
-  for (i = 0; i < MS_NBUTTS; i++) { /* Ok,Cancel $B%\%?%s$N=hM}(B */
+  for (i = 0; i < MS_NBUTTS; i++) { /* Ok,Cancel ボタンの処理 */
     bp = &msbut[i];
     if (PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h))
       break;
   }
-  if (i < MS_NBUTTS)  /* found one */ /* Ok,Cancel $B%\%?%s$r2!$7$?$H$-(B */
+  if (i < MS_NBUTTS)  /* found one */ /* Ok,Cancel ボタンを押したとき */
     if (BTTrack(bp)) doCmd(i);
 }
 
 /***************************************************/
-/* $B%\%?%s(B(Ok, Cancel) $B$N=hM}(B */
+/* ボタン(Ok, Cancel) の処理 */
 static void doCmd(cmd)
      int cmd;
 {
@@ -2067,7 +2067,7 @@ static void changeSuffix(ms_type)
 }
 
 /***************************************************/
-/* $B%@%$%"%m%0Fb$K%U%!%$%k%M!<%`$rI=<($9$k$H$-$N=hM}(B ($B2<@A$1(B)*/
+/* ダイアログ内にファイルネームを表示するときの処理 (下請け)*/
 static void redrawNamMSD()
 {
   int cpos;
@@ -2101,7 +2101,7 @@ static void redrawNamMSD()
 }
 
 /***************************************************/
-/* $B%@%$%"%m%0Fb$K%U%!%$%k%M!<%`$rI=<($9$k(B */
+/* ダイアログ内にファイルネームを表示する */
 static void showFNamMSD()
 {
   int len;
@@ -2137,7 +2137,7 @@ static void showFNamMSD()
 }
 
 /***************************************************/
-/* $B%-!<F~NO$7$?$H$-$N=hM}(B */
+/* キー入力したときの処理 */
 static int keyinMSD(c)
      int c;
 {

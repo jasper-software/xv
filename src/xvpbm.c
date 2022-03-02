@@ -90,7 +90,7 @@ reselect:
   FD_ZERO(&fds);     /* clear bits */
   FD_SET(pipefdr, &fds); /* set bit of fd in fds */
 
-  /* number of file descriptor to want check (0 $B!A(B width-1) */
+  /* number of file descriptor to want check (0 〜 width-1) */
   width = pipefdr + 1;
 
   /* select returns number of file descriptors */

@@ -866,7 +866,7 @@ doMaskCr (pic24, w, h, selx, sely, selw, selh)
 	    maxY = edgeY[y];
     }
 
-    tmp = 0.3;	/* ���������դο��ͤ�Ŭ���˷��ꤵ��ޤ���(?)�� */
+    tmp = 0.3;	/* ←↓この辺の数値は適当に決定されました(?)。 */
     for (;;)
     {
 	xp1 = 0; xp2 = 0;
