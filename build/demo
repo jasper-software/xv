@@ -1,0 +1,54 @@
+#! /usr/bin/env bash
+
+panic()
+{
+	echo "ERROR: $*"
+	exit 1
+}
+
+usage()
+{
+	exit 2
+}
+
+program_dir=$(dirname "$0") || exit 1
+top_dir="$program_dir/.."
+build="$program_dir/build"
+
+verbose=0
+build_dir=
+install_dir=
+tmp_dir=
+
+while getopts b:i: opt; do
+	case $opt in
+	b)
+		build_dir="$OPTARG";;
+	i)
+		install_dir="$OPTARG";;
+	\?)
+		usage;;
+	esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "$tmp_dir" ]; then
+	tmp_dir="$top_dir/tmp_cmake"
+fi
+if [ -z "$build_dir" ]; then
+	build_dir="$tmp_dir/build"
+fi
+if [ -z "$install_dir" ]; then
+	install_dir="$tmp_dir/install"
+fi
+
+"$build" -b "$build_dir" -i "$install_dir" || panic "build/install failed"
+
+images_dir="$top_dir/data/images"
+xv="$install_dir/bin/xv"
+
+if [ ! -x "$xv" ]; then
+	panic "xv program not found"
+fi
+
+"$xv" $images_dir/*.*
