@@ -913,8 +913,7 @@ static int brChkEvent(br, xev)
 
   else if (xev->type == ButtonPress) {
     XButtonEvent *e = (XButtonEvent *) xev;
-    //int i,x,y;
-    int x,y;
+    int i,x,y;
     x = e->x;  y = e->y;
 
 #ifdef VS_RESCMAP
@@ -932,8 +931,8 @@ static int brChkEvent(br, xev)
       if      (e->window == br->win)      clickBrow(br,x,y);
       else if (e->window == br->scrl.win) SCTrack(&(br->scrl),x,y);
       else if (e->window == br->iconW) {
-	i = clickIconWin(br, x,y,(unsigned long) e->time,
-			 (e->state&ControlMask) || (e->state&ShiftMask));
+        i = clickIconWin(br, x,y,(unsigned long) e->time,
+          (e->state&ControlMask) || (e->state&ShiftMask));
       }
       else rv = 0;
     }
