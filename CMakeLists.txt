@@ -70,18 +70,27 @@ add_compile_definitions(XV_CMAKE_BUILD)
 
 # Customize the compiler flags for warning messages.
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	#check_c_compiler_flag("-Wno-stringop-truncation"
+	#  XV_GCC_WARN_NO_STRINGOP_TRUNCATION)
 	add_compile_options(-Wall)
 	add_compile_options(-pedantic)
 	add_compile_options(-W)
 	add_compile_options(-Wmissing-prototypes)
 	add_compile_options(-Wstrict-prototypes)
 	add_compile_options(-Wmissing-declarations)
+	add_compile_options(-Wno-sign-compare)
+	add_compile_options(-Wno-format-truncation)
+	#if(XV_GCC_WARN_NO_STRINGOP_TRUNCATION)
+	#	add_compile_options(-Wno-stringop-truncation)
+	#endif()
 	if(XV_STRICT)
 		# Treat all compiler warnings as errors.
 		add_compile_options(-pedantic-errors)
 		add_compile_options(-Werror)
 	endif()
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+	# signed/unsigned mismatch
+	add_compile_options(/wd4018)
 	if(XV_STRICT)
 		# Treat all compiler warnings as errors.
 		add_compile_options(/WX)
