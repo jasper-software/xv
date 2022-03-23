@@ -17,6 +17,9 @@
 #  endif
 #endif
 
+#define XV_CAST(type, expr) ((type)(expr))
+#define XV_UNUSED(variable) ((void)(variable))
+
 /* xv 3.10a:				19941229 */
 /* PNG patch 1.2d:			19960731 */
 /* GRR orig jumbo fixes patch:		20000213 */
