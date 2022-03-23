@@ -222,6 +222,7 @@ static int quick_quant(p24,w,h, p8, rmap,gmap,bmap, nc)
      byte *p24, *p8, *rmap, *gmap, *bmap;
      int   w,h,nc;
 {
+  XV_UNUSED(nc);
   /* called after 'pic8' has been alloced, pWIDE,pHIGH set up, mono/1-bit
      checked already */
 
