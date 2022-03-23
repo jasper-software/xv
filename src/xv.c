@@ -173,7 +173,8 @@ int main(argc, argv)
 #endif
   XColor ecdef;
   Window rootReturn, parentReturn, *children;
-  unsigned int numChildren, rootDEEP;
+  //unsigned int numChildren, rootDEEP;
+  unsigned int numChildren;
 
 #ifdef AUTO_EXPAND
   signal(SIGHUP, SIG_IGN);
@@ -425,7 +426,7 @@ int main(argc, argv)
   maxHIGH   = vrHIGH  = dispHIGH  = DisplayHeight(theDisp,theScreen);
 
 
-  rootDEEP = dispDEEP;
+  //rootDEEP = dispDEEP;
 
   /* things dependent on theVisual:
    *    dispDEEP, theScreen, rootW, ncells, theCmap, theGC,
@@ -2549,8 +2550,14 @@ ms_auto_no:
   if (pinfo.w==0 || pinfo.h==0) {  /* shouldn't happen, but let's be safe */
     SetISTR(ISTR_INFO,"Image size '0x0' not allowed.");
     Warning();
-    if (pinfo.pic)     free(pinfo.pic);      pinfo.pic     = (byte *) NULL;
-    if (pinfo.comment) free(pinfo.comment);  pinfo.comment = (char *) NULL;
+    if (pinfo.pic) {
+      free(pinfo.pic);
+    }
+    pinfo.pic = (byte *) NULL;
+    if (pinfo.comment) {
+      free(pinfo.comment);
+    }
+    pinfo.comment = (char *) NULL;
     goto FAILED;
   }
 
@@ -2598,7 +2605,10 @@ ms_auto_no:
   if (!pinfo.pic) {  /* must've failed in the 8-24 or 24-8 conversion */
     SetISTR(ISTR_INFO,"Couldn't do %s conversion.",
 	    (picType==PIC24) ? "8->24" : "24->8");
-    if (pinfo.comment) free(pinfo.comment);  pinfo.comment = (char *) NULL;
+    if (pinfo.comment) {
+      free(pinfo.comment);
+    }
+    pinfo.comment = (char *) NULL;
     Warning();
     goto FAILED;
   }
