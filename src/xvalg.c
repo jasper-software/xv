@@ -69,6 +69,7 @@ static byte origrmap[256], origgmap[256], origbmap[256];
 void printUTime(str)
      const char *str;
 {
+  XV_UNUSED(str);
 #ifdef TIMING_TEST
   int i;
   struct rusage ru;
@@ -555,7 +556,7 @@ static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
      byte *pic24, *results;
      int   w,h, selx,sely,selw,selh, n;
 {
-
+  XV_UNUSED(h);
   /* convolves with an n*n array, consisting of only 1's.
      Operates on rectangular region 'selx,sely,selw,selh' (in pic coords)
      Region is guaranteed to be completely within pic boundaries
@@ -624,6 +625,7 @@ static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
      byte *pic24, *results;
      int   w,h, selx,sely,selw,selh, n;
 {
+  XV_UNUSED(h);
   byte  *p24;
   int    rv, gv, bv;
   byte  *rp;
@@ -717,6 +719,7 @@ static void doEdgeConvolv(pic24, w, h, results, selx,sely,selw,selh)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh;
 {
+  XV_UNUSED(h);
 
   /* convolves with two edge detection masks (vertical and horizontal)
      simultaneously, taking Max(abs(results))
@@ -812,6 +815,7 @@ static void doAngleConvolv(pic24, w, h, results, selx,sely,selw,selh)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh;
 {
+  XV_UNUSED(h);
 
   /* convolves with edge detection mask, at 45 degrees to horizontal.
 
@@ -897,6 +901,7 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh, n;
 {
+  XV_UNUSED(h);
 
   /* does an 'oil transfer', as described in the book "Beyond Photography",
      by Holzmann, chapter 4, photo 7.  It is a sort of localized smearing.
@@ -984,6 +989,7 @@ static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh;
 {
+  XV_UNUSED(h);
   /* 'blends' a rectangular region out of existence.  computes the average
      color of all the pixels on the edge of the rect, stores this in the
      center, and for each pixel in the rect, replaces it with a weighted
@@ -1319,6 +1325,7 @@ static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh, pixX,pixY;
 {
+  XV_UNUSED(h);
   /* runs 'pixelization' algorithm.  replaces each pixX-by-pixY region
      (smaller on edges) with the average color within that region */
 
@@ -1384,6 +1391,8 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
      byte *pic24, *results;
      int   w, h, selx,sely,selw,selh, pixX,pixY;
 {
+  XV_UNUSED(h);
+  XV_UNUSED(pic24);
   /* runs 'spread' algorithm.  For each pixel in the image, swaps it with
      a random pixel near it.  Distances of random pixels are controlled
      by pixX,pixY.  If pixX<0, it is treated as a single 'distance' value
@@ -1414,7 +1423,7 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 
 	minx = x - d;	if (minx < selx)       minx = selx;
 	maxx = x + d;	if (maxx >= selx+selw) maxx = selx+selw-1;
-	x1 = minx + abs(random()) % ((maxx - minx) + 1);
+	x1 = minx + labs(random()) % ((maxx - minx) + 1);
 
 	miny = y - d;	if (miny < sely)       miny = sely;
 	maxy = y + d;	if (maxy >= sely+selh) maxy = sely+selh-1;
@@ -1423,7 +1432,7 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 	if (y - miny > rdist) miny = (y-rdist);
 	if (maxy - y > rdist) maxy = (y+rdist);
 
-	y1 = miny + abs(random()) % ((maxy - miny) + 1);
+	y1 = miny + labs(random()) % ((maxy - miny) + 1);
       }
 
       else {
@@ -1431,11 +1440,11 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 
 	minx = x - pixX;  if (minx < selx)       minx = selx;
 	maxx = x + pixX;  if (maxx >= selx+selw) maxx = selx+selw-1;
-	x1 = minx + abs(random()) % ((maxx - minx) + 1);
+	x1 = minx + labs(random()) % ((maxx - minx) + 1);
 
 	miny = y - pixY;  if (miny < sely)       miny = sely;
 	maxy = y + pixY;  if (maxy >= sely+selh) maxy = sely+selh-1;
-	y1 = miny + abs(random()) % ((maxy - miny) + 1);
+	y1 = miny + labs(random()) % ((maxy - miny) + 1);
       }
 
       if (PTINRECT(x1,y1, selx,sely,selw,selh)) {  /* should always be true */
@@ -1456,13 +1465,14 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
      byte *pic24, *results;
      int   w,h, selx,sely,selw,selh, n;
 {
+  XV_UNUSED(h);
   /* runs the median filter algorithm
      Operates on rectangular region 'selx,sely,selw,selh' (in pic coords)
      Region is guaranteed to be completely within pic boundaries
      'n' must be odd */
 
-  register byte *p24;
-  register int   rsum,gsum,bsum;
+  byte *p24;
+  //int   rsum,gsum,bsum;
   byte          *rp;
   int            x,y,x1,y1,count,n2,nsq,c2;
   int           *rtab, *gtab, *btab;
@@ -1485,7 +1495,8 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
 
     for (x=selx; x<selx+selw; x++) {
 
-      rsum = gsum = bsum = 0;  count = 0;
+      //rsum = gsum = bsum = 0;
+      count = 0;
 
       for (y1=y-n2; y1<=y+n2; y1++) {
 
