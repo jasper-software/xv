@@ -854,9 +854,9 @@ static int brChkEvent(br, xev)
 #endif
 
   if (xev->type == Expose) {
-    int x,y,w,h;
+    //int x,y,w,h;
     XExposeEvent *e = (XExposeEvent *) xev;
-    x = e->x;  y = e->y;  w = e->width;  h = e->height;
+    //x = e->x;  y = e->y;  w = e->width;  h = e->height;
 
     /* throw away excess redraws for 'dumb' windows */
     if (e->count > 0 && (e->window == br->scrl.win))
@@ -913,7 +913,8 @@ static int brChkEvent(br, xev)
 
   else if (xev->type == ButtonPress) {
     XButtonEvent *e = (XButtonEvent *) xev;
-    int i,x,y;
+    //int i,x,y;
+    int x,y;
     x = e->x;  y = e->y;
 
 #ifdef VS_RESCMAP
@@ -1494,7 +1495,8 @@ static void setSelInfoStr(br, sel)
 	else if (bf->ftype != BF_DIR) {     /* no info.  display file size */
 	  struct stat st;
 
-	  sprintf(buf, "%s%s", br->path, bf->name);  /* build filename */
+      /* build filename */
+	  snprintf(buf, sizeof(buf), "%s%s", br->path, bf->name);
 #ifdef AUTO_EXPAND
 	  Dirtovd(buf);
 #endif
@@ -1551,6 +1553,7 @@ static void drawIconWin(delta, sptr)
      int delta;
      SCRL *sptr;
 {
+  XV_UNUSED(delta);
   int   i,indx, num;
   BROWINFO *br;
 
@@ -1836,10 +1839,7 @@ static void clickBrow(br, x,y)
 }
 
 /***************************************************************/
-static int updateSel(br, sel, multi, mtime)
-  BROWINFO *br;
-  int sel, multi;
-  unsigned long mtime;
+static int updateSel(BROWINFO *br, int sel, int multi, unsigned long mtime)
 {
   int i;
   BFIL *bf;
@@ -1952,7 +1952,8 @@ static int clickIconWin(br, mx, my, mtime, multi)
     int          x, y, rootx, rooty, iwx, iwy, bwx, bwy;
     unsigned int mask;
     Cursor       curs;
-    int          samepos, oldx, oldy, oldbrnum, destic, origsval, first;
+    //int          samepos, oldx, oldy, oldbrnum, destic, origsval, first;
+    int          oldx, oldy, oldbrnum, destic, origsval, first;
     int          hasrect, rx, ry, rw, rh;
 
     rx = ry = rw = rh = 0;
@@ -1973,10 +1974,12 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	else curs = movecurs;
 
 	/* change cursors */
-	for (i=0; i<MAXBRWIN; i++)
+	for (i=0; i<MAXBRWIN; i++) {
 	  XDefineCursor(theDisp,binfo[i].iconW, curs);
+    }
 
-	samepos = oldx = oldy = oldbrnum = 0;
+	//samepos = oldx = oldy = oldbrnum = 0;
+	oldx = oldy = oldbrnum = 0;
 
 	while (1) {  /* wait for button 1 to be released */
 	  while (!XQueryPointer(theDisp,rootW,&rW,&win,&rootx,&rooty,
@@ -2046,7 +2049,8 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	       a rect drag */
 
 	    if (sel>=0 && (oldx!=x || oldy!=y || oldbrnum!=i)) {  /* moved */
-	      samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i;
+	      //samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i;
+	      oldx = x;  oldy = y;  oldbrnum = i;
 	    }
 	    else {
 	      int scamt = 0;
@@ -2360,10 +2364,13 @@ static void doubleClick(br, sel)
   /* double-clicked something.  We should do something about it */
   if (br->bfList[sel].ftype == BF_DIR) {  /* try to cd */
 #ifndef VMS
-    sprintf(buf, "%s%s", br->path, br->bfList[sel].name);
+    snprintf(buf, sizeof(buf), "%s%s", br->path, br->bfList[sel].name);
 #else
-    if (strcmp(br->bfList[sel].name,"..")==0) sprintf(buf,"[-]");
-    else sprintf(buf, "%s%s", br->path, br->bfList[sel].name);
+    if (strcmp(br->bfList[sel].name,"..")==0) {
+      sprintf(buf,"[-]");
+    } else {
+      snprintf(buf, sizeof(buf), "%s%s", br->path, br->bfList[sel].name);
+    }
 #endif
 
 #ifdef AUTO_EXPAND
@@ -2402,7 +2409,7 @@ static void doubleClick(br, sel)
   else {  /* not a directory.  Try to open it as a file */
     int j;
 
-    sprintf(buf, "%s%s", br->path, br->bfList[sel].name);
+    snprintf(buf, sizeof(buf), "%s%s", br->path, br->bfList[sel].name);
 
     /* if name is already in namelist, make it the current selection */
     for (j=0;  j<numnames && strcmp(namelist[j],buf);  j++);
@@ -2592,7 +2599,7 @@ static void keyIconWin(br, kevt)
 	  }
 
 	  /* try to open this file */
-	  sprintf(foo, "%s%s", br->path, br->bfList[i].name);
+	  snprintf(foo, sizeof(buf), "%s%s", br->path, br->bfList[i].name);
 #ifdef AUTO_EXPAND
 	Dirtovd(foo);
 #endif
@@ -2610,7 +2617,7 @@ static void keyIconWin(br, kevt)
 
       else {          /* not SPACE, or SPACE and lit=1 and not shift */
 	for (i=0; i<br->bfLen && !br->bfList[i].lit; i++);  /* find lit one */
-	sprintf(fname, "%s%s", br->path, br->bfList[i].name);
+	snprintf(fname, sizeof(fname), "%s%s", br->path, br->bfList[i].name);
 #ifdef AUTO_EXPAND
 	Dirtovd(fname);
 #endif
@@ -2827,7 +2834,7 @@ static void changedBrDirMB(br, sel)
     if (chdir(tmppath)) {
 #endif
       char str[512];
-      sprintf(str,"Unable to cd to '%s'\n", tmppath);
+      snprintf(str, sizeof(str), "Unable to cd to '%s'\n", tmppath);
       MBRedraw(&(br->dirMB));
       setBrowStr(br,str);
       XBell(theDisp, 50);
@@ -2877,7 +2884,7 @@ static int cdBrow(br)
 #endif
   if (rv) {
     char str[512];
-    sprintf(str, "Unable to cd to '%s'\n", br->path);
+    snprintf(str, sizeof(str), "Unable to cd to '%s'\n", br->path);
     setBrowStr(br, str);
     XBell(theDisp, 50);
   }
@@ -3738,12 +3745,13 @@ static void genIcon(br, bf)
   int     iwide, ihigh;
   byte   *icon24, *icon8;
   char    str[256], str1[256], readname[128], uncompname[128];
-  char    basefname[128], *uncName;
+  //char    basefname[128], *uncName;
+  char    *uncName;
 
 
   if (!bf || !bf->name || bf->name[0] == '\0') return;   /* shouldn't happen */
   str[0] = '\0';
-  basefname[0] = '\0';
+  //basefname[0] = '\0';
   pinfo.pic = (byte *) NULL;
   pinfo.comment = (char *) NULL;
   strncpy(readname, bf->name, sizeof(readname) - 1);
@@ -3837,7 +3845,10 @@ ms_auto_no:
 #endif /* HAVE_MGCSFX_AUTO */
 
   /* get rid of comments.  don't need 'em */
-  if (pinfo.comment) free(pinfo.comment);  pinfo.comment = (char *) NULL;
+  if (pinfo.comment) {
+    free(pinfo.comment);
+  }
+  pinfo.comment = (char *) NULL;
 
   if (filetype == RFT_ERROR) {
     sprintf(str,"Couldn't open file '%s'", bf->name);
@@ -3996,7 +4007,7 @@ ms_auto_no:
    }
 
 
-  sprintf(str1, "%s:  %s", bf->name, str);
+  snprintf(str1, sizeof(str1), "%s:  %s", bf->name, str);
   setBrowStr(br, str1);
 
   /* dither 24-bit icon into 8-bit icon (using 3/3/2 cmap) */
@@ -4076,7 +4087,7 @@ static void loadThumbFile(br, bf)
 
   info = NULL;  icon8 = NULL;  builtin = 0;
 
-  sprintf(thFname, "%s%s/%s", br->path, THUMBDIR, bf->name);
+  snprintf(thFname, sizeof(thFname), "%s%s/%s", br->path, THUMBDIR, bf->name);
 
 #ifdef AUTO_EXPAND
   Dirtovd(thFname);
@@ -4188,14 +4199,14 @@ static void writeThumbFile(br, bf, icon8, w, h, info)
 
 
   /* stat the original file, get permissions for thumbfile */
-  sprintf(thFname, "%s%s", br->path, bf->name);
+  snprintf(thFname, sizeof(thFname), "%s%s", br->path, bf->name);
   i = stat(thFname, &st);
   if (!i) perm = st.st_mode & 07777;
      else perm = 0755;
 
 
 
-  sprintf(thFname, "%s%s/%s", br->path, THUMBDIR, bf->name);
+  snprintf(thFname, sizeof(thFname), "%s%s/%s", br->path, THUMBDIR, bf->name);
 
 #ifdef AUTO_EXPAND
   Dirtovd(thFname);
@@ -4204,7 +4215,7 @@ static void writeThumbFile(br, bf, icon8, w, h, info)
   unlink(thFname);  /* just in case there's already an unwritable one */
   fp = fopen(thFname, "w");
   if (!fp) {
-    sprintf(buf, "Can't create thumbnail file '%s':  %s", thFname,
+    snprintf(buf, sizeof(buf), "Can't create thumbnail file '%s':  %s", thFname,
 	    ERRSTR(errno));
     setBrowStr(br, buf);
     return;            /* can't write... */
@@ -4241,7 +4252,7 @@ static void writeThumbFile(br, bf, icon8, w, h, info)
   if (ferror(fp)) {  /* error occurred */
     fclose(fp);
     unlink(thFname);  /* delete it */
-    sprintf(buf, "Can't write thumbnail file '%s':  %s", thFname,
+    snprintf(buf, sizeof(buf), "Can't write thumbnail file '%s':  %s", thFname,
 	    ERRSTR(errno));
     setBrowStr(br, buf);
     return;            /* can't write... */
@@ -4264,7 +4275,7 @@ static void makeThumbDir(br)
   /* stat the THUMBDIR directory:  if it doesn't exist, and we are not
      already in a THUMBDIR, create it */
 
-  sprintf(thFname, "%s%s", br->path, THUMBDIRNAME);
+  snprintf(thFname, sizeof(thFname), "%s%s", br->path, THUMBDIRNAME);
 
 #ifdef AUTO_EXPAND
   Dirtovd(thFname);
@@ -4272,7 +4283,7 @@ static void makeThumbDir(br)
 
   i = stat(thFname, &st);
   if (i) {                      /* failed, let's create it */
-    sprintf(thFname, "%s.", br->path);
+    snprintf(thFname, sizeof(thFname), "%s.", br->path);
 #ifdef AUTO_EXPAND
     Dirtovd(thFname);
 #endif
@@ -4280,7 +4291,7 @@ static void makeThumbDir(br)
     if (!i) perm = st.st_mode & 07777;
        else perm = 0755;
 
-    sprintf(thFname, "%s%s", br->path, THUMBDIRNAME);
+    snprintf(thFname, sizeof(thFname), "%s%s", br->path, THUMBDIRNAME);
 #ifdef AUTO_EXPAND
     Dirtovd(thFname);
 #endif
@@ -4396,7 +4407,7 @@ static void updateIcons(br)
       struct stat filest, thumbst;
 
       /* stat this directory entry to make sure it's a plain file */
-      sprintf(thfname, "%s/%s", THUMBDIR, dp->d_name);
+      snprintf(thfname, sizeof(thfname), "%s/%s", THUMBDIR, dp->d_name);
       if (stat(thfname, &thumbst)==0) {  /* success */
 	int tmp;
 #ifdef AUTO_EXPAND
@@ -4644,7 +4655,7 @@ static void doChdirCmd(br)
 
 #ifndef VMS
   if (Globify(buf)) {		/* do ~ expansion if necessary */
-    sprintf(str,"Unable to expand '%s' (unknown uid)\n", buf);
+    snprintf(str, sizeof(str), "Unable to expand '%s' (unknown uid)\n", buf);
     setBrowStr(br, str);
     XBell(theDisp, 50);
     return;
@@ -4660,7 +4671,7 @@ static void doChdirCmd(br)
 #else
   if (chdir(buf)) {
 #endif
-    sprintf(str,"Unable to cd to '%s'\n", buf);
+    snprintf(str, sizeof(str), "Unable to cd to '%s'\n", buf);
     setBrowStr(br, str);
     XBell(theDisp, 50);
   }
@@ -4951,7 +4962,7 @@ static void recurseUpdate(br, subdir)
   if (chdir(curDir)) {
 #endif
     char str[512];
-    sprintf(str, "Unable to cd to '%s'\n", curDir);
+    snprintf(str, sizeof(str), "Unable to cd to '%s'\n", curDir);
     setBrowStr(br, str);
     return;
   }
@@ -5055,7 +5066,7 @@ static void rm_file(br, name)
   if (!tmp) strcpy(buf1,".");
   else *tmp = '\0';
 
-  sprintf(buf, "%s/%s/%s", buf1, THUMBDIR, BaseName(name));
+  snprintf(buf, sizeof(buf), "%s/%s/%s", buf1, THUMBDIR, BaseName(name));
   if (DEBUG) fprintf(stderr,"   (%s)\n", buf);
 
   unlink(buf);
@@ -5167,7 +5178,7 @@ static void rm_dir1(br)
 
   i = rmdir(rmdirPath);
   if (i < 0) {
-    sprintf(buf, "rm %s: %s", rmdirPath, ERRSTR(errno));
+    snprintf(buf, sizeof(buf), "rm %s: %s", rmdirPath, ERRSTR(errno));
     setBrowStr(br, buf);
   }
 }
@@ -5240,8 +5251,10 @@ static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
   Dirtovd(src);
 #endif
   if (stat(src, &st)==0) {
-    sprintf(dst,"%s%s", dstp, THUMBDIR);
-    mkdir(dst, st.st_mode & 07777);
+    int result = snprintf(dst, sizeof(dst), "%s%s", dstp, THUMBDIR);
+    if (result < sizeof(dst)) {
+      mkdir(dst, st.st_mode & 07777);
+    }
     dothumbs = 1;
   }
 
@@ -5278,8 +5291,8 @@ static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
 #endif
 
     if (dothumbs && j==0) {
-      sprintf(src,"%s%s/%s", srcpath, THUMBDIR, names[i]);
-      sprintf(dst,"%s%s/%s", dstp,    THUMBDIR, names[i]);
+      snprintf(src, sizeof(src), "%s%s/%s", srcpath, THUMBDIR, names[i]);
+      snprintf(dst, sizeof(dst), "%s%s/%s", dstp,    THUMBDIR, names[i]);
 
       /* delete destination thumbfile to avoid 'overwrite' warnings */
       unlink(dst);
@@ -5303,13 +5316,13 @@ static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
   /* update directory window (load/save) */
   sprintf(src, "%sbozo", srcpath);
   DIRDeletedFile(src);
-  sprintf(src, "%sbozo", dstp);
+  snprintf(src, sizeof(src), "%sbozo", dstp);
   DIRCreatedFile(src);
 
   if (dothumbs) {
-    sprintf(src, "%s%s/bozo", srcpath, THUMBDIR);
+    snprintf(src, sizeof(src), "%s%s/bozo", srcpath, THUMBDIR);
     DIRDeletedFile(src);
-    sprintf(src, "%s%s/bozo", dstp, THUMBDIR);
+    snprintf(src, sizeof(src), "%s%s/bozo", dstp, THUMBDIR);
     DIRCreatedFile(src);
   }
 
@@ -5368,8 +5381,7 @@ static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
   SetCursors(-1);
 }
 
-static int recursive_remove(dir)
-     char *dir;
+static int recursive_remove(char *dir)
 {
   DIR *dp = NULL;
   struct dirent *di;
