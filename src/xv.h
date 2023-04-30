@@ -1468,12 +1468,6 @@ WHERE Window        pngW;
 WHERE int           pngUp;        /* is pngW mapped, or what? */
 #endif
 
-#ifdef HAVE_WEBP
-/* stuff used for 'webp' box */
-WHERE Window        webpW;
-WHERE int           webpUp;        /* is pngW mapped, or what? */
-#endif
-
 #ifdef ENABLE_FIXPIX_SMOOTH
 WHERE int           do_fixpix_smooth;  /* GRR 19980607: runtime FS dithering */
 #endif
