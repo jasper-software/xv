@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 3.12)
 # The major, minor, and micro version numbers of the project.
 set(XV_VERSION_MAJOR 4)
 set(XV_VERSION_MINOR 0)
-set(XV_VERSION_PATCH 0)
-set(XV_VERSION_DATE "20220216")
+set(XV_VERSION_PATCH 1)
+set(XV_VERSION_DATE "20230429")
 
 # Generate the project version.
 set(XV_VERSION "${XV_VERSION_MAJOR}.${XV_VERSION_MINOR}.${XV_VERSION_PATCH}")
@@ -27,6 +27,7 @@ option(XV_ENABLE_JP2K "Enable JP2K Support" ON)
 option(XV_ENABLE_PDS  "Enable PDF Support" ON)
 option(XV_ENABLE_PNG  "Enable PNG Support" ON)
 option(XV_ENABLE_TIFF "Enable TIFF Support" ON)
+option(XV_ENABLE_WEBP "Enable WEBP Support" ON)
 
 option(XV_STRICT "Treat compiler warnings as errors" OFF)
 
@@ -191,10 +192,17 @@ if(XV_ENABLE_TIFF AND NOT TARGET TIFF::TIFF)
 	set(XV_ENABLE_TIFF OFF)
 endif()
 
+find_package(WebP)
+if(XV_ENABLE_WEBP AND NOT TARGET WebP::libwebp)
+    message(WARNING "Disabling WEBP Support.")
+    set(XV_ENABLE_WEBP OFF)
+endif()
+
 message("JP2K: ${XV_ENABLE_JP2K}")
 message("JPEG: ${XV_ENABLE_JPEG}")
 message("TIFF: ${XV_ENABLE_TIFF}")
 message("PNG: ${XV_ENABLE_PNG}")
+message("WEBP: ${XV_ENABLE_WEBP}")
 
 ################################################################################
 # Subdirectories.

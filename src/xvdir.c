@@ -83,6 +83,9 @@ static const char *saveFormats[] = {
 					"PM",
 					"Spectrum SCREEN$",	/* [JCE] */
 					"WBMP",
+#ifdef HAVE_WEBP
+                    "WEBP",
+#endif
 #ifdef HAVE_MAG
 					"MAG",
 #endif
@@ -1277,6 +1280,13 @@ int DoSave()
   rv = 0;
 
   switch (fmt) {
+
+#ifdef HAVE_WEBP
+  case F_WEBP:
+    rv = WriteWEBP  (fp, thepic, ptype, w, h, rp,gp,bp, nc,col);
+    break;
+#endif
+
   case F_GIF:
     rv = WriteGIF   (fp, thepic, ptype, w, h, rp,gp,bp, nc,col,picComments);
     break;
@@ -1586,6 +1596,9 @@ static void changeSuffix()
 #ifdef HAVE_PNG
       (strcmp(lowsuf,"png" )==0) ||
 #endif
+#ifdef HAVE_WEBP
+      (strcmp(lowsuf,"webp" )==0) ||
+#endif
       (strcmp(lowsuf,"wbmp")==0) ||
       (strcmp(lowsuf,"xpm" )==0) ||
       (strcmp(lowsuf,"tiff")==0) ||
@@ -1639,6 +1652,10 @@ static void changeSuffix()
 
 #ifdef HAVE_PNG
     case F_PNG:      strcpy(lowsuf,"png");  break;
+#endif
+
+#ifdef HAVE_WEBP
+    case F_WEBP:     strcpy(lowsuf,"webp");  break;
 #endif
 
 #ifdef HAVE_MAG
