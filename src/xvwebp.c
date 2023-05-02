@@ -95,8 +95,9 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
      byte *rmap, *gmap, *bmap;
      int   numcols, colorstyle;
 {
-  uint8_t*  webp_in;
-  uint8_t*  webp_out;
+  uint8_t*  webp_in = NULL;
+  uint8_t*  webp_out = NULL;
+  byte      mono_byte = 0;
   int       free_me = 0; /* if 1, we need to free webp_in */
   int       linesize = w*3;
   int       i = 0;
@@ -105,23 +106,41 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   /*
    * First, we have to prepare our data in such a fashion that we can
    * write it out.  webp only supports 24 or 32 bit formats, so any
-   * other formats will have to be massaged into 24/32 bit
+   * other formats will have to be massaged into 24/32 bit.
    *
-   * Greyscale and fullcolor / reduced color PIC24 are handled the same,
-   * only the 8bit variants matter.
+   * Greyscale is a bit of a pill.  WEBP doesn't have a 'greyscale' format
+   * that just uses intensities, so we'll have to make our own.
    */
   if (ptype == PIC24) {
-    /* nothing to do, we're already good to go */
-    webp_in = (uint8_t*)pic;
+    if (colorstyle == F_GREYSCALE) {
+        // Convert the pic to greyscale
+        webp_in = (uint8_t*)malloc(linesize*h);
+        free_me = 1;
+
+        for (i = 0; i < linesize*h; i+=3) {
+          mono_byte = MONO(pic[i], pic[i+1], pic[i+2]);
+
+          webp_in[i] = webp_in[i+1] = webp_in[i+2] = mono_byte;
+        }
+    } else {
+      /* nothing to do, we're already good to go */
+      webp_in = (uint8_t*)pic;
+    }
   } else {
-    /* PIC8 shouldn't matter for GREYSCALE vs. FULLCOLOR vs. REDUCED */
     webp_in = (uint8_t*)malloc(linesize*h);
     free_me = 1;
 
     for (i = 0; i < (w*h); i++) {
-      webp_in[i*3] = rmap[pic[i]];
-      webp_in[(i*3)+1] = gmap[pic[i]];
-      webp_in[(i*3)+2] = bmap[pic[i]];
+      if (colorstyle == F_GREYSCALE) {
+        mono_byte = MONO(rmap[pic[i]], gmap[pic[i]], bmap[pic[i]]);
+        webp_in[i*3] = mono_byte;
+        webp_in[(i*3)+1] = mono_byte;
+        webp_in[(i*3)+2] = mono_byte;
+      } else {
+        webp_in[i*3] = rmap[pic[i]];
+        webp_in[(i*3)+1] = gmap[pic[i]];
+        webp_in[(i*3)+2] = bmap[pic[i]];
+      }
     }
   }
 
@@ -133,6 +152,7 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
       free(webp_in);
     }
 
+    /* I'm not sure if this is necessary */
     if (webp_out) {
       WebPFree(webp_out);
     }
