@@ -5,7 +5,7 @@
  *
  *    WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
  *    VersionInfoWEBP()
- *    LoadWebP(fname, pinfo)
+ *    LoadWEBP(fname, pinfo)
  *
  * Uses Google's WebP library
  *
@@ -209,7 +209,7 @@ VersionInfoWEBP()
  * Returns 1 on success, 0 on failure
  *
  */
-int LoadWebP(fname, pinfo)
+int LoadWEBP(fname, pinfo)
      char    *fname;
      PICINFO *pinfo;
 {
@@ -237,7 +237,7 @@ int LoadWebP(fname, pinfo)
   raw_data = (uint8_t*)malloc(filesize);
 
   if (!raw_data) {
-    FatalError("malloc failure in LoadWebP");
+    FatalError("malloc failure in LoadWEBP");
     fclose(fp);
     return 0;
   }
@@ -342,7 +342,7 @@ int LoadWebP(fname, pinfo)
 
   if (!pinfo->pic) {
     free(raw_data);
-    FatalError("malloc failure in LoadWebP");
+    FatalError("malloc failure in LoadWEBP");
     return 0;
   }
 

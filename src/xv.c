@@ -3298,7 +3298,7 @@ int ReadPicFile(fname, ftype, pinfo, quick)
 #endif
 
 #ifdef HAVE_WEBP
-  case RFT_WEBP:     rv = LoadWebP (fname, pinfo);       break;
+  case RFT_WEBP:     rv = LoadWEBP (fname, pinfo);       break;
 #endif
 
 #ifdef HAVE_PDS
