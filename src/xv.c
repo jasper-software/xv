@@ -1886,6 +1886,10 @@ static void cmdSyntax()
 #ifdef HAVE_PNG
   VersionInfoPNG();
 #endif
+#ifdef HAVE_WEBP
+  VersionInfoWEBP();
+#endif
+  
   /* pbm/pgm/ppm support is native, not via pbmplus/netpbm libraries */
   fprintf(stderr, "\n");
 
@@ -3149,6 +3153,13 @@ int ReadFileType(fname)
            magicno[2]=='N'  && magicno[3]=='G')               rv = RFT_PNG;
 #endif
 
+#ifdef HAVE_WEBP
+  else if (magicno[0]=='R'  && magicno[1]=='I' &&
+           magicno[2]=='F'  && magicno[3]=='F' &&
+           magicno[8]=='W'  && magicno[9]=='E' &&
+           magicno[10]=='B' && magicno[11]=='P')               rv = RFT_WEBP;
+#endif
+
 #ifdef HAVE_PDS
   else if (strncmp((char *) magicno,  "NJPL1I00", (size_t) 8)==0 ||
 	   strncmp((char *) magicno+2,"NJPL1I",   (size_t) 6)==0 ||
@@ -3284,6 +3295,10 @@ int ReadPicFile(fname, ftype, pinfo, quick)
 
 #ifdef HAVE_PNG
   case RFT_PNG:     rv = LoadPNG   (fname, pinfo);         break;
+#endif
+
+#ifdef HAVE_WEBP
+  case RFT_WEBP:     rv = LoadWebP (fname, pinfo);       break;
 #endif
 
 #ifdef HAVE_PDS

@@ -465,6 +465,9 @@
 #  define HAVE_G3
 #endif
 
+#ifdef DOWEBP
+#  define HAVE_WEBP
+#endif
 
 #define PROGNAME   "xv"            /* used in resource database */
 
@@ -640,6 +643,12 @@
 #  define F_MGCSFXINC  0
 #endif
 
+#ifdef HAVE_WEBP
+#  define F_WEBPINC  1
+#else
+#  define F_WEBPINC  0
+#endif
+
 #ifdef MACBINARY
 #  define MACBSIZE 128
 #endif
@@ -665,7 +674,8 @@
 #define F_PM        (11 + F_TIFF)
 #define F_ZX        (12 + F_TIFF)   /* [JCE] */
 #define F_WBMP      (13 + F_TIFF)
-#define JP_EXT_F    (F_WBMP)
+#define F_WEBP      (F_WEBPINC + F_WBMP)
+#define JP_EXT_F    (F_WEBP)
 #define F_MAG       (JP_EXT_F + F_MAGINC)
 #define F_PIC       (JP_EXT_F + F_MAGINC + F_PICINC)
 #define F_MAKI      (JP_EXT_F + F_MAGINC + F_PICINC + F_MAKINC)
@@ -714,7 +724,8 @@
 #define RFT_JPC      26
 #define RFT_JP2      27
 #define RFT_G3       28
-#define JP_EXT_RFT   (RFT_G3)
+#define RFT_WEBP     29
+#define JP_EXT_RFT   (RFT_WEBP)
 #define RFT_MAG      (JP_EXT_RFT + 1)
 #define RFT_MAKI     (JP_EXT_RFT + 2)
 #define RFT_PIC      (JP_EXT_RFT + 3)
@@ -1457,7 +1468,6 @@ WHERE Window        pngW;
 WHERE int           pngUp;        /* is pngW mapped, or what? */
 #endif
 
-
 #ifdef ENABLE_FIXPIX_SMOOTH
 WHERE int           do_fixpix_smooth;  /* GRR 19980607: runtime FS dithering */
 #endif
@@ -2177,6 +2187,14 @@ void  VersionInfoTIFF      PARM((void));		/* GRR 19980605 */
 int LoadWBMP               PARM((char *, PICINFO *));
 int WriteWBMP              PARM((FILE *, byte *, int, int, int, byte *,
 				 byte *, byte *, int, int));
+
+/**************************** XVWEBP.C ***************************/
+int  LoadWEBP              PARM((char *, PICINFO *));
+int WriteWEBP              PARM((FILE *, byte *, int, int, int, byte *,
+				                 byte *, byte *, int, int));
+
+void VersionInfoWEBP       PARM((void));
+
 
 /**************************** XVXBM.C ***************************/
 int LoadXBM                PARM((char *, PICINFO *));

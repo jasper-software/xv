@@ -22,6 +22,11 @@ if(XV_ENABLE_PNG)
 	set(xv_libs ${xv_libs} PNG::PNG)
 endif()
 
+if(XV_ENABLE_WEBP)
+    add_compile_definitions(DOWEBP)
+    set(xv_libs ${xv_libs} WebP::libwebp)
+endif()
+
 if(XV_ENABLE_JPEG)
 	add_compile_definitions(DOJPEG)
 	set(xv_libs ${xv_libs} JPEG::JPEG)
@@ -95,6 +100,7 @@ set(xv_sources
 	xvtiffwr.c
 	xvvd.c
 	xvwbmp.c
+    xvwebp.c
 	xvxbm.c
 	xvxpm.c
 	xvxwd.c
