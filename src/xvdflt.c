@@ -13,8 +13,6 @@
 #include "bits/logo_out"
 #include "bits/xv_jhb"
 #include "bits/xv_cpyrt"
-#include "bits/xv_rev"
-#include "bits/xv_ver"
 #include "bits/xf_left"
 /* #include "bits/xf_right"	not used */
 #include "bits/font5x9.h"
@@ -105,22 +103,13 @@ void LoadDfltPic(pinfo)
   xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2,   203, 250);
 
-  i = xv_ver_width + xv_rev_width + 30;
-
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
-       dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2+1, 220+1,252);
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
-       dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2+1, 220+1,252);
-
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
-	   dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2, 220, 250);
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
-	   dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2, 220, 250);
+  strncpy(str, XV_REVDATE, sizeof(str));
+  DrawStr2Pic(str, DWIDE/2+1, 223+1, dfltpic, DWIDE, DHIGH, 252);
+  DrawStr2Pic(str, DWIDE/2, 223, dfltpic, DWIDE, DHIGH, 250);
 
   strcpy(str,"Press <right> mouse button for menu.");
   DrawStr2Pic(str, DWIDE/2+1, 241+1, dfltpic, DWIDE, DHIGH, 252);
   DrawStr2Pic(str, DWIDE/2, 241, dfltpic, DWIDE, DHIGH, 250);
-
 
 #ifdef REGSTR
   strcpy(str,REGSTR);
@@ -200,13 +189,9 @@ static void loadOldDfltPic(pinfo)
   xbm2pic((byte *) xv_cpyrt_bits, xv_cpyrt_width, xv_cpyrt_height,
 	   dfltpic, DWIDE, DHIGH, DWIDE/2, 203, 102);
 
-  i = xv_ver_width + xv_rev_width + 30;
-
-  xbm2pic((byte *) xv_ver_bits, xv_ver_width, xv_ver_height,
-	   dfltpic, DWIDE, DHIGH, DWIDE/2 - (i/2) + xv_ver_width/2, 220, 102);
-
-  xbm2pic((byte *) xv_rev_bits, xv_rev_width, xv_rev_height,
-	   dfltpic, DWIDE, DHIGH, DWIDE/2 + (i/2) - xv_rev_width/2, 220, 102);
+  strncpy(str, XV_REVDATE, sizeof(str));
+  DrawStr2Pic(str, DWIDE/2+1, 223+1, dfltpic, DWIDE, DHIGH, 252);
+  DrawStr2Pic(str, DWIDE/2, 223, dfltpic, DWIDE, DHIGH, 250);
 
   strcpy(str,"Press <right> mouse button for menu.");
   DrawStr2Pic(str, DWIDE/2, 241, dfltpic, DWIDE, DHIGH, 102);
