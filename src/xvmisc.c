@@ -766,10 +766,6 @@ static void set_cursors(mainc, otherc)
   if (pngW)  XDefineCursor(theDisp, pngW, otherc);
 #endif
 
-#ifdef HAVE_PNG
-  if (pngW)  XDefineCursor(theDisp, pngW, otherc);
-#endif
-
 #ifdef HAVE_PCD
   if (pcdW)  XDefineCursor(theDisp, pcdW, otherc);
 #endif
