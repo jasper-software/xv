@@ -44,9 +44,9 @@
 static int   copyTiff    PARM((TIFF *, char *));
 static int   cpStrips    PARM((TIFF *, TIFF *));
 static int   cpTiles     PARM((TIFF *, TIFF *));
-static byte *loadPalette PARM((TIFF *, uint32, uint32, int, int, PICINFO *));
-static byte *loadColor   PARM((TIFF *, uint32, uint32, int, int, PICINFO *));
-static int   loadImage   PARM((TIFF *, uint32, uint32, byte *, int));
+static byte *loadPalette PARM((TIFF *, uint32_t, uint32_t, int, int, PICINFO *));
+static byte *loadColor   PARM((TIFF *, uint32_t, uint32_t, int, int, PICINFO *));
+static int   loadImage   PARM((TIFF *, uint32_t, uint32_t, byte *, int));
 static void  _TIFFerr    PARM((const char *, const char *, va_list));
 static void  _TIFFwarn   PARM((const char *, const char *, va_list));
 
@@ -67,7 +67,7 @@ int LoadTIFF(fname, pinfo, quick)
   /* returns '1' on success, '0' on failure */
 
   TIFF  *tif;
-  uint32 w, h;
+  uint32_t w, h;
   float  xres, yres;
   short	 bps, spp, photo, orient;
   FILE  *fp;
@@ -285,11 +285,11 @@ static int copyTiff(in, fname)
 
   TIFF   *out;
   short   bitspersample, samplesperpixel, shortv, *shortav;
-  uint32  w, l;
+  uint32_t  w, l;
   float   floatv, *floatav;
   char   *stringv;
-  uint32  longv;
-  uint16 *red, *green, *blue, shortv2;
+  uint32_t  longv;
+  uint16_t *red, *green, *blue, shortv2;
   int     rv;
 
   out = TIFFOpen(fname, "w");
@@ -364,7 +364,7 @@ static int cpStrips(in, out)
   buf = (byte *) malloc((size_t) bufsize);
   if (buf) {
     tstrip_t s, ns = TIFFNumberOfStrips(in);
-    uint32 *bytecounts;
+    uint32_t *bytecounts;
 
     TIFFGetField(in, TIFFTAG_STRIPBYTECOUNTS, &bytecounts);
     for (s = 0; s < ns; s++) {
@@ -398,7 +398,7 @@ static int cpTiles(in, out)
   buf = (unsigned char *) malloc((size_t) bufsize);
   if (buf) {
     ttile_t t, nt = TIFFNumberOfTiles(in);
-    uint32 *bytecounts;
+    uint32_t *bytecounts;
 
     TIFFGetField(in, TIFFTAG_TILEBYTECOUNTS, &bytecounts);
     for (t = 0; t < nt; t++) {
@@ -423,12 +423,12 @@ static int cpTiles(in, out)
 /*******************************************/
 static byte *loadPalette(tif, w, h, photo, bps, pinfo)
      TIFF *tif;
-     uint32 w,h;
+     uint32_t w,h;
      int   photo,bps;
      PICINFO *pinfo;
 {
   byte *pic8;
-  uint32 npixels;
+  uint32_t npixels;
 
   switch (photo) {
   case PHOTOMETRIC_PALETTE:
@@ -469,12 +469,12 @@ static byte *loadPalette(tif, w, h, photo, bps, pinfo)
 /*******************************************/
 static byte *loadColor(tif, w, h, photo, bps, pinfo)
      TIFF *tif;
-     uint32 w,h;
+     uint32_t w,h;
      int   photo,bps;
      PICINFO *pinfo;
 {
   byte *pic24, *pic8;
-  uint32 npixels, count;
+  uint32_t npixels, count;
 
   pinfo->colType = F_FULLCOLOR;
   sprintf(pinfo->fullInfo, "TIFF, %u-bit, %s format.  (%ld bytes)",
@@ -584,85 +584,85 @@ static	byte **PALmap;
 #define tileSeparateRoutine _tileSeparateRoutine
 
 typedef void (*tileContigRoutine)   PARM((byte*, u_char*, RGBvalue*,
-					  uint32, uint32, int, int));
+					  uint32_t, uint32_t, int, int));
 
 typedef void (*tileSeparateRoutine) PARM((byte*, u_char*, u_char*, u_char*,
-                                         RGBvalue*, uint32, uint32, int, int));
+                                         RGBvalue*, uint32_t, uint32_t, int, int));
 
 
 static int    checkcmap             PARM((int, u_short*, u_short*, u_short*));
 
-static int    gt                       PARM((TIFF *, uint32, uint32, byte *));
-static uint32 setorientation           PARM((TIFF *, uint32));
+static int    gt                       PARM((TIFF *, uint32_t, uint32_t, byte *));
+static uint32_t setorientation           PARM((TIFF *, uint32_t));
 static int    gtTileContig             PARM((TIFF *, byte *, RGBvalue *,
-					     uint32, uint32, int));
+					     uint32_t, uint32_t, int));
 static int    gtTileSeparate           PARM((TIFF *, byte *, RGBvalue *,
-					     uint32, uint32, int));
+					     uint32_t, uint32_t, int));
 static int    gtStripContig            PARM((TIFF *, byte *, RGBvalue *,
-					     uint32, uint32, int));
+					     uint32_t, uint32_t, int));
 static int    gtStripSeparate          PARM((TIFF *, byte *, RGBvalue *,
-					     uint32, uint32, int));
+					     uint32_t, uint32_t, int));
 
 static int    makebwmap                PARM((void));
 static int    makecmap                 PARM((void));
 
 static void   put8bitcmaptile          PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put4bitcmaptile          PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put2bitcmaptile          PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put1bitcmaptile          PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   putgreytile              PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put1bitbwtile            PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put2bitbwtile            PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put4bitbwtile            PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 static void   put16bitbwtile           PARM((byte *, u_short *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putRGBcontig8bittile     PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putRGBcontig16bittile    PARM((byte *, u_short *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putRGBseparate8bittile   PARM((byte *, u_char *, u_char *,
 					     u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putRGBseparate16bittile  PARM((byte *, u_short *, u_short *,
 					    u_short *, RGBvalue *,
-					    uint32, uint32, int, int));
+					    uint32_t, uint32_t, int, int));
 
 
 static void   initYCbCrConversion      PARM((void));
 
 static void   putRGBContigYCbCrClump   PARM((byte *, u_char *, int, int,
-					     uint32, int, int, int));
+					     uint32_t, int, int, int));
 
 static void   putRGBSeparateYCbCrClump PARM((byte *, u_char *, u_char *,
-					     u_char *, int, int, uint32, int,
+					     u_char *, int, int, uint32_t, int,
 					     int, int));
   
 static void   putRGBSeparate16bitYCbCrClump PARM((byte *, u_short *, u_short *,
-						  u_short *, int, int, uint32,
+						  u_short *, int, int, uint32_t,
 						  int, int, int));
 
 static void   putcontig8bitYCbCrtile   PARM((byte *, u_char *, RGBvalue *,
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putYCbCrseparate8bittile PARM((byte *, u_char *, u_char *, 
 					     u_char *, RGBvalue *, 
-					     uint32, uint32, int, int));
+					     uint32_t, uint32_t, int, int));
 
 static void   putYCbCrseparate16bittile PARM((byte *, u_short *, u_short *, 
 					      u_short *, RGBvalue *, 
-					      uint32, uint32, int, int));
+					      uint32_t, uint32_t, int, int));
 
 static tileContigRoutine   pickTileContigCase   PARM((RGBvalue *));
 static tileSeparateRoutine pickTileSeparateCase PARM((RGBvalue *));
@@ -671,12 +671,12 @@ static tileSeparateRoutine pickTileSeparateCase PARM((RGBvalue *));
 /*******************************************/
 static int loadImage(tif, rwidth, rheight, raster, stop)
      TIFF *tif;
-     uint32 rwidth, rheight;
+     uint32_t rwidth, rheight;
      byte *raster;
      int stop;
 {
   int ok;
-  uint32 width, height;
+  uint32_t width, height;
 
   TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &bitspersample);
   switch (bitspersample) {
@@ -757,7 +757,7 @@ static int checkcmap(n, r, g, b)
 /*******************************************/
 static int gt(tif, w, h, raster)
      TIFF   *tif;
-     uint32 w, h;
+     uint32_t w, h;
      byte   *raster;
 {
 #ifdef USE_LIBJPEG_FOR_TIFF_YCbCr_RGB_CONVERSION
@@ -924,13 +924,13 @@ static int gt(tif, w, h, raster)
 
 
 /*******************************************/
-static uint32 setorientation(tif, h)
+static uint32_t setorientation(tif, h)
      TIFF *tif;
-     uint32 h;
+     uint32_t h;
 {
   /* note that orientation was flipped in LoadTIFF() (near line 175) */
 
-  uint32 y;
+  uint32_t y;
 
   TIFFGetFieldDefaulted(tif, TIFFTAG_ORIENTATION, &orientation);
   switch (orientation) {
@@ -978,11 +978,11 @@ static int gtTileContig(tif, raster, Map, h, w, bpp)
      TIFF *tif;
      byte *raster;
      RGBvalue *Map;
-     uint32 h, w;
+     uint32_t h, w;
      int bpp;
 {
-  uint32 col, row, y;
-  uint32 tw, th;
+  uint32_t col, row, y;
+  uint32_t tw, th;
   u_char *buf;
   int fromskew, toskew;
   u_int nrow;
@@ -1023,7 +1023,7 @@ static int gtTileContig(tif, raster, Map, h, w, bpp)
        * are returned decompressed and, typically, in the native byte- and
        * bit-ordering, but are otherwise packed."
        */
-      if (TIFFReadTile(tif, buf, (uint32)col, (uint32)row, 0, 0) < 0
+      if (TIFFReadTile(tif, buf, (uint32_t)col, (uint32_t)row, 0, 0) < 0
 	  && stoponerr) break;
 
       if (col + tw > w) {
@@ -1031,12 +1031,12 @@ static int gtTileContig(tif, raster, Map, h, w, bpp)
 	 * Tile is clipped horizontally.  Calculate
 	 * visible portion and skewing factors.
 	 */
-	uint32 npix = w - col;
+	uint32_t npix = w - col;
 	fromskew = tw - npix;
-	(*put)(raster + (y*w + col)*bpp, buf, Map, npix, (uint32) nrow,
+	(*put)(raster + (y*w + col)*bpp, buf, Map, npix, (uint32_t) nrow,
 	       fromskew, (int) ((toskew + fromskew)*bpp) );
       } else
-	(*put)(raster + (y*w + col)*bpp, buf, Map, tw,   (uint32) nrow,
+	(*put)(raster + (y*w + col)*bpp, buf, Map, tw,   (uint32_t) nrow,
 	       0, (int) (toskew*bpp));
     }
 
@@ -1065,15 +1065,15 @@ static int gtTileSeparate(tif, raster, Map, h, w, bpp)
      TIFF *tif;
      byte *raster;
      RGBvalue *Map;
-     uint32 h, w;
+     uint32_t h, w;
      int bpp;
 {
-  uint32 tw, th;
-  uint32 col, row, y;
+  uint32_t tw, th;
+  uint32_t col, row, y;
   u_char *buf;
   u_char *r, *g, *b;
   tsize_t tilesize;
-  uint32 bufsize;
+  uint32_t bufsize;
   int fromskew, toskew;
   u_int nrow;
   tileSeparateRoutine put;
@@ -1106,15 +1106,15 @@ static int gtTileSeparate(tif, raster, Map, h, w, bpp)
       tsample_t band;
 
       band = 0;
-      if (TIFFReadTile(tif, r, (uint32) col, (uint32) row,0, band) < 0
+      if (TIFFReadTile(tif, r, (uint32_t) col, (uint32_t) row,0, band) < 0
 	  && stoponerr) break;
 
       band = 1;
-      if (TIFFReadTile(tif, g, (uint32) col, (uint32) row,0, band) < 0
+      if (TIFFReadTile(tif, g, (uint32_t) col, (uint32_t) row,0, band) < 0
 	  && stoponerr) break;
 
       band = 2;
-      if (TIFFReadTile(tif, b, (uint32) col, (uint32) row,0, band) < 0
+      if (TIFFReadTile(tif, b, (uint32_t) col, (uint32_t) row,0, band) < 0
 	  && stoponerr) break;
 
       if (col + tw > w) {
@@ -1122,12 +1122,12 @@ static int gtTileSeparate(tif, raster, Map, h, w, bpp)
 	 * Tile is clipped horizontally.  Calculate
 	 * visible portion and skewing factors.
 	 */
-	uint32 npix = w - col;
+	uint32_t npix = w - col;
 	fromskew = tw - npix;
-	(*put)(raster + (y*w + col)*bpp, r, g, b, Map, npix, (uint32) nrow,
+	(*put)(raster + (y*w + col)*bpp, r, g, b, Map, npix, (uint32_t) nrow,
 	       fromskew, (int) ((toskew + fromskew)*bpp));
       } else
-	(*put)(raster + (y*w + col)*bpp, r, g, b, Map, tw, (uint32) nrow,
+	(*put)(raster + (y*w + col)*bpp, r, g, b, Map, tw, (uint32_t) nrow,
 	       0, (int) (toskew*bpp));
     }
     y += (orientation == ORIENTATION_TOPLEFT ? -nrow : nrow);
@@ -1147,14 +1147,14 @@ static int gtStripContig(tif, raster, Map, h, w, bpp)
      TIFF *tif;
      byte *raster;
      RGBvalue *Map;
-     uint32 h, w;
+     uint32_t h, w;
      int bpp;
 {
-  uint32 row, y, nrow;
+  uint32_t row, y, nrow;
   u_char *buf;
   tileContigRoutine put;
-  uint32 rowsperstrip;
-  uint32 imagewidth;
+  uint32_t rowsperstrip;
+  uint32_t imagewidth;
   int scanline;
   int fromskew, toskew;
   tsize_t bufsize;
@@ -1179,7 +1179,7 @@ static int gtStripContig(tif, raster, Map, h, w, bpp)
   for (row = 0; row < h; row += rowsperstrip) {
     nrow = (row + rowsperstrip > h ? h - row : rowsperstrip);
     if (TIFFReadEncodedStrip(tif,
-			     TIFFComputeStrip(tif, (uint32) row,(tsample_t) 0),
+			     TIFFComputeStrip(tif, (uint32_t) row,(tsample_t) 0),
 			     (tdata_t) buf, (tsize_t)(nrow*scanline)) < 0
 	&& stoponerr) break;
 
@@ -1202,19 +1202,19 @@ static int gtStripSeparate(tif, raster, Map, h, w, bpp)
      TIFF *tif;
      byte *raster;
      register RGBvalue *Map;
-     uint32 h, w;
+     uint32_t h, w;
      int bpp;
 {
-  uint32 nrow, row, y;
+  uint32_t nrow, row, y;
   u_char *buf;
   u_char *r, *g, *b;
   tsize_t stripsize;
-  uint32 bufsize;
+  uint32_t bufsize;
   int fromskew, toskew;
   int scanline;
   tileSeparateRoutine put;
-  uint32 rowsperstrip;
-  uint32 imagewidth;
+  uint32_t rowsperstrip;
+  uint32_t imagewidth;
 
   stripsize = TIFFStripSize(tif);
   bufsize = 3*stripsize;
@@ -1246,17 +1246,17 @@ static int gtStripSeparate(tif, raster, Map, h, w, bpp)
 
     nrow = (row + rowsperstrip > h ? h - row : rowsperstrip);
     band = 0;
-    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32) row, band),
+    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32_t) row, band),
 			     (tdata_t) r, (tsize_t)(nrow*scanline)) < 0
 	&& stoponerr) break;
 
     band = 1;
-    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32) row, band),
+    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32_t) row, band),
 			     (tdata_t) g, (tsize_t)(nrow*scanline)) < 0
 	&& stoponerr) break;
 
     band = 2;
-    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32) row, band),
+    if (TIFFReadEncodedStrip(tif, TIFFComputeStrip(tif, (uint32_t) row, band),
 			     (tdata_t) b, (tsize_t)(nrow*scanline)) < 0
 	&& stoponerr) break;
 
@@ -1400,7 +1400,7 @@ static int makecmap()
 #define	CASE4(x,op)	switch (x) { case 3: op; case 2: op; case 1: op; }
 
 #define	UNROLL8(w, op1, op2) {		\
-	uint32 x;	                \
+	uint32_t x;	                \
 	for (x = w; x >= 8; x -= 8) {	\
 		op1;			\
 		REPEAT8(op2);		\
@@ -1412,7 +1412,7 @@ static int makecmap()
 }
 
 #define	UNROLL4(w, op1, op2) {		\
-	uint32 x;		        \
+	uint32_t x;		        \
 	for (x = w; x >= 4; x -= 4) {	\
 		op1;			\
 		REPEAT4(op2);		\
@@ -1424,7 +1424,7 @@ static int makecmap()
 }
 
 #define	UNROLL2(w, op1, op2) {		\
-	uint32 x;		        \
+	uint32_t x;		        \
 	for (x = w; x >= 2; x -= 2) {	\
 		op1;			\
 		REPEAT2(op2);		\
@@ -1447,7 +1447,7 @@ static void put8bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   while (h-- > 0) {
@@ -1464,7 +1464,7 @@ static void put4bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
      byte     *cp;
      u_char   *pp;
      RGBvalue *Map;
-     uint32    w, h;
+     uint32_t    w, h;
      int       fromskew, toskew;
 {
   register byte *bw;
@@ -1485,7 +1485,7 @@ static void put2bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
      byte     *cp;
      u_char   *pp;
      RGBvalue *Map;
-     uint32    w, h;
+     uint32_t    w, h;
      int       fromskew, toskew;
 {
   register byte *bw;
@@ -1505,7 +1505,7 @@ static void put1bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
 	byte     *cp;
 	u_char   *pp;
 	RGBvalue *Map;
-	uint32    w, h;
+	uint32_t    w, h;
 	int       fromskew, toskew;
 {
   register byte *bw;
@@ -1526,11 +1526,11 @@ static void putgreytile(cp, pp, Map, w, h, fromskew, toskew)
      register byte *cp;
      register u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   while (h-- > 0) {
-    register uint32 x;
+    register uint32_t x;
     for (x = w; x-- > 0;)
       *cp++ = BWmap[*pp++][0];
     cp += toskew;
@@ -1546,7 +1546,7 @@ static void put1bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   register byte *bw;
@@ -1566,7 +1566,7 @@ static void put2bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   register byte *bw;
@@ -1586,7 +1586,7 @@ static void put4bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   register byte *bw;
@@ -1606,10 +1606,10 @@ static void put16bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
      byte  *cp;
      u_short *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
-  register uint32   x;
+  register uint32_t   x;
 
   while (h-- > 0) {
     for (x=w; x>0; x--) {
@@ -1629,13 +1629,13 @@ static void putRGBcontig8bittile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   fromskew *= samplesperpixel;
   if (Map) {
     while (h-- > 0) {
-      register uint32 x;
+      register uint32_t x;
       for (x = w; x-- > 0;) {
 	*cp++ = Map[pp[0]];
 	*cp++ = Map[pp[1]];
@@ -1665,7 +1665,7 @@ static void putRGBcontig16bittile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_short *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   register u_int x;
@@ -1703,13 +1703,13 @@ static void putRGBseparate8bittile(cp, r, g, b, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *r, *g, *b;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 
 {
   if (Map) {
     while (h-- > 0) {
-      register uint32 x;
+      register uint32_t x;
       for (x = w; x > 0; x--) {
 	*cp++ = Map[*r++];
 	*cp++ = Map[*g++];
@@ -1738,10 +1738,10 @@ static void putRGBseparate16bittile(cp, r, g, b, Map, w, h, fromskew, toskew)
      byte *cp;
      u_short *r, *g, *b;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
-  uint32 x;
+  uint32_t x;
 
   if (Map) {
     while (h-- > 0) {
@@ -1807,7 +1807,7 @@ static void putRGBContigYCbCrClump(cp, pp, cw, ch, w, n, fromskew, toskew)
      byte *cp;
      u_char *pp;
      int cw, ch;
-     uint32 w;
+     uint32_t w;
      int n, fromskew, toskew;
 {
   float Cb, Cr;
@@ -1852,7 +1852,7 @@ static void putRGBSeparateYCbCrClump(cp, y, cb, cr, cw, ch, w, n, fromskew, tosk
      byte *cp;
      u_char *y, *cb, *cr;
      int cw, ch;
-     uint32 w;
+     uint32_t w;
      int n, fromskew, toskew;
 {
   float Cb, Cr;
@@ -1880,7 +1880,7 @@ static void putRGBSeparate16bitYCbCrClump(cp, y, cb, cr, cw, ch, w, n, fromskew,
      byte *cp;
      u_short *y, *cb, *cr;
      int cw, ch;
-     uint32 w;
+     uint32_t w;
      int n, fromskew, toskew;
 {
   float Cb, Cr;
@@ -1918,12 +1918,12 @@ static void putcontig8bitYCbCrtile(cp, pp, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *pp;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
   u_int Coff = YCbCrVertSampling * YCbCrHorizSampling;
   byte *tp;
-  uint32 x;
+  uint32_t x;
 
   /* XXX adjust fromskew */
   while (h >= YCbCrVertSampling) {
@@ -1965,10 +1965,10 @@ static void putYCbCrseparate8bittile(cp, y, cb, cr, Map, w, h, fromskew, toskew)
      byte *cp;
      u_char *y, *cb, *cr;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
-  uint32 x;
+  uint32_t x;
   int fromskew2 = fromskew/YCbCrHorizSampling;
   
   while (h >= YCbCrVertSampling) {
@@ -2016,10 +2016,10 @@ static void putYCbCrseparate16bittile(cp, y, cb, cr, Map, w, h, fromskew, toskew
      byte *cp;
      u_short *y, *cb, *cr;
      RGBvalue *Map;
-     uint32 w, h;
+     uint32_t w, h;
      int fromskew, toskew;
 {
-  uint32 x;
+  uint32_t x;
   int fromskew2 = fromskew/YCbCrHorizSampling;
   
   while (h >= YCbCrVertSampling) {
