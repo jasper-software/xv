@@ -545,9 +545,9 @@ void ChangeCommentText()
   tv->freeonclose = 0;
 
   if (strlen(fullfname))
-    sprintf(tv->title, "File: '%s'", BaseName(fullfname));
+    snprintf(tv->title, TITLELEN-1, "File: '%s'", BaseName(fullfname));
   else
-    sprintf(tv->title, "<no file loaded>");
+    snprintf(tv->title, TITLELEN-1, "<no file loaded>");
 
   computeText(tv);      /* compute # lines and linestarts array */
 
