@@ -32,7 +32,7 @@
 #define LINELENGTH 132
 
 static int   fread_header(int fd, struct header *hd);
-static char  *getline(int fd, char **s, int *l);
+static char  *hips_getline(int fd, char **s, int *l);
 static int   dfscanf(int fd);
 static void  make_grayscale(char *r, char *g, char *b);
 static float hls_value (float n1, float n2, float hue);
@@ -70,14 +70,14 @@ static int fread_header(fd, hd)
     lalloc = 1;
   }
 /*fprintf(stderr,"fread_header: ssave allocated\n");*/
-  getline(fd,&ssave[0],&slmax[0]);
+  hips_getline(fd,&ssave[0],&slmax[0]);
   hd->orig_name = calloc(strlen(ssave[0])+1, sizeof (char));
   strcpy(hd->orig_name,ssave[0]);
-  getline(fd,&ssave[0],&slmax[0]);
+  hips_getline(fd,&ssave[0],&slmax[0]);
   hd->seq_name = calloc(strlen(ssave[0])+1, sizeof (char));
   strcpy(hd->seq_name,ssave[0]);
   hd->num_frame = dfscanf(fd);
-  getline(fd,&ssave[0],&slmax[0]);
+  hips_getline(fd,&ssave[0],&slmax[0]);
   hd->orig_date = calloc(strlen(ssave[0])+1, sizeof (char));
   strcpy(hd->orig_date,ssave[0]);
   hd->rows = dfscanf(fd);
@@ -87,7 +87,7 @@ static int fread_header(fd, hd)
   hd->pixel_format = dfscanf(fd);
   lineno = 0;
   len = 1;
-  getline(fd,&ssave[0],&slmax[0]);
+  hips_getline(fd,&ssave[0],&slmax[0]);
   s = ssave[0];
   while(*(s += strlen(s)-3) == '|') {
     len += strlen(ssave[lineno]);
@@ -99,7 +99,7 @@ static int fread_header(fd, hd)
       slmax[lineno] = LINELENGTH;
       lalloc++;
     }
-    getline(fd,&ssave[lineno],&slmax[lineno]);
+    hips_getline(fd,&ssave[lineno],&slmax[lineno]);
     s = ssave[lineno];
   }
   len += strlen(ssave[lineno]);
@@ -109,7 +109,7 @@ static int fread_header(fd, hd)
     strcat(hd->seq_history,ssave[i]);
   lineno = 0;
   len = 1;
-  while(strcmp(getline(fd,&ssave[lineno],&slmax[lineno]),".\n")) {
+  while(strcmp(hips_getline(fd,&ssave[lineno],&slmax[lineno]),".\n")) {
     len += strlen(ssave[lineno]);
     lineno++;
     if (lineno >= LINES)
@@ -130,7 +130,7 @@ static int fread_header(fd, hd)
 
 
 
-static char *getline(fd,s,l)
+static char *hips_getline(fd,s,l)
   int fd;
   char **s;
   int *l;
@@ -168,7 +168,7 @@ static int dfscanf(fd)
 {
   int i;
 
-  getline(fd,&ssave[0],&slmax[0]);
+  hips_getline(fd,&ssave[0],&slmax[0]);
   sscanf(ssave[0],"%d",&i);
   return(i);
 }
