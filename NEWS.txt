@@ -1,3 +1,15 @@
+5.0.0 (2024-02-06)
+==================
+
+* Removed all of the obsolete (and no longer used) make/imake-based build
+  infrastructure.
+* Removed the local copies of the source code for the external libraries
+  used for JPEG and TIFF support, as these local copies do not receive
+  bug fixes and are therefore very likely to have many serious security
+  vulnerabilities.  Since the CMake-based build process already uses
+  whatever JPEG and TIFF libraries are installed on the system, these
+  local copies of external libraries are completely unnecessary.
+
 4.2.0 (2023-07-16)
 ==================
 
