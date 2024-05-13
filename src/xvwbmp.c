@@ -153,6 +153,13 @@ int WriteWBMP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
     uint8 bit = 0;
     int i;
 
+    XV_UNUSED(ptype);
+    XV_UNUSED(rmap);
+    XV_UNUSED(gmap);
+    XV_UNUSED(bmap);
+    XV_UNUSED(numcols);
+    XV_UNUSED(colorstyle);
+
     write_mb(0, fp);	/* type : always 0 */
     putc(0, fp);	/* fixed header : always 0 for type 0 */
     write_mb((uint32)w, fp);
@@ -249,6 +256,8 @@ static int read_ext(fd, fixed)
      int fd;
      uint8 fixed;
 {
+    XV_UNUSED(fd);
+
     if (!(fixed&0x7f)) {    /* no extensions */
 	return 1;
     }
@@ -320,6 +329,8 @@ static uint8 *render1(data, size, npixels)
     int i;
     int cnt = 0;
     uint8 cb = *data;
+
+    XV_UNUSED(size);
 
     pic = calloc(npixels,1);   /* checked for overflow by caller */
     if (!pic) {

@@ -2487,6 +2487,8 @@ static void TrackPicValues(mx,my)
   const char   *str  =
    "8888,8888 = 123,123,123  #123456  (123,123,123 HSV)  [-2345,-2345]";
 
+  XV_UNUSED(mx);
+
   ecol = 0;  wh = infobg;  bl = infofg;
 
   if (!dropper) {
@@ -2615,6 +2617,8 @@ static Bool IsConfig(dpy, ev, arg)
 {
   XConfigureEvent *cev;
 
+  XV_UNUSED(dpy);
+
   if (ev->type == ConfigureNotify) {
     cev = (XConfigureEvent *) ev;
     if (cev->window == mainW && (cev->width != eWIDE || cev->height != eHIGH))
@@ -2717,6 +2721,9 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
   /* but first, if any input-grabbing popups are active, we have to 'cancel'
      them. */
 
+  XV_UNUSED(dummy);
+  XV_UNUSED(Id);
+
   if (psUp) PSDialog(0);      /* close PS window */
 
 #ifdef HAVE_JPEG
@@ -2759,6 +2766,7 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
 
 static void onInterrupt(int i)
 {
+  XV_UNUSED(i);
   XtNoticeSignal(IdQuit);
 }
 

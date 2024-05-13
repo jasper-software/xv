@@ -392,6 +392,8 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
   int   linesize, i, color, d, y, flipbw;
   byte *line, *graypic, graymap[256], *sp, *dp;
 
+  XV_UNUSED(userle);
+
   graypic = NULL;
   flipbw  = 0;
 

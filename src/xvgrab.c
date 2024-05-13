@@ -280,11 +280,10 @@ int Grab()
   }
 
   else {  /* TRACK A RECTANGLE */
-    int    origrx, origry;
 
     clickWin = rootW;
-    origrx = ix = x2 = rx;
-    origry = iy = y2 = ry;
+    ix = x2 = rx;
+    iy = y2 = ry;
     iw = ih = 0;
 
     XGrabServer(theDisp);
@@ -905,6 +904,8 @@ static int convertImageAndStuff(image, colors, ncolors, xwap, gx,gy,gw,gh)
 
 
   /* quiet compiler warnings */
+  XV_UNUSED(gw);
+  XV_UNUSED(gh);
   sval = 0;
   lval = 0;
   bit_shift = 0;
@@ -1168,6 +1169,8 @@ static int CountColors24(pic, pwide, phigh, x, y, w, h)
   int    low, high, mid;
   u_int  colors[257], col;
   byte   *pp;
+
+  XV_UNUSED(phigh);
 
   nc = 0;
 

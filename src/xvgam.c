@@ -200,6 +200,8 @@ static void printUTime(str)
   i = getrusage(RUSAGE_SELF, &ru);
   fprintf(stderr,"%s: utime = %ld.%ld seconds\n",
 	    str, ru.ru_utime.tv_sec, ru.ru_utime.tv_usec);
+#else
+  XV_UNUSED(str);
 #endif
 }
 
@@ -1055,7 +1057,7 @@ int x,y,but;
 
 
     else if (but==3) { /* add/delete cell(s) from current group */
-      int lastcell,j,resetdel,curcell;
+      int lastcell,resetdel,curcell;
 
       /* better save the current cmap state, as it might change */
       saveCMap(&tmpcmap);
@@ -1068,8 +1070,8 @@ int x,y,but;
 
 	lastcell = curcell;
 
-	j = XGrabPointer(theDisp, cmapF, False, 0, GrabModeAsync,
-			 GrabModeAsync, None, None, (Time) CurrentTime);
+	XV_UNUSED_RETURN(XGrabPointer(theDisp, cmapF, False, 0, GrabModeAsync,
+				GrabModeAsync, None, None, (Time) CurrentTime));
 	while (1) {
 	  Window       rW,cW;
 	  int          rx,ry,x,y;
@@ -2208,7 +2210,7 @@ struct cmapstate *cst;
 /*********************/
 static void parseResources()
 {
-  char gname[80], tmp[80], tmp1[256];
+  char gname[80], tmp[512], tmp1[256];
   int  i,j;
   struct gamstate *gsp, gs;
 
@@ -2315,7 +2317,7 @@ static void parseResources()
 static void makeResources()
 {
   char rsrc[2000];     /* wild over-estimation */
-  char gname[40], rname[64], tmp[256], tmp1[256];
+  char gname[40], rname[64], tmp[512], tmp1[256];
   struct gamstate gstate;
   int i;
 

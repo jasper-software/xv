@@ -539,6 +539,8 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   byte   *rlebuf, *pptr;
   byte   *lumbuf, *lptr, *longpic;
 
+  XV_UNUSED(numcols);
+
   xvbzero((char *) &img, sizeof(IMAGE));
 
   /* write header information */

@@ -24,6 +24,14 @@ usage()
 	    Set the build directory to \$build_dir.
 	-i \$install_dir
 	    Set the install directory to \$install_dir.
+	-c
+	    Clean the build and install directories.
+	-r
+	    Build to make a release.
+	-d
+	    Build for debugging.
+	-s
+	    Strict build to treat warnings as errors.
 	-v
 	    Enable verbose mode.
 	-h
@@ -41,8 +49,9 @@ install_dir=
 tmp_dir=
 mode=release
 strict=0
+clean=0
 
-while getopts vb:i:t:drs opt; do
+while getopts vhcb:i:t:drs opt; do
 	case $opt in
 	s)
 		strict=1;;
@@ -50,16 +59,20 @@ while getopts vb:i:t:drs opt; do
 		mode=release;;
 	d)
 		mode=debug;;
+	t)
+		tmp_dir="$OPTARG";;
 	b)
 		build_dir="$OPTARG";;
 	i)
 		install_dir="$OPTARG";;
+	c)
+		clean=1;;
 	v)
 		verbose=$((verbose + 1));;
 	h)
-		usage;;
+		usage "$@";;
 	\?)
-		usage;;
+		usage "$@";;
 	esac
 done
 shift $((OPTIND - 1))
@@ -72,6 +85,21 @@ if [ -z "$build_dir" ]; then
 fi
 if [ -z "$install_dir" ]; then
 	install_dir="$tmp_dir/install"
+fi
+
+if [ "$clean" -ge 1 ]; then
+	case "$build_dir" in
+	*tmp*/*build*)
+		rm -rf "$build_dir" || panic "Could not clean build dir ${build_dir}.";;
+	*)
+		panic "Not cleaning build dir ${build_dir}. Does not look match *tmp*build.";;
+	esac
+	case "$install_dir" in
+	*tmp*/*install*)
+		rm -rf "$install_dir" || panic "Could not clean install dir ${install_dir}.";;
+	*)
+		panic "Not cleaning install dir ${install_dir}. Does not look match *tmp*install.";;
+	esac
 fi
 
 cmake --version || panic "cannot run cmake"

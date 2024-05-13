@@ -69,7 +69,7 @@ typedef struct {  Window win, textW;
 		  int    freeonclose;      /* free text when closing win */
 		  int    textlen;          /* length of text */
 		  char   title[TITLELEN];  /* name of file being displayed */
-		  const char **lines;     /* ptr to array of line ptrs */
+		  const char **lines;      /* ptr to array of line ptrs */
 		  int    numlines;         /* # of lines in text */
 		  int    hexlines;         /* # of lines in HEX mode */
 		  int    maxwide;          /* length of longest line (ascii) */
@@ -347,6 +347,8 @@ void CreateTextWins(geom, cmtgeom)
     tv->text = (char *) NULL;
     tv->textlen = 0;
     tv->title[0] = '\0';
+    tv->lines = (const char **) NULL;
+    tv->numlines = 0;
 #ifdef TV_L10N
     tv->code = (xlocale ? LOCALE_DEFAULT : 0);
 #endif
@@ -386,7 +388,6 @@ int TextView(fname)
   int   filetype;
   long  textlen;
   char *text, buf[512], title[128], rfname[MAXPATHLEN+1];
-  char *basefname[128];  /* just current fname, no path */
   FILE *fp;
   char filename[MAXPATHLEN+1];
 
@@ -396,7 +397,6 @@ int TextView(fname)
   Dirtovd(filename);
 #endif
 
-  basefname[0] = '\0';
   strncpy(rfname, filename, sizeof(rfname) - 1);
 
   /* see if this file is compressed.  if it is, uncompress it, and view
@@ -407,6 +407,8 @@ int TextView(fname)
 #ifndef VMS
     if (!UncompressFile(filename, rfname, filetype)) return FALSE;
 #else
+    char *basefname[128];  /* just current fname, no path */
+    basefname[0] = '\0';
     /* chop off trailing '.Z' from friendly displayed basefname, if any */
     strncpy (basefname, filename, 128 - 1);
     *rindex (basefname, '.') = '\0';
@@ -722,9 +724,7 @@ static int tvChkEvent(tv, xev)
   if (!hasBeenSized) return 0;  /* ignore evrythng until we get 1st Resize */
 
   if (xev->type == Expose) {
-    int x,y,w,h;
     XExposeEvent *e = (XExposeEvent *) xev;
-    x = e->x;  y = e->y;  w = e->width;  h = e->height;
 
     /* throw away excess redraws for 'dumb' windows */
     if (e->count > 0 && (e->window == tv->vscrl.win ||
@@ -1102,6 +1102,8 @@ static void drawTextW(delta, sptr)
   char    linestr[512];
   byte   *lp;
   const byte  *sp, *ep;
+
+  XV_UNUSED(delta);
 
   /* figure out TVINFO pointer from SCRL pointer */
   for (i=0; i<MAXTVWIN && sptr != &tinfo[i].vscrl
@@ -1631,6 +1633,7 @@ static void computeText(tv)
   tv->numlines += 2;
 
   /* build lines array */
+  if (tv->lines != NULL) free(tv->lines);
   tv->lines = (const char **) malloc(tv->numlines * sizeof(char *));
   if (!tv->lines) FatalError("out of memory in computeText()");
 

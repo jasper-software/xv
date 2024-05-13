@@ -899,6 +899,7 @@ static int Convert16BitImage(fname, pinfo, swab)
   long i, j, k, l, n, *hist, nTot;
   size_t m;
   byte *lut, *pPix8;
+  byte *oldpic;
   FILE *fp;
   char  name[1024], *c;
 
@@ -999,10 +1000,12 @@ static int Convert16BitImage(fname, pinfo, swab)
 
   /* convert the 16-bit image to 8-bit */
   lut[0] = 0;
-  free(pShort = (unsigned short *)pinfo->pic);
+  oldpic = pinfo->pic;
+  pShort = (unsigned short *)oldpic;
   pinfo->pic = pPix8;
   while(--n >= 0)
     *pPix8++ = lut[*pShort++];
+  free(oldpic);
   free(lut);
   return 1;
 }

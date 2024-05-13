@@ -185,6 +185,9 @@ int WriteTarga(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle)
   int i, j;
   byte *xpic;
 
+  XV_UNUSED(numcols);
+  XV_UNUSED(colorstyle);
+
   /* write the header */
   for (i=0; i<12; i++) putc( (i==2) ? 2 : 0, fp);
 

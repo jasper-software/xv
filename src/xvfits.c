@@ -174,6 +174,8 @@ int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
   const char *error;
   byte  rgb[256];
 
+  XV_UNUSED(colorstyle);
+
   if (!fits_block) {
     fits_block = (char *) malloc((size_t) BLOCKSIZE);
     if (!fits_block) FatalError("Insufficient memory for FITS block buffer");
@@ -431,7 +433,7 @@ static const char *rdheader(fs)
    */
 
   int i, j, res, commlen, commsize;
-  char name[9];
+  char name[32];
   char *block=fits_block, *p;
   const char *error;
   long int val;         /* the value */

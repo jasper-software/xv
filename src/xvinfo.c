@@ -75,6 +75,8 @@ void RedrawInfo(x,y,w,h)
 {
   int  i;
 
+  XV_UNUSED(x); XV_UNUSED(y); XV_UNUSED(w); XV_UNUSED(h);
+
   XSetForeground(theDisp, theGC, infofg);
   XSetBackground(theDisp, theGC, infobg);
 

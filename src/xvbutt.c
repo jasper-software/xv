@@ -118,7 +118,7 @@ BUTT *bp;
 {
   int          x,y,r,x1,y1;
   unsigned int w,h;
-  XPoint       tpts[10], bpts[10], ipts[5];
+  XPoint       bpts[10], ipts[5];
 
   x = bp->x;  y=bp->y;  w=bp->w;  h=bp->h;  r=bp->fwidth;
 
@@ -135,15 +135,6 @@ BUTT *bp;
     ipts[2].x = x+w-r;      ipts[2].y = y+h-r;       /* botright */
     ipts[3].x = x+w-r;      ipts[3].y = y+r;         /* topright */
     ipts[4].x = ipts[0].x;  ipts[4].y = ipts[0].y;   /* close path */
-
-    /* top left polygon */
-    tpts[0].x = x;            tpts[0].y = y;
-    tpts[1].x = x;            tpts[1].y = y+h;
-    tpts[2].x = ipts[1].x;    tpts[2].y = ipts[1].y;
-    tpts[3].x = ipts[0].x;    tpts[3].y = ipts[0].y;
-    tpts[4].x = ipts[3].x;    tpts[4].y = ipts[3].y;
-    tpts[5].x = x+w;          tpts[5].y = y;
-    tpts[6].x = x;            tpts[6].y = y;
 
     /* bot left polygon */
     bpts[0].x = x;            bpts[0].y = y+h;

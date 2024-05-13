@@ -9,8 +9,6 @@
 #include "xv.h"
 
 /* Flmask */
-void cpcode 		PARM ((char *, unsigned char *, int));
-void MaskCr 		PARM ((void));
 static void FLmask 	PARM ((void));
 static void Q0mask 	PARM ((void));
 static void WINmask 	PARM ((void));
@@ -320,6 +318,8 @@ doMEKOmask (pic24, w, h, results, selx, sely, selw, selh, flag)
 
     printUTime ("start of MEKOmask.");
 
+    XV_UNUSED(h);
+
     xmax = selw / 16;
     ymax = selh / 16;
 
@@ -445,6 +445,7 @@ doCPmask (pic24, w, h, results, selx, sely, selw, selh, key)
 
     printUTime ("start of CPmask.");
 
+    XV_UNUSED(h);
     xmax = selw / 8;
     ymax = selh / 8;
 
@@ -517,6 +518,8 @@ doFLmask (pic24, w, h, results, selx, sely, selw, selh)
     register int *ar, xmax, ymax;
 
     printUTime ("start of FLMASK.");
+
+    XV_UNUSED(h);
 
     xmax = selw / 8;
     ymax = selh / 8;
@@ -631,6 +634,8 @@ doColReverse (pic24, w, h, results, selx, sely, selw, selh, bit_flag)
 
     printUTime ("start of Reverse.");
 
+    XV_UNUSED(h);
+
     for (y = sely; y < sely + selh; y++)
     {
 
@@ -664,14 +669,13 @@ doQ0mask (pic24, w, h, results, selx, sely, selw, selh, pixX, pixY)
      int w, h, selx, sely, selw, selh, pixX, pixY;
 {
     register byte *p24;
-    register int bperlin;
     byte *rp;
     int x, y;
     int skip, y0, x0;
 
     printUTime ("start of Q0mask.");
 
-    bperlin = w * 3;
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + ((selh / pixY) * pixY); y++)
     {
@@ -706,6 +710,8 @@ doWINmask (pic24, w, h, results, selx, sely, selw, selh)
     register int x, y;
 
     printUTime ("start of WIN mask.");
+
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + selh; y++)
     {
@@ -758,6 +764,8 @@ doRGBchange (pic24, w, h, results, selx, sely, selw, selh)
     register int x, y;
 
     printUTime ("start of RGB change.");
+
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + selh; y++)
     {
@@ -827,6 +835,8 @@ doMaskCr (pic24, w, h, selx, sely, selw, selh)
     int xp1, xp2, yp1, yp2;
 
     printUTime ("start of MaskCrop.");
+
+    XV_UNUSED(h);
 
     edgeX = (double *) malloc (sizeof (edge) * selw);
     edgeY = (double *) malloc (sizeof (edge) * selh);

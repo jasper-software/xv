@@ -448,7 +448,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
   char        software[256];
   char       *savecmnt;
   /* for storing values until all are accumulated, so that the image header can be set in full */
-  int         _bit_depth,_color_type,_interlace_type,_compression_type,_filter_type;
+  int         _bit_depth,_color_type,_interlace_type;
   png_uint_32 _width,_height;
   png_time    _mod_time;
 
@@ -908,9 +908,8 @@ int LoadPNG(fname, pinfo)
   int gray_to_rgb;
   size_t commentsize;
   /* temp storage vars for libpng15 migration */
-  int         _bit_depth,_color_type,_interlace_type,_compression_type,_filter_type,_num_text,_num_palette;
+  int         _bit_depth,_color_type,_interlace_type,_num_text,_num_palette;
   png_uint_32 _width,_height;
-  png_timep   _mod_time;
   double      _gamma;
   png_textp   _text;
   png_colorp  _palette;
@@ -1016,7 +1015,7 @@ int LoadPNG(fname, pinfo)
 	  ", %sinterlaced. (%d bytes)",
 	  _interlace_type ? "" : "non-", filesize);
 
-  sprintf(pinfo->shrtInfo, "%lux%lu PNG", _width, _height);
+  sprintf(pinfo->shrtInfo, "%lux%lu PNG", (long unsigned int) _width, (long unsigned int) _height);
 
   if (_bit_depth < 8)
       png_set_packing(png_ptr);

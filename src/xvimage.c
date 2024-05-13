@@ -113,6 +113,8 @@ static byte screen_set[3][256];
  * to you at the moment and would appreciate any suggestions...
  */
 
+static void screen_init PARM((void));
+
 static void screen_init()
 {
   static int init_flag; /* assume auto-init as 0 */
@@ -236,8 +238,10 @@ typedef struct { byte    *colorset;
  * Only fs2_init() specifies the (maximum) number of components.
  */
 
+static FSBUF *fs2_init PARM((int width));
+
 static FSBUF *fs2_init(width)
-int width;
+  int width;
 {
   FSBUF *fs;
   FSERROR *p;
@@ -271,6 +275,8 @@ int width;
  * (3) This particular implementation assumes *no* padding between lines!
  *     Adapt this if necessary.
  */
+
+static int fs2_dither PARM((FSBUF *fs, byte *ptr, int nc, int num_rows, int num_cols));
 
 static int fs2_dither(fs, ptr, nc, num_rows, num_cols)
 FSBUF *fs;
@@ -724,15 +730,13 @@ static void do_pan_calc(offx, offy, xp,yp)
      coords (returned in xp,yp) such that the 'pan window' remains entirely
      within the image boundaries */
 
-  int mx, my, eprx, epry, eprw, eprh, pprx, ppry, pprw, pprh;
+  int mx, my, eprx, epry, pprx, ppry, pprw, pprh;
 
   mx = *xp;  my = *yp;
 
   /* compute corners of pan rect in eWIDE,eHIGH coords */
   eprx = offx - mx;
   epry = offy - my;
-  eprw = eWIDE;
-  eprh = eHIGH;
 
   /* compute corners of pan rect in pWIDE,pHIGH coords */
   CoordE2P(eprx, epry, &pprx, &ppry);
@@ -2952,7 +2956,7 @@ static int doPadSolid(str, wide, high, opaque,omode)
 	   (r>=0 && r<=255 && g>=0 && g<=255 && b>=0 && b<=255)) {
     solidRGB = ((r&0xff)<<16) | ((g&0xff)<<8) | (b&0xff);
   }
-  else if (sscanf(str, "0x%x", &rgb) && rgb>=0 && rgb<=0xffffff) {
+  else if (sscanf(str, "0x%x", (unsigned int *) &rgb) && rgb>=0 && rgb<=0xffffff) {
     solidRGB = rgb;
   }
   else {   /* assume a colorname */
@@ -3004,7 +3008,7 @@ static int doPadBggen(str, wide, high, opaque,omode)
 #endif
   int i;
   byte *bgpic24;
-  char syscmd[512], fname[128], errstr[512];
+  char syscmd[512], fname[128], errstr[512 + 128];
   PICINFO pinfo;
 
   /* returns 0 on error, 1 if successful */
@@ -3092,6 +3096,8 @@ static int doPadLoad(str, wide, high, opaque,omode)
   PICINFO pinfo;
 
   /* returns 0 on error, 1 if successful */
+
+  XV_UNUSED(wide); XV_UNUSED(high);
 
   /* use first word as filename to load. */
   if (sscanf(str, "%s", loadName) != 1) {
@@ -3300,7 +3306,7 @@ static int ReadImageFile1(name, pinfo)
      PICINFO *pinfo;
 {
   int  i, ftype;
-  char uncompname[128], errstr[256], *uncName, *readname;
+  char uncompname[128], errstr[256], *uncName;
 #ifdef VMS
   char basefname[128];
 #endif
@@ -3319,7 +3325,6 @@ static int ReadImageFile1(name, pinfo)
 
     if (UncompressFile(uncName, uncompname, ftype)) {
       ftype = ReadFileType(uncompname);
-      readname = uncompname;
     }
     else {
       sprintf(errstr, "Error:  Couldn't uncompress file '%s'", name);

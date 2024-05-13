@@ -73,7 +73,7 @@ int LoadTIFF(fname, pinfo, quick)
   FILE  *fp;
   byte  *pic8;
   char  *desc, oldpath[MAXPATHLEN+1], tmppath[MAXPATHLEN+1], *sp;
-  char   tmp[256], tmpname[256];
+  char   tmp[256+32], tmpname[256];
   int    i, nump;
 
   error_occurred = 0;
@@ -1393,11 +1393,11 @@ static int makecmap()
 #define	REPEAT2(op)	op; op
 #define	CASE8(x,op)				\
 	switch (x) {				\
-	case 7: op; case 6: op; case 5: op;	\
-	case 4: op; case 3: op; case 2: op;	\
+	case 7: op; /* fall through */ case 6: op; /* fall through */ case 5: op; /* fall through */	\
+	case 4: op; /* fall through */ case 3: op; /* fall through */ case 2: op; /* fall through */	\
 	case 1: op;				\
 	}
-#define	CASE4(x,op)	switch (x) { case 3: op; case 2: op; case 1: op; }
+#define	CASE4(x,op)	switch (x) { case 3: op; /* fall through */ case 2: op; /* fall through */ case 1: op; }
 
 #define	UNROLL8(w, op1, op2) {		\
 	uint32_t x;	                \
@@ -1450,6 +1450,7 @@ static void put8bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
      uint32_t w, h;
      int fromskew, toskew;
 {
+  XV_UNUSED(Map);
   while (h-- > 0) {
     UNROLL8(w, , *cp++ = PALmap[*pp++][0]);
     cp += toskew;
@@ -1468,6 +1469,8 @@ static void put4bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
      int       fromskew, toskew;
 {
   register byte *bw;
+
+  XV_UNUSED(Map);
 
   fromskew /= 2;
   while (h-- > 0) {
@@ -1490,6 +1493,8 @@ static void put2bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
 {
   register byte *bw;
 
+  XV_UNUSED(Map);
+
   fromskew /= 4;
   while (h-- > 0) {
     UNROLL4(w, bw = PALmap[*pp++], *cp++ = *bw++);
@@ -1510,6 +1515,8 @@ static void put1bitcmaptile(cp, pp, Map, w, h, fromskew, toskew)
 {
   register byte *bw;
 
+  XV_UNUSED(Map);
+
   fromskew /= 8;
   while (h-- > 0) {
     UNROLL8(w, bw = PALmap[*pp++], *cp++ = *bw++)
@@ -1529,6 +1536,7 @@ static void putgreytile(cp, pp, Map, w, h, fromskew, toskew)
      uint32_t w, h;
      int fromskew, toskew;
 {
+  XV_UNUSED(Map);
   while (h-- > 0) {
     register uint32_t x;
     for (x = w; x-- > 0;)
@@ -1551,6 +1559,8 @@ static void put1bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
 {
   register byte *bw;
 
+  XV_UNUSED(Map);
+
   fromskew /= 8;
   while (h-- > 0) {
     UNROLL8(w, bw = BWmap[*pp++], *cp++ = *bw++)
@@ -1571,6 +1581,8 @@ static void put2bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
 {
   register byte *bw;
 
+  XV_UNUSED(Map);
+
   fromskew /= 4;
   while (h-- > 0) {
     UNROLL4(w, bw = BWmap[*pp++], *cp++ = *bw++);
@@ -1590,6 +1602,8 @@ static void put4bitbwtile(cp, pp, Map, w, h, fromskew, toskew)
      int fromskew, toskew;
 {
   register byte *bw;
+
+  XV_UNUSED(Map);
 
   fromskew /= 2;
   while (h-- > 0) {
@@ -1857,6 +1871,8 @@ static void putRGBSeparateYCbCrClump(cp, y, cb, cr, cw, ch, w, n, fromskew, tosk
 {
   float Cb, Cr;
   int j, k;
+
+  XV_UNUSED(n);
   
   Cb = Code2V(cb[0], refBlackWhite[2], refBlackWhite[3], 127);
   Cr = Code2V(cr[0], refBlackWhite[4], refBlackWhite[5], 127);
@@ -1885,7 +1901,9 @@ static void putRGBSeparate16bitYCbCrClump(cp, y, cb, cr, cw, ch, w, n, fromskew,
 {
   float Cb, Cr;
   int j, k;
-  
+
+  XV_UNUSED(n);
+
   Cb = Code2V(cb[0], refBlackWhite[2], refBlackWhite[3], 127);
   Cr = Code2V(cr[0], refBlackWhite[4], refBlackWhite[5], 127);
   for (j = 0; j < ch; j++) {
@@ -1924,6 +1942,8 @@ static void putcontig8bitYCbCrtile(cp, pp, Map, w, h, fromskew, toskew)
   u_int Coff = YCbCrVertSampling * YCbCrHorizSampling;
   byte *tp;
   uint32_t x;
+
+  XV_UNUSED(Map);
 
   /* XXX adjust fromskew */
   while (h >= YCbCrVertSampling) {
@@ -1971,6 +1991,8 @@ static void putYCbCrseparate8bittile(cp, y, cb, cr, Map, w, h, fromskew, toskew)
   uint32_t x;
   int fromskew2 = fromskew/YCbCrHorizSampling;
   
+  XV_UNUSED(Map);
+
   while (h >= YCbCrVertSampling) {
     for (x = w; x >= YCbCrHorizSampling; x -= YCbCrHorizSampling) {
       putRGBSeparateYCbCrClump(cp, y, cb, cr, YCbCrHorizSampling,
@@ -2022,6 +2044,8 @@ static void putYCbCrseparate16bittile(cp, y, cb, cr, Map, w, h, fromskew, toskew
   uint32_t x;
   int fromskew2 = fromskew/YCbCrHorizSampling;
   
+  XV_UNUSED(Map);
+
   while (h >= YCbCrVertSampling) {
     for (x = w; x >= YCbCrHorizSampling; x -= YCbCrHorizSampling) {
       putRGBSeparate16bitYCbCrClump(cp, y, cb, cr, YCbCrHorizSampling,
@@ -2068,6 +2092,8 @@ static tileContigRoutine pickTileContigCase(Map)
      RGBvalue* Map;
 {
   tileContigRoutine put = 0;
+
+  XV_UNUSED(Map);
 
   switch (photometric) {
   case PHOTOMETRIC_RGB:
@@ -2119,6 +2145,8 @@ static tileSeparateRoutine pickTileSeparateCase(Map)
      RGBvalue* Map;
 {
   tileSeparateRoutine put = 0;
+
+  XV_UNUSED(Map);
 
   switch (photometric) {
   case PHOTOMETRIC_RGB:

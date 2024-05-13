@@ -436,6 +436,8 @@ static int hash_init(hsize)
 
   int i;
 
+  XV_UNUSED(hsize);
+
   hash_len = 257;
 
   hashtab = (hentry **) malloc(sizeof(hentry *) * hash_len);
@@ -544,6 +546,8 @@ int WriteXPM(fp, pic, ptype, w, h, rp, gp, bp, nc, col, name, comments)
   long	li;		/* for() loop index */
   int	numcol;
 #endif
+
+  XV_UNUSED(comments);
 
   if (DEBUG) {
     if (ptype == PIC8)

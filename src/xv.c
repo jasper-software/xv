@@ -508,7 +508,7 @@ int main(argc, argv)
     else if (!strcmp(visualstr,"directcolor")) vclass = DirectColor;
     else if (!strcmp(visualstr,"default"))     {}   /* recognize it as valid */
     else if (!strncmp(visualstr,"0x",(size_t) 2)) {  /* specified visual id */
-      if (sscanf(visualstr, "0x%x", &vid) != 1) vid = -1;
+      if (sscanf(visualstr, "0x%x", (unsigned int *) &vid) != 1) vid = -1;
     }
     else {
       fprintf(stderr,"%s: Unrecognized visual type '%s'.  %s\n",
@@ -1460,7 +1460,7 @@ static void parseCmdLine(argc, argv)
 
     else if (!argcmp(argv[i],"-windowid",3,0,&pm)) {
       if (++i<argc) {
-	if (sscanf(argv[i], "%ld", &spec_window) != 1) {
+	if (sscanf(argv[i], "%ld", (long int *) &spec_window) != 1) {
 		fprintf(stderr,"%s: bad argument to -windowid '%s'\n",cmd,argv[i]);
         }
       }
@@ -2488,7 +2488,7 @@ ms_auto_no:
 #endif /* HAVE_MGCSFX_AUTO */
 
   if (filetype == RFT_ERROR) {
-    char  foostr[512];
+    char  foostr[512 + 128];
     sprintf(foostr,"Can't open file '%s'\n\n  %s.",filename, ERRSTR(errno));
 
     if (!polling) ErrPopUp(foostr, "\nBummer!");
@@ -2725,9 +2725,8 @@ ms_auto_no:
     SetCropString();
   }
   else {
-    int w,h,aspWIDE,aspHIGH,oldemode;
+    int w,h,aspWIDE,aspHIGH;
 
-    oldemode = epicMode;
     epicMode = EM_RAW;   /* be in raw mode for all intermediate conversions */
     cpic = pic;  cWIDE = pWIDE;  cHIGH = pHIGH;  cXOFF = cYOFF = 0;
     epic = cpic; eWIDE = cWIDE;  eHIGH = cHIGH;
@@ -3635,7 +3634,7 @@ static int readpipe(cmd, fname)
    * returns '0' if everything's cool, '1' on error
    */
 
-  char fullcmd[512], tmpname[64], str[512];
+  char fullcmd[512], tmpname[64], str[512 + 128];
   int i;
 #ifndef USE_MKSTEMP
   int tmpfd;
@@ -4414,7 +4413,6 @@ void HandleDispMode()
 
   static int haveoldinfo = 0;
   static Window            oldMainW;
-  static int               oldCmapMode;
   static XSizeHints        oldHints;
   static XWindowAttributes oldXwa;
   int i;
@@ -4545,7 +4543,6 @@ void HandleDispMode()
       /* save current window stuff */
       haveoldinfo = 1;
       oldMainW = mainW;
-      oldCmapMode = colorMapMode;
 
       GetWindowPos(&oldXwa);
       if (!XGetNormalHints(theDisp, mainW, &oldHints)) oldHints.flags = 0;
@@ -4627,7 +4624,7 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
     if (nlp) *nlp = '\0';
     strcpy(s, fbuf);
 
-    namelist[*numn] = s;  (*numn)++;
+    nlist[*numn] = s;  (*numn)++;
   }
 
 

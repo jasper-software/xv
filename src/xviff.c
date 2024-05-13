@@ -70,11 +70,11 @@ int LoadIFF(fname, pinfo)
   register long col, colbit;
   FILE          *fp;
   int           rv;
-  int           BMHDok, CMAPok, CAMGok;
-  int           bmhd_width, bmhd_height, bmhd_bitplanes, bmhd_transcol;
+  int           BMHDok, CAMGok;
+  int           bmhd_width, bmhd_height, bmhd_bitplanes;
   int           i, j, k, lineskip, colors, fmt;
   int           npixels = 0; /* needs to be initialized _outside_ while-loop */
-  byte          bmhd_masking, bmhd_compression;
+  byte          bmhd_compression;
   long          chunkLen, camg_viewmode;
   byte          *databuf, *dataptr, *cmapptr, *picptr, *pic, *bodyptr;
   byte          *workptr, *workptr2, *workptr3, *decomp_mem;
@@ -145,9 +145,9 @@ int LoadIFF(fname, pinfo)
       bmhd_width       = iff_getword(dataptr + 8);      /* width of picture */
       bmhd_height      = iff_getword(dataptr + 8 + 2);  /* height of picture */
       bmhd_bitplanes   = *(dataptr + 8 + 8);            /* # of bitplanes */
-      bmhd_masking     = *(dataptr + 8 + 9);
+      /* bmhd_masking  = *(dataptr + 8 + 9); */
       bmhd_compression = *(dataptr + 8 + 10);           /* get compression */
-      bmhd_transcol    = iff_getword(dataptr + 8 + 12);
+      /* bmhd_transcol = iff_getword(dataptr + 8 + 12); */
       BMHDok = 1;                                       /* got BMHD */
       dataptr += 8 + chunkLen;                          /* to next chunk */
 
@@ -169,7 +169,7 @@ int LoadIFF(fname, pinfo)
 	pinfo->b[i] = *cmapptr++;
       }
 
-      CMAPok = 1;                                       /* got CMAP */
+      /* CMAPok = 1; */                                 /* got CMAP */
       dataptr += 8 + chunkLen;                          /* to next chunk */
     }
 

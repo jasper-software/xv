@@ -1564,7 +1564,7 @@ int LoadPS(fname, pinfo, quick)
 
 #ifdef GS_PATH
   #define CMDSIZE	1024
-  char tmp[512], gscmd[512], cmdstr[CMDSIZE], tmpname[64];
+  char tmp[CMDSIZE + 128], gscmd[512], cmdstr[CMDSIZE], tmpname[64];
   int  gsresult, nump, i, filetype, doalert, epsf;
 #endif
 

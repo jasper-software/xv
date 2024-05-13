@@ -61,6 +61,7 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
      InitGraf() sets those fields of a GRAF to likely enough values */
 
   int i;
+  char tstr[32];
 
   if (!pixmaps_built) {
     gfbpix[GFB_ADDH]   = MakePix1(parent, gf1_addh_bits, PW, PH);
@@ -83,7 +84,9 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
   gp->entergamma = 0;
   gp->drawobj = NULL;
 
-  sprintf(gp->gvstr, "%.5g", gp->gamma);
+  sprintf(tstr, "%.5g", gp->gamma);
+  strncpy(gp->gvstr, tstr, GVMAX+1);
+  gp->gvstr[GVMAX] = '\0';
 
   gp->win = XCreateSimpleWindow(theDisp, parent, x,y, GWIDE, GHIGH, 1, fg,bg);
   if (!gp->win) FatalError("can't create graph (main) window");
@@ -247,6 +250,8 @@ int mx,my;
   int          x, y, rx, ry, firsttime=1;
   unsigned int mask;
 
+  XV_UNUSED(child);
+
   rv = 0;
 
   while (1) {   /* loop until Button1 up and ShiftKey up */
@@ -385,7 +390,7 @@ int mx,my;
 
 
     else if (cW == gp->gwin) {  /* clicked in graph */
-      int h, vertonly, offx, offy;
+      int h, vertonly;
 
       XTranslateCoordinates(theDisp, gp->win, gp->gwin,mx,my,&mx,&my,&cW);
 
@@ -402,7 +407,7 @@ int mx,my;
       }
 
       else {  /* track handle */
-	int origx, origy, orighx, orighy, dx, dy, olddx, olddy, grab;
+	int origx, origy, orighx, orighy, dx, dy, grab;
 
 	drawHandPos(gp, h);
 
@@ -417,12 +422,8 @@ int mx,my;
 	orighx = gp->hands[h].x;  orighy = gp->hands[h].y;
 
 	gp->gammamode = 0;
-	offx = gp->hands[h].x - origx;
-	offy = gp->hands[h].y - origy;
 
 	vertonly = (h==0 || h==(gp->nhands-1));
-
-	olddx = 0;  olddy = 0;
 
 	while (XQueryPointer(theDisp,rootW,&rW,&cW,&rx,&ry,&x,&y,&mask)) {
 	  int newx, newy;
@@ -457,7 +458,6 @@ int mx,my;
 	    drawGraf(gp,0);
 	    drawHandPos(gp, h);
 	    rv = 1;
-	    olddx = dx;  olddy = dy;
 
 	    if (gp->drawobj) (gp->drawobj)();
 	  }
@@ -712,7 +712,7 @@ char *str;
      able to hold it... */
 
   int i;
-  char cstr[16];
+  char cstr[64];
 
   if (gp->gammamode) {
     sprintf(str,"G %g", gp->gamma);
@@ -759,8 +759,11 @@ int Str2Graf(gp, str)
   if (*tstr == 'G' || *tstr == 'g') {
     if (sscanf(tstr+1, "%lf", &(gp->gamma)) == 1 &&
 	gp->gamma >= -1000.0 && gp->gamma <= 1000.0) {
+      char tstr2[32];
       gp->gammamode = 1;
-      sprintf(gp->gvstr, "%.5g", gp->gamma);
+      sprintf(tstr2, "%.5g", gp->gamma);
+      strncpy(gp->gvstr, tstr2, GVMAX+1);
+      gp->gvstr[GVMAX] = '\0';
       return 0;
     }
     else return 1;

@@ -11,6 +11,8 @@
 
 #define REVDATE   "Rev: 2/13/89"
 
+#define XV_UNUSED(variable) ((void)(variable))
+
 /* include files */
 #include <stdio.h>
 #ifdef __STDC__
@@ -275,6 +277,8 @@ static void CreateMainWindow(name,geom,argc,argv)
   int i,x,y;
   unsigned int w,h;
 
+  XV_UNUSED(name);
+
   WIDE = HIGH = 256;			/* default window size */
 
   x=y=w=h=1;
@@ -389,8 +393,8 @@ static void DrawPixValue(x,y)
   static unsigned long pix, lastpix;
   static int           pvaly;
 
-  if (x<0) x=0;  if (x>=WIDE) x=WIDE-1;
-  if (y<0) y=0;  if (y>=HIGH) y=HIGH-1;
+  if (x<0) { x=0; } if (x>=WIDE) { x=WIDE-1; }
+  if (y<0) { y=0; } if (y>=HIGH) { y=HIGH-1; }
 
   if (!pvalup) {	/* it's not up.  make it so */
     if (y >= HIGH/2) pvaly = 0;  else pvaly = HIGH - 12;

@@ -56,6 +56,9 @@ int main(argc, argv)
   byte *pic;
   int   w,h;
 
+  XV_UNUSED(argc);
+  XV_UNUSED(argv);
+
   pic = loadThumbFile(&w, &h);
   writePPM(pic, w, h);
 
@@ -80,10 +83,9 @@ static byte *loadThumbFile(wptr, hptr)
   FILE *fp;
   byte  *icon8, *pic24, *ip, *pp;
   char  buf[256];
-  int   i, builtin, w, h, maxval, npixels, p24sz;
+  int   i, w, h, maxval, npixels, p24sz;
 
   fp = stdin;
-  builtin = 0;
 
   if (!fgets(buf, 256, fp))               errexit();
   if (strncmp(buf, "P7 332", (size_t) 6)) errexit();
@@ -95,7 +97,6 @@ static byte *loadThumbFile(wptr, hptr)
     if (!strncmp(buf, "#END_OF_COMMENTS", (size_t) 16)) break;
 
     else if (!strncmp(buf, "#BUILTIN:",   (size_t)  9)) {
-      builtin = 1;
       fprintf(stderr, "Built-in icon:  no image to convert\n");
       exit(1);
     }
@@ -149,7 +150,7 @@ static void writePPM(pic, w, h)
 {
   FILE *fp;
   byte *pix;
-  int   i,j,len;
+  int   i,j;
 
   fp = stdout;
 
@@ -158,7 +159,7 @@ static void writePPM(pic, w, h)
 
   if (ferror(fp)) errexit();
 
-  for (i=0, pix=pic, len=0; i<h; i++) {
+  for (i=0, pix=pic; i<h; i++) {
     for (j=0; j<w; j++, pix+=3) {
       putc(pix[0],fp);  putc(pix[1],fp);  putc(pix[2],fp);
     }

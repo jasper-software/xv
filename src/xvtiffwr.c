@@ -65,6 +65,7 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
   }
 
 #ifndef VMS
+  XV_UNUSED(fp);
   tif = TIFFOpen(fname, "w");
 #else
   tif = TIFFFdOpen(dup(fileno(fp)), fname, "w");

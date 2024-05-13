@@ -549,6 +549,8 @@ magnify(int mag,  /* power of 2 by which to magnify in place */
   int x,y,yi;
   byte *optr,*nptr,*uptr;  /* MUST be unsigned, else averaging fails */
 
+  XV_UNUSED(mh);
+
   while (mag > 1) {
 
     /* create every 2nd new row from 0 */
@@ -754,9 +756,7 @@ XEvent *xev;
 void
 PCDSetParamOptions(const char *fname)
 {
-  int cur;
-  cur = RBWhich(resnRB);
-
+  XV_UNUSED(fname);
   RBSetActive(resnRB,0,1);
   RBSetActive(resnRB,1,1);
   RBSetActive(resnRB,2,1);
@@ -833,6 +833,7 @@ int cmd;
   switch (cmd) {
   case T_BOK:    PCDSetParams();
                 goforit=1;
+                /* fall through */
   case T_BCANC:  PCDDialog(0);
                 break;
 
@@ -1161,8 +1162,9 @@ gethuffdata(  byte *luma,
 {
 static  byte  clip[3*256];
   int  *hufftable[3], *huffstart = NULL, *huffptr = NULL;
-  int  row, col, plane, i, result = 1;
+  int  row, plane, i, result = 1;
 #if TRACE
+  int  col;
   int  uflow = 0, oflow = 0;
 #endif
   byte  *pixelptr = NULL;
@@ -1211,17 +1213,22 @@ static  byte  clip[3*256];
   i = 0;
   while (is24() != 0xfffffe) {
     (void)get24();
-    if(++i == 1)
+    if(++i == 1) {
       trace((stderr,"gethuffdata: skipping for sync ..."));
+    }
   }
-  if(i != 0)
+  if(i != 0) {
     trace((stderr, " %d times\n", i));
+  }
 
   while(result) {
     if(is24() == 0xfffffe) {
       skip24();
       plane = get2();
-      row = get13(); col = 0;
+      row = get13();
+#if TRACE
+      col = 0;
+#endif
       skip1();
       if(row >= maxrownumber) {
         trace((stderr,

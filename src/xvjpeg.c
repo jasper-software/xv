@@ -459,10 +459,8 @@ METHODDEF void  xv_error_output(cinfo)
 #endif
      j_common_ptr cinfo;
 {
-  my_error_ptr myerr;
   char         buffer[JMSG_LENGTH_MAX];
 
-  myerr = (my_error_ptr) cinfo->err;
   (*cinfo->err->format_message)(cinfo, buffer);
 
   SetISTR(ISTR_WARNING, "%s: %s", fbasename, buffer);   /* send it to XV */
@@ -667,11 +665,14 @@ L2:
   jpeg_start_decompress(&cinfo);
 
   while (cinfo.output_scanline < cinfo.output_height) {
+#if 0
+    /* can never happen because output_scanline is unsigned */
     if (cinfo.output_scanline < 0) {   /* should never happen, but... */
       SetISTR(ISTR_WARNING, "%s:  invalid negative scanline (%d)",
               fbasename, cinfo.output_scanline);
       goto L1;
     }
+#endif
     rowptr[0] = (JSAMPROW) &pic[cinfo.output_scanline * w * bperpix];
     (void) jpeg_read_scanlines(&cinfo, rowptr, (JDIMENSION) 1);
   }
@@ -696,9 +697,9 @@ L2:
       do {
         register int cmy, k = 255 - q[3];
 
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* R */
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* G */
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* B */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* R */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* G */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* B */
       } while (++q <= pic_end);
     }
     else { /* assume normal data */
@@ -707,9 +708,9 @@ L2:
       do {
         register int cmy, k = 255 - q[3];
 
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* R */
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* G */
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* B */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* R */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* G */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* B */
       } while (++q <= pic_end);
     }
     pic = realloc(pic,p-pic); /* Release extra storage */

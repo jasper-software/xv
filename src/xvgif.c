@@ -271,7 +271,7 @@ int LoadGIF(fname, pinfo)
 
 
       else if (fn == 0xFE) {  /* Comment Extension */
-	int   ch, j, sbsize, cmtlen;
+	int   j, sbsize, cmtlen;
 	byte *ptr1, *cmt, *cmt1, *sp;
 
 	cmtlen = 0;
@@ -281,7 +281,7 @@ int LoadGIF(fname, pinfo)
 	do {
 	  sbsize = NEXTBYTE;
 	  cmtlen += sbsize;
-	  for (j=0; j<sbsize; j++) ch = NEXTBYTE;
+	  for (j=0; j<sbsize; j++) XV_UNUSED_RETURN(NEXTBYTE);
 	} while (sbsize);
 
 

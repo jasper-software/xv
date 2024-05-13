@@ -357,6 +357,8 @@ void RedrawDirW(x,y,w,h)
   char       foo[30];
   const char *str;
 
+  XV_UNUSED(x); XV_UNUSED(y); XV_UNUSED(w); XV_UNUSED(h);
+
   if (dList.nstr==1) strcpy(foo,"1 file");
                 else sprintf(foo,"%d files",dList.nstr);
 
@@ -428,7 +430,7 @@ int x,y;
 {
   BUTT  *bp;
   int    bnum,i,maxbut,v;
-  char   buf[1024];
+  char   buf[MAXPATHLEN + 1024];
 
   if (savemode) {                           /* check format/colors MBUTTS */
     i = v = 0;
@@ -641,7 +643,7 @@ static void changedDirMB(sel)
 #else
     if (chdir(tmppath)) {
 #endif
-      char str[512];
+      char str[MAXPATHLEN + 128];
       sprintf(str,"Unable to cd to '%s'\n", tmppath);
       *trunc_point = '/';  /* restore the path */
       MBRedraw(&dirMB);
@@ -659,6 +661,7 @@ static void RedrawDList(delta, sptr)
      int   delta;
      SCRL *sptr;
 {
+  XV_UNUSED(sptr);
   LSRedraw(&dList,delta);
 }
 
@@ -1468,7 +1471,7 @@ char *GetDirFullName()
     strcpy(globname, filename);
     if (globname[0] == '~') Globify(globname);
 
-    if (globname[0] != '/') sprintf(fullname, "%s%s", path, globname);
+    if (globname[0] != '/') sprintf(fullname, "%.*s%s", MAXPATHLEN-(int)strlen(globname), path, globname);
     else strcpy(fullname, globname);
   }
 

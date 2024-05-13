@@ -24,6 +24,9 @@
 
 #define TRUNCSTR "File appears to be truncated."
 
+static int PointZX PARM((byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int x, int y));
+static void CellZX PARM((byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int cx, int cy, byte *zxfile));
+
 static int zxError PARM((const char *, const char *));
 
 static const char *bname;
@@ -38,7 +41,7 @@ int LoadZX(fname, pinfo)
 
   FILE  *fp;
   unsigned int    c, c1;
-  int   x,y, trunc;
+  int   x,y;
   byte  *zxfile;
 
   bname = BaseName(fname);
@@ -62,7 +65,7 @@ int LoadZX(fname, pinfo)
 
   /* Load it in en bloc */
   memset(zxfile, 0, 7040);
-  if (fread(zxfile, 1, 7040, fp) < 7040) trunc = 1;
+  if (fread(zxfile, 1, 7040, fp) < 7040) { /* trunc = 1 */; }
 
   /* Transform to 8-bit */
 
@@ -309,6 +312,10 @@ int WriteZX(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
 	byte *zxfile;
 	byte *pic8;
 	byte  rtemp[256],gtemp[256],btemp[256];
+
+	XV_UNUSED(numcols);
+	XV_UNUSED(colorstyle);
+	XV_UNUSED(comment);
 
 	/* To simplify matters, reduce 24-bit to 8-bit. Since the Spectrum
            screen is 3.5-bit anyway, it doesn't make much difference */

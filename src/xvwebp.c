@@ -103,6 +103,8 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   int       i = 0;
   int       final_size = 0;
 
+  XV_UNUSED(numcols);
+
   /*
    * First, we have to prepare our data in such a fashion that we can
    * write it out.  webp only supports 24 or 32 bit formats, so any

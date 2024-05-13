@@ -1,0 +1,10 @@
+# staging area
+tmp*
+
+# temporary build files
+*-
+*.err
+*.log
+
+# executables
+*.o

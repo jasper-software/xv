@@ -19,6 +19,7 @@
 
 #define XV_CAST(type, expr) ((type)(expr))
 #define XV_UNUSED(variable) ((void)(variable))
+#define XV_UNUSED_RETURN(expr) ((void)(expr))
 
 /* xv 3.10a:				19941229 */
 /* PNG patch 1.2d:			19960731 */
@@ -1314,7 +1315,7 @@ WHERE XImage        *theImage;     /* X version of epic */
 
 WHERE int           ncols;         /* max # of (different) colors to alloc */
 
-WHERE char          dummystr[128]; /* dummy string used for error messages */
+WHERE char          dummystr[256]; /* dummy string used for error messages */
 WHERE char          initdir[MAXPATHLEN];   /* cwd when xv was started */
 WHERE char          searchdir[MAXPATHLEN]; /* '-dir' option */
 WHERE char          fullfname[MAXPATHLEN]; /* full name of current file */
@@ -1662,6 +1663,7 @@ void   ChangeCmapMode      PARM((int, int, int));
 
 /************************** XVCPMASK.C **************************/
 CPS   *calcCPmask          PARM((char *, int));
+void   cpcode 	           PARM((char *, unsigned char *, int));
 
 
 /**************************** XVCTRL.C **************************/
@@ -2192,7 +2194,7 @@ int WriteWBMP              PARM((FILE *, byte *, int, int, int, byte *,
 int  LoadWEBP              PARM((char *, PICINFO *));
 int WriteWEBP              PARM((FILE *, byte *, int, int, int, byte *,
 				                 byte *, byte *, int, int));
-
+void WEBPSaveParams        PARM((char *, int));
 void VersionInfoWEBP       PARM((void));
 
 

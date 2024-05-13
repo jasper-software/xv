@@ -254,7 +254,7 @@ typedef struct {  Window        win, iconW;
 		  int           numWide, numHigh, visHigh;
 
 		  SCRL          scrl;
-		  BUTT          but[BR_NBUTTS];
+		  BUTT          but[BR_NCMDS];
 		  MBUTT         dirMB, cmdMB;
 		  char          dispstr[256];
 		  int           numbutshown;
@@ -913,11 +913,12 @@ static int brChkEvent(br, xev)
 
   else if (xev->type == ButtonPress) {
     XButtonEvent *e = (XButtonEvent *) xev;
-    int i,x,y;
+    int x,y;
     x = e->x;  y = e->y;
 
 #ifdef VS_RESCMAP
     if (browCmap && browPerfect && (_IfTempOut!=0)) {
+      int i;
       XSetWindowAttributes  xswa;
       _IfTempOut--;
       xswa.colormap = browCmap;
@@ -931,8 +932,8 @@ static int brChkEvent(br, xev)
       if      (e->window == br->win)      clickBrow(br,x,y);
       else if (e->window == br->scrl.win) SCTrack(&(br->scrl),x,y);
       else if (e->window == br->iconW) {
-        i = clickIconWin(br, x,y,(unsigned long) e->time,
-          (e->state&ControlMask) || (e->state&ShiftMask));
+        XV_UNUSED_RETURN(clickIconWin(br, x,y,(unsigned long) e->time,
+          (e->state&ControlMask) || (e->state&ShiftMask)));
       }
       else rv = 0;
     }
@@ -1783,8 +1784,8 @@ static void makeIconVisible(br, num)
   int sval, first, numvis;
 
   /* if we know what path we have, remember last visible icon for this path */
-  if (br->path)
-    recIconVisible(br->path, num);
+  /* br->path is an array so it can never be NULL */
+  recIconVisible(br->path, num);
 
   /* if icon #i isn't visible, adjust scrollbar so it *is* */
 

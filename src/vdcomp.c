@@ -1027,7 +1027,7 @@ int read_var(ibuf,host)
   char  *ibuf;
   int   host;
 {
-  int   length,result,nlen;
+  int   length,nlen;
   char  temp;
   union /* this union is used to swap 16 and 32 bit integers          */
     {
@@ -1041,7 +1041,7 @@ int read_var(ibuf,host)
           /* IBM PC host                                         */
           /*******************************************************/
     length = 0;
-    result = read(infile,&length,(size_t) 2);
+    if (read(infile,&length,(size_t) 2) <= 0) return 0;
     nlen =   read(infile,ibuf,(size_t) (length+(length%2)));
     return (length);
 
@@ -1050,7 +1050,7 @@ int read_var(ibuf,host)
           /*******************************************************/
 
     length = 0;
-    result = read(infile,onion.ichar,(size_t) 2);
+    if (read(infile,onion.ichar,(size_t) 2) <= 0) return 0;
     /*     byte swap the length field                            */
     temp   = onion.ichar[0];
     onion.ichar[0]=onion.ichar[1];
@@ -1062,14 +1062,14 @@ int read_var(ibuf,host)
   case 3: /*******************************************************/
           /* VAX host with variable-length support               */
           /*******************************************************/
-    length = read(infile,ibuf,(size_t) 2048/* upper bound */);
+    if (read(infile,ibuf,(size_t) 2048/* upper bound */) <= 0) return 0;
     return (length);
 
   case 4: /*******************************************************/
           /* VAX host, but not a variable-length file            */
           /*******************************************************/
     length = 0;
-    result = read(infile,&length,(size_t) 2);
+    if (read(infile,&length,(size_t) 2) <= 0) return 0;
     nlen =   read(infile,ibuf,(size_t) length+(length%2));
 
     /* check to see if we crossed a VAX record boundary          */
@@ -1081,7 +1081,7 @@ int read_var(ibuf,host)
           /* Unix workstation host (non-byte-swapped 32 bit host)*/
           /*******************************************************/
     length = 0;
-    result = read(infile,onion.ichar,(size_t) 2);
+    if (read(infile,onion.ichar,(size_t) 2) <= 0) return 0;
     /*     byte swap the length field                            */
     temp   = onion.ichar[0];
     onion.ichar[0]=onion.ichar[1];
