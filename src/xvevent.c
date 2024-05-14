@@ -1948,6 +1948,9 @@ static void handleKeyEvent(event, donep, retvalp)
       case 'H':    FakeButtonPress(&gbut[G_BHISTEQ]);  break;
       case 'N':    FakeButtonPress(&gbut[G_BMAXCONT]); break;
 
+        /* wait pause/resume */
+      case 'w':    waitsec = -waitsec;                 break;
+
       default:     break;
       }
     }

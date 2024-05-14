@@ -46,7 +46,7 @@ static long CountDown;
 static int  Interlace;
 
 static void putword     PARM((int, FILE *));
-static void compress    PARM((int, FILE *, byte *, int));
+static void xv_compress PARM((int, FILE *, byte *, int));
 static void output      PARM((int));
 static void cl_block    PARM((void));
 static void cl_hash     PARM((count_int));
@@ -203,7 +203,7 @@ int WriteGIF(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
             else fputc(0x00, fp);
 
   fputc(InitCodeSize, fp);
-  compress(InitCodeSize+1, fp, pic8, w*h);
+  xv_compress(InitCodeSize+1, fp, pic8, w*h);
 
   fputc(0,fp);                      /* Write out a Zero-length packet (EOF) */
   fputc(';',fp);                    /* Write GIF file terminator */
@@ -264,7 +264,7 @@ static  unsigned short codetab [HSIZE];
 static int hsize = HSIZE;            /* for dynamic table sizing */
 
 /*
- * To save much memory, we overlay the table used by compress() with those
+ * To save much memory, we overlay the table used by xv_compress() with those
  * used by decompress().  The tab_prefix table is the same size and type
  * as the codetab.  The tab_suffix table needs 2**BITS characters.  We
  * get this from the beginning of htab.  The output stack uses the rest
@@ -311,7 +311,7 @@ static int EOFCode;
 
 
 /********************************************************/
-static void compress(init_bits, outfile, data, len)
+static void xv_compress(init_bits, outfile, data, len)
 int   init_bits;
 FILE *outfile;
 byte *data;

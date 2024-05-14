@@ -3,6 +3,15 @@
 
 * Made some improvements to WEBP support.
 
+5.0.1 (2024-05-14)
+==================
+
+* Increased some buffers to fix compile warnings and sanitizer warnings.
+* Fixed unused variable warnings with XV_UNUSED macro or by removing the variables.
+* Updated prototypes in xv.h to fix warnings about declarations without prototypes.
+* Added a -c option to the build script to do a clean build.
+* Added .gitignore
+
 5.0.0 (2024-02-06)
 ==================
 

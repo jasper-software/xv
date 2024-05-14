@@ -1128,7 +1128,7 @@ typedef struct { byte *pic;                  /* image data */
 #define GFB_RESET  4
 #define GFB_GAMMA  5
 
-#define GVMAX 8
+#define GVMAX 16
 
 typedef struct {  Window win;               /* window ID */
 		  Window gwin;              /* graph subwindow */

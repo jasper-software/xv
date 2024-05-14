@@ -5,6 +5,14 @@ tmp*
 *-
 *.err
 *.log
+*.orig
+
+#objects
+*.o
 
 # executables
-*.o
+xv
+bggen
+vdcomp
+xcmap
+xvpictoppm
