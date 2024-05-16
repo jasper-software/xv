@@ -471,6 +471,14 @@
 #  define HAVE_G3
 #endif
 
+#ifndef TRUE
+#  define TRUE 1
+#endif
+
+#ifndef FALSE
+#  define FALSE 0
+#endif
+
 #ifdef DOWEBP
 #  define HAVE_WEBP
 #endif
