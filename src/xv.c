@@ -1228,10 +1228,10 @@ static void useOtherVisual(vinfo, best)
     XFlush(theDisp);
     XSync(theDisp, False);
 
-    xswa.background_pixel = 0;
+    xswa.background_pixmap  = None;
     xswa.border_pixel     = 1;
     xswa.colormap         = theCmap;
-    xswamask = CWBackPixel | CWBorderPixel | CWColormap;
+    xswamask = CWBackPixmap | CWBorderPixel | CWColormap;
 
     win = XCreateWindow(theDisp, rootW, 0, 0, 100, 100, 2, (int) dispDEEP,
 			InputOutput, theVisual, xswamask, &xswa);
@@ -3966,7 +3966,7 @@ static void createMainWindow(geom, name)
   hints.flags |= PSize | PMaxSize;
 
   xswa.bit_gravity      = StaticGravity;
-  xswa.background_pixel = bg;
+  xswa.background_pixmap  = None;
   xswa.border_pixel     = fg;
   xswa.colormap         = theCmap;
 
@@ -3981,7 +3981,8 @@ static void createMainWindow(geom, name)
      that windows, by default, have backing-store turned on, then the
      image window will, too */
 
-  xswamask = CWBackPixel | CWBorderPixel | CWColormap /* | CWBackingStore */;
+  /* CWBackPixel */
+  xswamask = CWBackPixmap | CWBorderPixel | CWColormap /* | CWBackingStore */;
   if (!clearonload) xswamask |= CWBitGravity;
 
   if (mainW) {
