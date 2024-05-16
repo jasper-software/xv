@@ -28,6 +28,7 @@ option(XV_ENABLE_PDS  "Enable PDF Support" ON)
 option(XV_ENABLE_PNG  "Enable PNG Support" ON)
 option(XV_ENABLE_TIFF "Enable TIFF Support" ON)
 option(XV_ENABLE_WEBP "Enable WEBP Support" ON)
+option(XV_ENABLE_G3   "Enable G3 Support" ON)
 option(XV_ENABLE_XRANDR "Enable XRANDR Support" ON)
 
 option(XV_STRICT "Treat compiler warnings as errors" OFF)
@@ -228,6 +229,7 @@ message("JPEG: ${XV_ENABLE_JPEG}")
 message("TIFF: ${XV_ENABLE_TIFF}")
 message("PNG: ${XV_ENABLE_PNG}")
 message("WEBP: ${XV_ENABLE_WEBP}")
+message("G3: ${XV_ENABLE_G3}")
 message("RANDR: ${XV_ENABLE_XRANDR}")
 
 ################################################################################

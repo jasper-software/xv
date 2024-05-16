@@ -55,7 +55,7 @@ static int    randomShow = 0;   /* do a 'random' slideshow */
 static int    startIconic = 0;  /* '-iconic' option */
 static int    defaultVis  = 0;  /* true if using DefaultVisual */
 #ifdef HAVE_G3
-static int    fax = 0;          /* temporary(?) kludge */
+static int    lowresfax = 0;    /* temporary(?) kludge */
 int           highresfax = 0;
 #endif
 static double hexpand = 1.0;    /* '-expand' argument */
@@ -1587,10 +1587,6 @@ static void parseCmdLine(argc, argv)
       }
     }
 
-#ifdef HAVE_G3
-    else if (!argcmp(argv[i],"-fax",3,0,&highresfax));     /* fax */
-#endif
-
     else if (!argcmp(argv[i],"-fg",3,0,&pm))               /* fg color */
       { if (++i<argc) fgstr = argv[i]; }
 
@@ -1627,6 +1623,8 @@ static void parseCmdLine(argc, argv)
       { if (++i<argc) histr = argv[i]; }
 
 #ifdef HAVE_G3
+    else if (!argcmp(argv[i],"-fax",3,3,&highresfax)); /* high resolution fax */
+    else if (!argcmp(argv[i],"-lowresfax",4,0,&lowresfax)); /* low resolution fax */
     else if (!argcmp(argv[i],"-highresfax",4,0,&highresfax));/* high res. fax */
 #endif
 
@@ -1964,9 +1962,6 @@ static void cmdSyntax(i)
   printoption("[-/+dither]");
   printoption("[-drift dx dy]");
   printoption("[-expand exp | hexp:vexp]");
-#ifdef HAVE_G3
-  printoption("[-fax]");
-#endif
   printoption("[-fg color]");
   printoption("[-/+fixed]");
 #ifdef ENABLE_FIXPIX_SMOOTH
@@ -1982,9 +1977,6 @@ static void cmdSyntax(i)
   printoption("[-help]");
   printoption("[-/+hflip]");
   printoption("[-hi color]");
-#ifdef HAVE_G3
-  printoption("[-highresfax]");
-#endif
   printoption("[-/+hist]");
   printoption("[-/+hsv]");
   printoption("[-ibg color]");  /* GRR 19980314 */
@@ -2065,6 +2057,11 @@ static void cmdSyntax(i)
   printoption("[-white color]");
   printoption("[-windowid windowid]");
   printoption("[-/+wloop]");
+#ifdef HAVE_G3
+  printoption("[-fax]");
+  printoption("[-lowresfax]");
+  printoption("[-highresfax]");
+#endif
   printoption("[filename ...]");
   fprintf(stderr,"\n\n");
   Quit(i);
@@ -3170,7 +3167,7 @@ int ReadFileType(fname)
 #endif
 
 #ifdef HAVE_JP2K
-  else if (magicno[0]==0xff && magicno[1]==0x4f && 
+  else if (magicno[0]==0xff && magicno[1]==0x4f &&
            magicno[2]==0xff && magicno[3]==0x51)              rv = RFT_JPC;
 
   else if (memcmp(magicno, jp2k_magic, sizeof(jp2k_magic))==0) rv = RFT_JP2;
@@ -3212,8 +3209,11 @@ int ReadFileType(fname)
   else if ((magicno[0]==  1 && magicno[1]==  1 &&
             magicno[2]== 77 && magicno[3]==154 &&
             magicno[4]==128 && magicno[5]==  0 &&
-            magicno[6]==  1 && magicno[7]== 77)
-           || highresfax || fax) /* kludge! */                rv = RFT_G3;
+            magicno[6]==  1 && magicno[7]== 77) ||
+            highresfax || lowresfax || !strcmp(fname+strlen(fname)-3,".g3")) {
+               if (!lowresfax) highresfax = 1;
+               rv = RFT_G3;
+  }
 #endif
 
 #ifdef HAVE_MAG

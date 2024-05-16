@@ -37,6 +37,10 @@ if(XV_ENABLE_JP2K)
 	set(xv_libs ${xv_libs} Jasper::Jasper)
 endif()
 
+if(XV_ENABLE_G3)
+	add_compile_definitions(DOG3)
+endif()
+
 if(XV_ENABLE_PDS)
 	add_compile_definitions(DOPDS)
 	#set(xv_libs ${xv_libs} XXX::XXX)
@@ -64,6 +68,7 @@ set(xv_sources
 	xvdir.c
 	xvevent.c
 	xvfits.c
+	xvg3.c
 	xvgam.c
 	xvgif.c
 	xvgifwr.c
@@ -105,7 +110,7 @@ set(xv_sources
 	xvtiffwr.c
 	xvvd.c
 	xvwbmp.c
-    xvwebp.c
+	xvwebp.c
 	xvxbm.c
 	xvxpm.c
 	xvxwd.c

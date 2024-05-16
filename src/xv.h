@@ -679,7 +679,8 @@
 #define F_FITS      (10 + F_TIFF)
 #define F_PM        (11 + F_TIFF)
 #define F_ZX        (12 + F_TIFF)   /* [JCE] */
-#define F_WBMP      (13 + F_TIFF)
+#define F_G3        (13 + F_TIFF)   /* [JCE] */
+#define F_WBMP      (14 + F_TIFF)
 #define F_WEBP      (F_WEBPINC + F_WBMP)
 #define JP_EXT_F    (F_WEBP)
 #define F_MAG       (JP_EXT_F + F_MAGINC)
@@ -2052,6 +2053,10 @@ int WriteBMP               PARM((FILE *, byte *, int, int, int, byte *,
 int LoadFITS               PARM((char *, PICINFO *, int));
 int WriteFITS              PARM((FILE *, byte *, int, int, int, byte *,
 				 byte *, byte *, int, int, char *));
+
+/**************************** XVG3.C ****************************/
+int LoadG3                 PARM((char *, PICINFO *));
+
 
 /**************************** XVGIF.C ***************************/
 int LoadGIF                PARM((char *, PICINFO *));

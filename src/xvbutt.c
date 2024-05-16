@@ -857,7 +857,7 @@ void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
   mb->h        = h;
   mb->title    = title;
   mb->active   = 1;
-  mb->list     = list;
+  mb->list     = (const char **)list;
   mb->nlist    = nlist;
   mb->hascheck = 0;
   mb->fg       = fg;
