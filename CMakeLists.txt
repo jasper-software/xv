@@ -28,6 +28,7 @@ option(XV_ENABLE_PDS  "Enable PDF Support" ON)
 option(XV_ENABLE_PNG  "Enable PNG Support" ON)
 option(XV_ENABLE_TIFF "Enable TIFF Support" ON)
 option(XV_ENABLE_WEBP "Enable WEBP Support" ON)
+option(XV_ENABLE_XRANDR "Enable XRANDR Support" ON)
 
 option(XV_STRICT "Treat compiler warnings as errors" OFF)
 
@@ -198,11 +199,36 @@ if(XV_ENABLE_WEBP AND NOT TARGET WebP::libwebp)
     set(XV_ENABLE_WEBP OFF)
 endif()
 
+if(XV_ENABLE_XRANDR)
+	find_path(XRANDR_INCLUDE_DIR NAMES X11/extensions/Xrandr.h
+		PATH_SUFFIXES X11/extensions
+		DOC "The XRANDR include directory"
+	)
+
+	find_library(XRANDR_LIBRARY NAMES Xrandr
+		DOC "The XRANDR library"
+	)
+
+	include(FindPackageHandleStandardArgs)
+	FIND_PACKAGE_HANDLE_STANDARD_ARGS(XRANDR DEFAULT_MSG XRANDR_LIBRARY XRANDR_INCLUDE_DIR)
+
+	mark_as_advanced(XRANDR_INCLUDE_DIR XRANDR_LIBRARY)
+
+	if(XRANDR_FOUND)
+		set(XRANDR_LIBRARIES ${XRANDR_LIBRARY})
+		set(XRANDR_INCLUDE_DIRS ${XRANDR_INCLUDE_DIR})
+	else()
+		message(WARNING "Disabling RANDR Support.")
+		set(XV_ENABLE_XRANDR OFF)
+	endif()
+endif()
+
 message("JP2K: ${XV_ENABLE_JP2K}")
 message("JPEG: ${XV_ENABLE_JPEG}")
 message("TIFF: ${XV_ENABLE_TIFF}")
 message("PNG: ${XV_ENABLE_PNG}")
 message("WEBP: ${XV_ENABLE_WEBP}")
+message("RANDR: ${XV_ENABLE_XRANDR}")
 
 ################################################################################
 # Subdirectories.

@@ -282,6 +282,16 @@
 /* #  define TV_FONTSET "-*-fixed-medium-r-normal--%d-*" */
 #endif /* TV_L10N */
 
+/***************************************************************************
+ * X11 Rotate And Resize Support
+ *
+ * if you want XV to adjust the max(pect) sizes to your current screen size
+ * and you have the XRandR headers and library installed
+ */
+
+#ifdef DOXRANDR
+#  define HAVE_XRR
+#endif
 
 /***************************************************************************
  * User definable filter support:

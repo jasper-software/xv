@@ -75,6 +75,10 @@ static void   annotatePic      PARM((void));
 static int    debkludge_offx;
 static int    debkludge_offy;
 
+#ifdef HAVE_XRR
+int RRevent_number = -1, RRerror_number = -1;
+#endif
+
 #ifndef NOSIGNAL
 static XtSignalId IdQuit = 0;
 extern XtAppContext context;
@@ -234,6 +238,10 @@ int HandleEvent(event, donep)
 #endif
 #ifdef HAVE_MGCSFX
   static int wasMgcSfxUp=0;
+#endif
+#ifdef HAVE_XRR
+  int screen;
+  XRRScreenChangeNotifyEvent *xrr_event;
 #endif
 
   static int mainWKludge=0;  /* force first mainW expose after a mainW config
@@ -918,10 +926,23 @@ int HandleEvent(event, donep)
     }
     break;
 
-
-
   default: break;		/* ignore unexpected events */
   }  /* switch */
+
+#ifdef HAVE_XRR
+  if (event->type == RRevent_number + RRScreenChangeNotify) {
+    XRRUpdateConfiguration(event);
+    XSync (theDisp, False);
+    xrr_event = (XRRScreenChangeNotifyEvent *)event;
+
+    screen = XRRRootToScreen(theDisp, xrr_event->window);
+
+    dispWIDE = DisplayWidth(theDisp, screen);
+    dispHIGH = DisplayHeight(theDisp, screen);
+    maxWIDE = vrWIDE = dispWIDE;  maxHIGH = vrHIGH = dispHIGH;
+    HandleDispMode();
+  }
+#endif
 
   frominterrupt = 0;
   *donep = done;

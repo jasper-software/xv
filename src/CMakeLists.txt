@@ -42,6 +42,11 @@ if(XV_ENABLE_PDS)
 	#set(xv_libs ${xv_libs} XXX::XXX)
 endif()
 
+if(XV_ENABLE_XRANDR)
+	add_compile_definitions(DOXRANDR)
+	set(xv_libs ${xv_libs} ${XRANDR_LIBRARIES})
+endif()
+
 set(xv_sources
 	vprintf.c
 	xv24to8.c

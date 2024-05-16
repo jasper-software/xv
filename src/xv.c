@@ -140,6 +140,9 @@ static int  argcmp                   PARM((const char *, const char *,
                                            int, int, int *));
 static void add_filelist_to_namelist PARM((char *, char **, int *, int));
 
+#ifdef HAVE_XRR
+extern int RRevent_number, RRerror_number;
+#endif
 
 /* formerly local vars in main, made local to this module when
    parseResources() and parseCmdLine() were split out of main() */
@@ -170,6 +173,10 @@ int main(argc, argv)
   int    i;
 #ifdef TV_L10N
   int    j;
+#endif
+#ifdef HAVE_XRR
+  int major = -1, minor = -1;
+  int nScreens;
 #endif
   XColor ecdef;
   Window rootReturn, parentReturn, *children;
@@ -1042,8 +1049,26 @@ int main(argc, argv)
   /* make std colormap, maybe */
   ChangeCmapMode(colorMapMode, 0, 0);
 
+  /* Xrandr */
+#ifdef HAVE_XRR
+  if (!XRRQueryExtension(theDisp, &RRevent_number, &RRerror_number)) {
+    major = -1;
+  } else {
+    if (DEBUG) fprintf(stderr, "XRRQueryExtension: %d, %d\n", RRevent_number, RRerror_number);
 
+    if (!XRRQueryVersion(theDisp, &major, &minor)) {
+      if (DEBUG) fprintf(stderr, "XRRQueryVersion failed!\n");
+    } else {
+      if (DEBUG) fprintf(stderr, "XRRQueryVersion: %d, %d\n", major, minor);
+    }
 
+    nScreens = ScreenCount(theDisp);
+
+    for (i = 0; i < nScreens; i++) {
+      XRRSelectInput(theDisp, RootWindow(theDisp, i), RRScreenChangeNotifyMask);
+    }
+  }
+#endif
 
   /* Do The Thing... */
   mainLoop();

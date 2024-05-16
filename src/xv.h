@@ -252,6 +252,11 @@
 #include <X11/Xatom.h>
 #include <X11/Xmd.h>
 
+#ifdef HAVE_XRR
+#include <X11/Xproto.h>
+#include <X11/extensions/Xrandr.h>
+#endif
+
 #ifdef TV_L10N
 #  include <X11/Xlocale.h>
 #endif
