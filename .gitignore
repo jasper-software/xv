@@ -6,6 +6,7 @@ tmp*
 *.err
 *.log
 *.orig
+*.rej
 
 #objects
 *.o
