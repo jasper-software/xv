@@ -348,6 +348,10 @@ int main(argc, argv)
   pngW = (Window) NULL;  pngUp = 0;
 #endif
 
+#ifdef HAVE_WEBP
+  webpW = (Window) NULL; webpUp = 0;
+#endif
+
   pcdW = (Window) NULL;  pcdUp = 0;
 
 #ifdef HAVE_PIC2
@@ -997,6 +1001,11 @@ int main(argc, argv)
 #ifdef HAVE_PNG
   CreatePNGW();
   XSetTransientForHint(theDisp, pngW, dirW);
+#endif
+
+#ifdef HAVE_WEBP
+  CreateWEBPW();
+  XSetTransientForHint(theDisp, webpW, dirW);
 #endif
 
 #ifdef HAVE_PCD

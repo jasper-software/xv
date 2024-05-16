@@ -230,6 +230,9 @@ int HandleEvent(event, donep)
 #ifdef HAVE_PNG
   static int wasPngUp=0;
 #endif
+#ifdef HAVE_WEBP
+  static int wasWebpUp=0;
+#endif
 #ifdef HAVE_PCD
   static int wasPcdUp=0;
 #endif
@@ -327,6 +330,10 @@ int HandleEvent(event, donep)
 
 #ifdef HAVE_PNG
     if (PNGCheckEvent (event)) break;   /* event has been processed */
+#endif
+
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent(event)) break;   /* event has been processed */
 #endif
 
     if (PCDCheckEvent(event)) break;    /* event has been processed */
@@ -482,6 +489,10 @@ int HandleEvent(event, donep)
 
 #ifdef HAVE_PNG
       else if (client_event->window == pngW)  PNGDialog(0);
+#endif
+
+#ifdef HAVE_WEBP
+      else if (client_event->window == webpW)  WEBPDialog(0);
 #endif
 
       else if (client_event->window == pcdW)  PCDDialog(0);
@@ -686,6 +697,9 @@ int HandleEvent(event, donep)
 #ifdef HAVE_PNG
 	if (wasPngUp)  { PNGDialog(wasPngUp);    wasPngUp=0; }
 #endif
+#ifdef HAVE_WEBP
+       if (wasWebpUp) { WEBPDialog(wasWebpUp);  wasWebpUp=0; }
+#endif
 #ifdef HAVE_PCD
 	if (wasPcdUp)  { PCDDialog(wasPcdUp);    wasPcdUp=0; }
 #endif
@@ -737,6 +751,9 @@ int HandleEvent(event, donep)
 #endif
 #ifdef HAVE_PNG
 	  if (pngUp)  { wasPngUp  = pngUp;   PNGDialog(0); }
+#endif
+#ifdef HAVE_WEBP
+         if (webpUp) { wasWebpUp = webpUp;  WEBPDialog(0); }
 #endif
 #ifdef HAVE_PCD
 	  if (pcdUp)  { wasPcdUp = pcdUp;    PCDDialog(0); }
@@ -1373,6 +1390,10 @@ static void handleButtonEvent(event, donep, retvalp)
     if (PNGCheckEvent (event)) break;
 #endif
 
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent(event)) break;
+#endif
+
 #ifdef HAVE_PCD
     if (PCDCheckEvent (event)) break;	/* event has been processed */
 #endif
@@ -1661,6 +1682,10 @@ static void handleKeyEvent(event, donep, retvalp)
 
 #ifdef HAVE_PNG
     if (PNGCheckEvent (event)) break;
+#endif
+
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent (event)) break;
 #endif
 
     if (PCDCheckEvent (event)) break;
@@ -2764,6 +2789,10 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
 
 #ifdef HAVE_PNG
   if (pngUp) PNGDialog(0);    /* close png window */
+#endif
+
+#ifdef HAVE_WEBP
+  if (webpUp) WEBPDialog(0);  /* close png window */
 #endif
 
   if (pcdUp) PCDDialog(0);    /* close pcd window */

@@ -84,7 +84,7 @@ static const char *saveFormats[] = {
 					"Spectrum SCREEN$",	/* [JCE] */
 					"WBMP",
 #ifdef HAVE_WEBP
-                    "WEBP",
+					"WEBP",
 #endif
 #ifdef HAVE_MAG
 					"MAG",
@@ -1245,6 +1245,15 @@ int DoSave()
   }
 #endif
 
+#ifdef HAVE_WEBP
+  else if (fmt == F_WEBP) {   /* WEBP */
+    WEBPSaveParams(fullname, col);
+    WEBPDialog(1);                  /* open WEBP Dialog box */
+    dbut[S_BOK].lit = 0;  BTRedraw(&dbut[S_BOK]);
+    return 0;                      /* always 'succeeds' */
+  }
+#endif
+
 #ifdef HAVE_PIC2
   else if (fmt == F_PIC2) {   /* PIC2 */
     if (PIC2SaveParams(fullname, col) < 0)
@@ -1509,6 +1518,16 @@ void SetDirSaveMode(group, bnum)
       colMB.dim[F_REDUCED]   = 1;
       MBSelect(&colMB, F_BWDITHER);
     }
+
+#ifdef HAVE_WEBP
+    else if (MBWhich(&fmtMB) == F_WEBP) { /* turn off all but FULLCOLOR */
+      colMB.dim[F_FULLCOLOR] = 0;
+      colMB.dim[F_GREYSCALE] = 1;
+      colMB.dim[F_BWDITHER]  = 1;
+      colMB.dim[F_REDUCED]   = 1;
+      MBSelect(&colMB, F_FULLCOLOR);
+    }
+#endif
 
     else if (MBWhich(&fmtMB) == F_FITS) { /* turn off 'color' modes */
       colMB.dim[F_FULLCOLOR] = 1;
