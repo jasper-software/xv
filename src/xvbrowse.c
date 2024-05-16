@@ -857,9 +857,9 @@ static int brChkEvent(br, xev)
 #endif
 
   if (xev->type == Expose) {
-    //int x,y,w,h;
+    /* int x,y,w,h; */
     XExposeEvent *e = (XExposeEvent *) xev;
-    //x = e->x;  y = e->y;  w = e->width;  h = e->height;
+    /* x = e->x;  y = e->y;  w = e->width;  h = e->height; */
 
     /* throw away excess redraws for 'dumb' windows */
     if (e->count > 0 && (e->window == br->scrl.win))
@@ -1955,7 +1955,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
     int          x, y, rootx, rooty, iwx, iwy, bwx, bwy;
     unsigned int mask;
     Cursor       curs;
-    //int          samepos, oldx, oldy, oldbrnum, destic, origsval, first;
+    /* int          samepos, oldx, oldy, oldbrnum, destic, origsval, first; */
     int          oldx, oldy, oldbrnum, destic, origsval, first;
     int          hasrect, rx, ry, rw, rh;
 
@@ -1981,7 +1981,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	  XDefineCursor(theDisp,binfo[i].iconW, curs);
     }
 
-	//samepos = oldx = oldy = oldbrnum = 0;
+	/* samepos = oldx = oldy = oldbrnum = 0; */
 	oldx = oldy = oldbrnum = 0;
 
 	while (1) {  /* wait for button 1 to be released */
@@ -2052,7 +2052,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	       a rect drag */
 
 	    if (sel>=0 && (oldx!=x || oldy!=y || oldbrnum!=i)) {  /* moved */
-	      //samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i;
+	      /* samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i; */
 	      oldx = x;  oldy = y;  oldbrnum = i;
 	    }
 	    else {
@@ -3749,13 +3749,13 @@ static void genIcon(br, bf)
   int     iwide, ihigh;
   byte   *icon24, *icon8;
   char    str[256], str1[256], readname[128], uncompname[128];
-  //char    basefname[128], *uncName;
+  /* char    basefname[128], *uncName; */
   char    *uncName;
 
 
   if (!bf || !bf->name || bf->name[0] == '\0') return;   /* shouldn't happen */
   str[0] = '\0';
-  //basefname[0] = '\0';
+  /* basefname[0] = '\0'; */
   pinfo.pic = (byte *) NULL;
   pinfo.comment = (char *) NULL;
   strncpy(readname, bf->name, sizeof(readname) - 1);

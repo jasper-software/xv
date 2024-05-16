@@ -427,7 +427,7 @@ int LoadGIF(fname, pinfo)
 
       if (pinfo->numpages > 0) {   /* do multipage stuff */
 	if (pinfo->numpages == 1) {    /* first time only... */
-	  xv_mktemp(pinfo->pagebname, "xvpgXXXXXX"); // a.k.a. close(mkstemp())
+	  xv_mktemp(pinfo->pagebname, "xvpgXXXXXX"); /* a.k.a. close(mkstemp()) */
 	  if (pinfo->pagebname[0] == '\0') {
 	    ErrPopUp("LoadGIF: Unable to create temporary filename???",
 			"\nHow unlikely!");

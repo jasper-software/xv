@@ -180,7 +180,7 @@ int main(argc, argv)
 #endif
   XColor ecdef;
   Window rootReturn, parentReturn, *children;
-  //unsigned int numChildren, rootDEEP;
+  /* unsigned int numChildren, rootDEEP; */
   unsigned int numChildren;
 
 #ifdef AUTO_EXPAND
@@ -437,7 +437,7 @@ int main(argc, argv)
   maxHIGH   = vrHIGH  = dispHIGH  = DisplayHeight(theDisp,theScreen);
 
 
-  //rootDEEP = dispDEEP;
+  /* rootDEEP = dispDEEP; */
 
   /* things dependent on theVisual:
    *    dispDEEP, theScreen, rootW, ncells, theCmap, theGC,
@@ -2276,12 +2276,12 @@ static int openPic(filenum)
 #ifdef AUTO_EXPAND
   else {
     fullname = (char *) malloc(MAXPATHLEN+2);
-    strcpy(fullname, namelist[filenum]);   // 1 of 2 places fullname != const
+    strcpy(fullname, namelist[filenum]);   /* 1 of 2 places fullname != const */
     freename = 1;
   }
   tmp = (char *) rindex(fullname, '/');
   if (tmp) {
-    *tmp = '\0';			   // 2 of 2 places fullname != const
+    *tmp = '\0';			   /* 2 of 2 places fullname != const */
     Mkvdir(fullname);
     *tmp = '/';
   }

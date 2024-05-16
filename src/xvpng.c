@@ -706,7 +706,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
 
   Display_Gamma = gDial.val;  /* Save the current gamma for loading */
 
-// GRR FIXME:  add .Xdefaults option to omit writing gamma (size, cumulative errors when editing)--alternatively, modify save box to include "omit" checkbox
+/* GRR FIXME:  add .Xdefaults option to omit writing gamma (size, cumulative errors when editing)--alternatively, modify save box to include "omit" checkbox */
   png_set_gAMA(png_ptr,info_ptr,1.0/gDial.val);
 /* doesn't seem to be a way to set valid directly anymore, unnecessary maybe.. 
   info_ptr->valid |= PNG_INFO_gAMA; */

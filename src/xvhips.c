@@ -52,7 +52,7 @@ static int   load_colourmap(char *filestem, int max_colours,
 static char *ssave[LINES];
 static int slmax[LINES];
 static int lalloc = 0;
-//extern char *calloc();
+/* extern char *calloc(); */
 
 
 
@@ -196,7 +196,7 @@ int LoadHIPS(fname,pinfo)
 
   pinfo->w = h.cols;
   pinfo->h = h.rows;
-  pic = pinfo->pic = (byte *) malloc(h.rows * h.cols);   // GRR POSSIBLE OVERFLOW / FIXME
+  pic = pinfo->pic = (byte *) malloc(h.rows * h.cols);   /*  GRR POSSIBLE OVERFLOW / FIXME */
   if (!pic) FatalError("couldn't malloc HIPS file");
 
   if (!fread(pic, 1, h.cols*h.rows, fp)) {

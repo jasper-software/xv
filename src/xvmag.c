@@ -297,8 +297,8 @@ static void mag_expand_body(mi, pic0)
     data16 *pixel0;
 
     flag   = mag_malloc((size_t) mi->p_width / 2, "mag_expand_body#1");
-    *pic0  = mag_malloc((size_t) mi->width * mi->height, "mag_expand_body#2");  // GRR POSSIBLE OVERFLOW / FIXME
-    pixel0 = mag_malloc((size_t) 2 * mi->p_width * 17, "mag_expand_body#3");  // GRR POSSIBLE OVERFLOW / FIXME
+    *pic0  = mag_malloc((size_t) mi->width * mi->height, "mag_expand_body#2");  /* GRR POSSIBLE OVERFLOW / FIXME */
+    pixel0 = mag_malloc((size_t) 2 * mi->p_width * 17, "mag_expand_body#3");  /* GRR POSSIBLE OVERFLOW / FIXME */
 
 #define pixel(x, y) pixel0[(y) % 17 * mi->p_width + (x)]
 
@@ -427,7 +427,7 @@ int WriteMAG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
     mag.p_height = h;
     mag.width = w;
     mag.height = h;
-    mag.a_size = (mag.p_width * mag.p_height + 15) / 16;	/* x/2/8 */   // GRR POSSIBLE OVERFLOW / FIXME
+    mag.a_size = (mag.p_width * mag.p_height + 15) / 16;	/* x/2/8 */   /* GRR POSSIBLE OVERFLOW / FIXME */
     if(mag.a_size % 2)
 	mag.a_size++;
 
@@ -459,9 +459,9 @@ static void mag_compress_data(mi, pic0)
     data16 *pixel0;
     int px, py, x, y;
 
-    pixel0 = mag_malloc((size_t) 2 * mi->p_width * mi->p_height,  // GRR POSSIBLE OVERFLOW / FIXME
+    pixel0 = mag_malloc((size_t) 2 * mi->p_width * mi->p_height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 			"mag_compress_data#1");
-    flag0 = mag_malloc((size_t) mi->p_width * mi->p_height,  // GRR POSSIBLE OVERFLOW / FIXME
+    flag0 = mag_malloc((size_t) mi->p_width * mi->p_height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 		       "mag_compress_data#2");
 
 #define pic(x, y) pic0[(y) * mi->width + (x)]
@@ -541,7 +541,7 @@ static void mag_compress_data(mi, pic0)
 
     mask = 0x80;
     ai = bi = bmax = 0;
-    mi->a = mag_malloc((size_t) mi->a_size, "mag_compress_data#4");   // GRR POSSIBLE OVERFLOW / FIXME
+    mi->a = mag_malloc((size_t) mi->a_size, "mag_compress_data#4");   /* GRR POSSIBLE OVERFLOW / FIXME */
     for(i = 0; i < mi->p_width / 2 * mi->p_height; i++){
 	if(flag0[i] == 0){
 	    mi->a[ai] &= ~mask;

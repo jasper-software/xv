@@ -798,7 +798,7 @@ static int gt(tif, w, h, raster)
         return (0);
       }
     } else
-#endif // USE_LIBJPEG_FOR_TIFF_YCbCr_RGB_CONVERSION
+#endif /* USE_LIBJPEG_FOR_TIFF_YCbCr_RGB_CONVERSION */
     {
       TIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRCOEFFICIENTS, &YCbCrCoeffs);
       TIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRSUBSAMPLING,

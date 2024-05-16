@@ -863,10 +863,10 @@ int HandleEvent(event, donep)
 	XWindowAttributes xwa;
 
 	GetWindowPos(&xwa);
-	//fprintf(stderr, "RAC: orig window pos %d,%d\n", xwa.x, xwa.y);
+	/* fprintf(stderr, "RAC: orig window pos %d,%d\n", xwa.x, xwa.y); */
 
 	xwa.width = eWIDE;  xwa.height = eHIGH;
-	//fprintf(stderr, "RAC: image size now %d,%d\n", xwa.width, xwa.height);
+	/* fprintf(stderr, "RAC: image size now %d,%d\n", xwa.width, xwa.height); */
 
 	/* try to keep the damned thing on-screen, if possible */
 	if (xwa.x + xwa.width  > vrWIDE) xwa.x = vrWIDE - xwa.width;
@@ -874,7 +874,7 @@ int HandleEvent(event, donep)
 	if (xwa.x < 0) xwa.x = 0;
 	if (xwa.y < 0) xwa.y = 0;
 
-	//fprintf(stderr, "RAC: moving window to %d,%d\n", xwa.x, xwa.y);
+	/* fprintf(stderr, "RAC: moving window to %d,%d\n", xwa.x, xwa.y); */
 	SetWindowPos(&xwa);
       }
 #endif

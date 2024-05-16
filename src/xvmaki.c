@@ -242,7 +242,7 @@ static void maki_expand_virtual_screen(mi)
     int x, y, fai, fbi;
     int bpl = mi->width / 2 / 8;		/* bytes per line */
     byte mask;
-    mi->vs = maki_malloc((size_t) bpl * mi->height,  // GRR POSSIBLE OVERFLOW / FIXME
+    mi->vs = maki_malloc((size_t) bpl * mi->height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 			 "maki_expand_virtual_screen");
 
     fai = fbi = 0;
@@ -295,7 +295,7 @@ static void maki_expand_pixel_data(mi, pic)
     byte *p;
     byte mask;
     int gap;
-    *pic = maki_malloc((size_t) mi->width * mi->height,  // GRR POSSIBLE OVERFLOW / FIXME
+    *pic = maki_malloc((size_t) mi->width * mi->height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 		       "maki_expand_pixel_data");
 
     vsi = pi = 0;
@@ -407,9 +407,9 @@ static void maki_make_pixel_data(mi, pic)
     int x, y, i;
     int nza, nzb;
 
-    mi->forma = maki_malloc((size_t) mi->width / 2 * mi->height,  // GRR POSSIBLE OVERFLOW / FIXME
+    mi->forma = maki_malloc((size_t) mi->width / 2 * mi->height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 			    "maki_make_pixel_data#1");
-    mi->formb = maki_malloc((size_t) mi->width / 2 * mi->height,  // GRR POSSIBLE OVERFLOW / FIXME
+    mi->formb = maki_malloc((size_t) mi->width / 2 * mi->height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 			    "maki_make_pixel_data#2");
 
     for(y = 0; y < mi->height; y++){
@@ -462,7 +462,7 @@ static void maki_make_virtual_screen(mi)
     byte *pixels;
     int x, y;
 
-    mi->vs = maki_malloc((size_t) bpl * mi->height,  // GRR POSSIBLE OVERFLOW / FIXME
+    mi->vs = maki_malloc((size_t) bpl * mi->height,  /* GRR POSSIBLE OVERFLOW / FIXME */
 			 "maki_make_virtual_screen#1");
 
     if(mi->m_maki01b)
@@ -516,7 +516,7 @@ static void maki_make_flags(mi)
     int x, y;
     byte mask;
 
-    mi->fa = maki_malloc((size_t) bpl * mi->height, "maki_make_flags#1");  // GRR POSSIBLE OVERFLOW / FIXME
+    mi->fa = maki_malloc((size_t) bpl * mi->height, "maki_make_flags#1");  /* GRR POSSIBLE OVERFLOW / FIXME */
 
     fbi = fai = 0;
     max_fbi = -1;

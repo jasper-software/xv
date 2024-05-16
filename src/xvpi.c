@@ -289,7 +289,7 @@ static void pi_expand(pi, pic)
     int prev_pos = -1;
     int cnt = 0, max_cnt = pi->width * pi->height;
 
-    *pic = pi_malloc((size_t) max_cnt, "pi_expand");   // GRR POSSIBLE OVERFLOW / FIXME
+    *pic = pi_malloc((size_t) max_cnt, "pi_expand");   /* GRR POSSIBLE OVERFLOW / FIXME */
 
     pi_table_create(pi);
 

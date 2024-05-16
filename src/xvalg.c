@@ -1472,7 +1472,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
      'n' must be odd */
 
   byte *p24;
-  //int   rsum,gsum,bsum;
+  /* int   rsum,gsum,bsum; */
   byte          *rp;
   int            x,y,x1,y1,count,n2,nsq,c2;
   int           *rtab, *gtab, *btab;
@@ -1495,7 +1495,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
 
     for (x=selx; x<selx+selw; x++) {
 
-      //rsum = gsum = bsum = 0;
+      /* rsum = gsum = bsum = 0; */
       count = 0;
 
       for (y1=y-n2; y1<=y+n2; y1++) {

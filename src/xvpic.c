@@ -457,7 +457,7 @@ static void pic_read_header(pi)
 	pic_cache_init(pi);
 
 
-    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			  "pic_read_header#2");
     {
 	int i;
@@ -556,13 +556,13 @@ static void pic_make_xvpic(pi, xp, rp, gp, bp)
 {
     if(pi->cmapped){
 	if(pi->tiled256)
-	    *xp = pic_malloc((size_t) pi->width * pi->height * 2,   // GRR POSSIBLE OVERFLOW / FIXME
+	    *xp = pic_malloc((size_t) pi->width * pi->height * 2,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			     "pic_make_xvpic#1");
 	else
-	    *xp = pic_malloc((size_t) pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+	    *xp = pic_malloc((size_t) pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			     "pic_make_xvpic#2");
     }else
-	*xp = pic_malloc((size_t) pi->width * pi->height * 3,   // GRR POSSIBLE OVERFLOW / FIXME
+	*xp = pic_malloc((size_t) pi->width * pi->height * 3,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			 "pic_make_xvpic#3");
 
     if(pi->cmapped){
@@ -735,7 +735,7 @@ static void pic_make_sparse_data(pi, dat)
     int i;
     data32 c;
 
-    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			  "pic_make_sparse_data");
 
     if(pi->cmapped){
