@@ -88,6 +88,7 @@ Window CreateFlexWindow(name,clname,geom,defw,defh,fg,bg,usesize,keepsize,usersp
      unsigned long fg, bg;
      int           usesize;
      int           keepsize;
+     int           userspec;
 {
   Window               win;
   XSetWindowAttributes xswa;
