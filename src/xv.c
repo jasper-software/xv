@@ -328,42 +328,43 @@ int main(argc, argv)
   conv24 = CONV24_SLOW;  /* use 'slow' algorithm by default */
 
   defaspect = normaspect = 1.0;
-  mainW = dirW = infoW = ctrlW = gamW = psW = (Window) NULL;
+  mainW = dirW = infoW = ctrlW = gamW = psW = (Window) None;
   anyBrowUp = 0;
   incrementalSearchTimeout = 30;
+  forcegeom = TRUE;
 
 #ifdef HAVE_JPEG
-  jpegW = (Window) NULL;  jpegUp = 0;
+  jpegW = (Window) None;  jpegUp = 0;
 #endif
 
 #ifdef HAVE_JP2K
-  jp2kW = (Window) NULL;  jp2kUp = 0; 
+  jp2kW = (Window) None;  jp2kUp = 0;
 #endif
 
 #ifdef HAVE_TIFF
-  tiffW = (Window) NULL;  tiffUp = 0;
+  tiffW = (Window) None;  tiffUp = 0;
 #endif
 
 #ifdef HAVE_PNG
-  pngW = (Window) NULL;  pngUp = 0;
+  pngW = (Window) None;  pngUp = 0;
 #endif
 
 #ifdef HAVE_WEBP
-  webpW = (Window) NULL; webpUp = 0;
+  webpW = (Window) None; webpUp = 0;
 #endif
 
-  pcdW = (Window) NULL;  pcdUp = 0;
+  pcdW = (Window) None;  pcdUp = 0;
 
 #ifdef HAVE_PIC2
-  pic2W = (Window) NULL;  pic2Up = 0;
+  pic2W = (Window) None;  pic2Up = 0;
 #endif
 
 #ifdef HAVE_PCD
-  pcdW = (Window) NULL;  pcdUp = 0;
+  pcdW = (Window) None;  pcdUp = 0;
 #endif
 
 #ifdef HAVE_MGCSFX
-  mgcsfxW = (Window) NULL;  mgcsfxUp = 0;
+  mgcsfxW = (Window) None;  mgcsfxUp = 0;
 #endif
 
   imap = ctrlmap = gmap = browmap = cmtmap = 0;
@@ -425,9 +426,9 @@ int main(argc, argv)
   theScreen = DefaultScreen(theDisp);
   theCmap   = DefaultColormap(theDisp, theScreen);
   if (spec_window) {
-	rootW = spec_window;
+    rootW = spec_window;
   } else {
-	rootW = RootWindow(theDisp,theScreen);
+    rootW = RootWindow(theDisp,theScreen);
   }
   theGC     = DefaultGC(theDisp,theScreen);
   theVisual = DefaultVisual(theDisp,theScreen);
@@ -591,7 +592,7 @@ int main(argc, argv)
     if (XGetWindowProperty (theDisp, children[i], __SWM_VROOT, 0L, 1L,
 	  False, XA_WINDOW, &actual_type, &actual_format, &nitems,
 	  &bytesafter, (unsigned char **) &newRoot) == Success && newRoot) {
-      vrootW = *(Window *)newRoot;
+      vrootW = *(Window *)newRoot; /* FIXME: alignment and type aliasing violation (use memcpy()) */
       XGetWindowAttributes(theDisp, vrootW, &xwa);
       maxWIDE = vrWIDE = xwa.width;  maxHIGH = vrHIGH = xwa.height;
       dispDEEP = xwa.depth;
@@ -941,8 +942,8 @@ int main(argc, argv)
 
 
   /* create the directory window */
-  CreateDirW(NULL);
-  XSelectInput(theDisp, dirW, ExposureMask | ButtonPressMask | KeyPressMask);
+  CreateDirW();
+  XSelectInput(theDisp, dirW, ExposureMask | StructureNotifyMask | ButtonPressMask | KeyPressMask);
   browseCB.val = browseMode;
   savenormCB.val = savenorm;
 
@@ -965,7 +966,7 @@ int main(argc, argv)
   if (!novbrowse) {
     MakeBrowCmap();
     /* create the visual browser window */
-    CreateBrowse(browgeom, fgstr, bgstr, histr, lostr);
+    CreateBrowse(browgeom, browgeom != DEFBROWGEOM, fgstr, bgstr, histr, lostr);
 
     if (browmap) OpenBrowse();
   }
@@ -1254,8 +1255,8 @@ static void useOtherVisual(vinfo, best)
 
 /*****************************************************/
 static void parseResources(argc, argv)
-     int argc;
-     char **argv;
+  int argc;
+  char **argv;
 {
   int i, pm;
 
@@ -1385,6 +1386,7 @@ static void parseResources(argc, argv)
   if (rd_flag("nopicadjust"))    nopicadjust = def_int;
 #endif
   if (rd_flag("nopos"))          nopos       = def_int;
+  if (rd_flag("forcegeom]"))     forcegeom   = def_int;
   if (rd_flag("noqcheck"))       noqcheck    = def_int;
   if (rd_flag("nostat"))         nostat      = def_int;
   if (rd_flag("ownCmap"))        owncmap     = def_int;
@@ -1417,7 +1419,7 @@ static void parseResources(argc, argv)
   if (rd_flag("vsMap"))          browmap     = def_int;
   if (rd_flag("vsPerfect"))      browPerfect = def_int;
   if (rd_str ("white"))          whitestr    = def_str;
-  
+
   /* Check for any command-bindings to the supported function keys */
 #define TMPLEN 80
   for (i=0; i<FSTRMAX; ++i) {
@@ -1428,7 +1430,7 @@ static void parseResources(argc, argv)
       fkeycmds[i] = def_str;
     else
       fkeycmds[i] = NULL;
-  }  
+  }
 #undef TMPLEN
 }
 
@@ -1481,7 +1483,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-4x3",    2,1,&auto4x3 ));   /* 4x3 */
     else if (!argcmp(argv[i],"-8",      2,1,&force8  ));   /* force8 */
     else if (!argcmp(argv[i],"-acrop",  3,1,&autocrop));   /* autocrop */
-                                                          
+
     else if (!argcmp(argv[i],"-aspect",3,0,&pm)) {         /* def. aspect */
       int n,d;
       if (++i<argc) {
@@ -1699,6 +1701,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-nopicadjust", 4,1,&nopicadjust));/*nopicadjust*/
 #endif
     else if (!argcmp(argv[i],"-nopos",     4,1,&nopos));      /* nopos */
+    else if (!argcmp(argv[i],"-forcegeom", 6,1,&forcegeom));  /* forcegeom */
     else if (!argcmp(argv[i],"-noqcheck",  4,1,&noqcheck));   /* noqcheck */
     else if (!argcmp(argv[i],"-noresetroot",5,1,&resetroot)); /* reset root */
     else if (!argcmp(argv[i],"-norm",      5,1,&autonorm));   /* norm */
@@ -1799,7 +1802,7 @@ static void parseCmdLine(argc, argv)
   /* build origlist[], a copy of namelist that remains unmodified, for
      use with the 'autoDelete' option */
   orignumnames = numnames;
-  xvbcopy( (char *) namelist, (char *) origlist, sizeof(origlist));
+  xvbcopy((char *) namelist, (char *) origlist, sizeof(origlist));
 }
 
 
@@ -2010,6 +2013,7 @@ static void cmdSyntax(i)
   printoption("[-/+nopicadjust]");
 #endif
   printoption("[-/+nopos]");
+  printoption("[-/+forcegeom]");
   printoption("[-/+noqcheck]");
   printoption("[-/+noresetroot]");
   printoption("[-/+norm]");
@@ -3435,6 +3439,11 @@ int UncompressFile(name, uncompname, filetype)
   close(tmpfd);
 #endif
 
+  /* FIXME: need to replace any ticks in filename (with the
+   * ugly sequence '\"'\"' because backslash won't work inside
+   * single quotes) before calling system().  Maybe one of the
+   * exec() variants would be better...
+   */
 #ifndef VMS
   if (filetype == RFT_COMPRESS)
     sprintf(buf,"%s -c '%s' > '%s'", UNCOMPRESS, fname, uncompname);
@@ -4494,7 +4503,7 @@ void HandleDispMode()
 
     if (useroot && resetroot) ClearRoot();
 
-    if (mainW == (Window) NULL || useroot) {  /* window not visible */
+    if (mainW == (Window) None || useroot) {  /* window not visible */
       useroot = 0;
 
       if (haveoldinfo) {             /* just remap mainW and resize it */
@@ -4527,7 +4536,7 @@ void HandleDispMode()
       }
 
       else {                         /* first time.  need to create mainW */
-	mainW = (Window) NULL;
+	mainW = (Window) None;
 	createMainWindow(maingeom, fnam);
 	XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask
 		     | StructureNotifyMask | ButtonPressMask

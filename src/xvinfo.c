@@ -46,7 +46,7 @@ void CreateInfo(geom)
      const char *geom;
 {
   infoW = CreateWindow("xv info", "XVinfo", geom, INFOWIDE, INFOHIGH,
-		       infofg, infobg, 0);
+		       infofg, infobg, False);
   if (!infoW) FatalError("can't create info window!");
 
   pennPix = XCreatePixmapFromBitmapData(theDisp, infoW,

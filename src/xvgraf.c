@@ -72,7 +72,7 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
     gfbpix[GFB_GAMMA]  = MakePix1(parent, gf1_gamma_bits,
 				  gf1_gamma_width, gf1_gamma_height);
 
-    for (i=0; i<N_GFB && gfbpix[i] != (Pixmap) NULL; i++);
+    for (i=0; i<N_GFB && gfbpix[i] != (Pixmap) None; i++);
     if (i<N_GFB) FatalError("can't create graph pixmaps");
 
     pixmaps_built = 1;

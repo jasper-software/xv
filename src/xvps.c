@@ -127,7 +127,7 @@ void CreatePSD(geom)
 char *geom;
 {
   psW = CreateWindow("xv postscript", "XVps", geom,
-		     PSWIDE, PSHIGH, infofg, infobg, 0);
+		     PSWIDE, PSHIGH, infofg, infobg, FALSE);
   if (!psW) FatalError("can't create postscript window!");
 
   pageF = XCreateSimpleWindow(theDisp, psW, 20,30, PMAX+1,PMAX+1,

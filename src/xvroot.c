@@ -309,7 +309,7 @@ void SaveRootInfo()
      is avoided */
 
   Atom          prop;
-  static Pixmap riPix = (Pixmap) NULL;
+  static Pixmap riPix = (Pixmap) None;
 
   if ( !(theVisual->class & 1)) return;  /* no colormap to worry about */
   if (riPix) return;                     /* it's already been saved once */

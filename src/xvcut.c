@@ -56,7 +56,6 @@
 #include "bits/copy"
 #include "bits/copym"
 
-#define DBLCLKTIME 500
 #define CLIPPROP   "XV_CLIPBOARD"
 
 
@@ -212,7 +211,7 @@ void DoImgPaste()
 
   /* if there's no selection, make one! */
   if (!HaveSelection()) makePasteSel(cimg);
-                   else doPaste(cimg);
+  doPaste(cimg);
 
   free(cimg);
   SetCursors(-1);
@@ -1201,7 +1200,7 @@ int DoSelection(ev)
 
   if (ev->button == Button1) {
     /* double clicked B1 ? */
-    if (lastClickButton==Button1 && (ev->time - lastClickTime) < DBLCLKTIME) {
+    if (lastClickButton==Button1 && (ev->time - lastClickTime) < DBLCLICKTIME) {
       lastClickButton=Button3;
       if (HaveSelection() && PTINRECT(px, py, selrx, selry, selrw, selrh)) {
 	EnableSelection(0);

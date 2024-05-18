@@ -237,10 +237,10 @@ static RBUTT *compRB;
 /***************************************************/
 void CreateTIFFW()
 {
-  int	     y;
+  int y;
 
   tiffW = CreateWindow("xv tiff", "XVtiff", NULL,
-		       TWIDE, THIGH, infofg, infobg, 0);
+		       TWIDE, THIGH, infofg, infobg, FALSE);
   if (!tiffW) FatalError("can't create tiff window!");
 
   XSelectInput(theDisp, tiffW, ExposureMask | ButtonPressMask | KeyPressMask);

@@ -637,19 +637,19 @@ static RBUTT *resnRB;
 /***************************************************/
 void CreatePCDW()
 {
-  int       y;
+  int y;
 
   pcdW = CreateWindow("xv pcd", "XVpcd", NULL,
-           TWIDE, THIGH, infofg, infobg, 0);
+                     TWIDE, THIGH, infofg, infobg, 0);
   if (!pcdW) FatalError("can't create pcd window!");
 
   XSelectInput(theDisp, pcdW, ExposureMask | ButtonPressMask | KeyPressMask);
 
   BTCreate(&tbut[T_BOK], pcdW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
-     "Ok", infofg, infobg, hicol, locol);
+          "Ok", infofg, infobg, hicol, locol);
 
   BTCreate(&tbut[T_BCANC], pcdW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
-     "Cancel", infofg, infobg, hicol, locol);
+          "Cancel", infofg, infobg, hicol, locol);
 
   y = 55;
   resnRB = RBCreate(NULL, pcdW, 36, y,   "192*128   Base/16",
@@ -678,7 +678,7 @@ int vis;
 {
   if (vis) {
     CenterMapWindow(pcdW, tbut[T_BOK].x + tbut[T_BOK].w/2,
-        tbut[T_BOK].y + tbut[T_BOK].h/2, TWIDE, THIGH);
+                   tbut[T_BOK].y + tbut[T_BOK].h/2, TWIDE, THIGH);
   }
   else     XUnmapWindow(theDisp, pcdW);
   pcdUp = vis;
@@ -731,12 +731,12 @@ XEvent *xev;
 
     if (e->window == pcdW) {
       if (stlen) {
-  if (buf[0] == '\r' || buf[0] == '\n') { /* enter */
-    FakeButtonPress(&tbut[T_BOK]);
-  }
-  else if (buf[0] == '\033') {            /* ESC */
-    FakeButtonPress(&tbut[T_BCANC]);
-  }
+        if (buf[0] == '\r' || buf[0] == '\n') { /* enter */
+          FakeButtonPress(&tbut[T_BOK]);
+        }
+        else if (buf[0] == '\033') {            /* ESC */
+          FakeButtonPress(&tbut[T_BCANC]);
+        }
       }
     }
     else rv = 0;

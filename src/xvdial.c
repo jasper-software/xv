@@ -399,7 +399,7 @@ static void drawButt(dp, i, lit)
      DIAL *dp;
      int i, lit;
 {
-  Pixmap pix = (Pixmap) NULL;
+  Pixmap pix = (Pixmap) None;
 
   XSetForeground(theDisp, theGC, dp->fg);
   XDrawRectangle(theDisp, dp->win, theGC, dp->bx[i], dp->by[i], 14, 10);

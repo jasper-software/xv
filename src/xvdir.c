@@ -4,9 +4,12 @@
  * callable functions:
  *
  *   CreateDirW(geom,bwidth)-  creates the dirW window.  Doesn't map it.
+ *   ResizeDirW()	    -  change the size of the dirW window
  *   DirBox(vis)            -  random processing based on value of 'vis'
  *                             maps/unmaps window, etc.
  *   ClickDirW()            -  handles mouse clicks in DirW
+ *   DbouleClickDirW()      -  handles mouse double-clicks in DirW
+ *   DragDirW()             -  handles mouse movement with mouse down in DirW
  *   LoadCurrentDirectory() -  loads up current dir information for dirW
  *   GetDirPath()           -  returns path that 'dirW' is looking at
  *   DoSave()               -  calls appropriate save routines
@@ -32,15 +35,20 @@
 #endif
 
 
-#define DIRWIDE  350               /* (fixed) size of directory window */
-#define DIRHIGH  400
+#define DEF_DIRWIDE 350            /* initial size of directory window */
+#define DEF_DIRHIGH 400
+#define MIN_DIRWIDE 330
+#define MIN_DIRHIGH 300
 
-#define NLINES   15                /* # of lines in list control (keep odd) */
-#define LISTWIDE 237               /* width of list window */
-#define BUTTW    60                /* width of buttons */
+#define DLIST_X  10                /* left of directory list box */
+#define DLIST_Y  30                /* top of directory list box */
+#define DNAM_X   80                /* left of filename box */
+
+#define NLINES   15                /* initial # of lines in list control (keep odd) */
+#define BUTTW    80                /* width of buttons */
 #define BUTTH    24                /* height of buttons */
-#define DDWIDE  (LISTWIDE-80+15)   /* max width of dirMB */
-#define DNAMWIDE 252               /* width of 'file name' entry window */
+#define MBDIRPAD 10                /* space around directory name in menu button */
+#define DNAMMORE 3                 /* width of "more off screen" markers */
 #define MAXDEEP  30                /* max num of directories in cwd path */
 #define MAXFNLEN 256               /* max len of filename being entered */
 
@@ -109,28 +117,41 @@ static const char *saveFormats[] = {
 					"Filename List" };
 
 #ifdef HAVE_PIC2
-extern int PIC2SaveParams    PARM((char *, int));
+extern int PIC2SaveParams       PARM((char *, int));
 #endif
 
-static void arrangeButts     PARM((int));
-static void RedrawDList      PARM((int, SCRL *));
-static void changedDirMB     PARM((int));
-static int  dnamcmp          PARM((const void *, const void *));
-static int  FNameCdable      PARM((void));
-static void loadCWD          PARM((void));
+static int  DirHigh             PARM((void));
+static int  DirWide             PARM((void));
+static int  roomForLines        PARM((int));
+static int  DNamWide            PARM((void));
+static int  DNamY               PARM((void));
+static void arrangeElements     PARM((int));
+static int  posOfCoordinate     PARM((int));
+static void moveInsertionPoint  PARM((int));
+static void unselect            PARM((void));
+static void removeSelectedRange PARM((void));
+static void pasteIntoBox        PARM((const char *text));
+static void RedrawDList         PARM((int, SCRL *));
+static void changedDirMB        PARM((int));
+static int  updatePrimarySelection PARM((void));
+static int  updateClipboardSelection PARM((void));
+static int  dnamcmp             PARM((const void *, const void *));
+static int  FNameCdable         PARM((void));
+static void loadCWD             PARM((void));
 #ifdef FOO
-static int  cd_able          PARM((char *));
+static int  cd_able             PARM((char *));
 #endif
-static void scrollToFileName PARM((void));
-static void setFName         PARM((const char *));
-static void showFName        PARM((void));
-static void changeSuffix     PARM((void));
-static int  autoComplete     PARM((void));
+static void scrollToFileName    PARM((void));
+static void setFName            PARM((const char *));
+static void showFName           PARM((void));
+static void changeSuffix        PARM((void));
+static int  autoComplete        PARM((void));
 
-static byte *handleBWandReduced   PARM((byte *, int,int,int, int, int *,
+static byte *handleBWandReduced PARM((byte *, int,int,int, int, int *,
 					byte **, byte **, byte **));
-static byte *handleNormSel        PARM((int *, int *, int *, int *));
+static byte *handleNormSel      PARM((int *, int *, int *, int *));
 
+static int   dir_h; /* current height of dir window */
 
 static char       *fnames[MAXNAMES];
 static int         numfnames = 0, ndirs = 0;
@@ -146,6 +167,7 @@ static char        deffname[MAXFNLEN+100];   /* default filename */
 static int   savemode;                 /* if 0 'load box', if 1 'save box' */
 static int   curPos;                   /* insertion point in textedit filename */
 static int   stPos, enPos;             /* start and end of visible textedit filename */
+static int   selPos, selLen;           /* start and length of selected region of textedit filename */
 static MBUTT dirMB;                    /* popup path menu */
 static MBUTT fmtMB;                    /* 'format' menu button (Save only) */
 static MBUTT colMB;                    /* 'colors' menu button (Save only) */
@@ -162,72 +184,135 @@ static int  dopipe;
 
 
 /***************************************************/
-void CreateDirW(geom)
-     char *geom;
+static int DirHigh()
 {
+  return dir_h;
+}
+
+
+/***************************************************/
+static int DirWide()
+{
+  return dList.w + 113;
+}
+
+
+/***************************************************/
+static int roomForLines(height)
+    int height;
+{
+  int num;
+
+  num = (height - (dList.y + 66))/LINEHIGH;
+  if (num < 1)
+    num = 1;
+  if (num > MAXNAMES)
+    num = MAXNAMES;
+
+  return num;
+}
+
+
+/***************************************************/
+void ResizeDirW(w, h)
+    int w, h;
+{
+  int nlines;
+
+  dir_h = h;
+
+  nlines = roomForLines(h);
+  LSResize(&dList, w - 113, LINEHIGH*nlines, nlines);
+  arrangeElements(savemode);
+  showFName();
+}
+
+
+/***************************************************/
+static int DNamWide()
+{
+  return DirWide() - 100;
+}
+
+
+/***************************************************/
+static int DNamY()
+{
+  return DirHigh() - (10 + 2 + LINEHIGH+5);
+}
+
+
+/***************************************************/
+void CreateDirW()
+{
+  int nlines;
+
   path[0] = '\0';
 
   xv_getwd(loadpath, sizeof(loadpath));
   xv_getwd(savepath, sizeof(savepath));
 
-
-  dirW = CreateWindow("","XVdir", geom, DIRWIDE, DIRHIGH, infofg, infobg, 0);
+  dir_h = DEF_DIRHIGH;
+  dirW = CreateFlexWindow("", "XVdir", NULL, DEF_DIRWIDE, DEF_DIRHIGH,
+			  infofg, infobg, FALSE, FALSE, FALSE);
   if (!dirW) FatalError("couldn't create 'directory' window!");
+  SetMinSizeWindow(dirW, MIN_DIRWIDE, MIN_DIRHIGH);
 
-  LSCreate(&dList, dirW, 10, 5 + 3*(6+LINEHIGH) + 6, LISTWIDE,
-	   LINEHIGH*NLINES, NLINES, fnames, numfnames, infofg, infobg,
-	   hicol, locol, RedrawDList, 1, 0);
+  nlines = roomForLines(dir_h);
 
-  dnamW = XCreateSimpleWindow(theDisp, dirW, 80, dList.y + (int) dList.h + 30,
-			      (u_int) DNAMWIDE+6, (u_int) LINEHIGH+5,
+  LSCreate(&dList, dirW, DLIST_X, 5 + 3*(6+LINEHIGH) + 6, DEF_DIRWIDE - 113,
+	   LINEHIGH*nlines, nlines, fnames, numfnames, infofg, infobg,
+	   hicol, locol, RedrawDList, TRUE, FALSE);
+
+
+  dnamW = XCreateSimpleWindow(theDisp, dirW, 0, 0, 1, 1,
 			      1, infofg, infobg);
   if (!dnamW) FatalError("can't create name window");
   XSelectInput(theDisp, dnamW, ExposureMask);
 
+  /* create checkboxes */
 
-  CBCreate(&browseCB,   dirW, DIRWIDE/2, dList.y + (int) dList.h + 6,
+  CBCreate(&browseCB,   dirW, 0, 0,
 	   "Browse", infofg, infobg, hicol,locol);
 
-  CBCreate(&savenormCB, dirW, 220, dList.y + (int) dList.h + 6,
-	   "Normal Size", infofg, infobg,hicol,locol);
+  CBCreate(&savenormCB, dirW, 0, 0,
+	   "Normal Size", infofg, infobg, hicol,locol);
 
-  CBCreate(&saveselCB,  dirW, 80,        dList.y + (int) dList.h + 6,
-           "Selected Area", infofg, infobg,hicol,locol);
-
+  CBCreate(&saveselCB,  dirW, 0, 0,
+           "Selected Area", infofg, infobg, hicol,locol);
 
   /* y-coordinates get filled in when window is opened */
-  BTCreate(&dbut[S_BOK],     dirW, 259, 0, 80, BUTTH,
+  BTCreate(&dbut[S_BOK],     dirW, 0, 0, BUTTW, BUTTH,
 	   "Ok",        infofg, infobg,hicol,locol);
-  BTCreate(&dbut[S_BCANC],   dirW, 259, 0, 80, BUTTH,
+  BTCreate(&dbut[S_BCANC],   dirW, 0, 0, BUTTW, BUTTH,
 	   "Cancel",    infofg,infobg,hicol,locol);
-  BTCreate(&dbut[S_BRESCAN], dirW, 259, 0, 80, BUTTH,
+  BTCreate(&dbut[S_BRESCAN], dirW, 0, 0, BUTTW, BUTTH,
 	   "Rescan",    infofg,infobg,hicol,locol);
-  BTCreate(&dbut[S_BOLDSET], dirW, 259, 0, 80, BUTTH,
+  BTCreate(&dbut[S_BOLDSET], dirW, 0, 0, BUTTW, BUTTH,
 	   "Prev Set",  infofg,infobg,hicol,locol);
-  BTCreate(&dbut[S_BOLDNAM], dirW, 259, 0, 80, BUTTH,
+  BTCreate(&dbut[S_BOLDNAM], dirW, 0, 0, BUTTW, BUTTH,
 	   "Prev Name", infofg,infobg,hicol,locol);
 
   SetDirFName("");
   XMapSubwindows(theDisp, dirW);
   numfnames = 0;
 
-
   /*
    * create MBUTTs *after* calling XMapSubWindows() to keep popup unmapped
    */
 
-  MBCreate(&dirMB, dirW, 50, dList.y -(LINEHIGH+6),
-	   (u_int) DDWIDE, (u_int) LINEHIGH, NULL, NULL, 0,
+  MBCreate(&dirMB, dirW, 0, 0, 1, 1,
+	   NULL, NULL, 0,
 	   infofg,infobg,hicol,locol);
 
-  MBCreate(&fmtMB, dirW, DIRWIDE-FMTWIDE-10, 5,
-	   (u_int) FMTWIDE, (u_int) LINEHIGH, NULL, saveFormats, F_MAXFMTS,
+  MBCreate(&fmtMB, dirW, 0, 0, 1, 1,
+	   NULL, saveFormats, F_MAXFMTS,
 	   infofg,infobg,hicol,locol);
   fmtMB.hascheck = 1;
   MBSelect(&fmtMB, 0);
 
-  MBCreate(&colMB, dirW, DIRWIDE-COLWIDE-10, 5+LINEHIGH+6,
-	   (u_int) COLWIDE, (u_int) LINEHIGH, NULL, saveColors, F_MAXCOLORS,
+  MBCreate(&colMB, dirW, 0, 0, 1, 1,
+	   NULL, saveColors, F_MAXCOLORS,
 	   infofg,infobg,hicol,locol);
   colMB.hascheck = 1;
   MBSelect(&colMB, 0);
@@ -240,17 +325,16 @@ void CreateDirW(geom)
   d_savePix = XCreatePixmapFromBitmapData(theDisp, dirW,
                  (char *) d_save_bits, d_save_width, d_save_height,
 					  infofg, infobg, dispDEEP);
-
 }
 
 
 /***************************************************/
 void DirBox(mode)
-     int mode;
+    int mode;
 {
   static int firstclose = 1;
 
-  if (!mode) {
+  if (mode == 0) {
     if (savemode) strcpy(savepath, path);
              else strcpy(loadpath, path);
 
@@ -262,61 +346,61 @@ void DirBox(mode)
 
     XUnmapWindow(theDisp, dirW);  /* close */
   }
+  else {
 
-  else if (mode == BLOAD) {
-    strcpy(path, loadpath);
-    WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
+    if (mode == BLOAD) {
+      savemode = FALSE;
 
-    XStoreName(theDisp, dirW, "xv load");
-    XSetIconName(theDisp, dirW, "xv load");
+      strcpy(path, loadpath);
+      WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
 
-    dbut[S_BLOADALL].str = "Load All";
-    BTSetActive(&dbut[S_BLOADALL], 1);
+      XStoreName(theDisp, dirW, "xv load");
+      XSetIconName(theDisp, dirW, "xv load");
 
-    arrangeButts(mode);
+      dbut[S_BLOADALL].str = "Load All";
+      BTSetActive(&dbut[S_BLOADALL], 1);
 
-    MBSetActive(&fmtMB, 0);
-    MBSetActive(&colMB, 0);
+      arrangeElements(savemode);
 
-    CenterMapWindow(dirW, dbut[S_BOK].x+30, dbut[S_BOK].y + BUTTH/2,
-		    DIRWIDE, DIRHIGH);
-
-    savemode = 0;
-  }
-
-  else if (mode == BSAVE) {
-    strcpy(path, savepath);
-    WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
-
-    XStoreName(theDisp, dirW, "xv save");
-    XSetIconName(theDisp, dirW, "xv save");
-
-    dbut[S_BOLDSET].str = "Prev Set";
-
-    arrangeButts(mode);
-
-    BTSetActive(&dbut[S_BOLDSET], haveoldinfo);
-    BTSetActive(&dbut[S_BOLDNAM], haveoldinfo);
-
-    CBSetActive(&saveselCB, HaveSelection());
-
-    MBSetActive(&fmtMB, 1);
-    if (MBWhich(&fmtMB) == F_FILELIST) {
-      MBSetActive(&colMB,      0);
-      CBSetActive(&savenormCB, 0);
-    }
-    else {
-      MBSetActive(&colMB,      1);
-      CBSetActive(&savenormCB, 1);
+      MBSetActive(&fmtMB, 0);
+      MBSetActive(&colMB, 0);
     }
 
-    CenterMapWindow(dirW, dbut[S_BOK].x+30, dbut[S_BOK].y + BUTTH/2,
-		    DIRWIDE, DIRHIGH);
+    else if (mode == BSAVE) {
+      savemode = TRUE;
 
-    savemode = 1;
+      strcpy(path, savepath);
+      WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
+
+      XStoreName(theDisp, dirW, "xv save");
+      XSetIconName(theDisp, dirW, "xv save");
+
+      dbut[S_BOLDSET].str = "Prev Set";
+
+      arrangeElements(savemode);
+
+      BTSetActive(&dbut[S_BOLDSET], haveoldinfo);
+      BTSetActive(&dbut[S_BOLDNAM], haveoldinfo);
+
+      CBSetActive(&saveselCB, HaveSelection());
+
+      MBSetActive(&fmtMB, 1);
+      if (MBWhich(&fmtMB) == F_FILELIST) {
+        MBSetActive(&colMB,      0);
+        CBSetActive(&savenormCB, 0);
+      }
+      else {
+        MBSetActive(&colMB,      1);
+        CBSetActive(&savenormCB, 1);
+      }
+    }
+
+    CenterMapFlexWindow(dirW,
+		        dbut[S_BOK].x + BUTTW/2, dbut[S_BOK].y + BUTTH/2,
+		        DirWide(), DirHigh(), FALSE);
+
+    scrollToFileName();
   }
-
-  scrollToFileName();
 
   dirUp = mode;
   BTSetActive(&but[BLOAD], !dirUp);
@@ -325,12 +409,14 @@ void DirBox(mode)
 
 
 /***************************************************/
-static void arrangeButts(mode)
-     int mode;
+static void arrangeElements(savemode)
+    int savemode;
 {
   int i, nbts, ngaps, szdiff, top, gap;
 
-  nbts = (mode==BLOAD) ? S_LOAD_NBUTTS : S_NBUTTS;
+  /* buttons */
+
+  nbts = !savemode ? S_LOAD_NBUTTS : S_NBUTTS;
   ngaps = nbts-1;
 
   szdiff = dList.h - (nbts * BUTTH);
@@ -340,19 +426,51 @@ static void arrangeButts(mode)
     gap = 16;
     top = dList.y + (dList.h - (nbts*BUTTH) - (ngaps*gap))/2;
 
-    for (i=0; i<nbts; i++) dbut[i].y = top + i*(BUTTH+gap);
+    for (i=0; i<nbts; i++)
+      BTMove(&dbut[i],
+             dList.x + dList.w + 12,
+             top + i*(BUTTH+gap));
   }
   else {
     for (i=0; i<nbts; i++)
-      dbut[i].y = dList.y + ((dList.h-BUTTH)*i) / ngaps;
+      BTMove(&dbut[i],
+             dList.x + dList.w + 12,
+             dList.y + ((dList.h-BUTTH)*i) / ngaps);
   }
+
+  /* checkboxes */
+
+  CBMove(&browseCB, DirWide()/2, dList.y + (int) dList.h + 6);
+  CBMove(&savenormCB, 220, dList.y + (int) dList.h + 6);
+  CBMove(&saveselCB, 80, dList.y + (int) dList.h + 6);
+
+  /* filename box */
+
+  XMoveResizeWindow(theDisp, dnamW,
+		    DNAM_X, DNamY(),
+		    (u_int) DNamWide()+2*DNAMMORE, (u_int) LINEHIGH+5);
+
+  /* menu buttons */
+
+  MBChange(&dirMB,
+           dList.x + dList.w/2 - dirMB.w/2,
+	   dList.y - (LINEHIGH+6),
+	   (u_int) dirMB.w, (u_int) LINEHIGH);
+
+  MBChange(&fmtMB,
+           DirWide()-FMTWIDE-10, 5,
+	   (u_int) FMTWIDE, (u_int) LINEHIGH);
+
+  MBChange(&colMB,
+           DirWide()-COLWIDE-10, 5+LINEHIGH+6,
+	   (u_int) COLWIDE, (u_int) LINEHIGH);
 }
 
 
 
 /***************************************************/
-void RedrawDirW(x,y,w,h)
-     int x,y,w,h;
+void RedrawDirW(x, y, w, h)
+     int x, y, w, h;
 {
   int        i, ypos, txtw;
   char       foo[30];
@@ -360,30 +478,34 @@ void RedrawDirW(x,y,w,h)
 
   XV_UNUSED(x); XV_UNUSED(y); XV_UNUSED(w); XV_UNUSED(h);
 
-  if (dList.nstr==1) strcpy(foo,"1 file");
-                else sprintf(foo,"%d files",dList.nstr);
+  if (dList.nstr==1)
+    strcpy(foo, "1 file");
+  else
+    sprintf(foo, "%d files", dList.nstr);
 
   ypos = dList.y + dList.h + 8 + ASCENT;
   XSetForeground(theDisp, theGC, infobg);
   XFillRectangle(theDisp, dirW, theGC, 10, ypos-ASCENT,
-		 (u_int) DIRWIDE, (u_int) CHIGH);
+		 (u_int) DirWide(), (u_int) CHIGH);
   XSetForeground(theDisp, theGC, infofg);
   DrawString(dirW, 10, ypos, foo);
 
 
-  if (dirUp == BLOAD) str = "Load file:";
-                 else str = "Save file:";
-  DrawString(dirW, 10, dList.y + (int) dList.h + 30 + 4 + ASCENT, str);
+  if (dirUp == BLOAD)
+    str = "Load file:";
+  else
+    str = "Save file:";
+  DrawString(dirW, 10, DNamY() + 1 + ASCENT + 3, str);
 
   /* draw dividing line */
   XSetForeground(theDisp,    theGC, infofg);
-  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-6, DIRWIDE, dirMB.y-6);
+  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-6, DirWide(), dirMB.y-6);
   if (ctrlColor) {
     XSetForeground(theDisp,  theGC, locol);
-    XDrawLine(theDisp, dirW, theGC, 0, dirMB.y-5, DIRWIDE, dirMB.y-5);
+    XDrawLine(theDisp, dirW, theGC, 0, dirMB.y-5, DirWide(), dirMB.y-5);
     XSetForeground(theDisp,  theGC, hicol);
   }
-  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-4, DIRWIDE, dirMB.y-4);
+  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-4, DirWide(), dirMB.y-4);
 
 
 
@@ -426,162 +548,322 @@ void RedrawDirW(x,y,w,h)
 
 
 /***************************************************/
-int ClickDirW(x,y)
-int x,y;
+int ClickDirW(x, y, button)
+    int x, y;
+    int button;
 {
   BUTT  *bp;
   int    bnum,i,maxbut,v;
   char   buf[MAXPATHLEN + 1024];
 
-  if (savemode) {                           /* check format/colors MBUTTS */
-    i = v = 0;
-    if      (MBClick(&fmtMB, x,y) && (v=MBTrack(&fmtMB))>=0) i=1;
-    else if (MBClick(&colMB, x,y) && (v=MBTrack(&colMB))>=0) i=2;
+  switch (button) {
+  case 1:
+    if (savemode) {                           /* check format/colors MBUTTS */
+      i = v = 0;
+      if      (MBClick(&fmtMB, x,y) && (v=MBTrack(&fmtMB))>=0) i=1;
+      else if (MBClick(&colMB, x,y) && (v=MBTrack(&colMB))>=0) i=2;
 
-    if (i) {  /* changed one of them */
-      if (i==1) SetDirSaveMode(F_FORMAT, v);
-           else SetDirSaveMode(F_COLORS, v);
-      changeSuffix();
-    }
-  }
-
-
-  if (!savemode) {  /* LOAD */
-    if (CBClick(&browseCB,x,y)) CBTrack(&browseCB);
-  }
-  else {            /* SAVE */
-    if      (CBClick(&savenormCB,x,y)) CBTrack(&savenormCB);
-    else if (CBClick(&saveselCB,x,y))  CBTrack(&saveselCB);
-  }
-
-
-  maxbut = (savemode) ? S_NBUTTS : S_LOAD_NBUTTS;
-
-  for (bnum=0; bnum<maxbut; bnum++) {
-    bp = &dbut[bnum];
-    if (PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) break;
-  }
-
-  if (bnum<maxbut && BTTrack(bp)) {   /* found one */
-    if (bnum<S_BOLDSET) return bnum;  /* do Ok,Cancel,Rescan in xvevent.c */
-
-    if (bnum == S_BOLDSET && savemode && haveoldinfo) {
-      MBSelect(&fmtMB, oldformat);
-      MBSelect(&colMB, oldcolors);
-      changeSuffix();
+      if (i) {  /* changed one of them */
+        if (i==1) SetDirSaveMode(F_FORMAT, v);
+             else SetDirSaveMode(F_COLORS, v);
+        changeSuffix();
+      }
     }
 
-    else if (bnum == S_BOLDNAM && savemode && haveoldinfo) {
-      setFName(oldfname);
+    if (!savemode) {  /* LOAD */
+      if (CBClick(&browseCB,x,y)) CBTrack(&browseCB);
+    }
+    else {            /* SAVE */
+      if      (CBClick(&savenormCB,x,y)) CBTrack(&savenormCB);
+      else if (CBClick(&saveselCB,x,y))  CBTrack(&saveselCB);
     }
 
-    else if (bnum == S_BLOADALL && !savemode) {
-      int j, oldnumnames;
-      char *dname;
+    maxbut = (savemode) ? S_NBUTTS : S_LOAD_NBUTTS;
 
-      oldnumnames = numnames;
+    for (bnum=0; bnum<maxbut; bnum++) {
+      bp = &dbut[bnum];
+      if (PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) break;
+    }
 
-      for (i=0; i<numfnames && numnames<MAXNAMES; i++) {
-	if (fnames[i][0] == C_REG || fnames[i][0] == C_EXE) {
-	  sprintf(buf,"%s%s", path, fnames[i]+1);
+    if (bnum<maxbut && BTTrack(bp)) {   /* found one */
+      if (bnum<S_BOLDSET) return bnum;  /* do Ok,Cancel,Rescan in xvevent.c */
 
-	  /* check for dups.  Don't add it if it is. */
-	  for (j=0; j<numnames && strcmp(buf,namelist[j]); j++);
-
-	  if (j==numnames) {  /* add to list */
-	    namelist[numnames] = (char *) malloc(strlen(buf)+1);
-	    if (!namelist[numnames]) FatalError("out of memory!\n");
-	    strcpy(namelist[numnames],buf);
-
-	    dname = namelist[numnames];
-
-	    /* figure out how much of name can be shown */
-	    if (StringWidth(dname) > (nList.w-10-16)) {   /* truncate */
-	      char *tmp;
-	      int   prelen = 0;
-
-	      tmp = dname;
-	      while (1) {
-		tmp = (char *) index(tmp,'/'); /* find next '/' in buf */
-		if (!tmp) break;
-
-		tmp++;                   /* move to char following the '/' */
-		prelen = tmp - dname;
-		if (StringWidth(tmp) <= (nList.w-10-16)) break; /* cool now */
-	      }
-
-	      dispnames[numnames] = dname + prelen;
-	    }
-	    else dispnames[numnames] = dname;
-
-	    numnames++;
-	  }
-	}
+      if (bnum == S_BOLDSET && savemode && haveoldinfo) {
+        MBSelect(&fmtMB, oldformat);
+        MBSelect(&colMB, oldcolors);
+        changeSuffix();
       }
 
-      if (oldnumnames != numnames) {  /* added some */
-	if (numnames>0) BTSetActive(&but[BDELETE],1);
-	windowMB.dim[WMB_TEXTVIEW] = (numnames==0);
-
-	LSNewData(&nList, dispnames, numnames);
-	nList.selected = oldnumnames;
-	curname = oldnumnames - 1;
-
-	ActivePrevNext();
-
-	ScrollToCurrent(&nList);
-	DrawCtrlNumFiles();
-
-	if (!browseCB.val) DirBox(0);
+      else if (bnum == S_BOLDNAM && savemode && haveoldinfo) {
+        setFName(oldfname);
       }
 
+      else if (bnum == S_BLOADALL && !savemode) {
+        int j, oldnumnames;
+        char *dname;
+
+        oldnumnames = numnames;
+
+        for (i=0; i<numfnames && numnames<MAXNAMES; i++) {
+         if (fnames[i][0] == C_REG || fnames[i][0] == C_EXE) {
+           sprintf(buf,"%s%s", path, fnames[i]+1);
+
+           /* check for dups.  Don't add it if it is. */
+           for (j=0; j<numnames && strcmp(buf,namelist[j]); j++);
+
+           if (j==numnames) {  /* add to list */
+             namelist[numnames] = (char *) malloc(strlen(buf)+1);
+             if (!namelist[numnames]) FatalError("out of memory!\n");
+             strcpy(namelist[numnames],buf);
+
+             dname = namelist[numnames];
+
+             /* figure out how much of name can be shown */
+             if (StringWidth(dname) > (nList.w-10-16)) {   /* truncate */
+               char *tmp;
+               int   prelen = 0;
+
+               tmp = dname;
+               while (1) {
+                 tmp = (char *) index(tmp,'/'); /* find next '/' in buf */
+                 if (!tmp) break;
+
+                 tmp++;                   /* move to char following the '/' */
+                 prelen = tmp - dname;
+                 if (StringWidth(tmp) <= (nList.w-10-16)) break; /* cool now */
+               }
+               dispnames[numnames] = dname + prelen;
+             }
+             else dispnames[numnames] = dname;
+             numnames++;
+           }
+         }
+        }
+
+        if (oldnumnames != numnames) {  /* added some */
+         if (numnames>0) BTSetActive(&but[BDELETE],1);
+         windowMB.dim[WMB_TEXTVIEW] = (numnames==0);
+
+         LSNewData(&nList, dispnames, numnames);
+         nList.selected = oldnumnames;
+         curname = oldnumnames - 1;
+
+         ActivePrevNext();
+
+         ScrollToCurrent(&nList);
+         DrawCtrlNumFiles();
+
+         if (!browseCB.val) DirBox(0);
+        }
+      }
     }
-  }
 
-
-  if (MBClick(&dirMB, x, y)) {
-    i = MBTrack(&dirMB);
-    if (i >= 0) changedDirMB(i);
-    return -1;
-  }
-
-  /* handle clicks inside the filename box, but only when box is not empty */
-  if (enPos > stPos &&
-      x > 80 &&
-      y > dList.y + (int) dList.h + 30 &&
-      x < 80 + DNAMWIDE+6 &&
-      y < dList.y + (int) dList.h + 30 + LINEHIGH+5) {
-    int tx;
-    int dx;
-    int pos;
-
-    /* make coordinates relative to dnamW */
-    tx = x - (80 + 1 + 3); /* left side plus the border plus the space for the "more stuff" sign */
-
-    for (pos=stPos; pos+1 < enPos; pos++) {
-      if (XTextWidth(mfinfo, &filename[stPos], 1+pos-stPos) > tx)
-        break;
+    if (MBClick(&dirMB, x, y)) {
+      i = MBTrack(&dirMB);
+      if (i >= 0) changedDirMB(i);
+      return -1;
     }
 
-    if (pos == 0)
-	return -1;
+    /* handle clicks inside the filename box */
+    if (x > DNAM_X &&
+        x < DNAM_X + DNamWide()+2*DNAMMORE &&
+        y > DNamY() &&
+        y < DNamY() + LINEHIGH+5) {
+      Window dummy_root, dummy_child;
+      int dummy_rx, dummy_ry;
+      int wx, wy;
+      unsigned int mask;
+      int clkx_start, clkx_now;
+      int pos_start, pos_now, pos_prev;
 
-    /* if we are more than halfway past this char, put the insertion point after it */
-    dx = tx - XTextWidth(mfinfo, &filename[stPos], pos-stPos);
-    if (dx > XTextWidth(mfinfo, &filename[pos], 1)/2)
-      pos++;
+      /* make coordinates relative to dnamW */
+      /* left side plus the border plus the space for the "more stuff" sign */
+      clkx_start = x - (DNAM_X + 1 + DNAMMORE);
+      pos_start = posOfCoordinate(clkx_start);
 
-    curPos = pos;
-    showFName();
-  }
+      clkx_now = clkx_start;
+      pos_prev = pos_now = -1;
+      selPos=selLen = 0;
+      while (XQueryPointer(theDisp, dirW,
+                           &dummy_root, &dummy_child, &dummy_rx, &dummy_ry,
+                           &wx, &wy, &mask)) {
+        if (!(mask & Button1Mask)) break;    /* button released */
+
+        clkx_now = wx - (DNAM_X + 1 + DNAMMORE);
+        pos_prev = pos_now;
+        pos_now = posOfCoordinate(clkx_now);
+
+        if (pos_prev != pos_now) {
+          if (pos_start == pos_now) {
+            selPos=selLen = 0;
+            curPos = pos_start;
+          } else if (pos_start < pos_now) {
+            selPos = pos_start;
+            selLen = pos_now - pos_start;
+          } else {
+            selPos = pos_now;
+            selLen = pos_start - pos_now;
+          }
+          showFName();
+        }
+      }
+
+      if (selLen > 0)
+        updatePrimarySelection();
+      else {
+        unselect();
+        moveInsertionPoint(clkx_start);
+      }
+     }
+    break;
+
+  case 2:
+    /* handle clicks inside the filename box */
+    if (x > DNAM_X &&
+        x < DNAM_X + DNamWide()+2*DNAMMORE &&
+        y > DNamY() &&
+        y < DNamY() + LINEHIGH+5) {
+      int   clkx;
+      char *text;
+
+      /* make coordinates relative to dnamW */
+      clkx = x - (DNAM_X + 1 + DNAMMORE); /* left side plus the border plus the space for the "more stuff" sign */
+      moveInsertionPoint(clkx);
+
+      text = GetPrimaryText();
+
+      if (text != NULL) {
+       pasteIntoBox(text);
+        free(text);
+      }
+    }
+    break;
+   }
 
   return -1;
+}
+
+/***************************************************/
+int DoubleClickDirW(x, y, button)
+    int x, y;
+    int button;
+{
+  /* handle double-clicks inside the filename box */
+  if (button == 1 &&
+      x > DNAM_X &&
+      x < DNAM_X + DNamWide()+2*DNAMMORE &&
+      y > DNamY() &&
+      y < DNamY() + LINEHIGH+5) {
+    SelectAllDirW();
+    return -1;
+  }
+  return ClickDirW(x, y, button);
+}
+
+
+static int posOfCoordinate(clkx)
+    int clkx;
+{
+  int dx, pos;
+
+  for (pos=stPos; pos < enPos; pos++) {
+    if (XTextWidth(mfinfo, &filename[stPos], pos-stPos) + 1 > clkx)
+      break;
+  }
+  /* if we are more than halfway past this char, put the insertion point after it */
+  if (pos < enPos) {
+    dx = clkx - XTextWidth(mfinfo, &filename[stPos], pos-stPos);
+    if (dx > XTextWidth(mfinfo, &filename[pos], 1)/2)
+      pos++;
+  }
+
+  return pos;
+}
+
+
+/***************************************************/
+static void moveInsertionPoint(clkx)
+    int clkx;
+{
+  curPos = posOfCoordinate(clkx);
+  selPos=selLen = 0;
+
+  showFName();
+}
+
+
+/***************************************************/
+static void unselect()
+{
+  selPos=selLen = 0;
+  ReleaseSelection(XA_PRIMARY);
+}
+
+
+/***************************************************/
+static void removeSelectedRange()
+{
+  if (selLen > 0) {
+    int len;
+    len = strlen(filename);
+    xvbcopy(&filename[selPos + selLen], &filename[selPos], (size_t)(len - (selPos + selLen)));
+    filename[len - selLen] = '\0';
+    curPos = selPos;
+  }
+  unselect();
+}
+
+
+/***************************************************/
+static void pasteIntoBox(text)
+    const char *text;
+{
+  int len, cleanlen;
+  int tpos, cpos;
+  char ch;
+  char *clean;
+
+  removeSelectedRange();
+
+  len = strlen(filename);
+
+  clean = malloc(strlen(text)+1);
+  if (!clean) FatalError("out of memory!\n");
+
+  cpos = 0;
+  for (tpos=0; text[tpos]!='\0'; tpos++) {
+    ch = text[tpos];
+
+    /* skip non-printable characters */
+    if (ch<' ' || ch>='\177') continue;
+
+    /* note: only allow 'piped commands' in savemode... */
+    /* only allow vertbars in 'piped commands', not filenames */
+    if (ch=='|' && curPos+cpos>0 && !ISPIPE(filename[0])) continue;
+
+    /* stop if we fill up the filename array */
+    if (len + cpos >= MAXFNLEN-1) break;
+
+    clean[cpos] = ch;
+    cpos++;
+  }
+  clean[cpos] = '\0';
+  cleanlen = cpos;
+
+  xvbcopy(&filename[curPos], &filename[curPos+cleanlen], (size_t) (len+1-curPos));
+  xvbcopy(clean, &filename[curPos], cleanlen);
+  curPos += cleanlen;
+
+  free(clean);
+
+  scrollToFileName();
+  showFName();
 }
 
 
 /***************************************************/
 void SelectDir(n)
-int n;
+    int n;
 {
   /* called when entry #n in the dir list was selected/double-clicked */
 
@@ -605,7 +887,7 @@ int n;
 
 /***************************************************/
 static void changedDirMB(sel)
-     int sel;
+    int sel;
 {
   if (sel != 0) {   /* changed directories */
     char tmppath[MAXPATHLEN+1], *trunc_point;
@@ -659,8 +941,8 @@ static void changedDirMB(sel)
 
 /***************************************************/
 static void RedrawDList(delta, sptr)
-     int   delta;
-     SCRL *sptr;
+    int   delta;
+    SCRL *sptr;
 {
   XV_UNUSED(sptr);
   LSRedraw(&dList,delta);
@@ -675,7 +957,6 @@ static void loadCWD()
   xv_getwd(path, sizeof(path));
   LoadCurrentDirectory();
 }
-
 
 
 /***************************************************/
@@ -771,16 +1052,15 @@ void LoadCurrentDirectory()
   dirMB.nlist = ndirs;
   XClearArea(theDisp, dirMB.win, dirMB.x, dirMB.y,
 	     (u_int) dirMB.w+3, (u_int) dirMB.h+3, False);
-  i = StringWidth(dirMBlist[0]) + 10;
-  dirMB.x = dirMB.x + dirMB.w/2 - i/2;
-  dirMB.w = i;
+  dirMB.w = StringWidth(dirMBlist[0]) + 2*MBDIRPAD;
+  arrangeElements(savemode);
   MBRedraw(&dirMB);
 
 
   dirp = opendir(".");
   if (!dirp) {
     LSNewData(&dList, fnames, 0);
-    RedrawDirW(0,0,DIRWIDE,DIRHIGH);
+    RedrawDirW(0, 0, DirWide(), DirHigh());
     return;
   }
 
@@ -855,14 +1135,14 @@ void LoadCurrentDirectory()
 
   if (changedDir) LSNewData(&dList, fnames, numfnames);
              else LSChangeData(&dList, fnames, numfnames);
-  RedrawDirW(0,0,DIRWIDE,DIRHIGH);
+  RedrawDirW(0, 0, DirWide(), DirHigh());
   SetCursors(-1);
 }
 
 
 /***************************************************/
 void GetDirPath(buf)
-     char *buf;
+    char *buf;
 {
   /* returns current 'dirW' path.  buf should be MAXPATHLEN long */
 
@@ -873,7 +1153,7 @@ void GetDirPath(buf)
 /***************************************************/
 #ifdef FOO
 static int cd_able(str)
-char *str;
+    char *str;
 {
   return ((str[0] == C_DIR || str[0] == C_LNK));
 }
@@ -881,8 +1161,8 @@ char *str;
 
 
 /***************************************************/
-static int dnamcmp(p1,p2)
-     const void *p1, *p2;
+static int dnamcmp(p1, p2)
+    const void *p1, *p2;
 {
   char **s1, **s2;
 
@@ -907,12 +1187,96 @@ static int dnamcmp(p1,p2)
 }
 
 
+/***************************************************/
+static int updatePrimarySelection()
+{
+  if (selLen > 0)
+    if (SetPrimaryText(dirW, &filename[selPos], selLen) == 0) {
+      if (DEBUG) fprintf(stderr, "unable to set PRIMARY selection\n");
+      return 0;
+    }
 
+  return 1;
+}
+
+
+/***************************************************/
+static int updateClipboardSelection()
+{
+  if (selLen > 0)
+    if (SetClipboardText(dirW, &filename[selPos], selLen) == 0) {
+      if (DEBUG) fprintf(stderr, "unable to set CLIPBOARD selection\n");
+      return 0;
+    }
+
+  return 1;
+}
+
+
+/***************************************************/
+void SelectAllDirW()
+{
+  selPos = 0;
+  selLen = strlen(filename);
+  showFName();
+  updatePrimarySelection();
+}
+
+
+/***************************************************/
+void InactivateDirW()
+{
+  /* FIXME: it would be nice to have two selection colors:
+   * one for selected and PRIMARY and one for just selected
+   */
+  ReleaseSelection(XA_PRIMARY);
+}
+
+
+/***************************************************/
+void CutDirW()
+{
+  updateClipboardSelection();
+
+  removeSelectedRange();
+
+  scrollToFileName();
+  showFName();
+}
+
+
+/***************************************************/
+void CopyDirW()
+{
+  updateClipboardSelection();
+}
+
+
+/***************************************************/
+void PasteDirW()
+{
+  char *text = GetClipboardText();
+
+  if (text != NULL) {
+    pasteIntoBox(text);
+    free(text);
+  }
+}
+
+
+/***************************************************/
+void ClearDirW()
+{
+  removeSelectedRange();
+
+  scrollToFileName();
+  showFName();
+}
 
 
 /***************************************************/
 int DirKey(c)
-     int c;
+    int c;
 {
   /* got keypress in dirW.  stick on end of filename */
   int len;
@@ -933,6 +1297,8 @@ int DirKey(c)
 
     if (len >= MAXFNLEN-1) return(-1);  /* max length of string */
 
+    removeSelectedRange();
+
     xvbcopy(&filename[curPos], &filename[curPos+1], (size_t) (len-curPos+1));
     filename[curPos]=c;  curPos++;
 
@@ -940,9 +1306,13 @@ int DirKey(c)
   }
 
   else if (c=='\010') {                 /* BS */
-    if (curPos==0) return(-1);          /* at beginning of str */
-    xvbcopy(&filename[curPos], &filename[curPos-1], (size_t) (len-curPos+1));
-    curPos--;
+    if (selLen > 0) {
+      removeSelectedRange();
+    } else {
+      if (curPos==0) return(-1);          /* at beginning of str */
+      xvbcopy(&filename[curPos], &filename[curPos-1], (size_t) (len-curPos+1));
+      curPos--;
+    }
 
     if (strlen(filename) > (size_t) 0) scrollToFileName();
   }
@@ -950,33 +1320,53 @@ int DirKey(c)
   else if (c=='\025') {                 /* ^U: clear entire line */
     filename[0] = '\0';
     curPos = 0;
+    unselect();
   }
 
   else if (c=='\013') {                 /* ^K: clear to end of line */
     filename[curPos] = '\0';
+    unselect();
   }
 
   else if (c=='\001') {                 /* ^A: move to beginning */
     curPos = 0;
+    unselect();
   }
 
   else if (c=='\005') {                 /* ^E: move to end */
     curPos = len;
+    unselect();
   }
 
   else if (c=='\004' || c=='\177') {    /* ^D or DEL: delete character at curPos */
-    if (curPos==len) return(-1);
-    xvbcopy(&filename[curPos+1], &filename[curPos], (size_t) (len-curPos));
+    if (selLen > 0) {
+      removeSelectedRange();
+    } else {
+      if (curPos==len) return(-1);
+      xvbcopy(&filename[curPos+1], &filename[curPos], (size_t) (len-curPos));
+    }
+
+    if (strlen(filename) > (size_t) 0) scrollToFileName();
   }
 
   else if (c=='\002') {                 /* ^B: move backwards char */
-    if (curPos==0) return(-1);
-    curPos--;
+    if (selLen > 0) {
+      curPos = selPos;
+    } else {
+      if (curPos<=0) { curPos = 0; unselect(); return(-1); }
+      curPos--;
+    }
+    unselect();
   }
 
   else if (c=='\006') {                 /* ^F: move forwards char */
-    if (curPos==len) return(-1);
-    curPos++;
+    if (selLen > 0) {
+      curPos = selPos + selLen;
+    } else {
+      if (curPos>=len) { curPos = len; unselect(); return(-1); }
+      curPos++;
+    }
+    unselect();
   }
 
   else if (c=='\012' || c=='\015') {    /* CR or LF */
@@ -991,6 +1381,7 @@ int DirKey(c)
     if (!autoComplete()) XBell(theDisp, 0);
     else {
       curPos = strlen(filename);
+      unselect();
       scrollToFileName();
     }
   }
@@ -1022,13 +1413,14 @@ static int autoComplete()
 
   int i, firstmatch, slen, nummatch, cnt;
 
+  slen = strlen(filename);
+
   /* is filename a simple filename? */
-  if (strlen(filename)==0  ||
+  if (slen==0  ||
       ISPIPE(filename[0])  ||
       index(filename, '/') ||
       filename[0]=='~'   ) return 0;
 
-  slen = strlen(filename);
   for (i=0; i<dList.nstr; i++) {
     if (strncmp(filename, dList.str[i]+1, (size_t) slen) <= 0) break;
   }
@@ -1066,6 +1458,7 @@ static int autoComplete()
   return 1;
 }
 
+
 /***************************************************/
 static void scrollToFileName()
 {
@@ -1074,7 +1467,7 @@ static void scrollToFileName()
   /* called when 'fname' changes.  Tries to scroll the directory list
      so that fname would be centered in it */
 
-  /* nothing to do if scrlbar not enabled ( <= NLINES names in list) */
+  /* nothing to do if scrlbar not enabled ( <= nlines names in list) */
   if (dList.scrl.max <= 0) return;
 
   /* find the position in the namelist that the current name should be at
@@ -1093,7 +1486,7 @@ static void scrollToFileName()
   }
 
   /* set scroll position so that 'pos' will be centered in the list */
-  i = pos - (NLINES/2);
+  i = pos - (dList.nlines/2);
   SCSetVal(&dList.scrl, i);
 }
 
@@ -1101,35 +1494,60 @@ static void scrollToFileName()
 /***************************************************/
 void RedrawDNamW()
 {
-  int cpos;
+  int cpos, i;
+  int xoff;
 
   /* draw substring filename[stPos:enPos] and cursor */
 
-  Draw3dRect(dnamW, 0, 0, (u_int) DNAMWIDE+5, (u_int) LINEHIGH+4, R3D_IN, 2,
+  Draw3dRect(dnamW, 0, 0, (u_int) DNamWide()+2*DNAMMORE-1, (u_int) LINEHIGH+4, R3D_IN, 2,
 	     hicol, locol, infobg);
 
   XSetForeground(theDisp, theGC, infofg);
 
-  if (stPos>0) {  /* draw a "there's more over here" doowah */
-    XDrawLine(theDisp, dnamW, theGC, 0,0,0,LINEHIGH+5);
-    XDrawLine(theDisp, dnamW, theGC, 1,0,1,LINEHIGH+5);
-    XDrawLine(theDisp, dnamW, theGC, 2,0,2,LINEHIGH+5);
+  xoff = DNAMMORE;
+  if (selLen == 0 ||
+      selPos + selLen < stPos ||
+      selPos > enPos) {
+    XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[stPos], enPos-stPos);
+  } else {
+    if (selPos > stPos) {
+      XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[stPos], selPos-stPos);
+      xoff += XTextWidth(mfinfo, &filename[stPos], selPos-stPos);
+    }
+    if (selPos + selLen > enPos) {
+      XSetForeground(theDisp, theGC, infobg);
+      XSetBackground(theDisp, theGC, infofg);
+      XDrawImageString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos], enPos-selPos);
+      XSetForeground(theDisp, theGC, infofg);
+      XSetBackground(theDisp, theGC, infobg);
+    } else {
+      XSetForeground(theDisp, theGC, infobg);
+      XSetBackground(theDisp, theGC, infofg);
+      XDrawImageString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos], selLen);
+      xoff += XTextWidth(mfinfo, &filename[selPos], selLen);
+      XSetForeground(theDisp, theGC, infofg);
+      XSetBackground(theDisp, theGC, infobg);
+      XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos + selLen], enPos - (selPos + selLen));
+    }
   }
 
-  if ((size_t) enPos < strlen(filename)) {
-    /* draw a "there's more over here" doowah */
-    XDrawLine(theDisp, dnamW, theGC, DNAMWIDE+5,0,DNAMWIDE+5,LINEHIGH+5);
-    XDrawLine(theDisp, dnamW, theGC, DNAMWIDE+4,0,DNAMWIDE+4,LINEHIGH+5);
-    XDrawLine(theDisp, dnamW, theGC, DNAMWIDE+3,0,DNAMWIDE+3,LINEHIGH+5);
-  }
+  /* draw a "there's more over here" doowah on the left */
+  if (stPos > 0)
+    for (i=0; i<DNAMMORE; i++)
+      XDrawLine(theDisp, dnamW, theGC, i,0,i,LINEHIGH+5);
 
-  XDrawString(theDisp, dnamW, theGC,3,ASCENT+3,filename+stPos, enPos-stPos);
+  /* draw a "there's more over here" doowah on the right */
+  if ((size_t) enPos < strlen(filename))
+    for (i=0; i<DNAMMORE; i++)
+      XDrawLine(theDisp, dnamW, theGC, DNamWide()+DNAMMORE+i,0,DNamWide()+DNAMMORE+i,LINEHIGH+5);
 
   /* draw insertion point */
-  cpos = XTextWidth(mfinfo, &filename[stPos], curPos-stPos);
-  XDrawLine(theDisp, dnamW, theGC, 3+cpos, 2, 3+cpos, 2+CHIGH+1);
-  XDrawLine(theDisp, dnamW, theGC, 3+cpos, 2+CHIGH+1, 5+cpos, 2+CHIGH+3);
-  XDrawLine(theDisp, dnamW, theGC, 3+cpos, 2+CHIGH+1, 1+cpos, 2+CHIGH+3);
+  if (selLen == 0) {
+    cpos = DNAMMORE + XTextWidth(mfinfo, &filename[stPos], curPos-stPos);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2,         cpos,   2+CHIGH+1);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2+CHIGH+1, cpos+2, 2+CHIGH+3);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2+CHIGH+1, cpos-2, 2+CHIGH+3);
+  }
 }
 
 
@@ -1399,10 +1817,9 @@ int DoSave()
 }
 
 
-
 /***************************************************/
 void SetDirFName(st)
-     const char *st;
+    const char *st;
 {
   strncpy(deffname, st, (size_t) MAXFNLEN-1);
   deffname[MAXFNLEN-1] = '\0';
@@ -1412,7 +1829,7 @@ void SetDirFName(st)
 
 /***************************************************/
 static void setFName(st)
-     const char *st;
+    const char *st;
 {
   /* Prevent an ASan failure. */
   /* Why is this code being called with filename == st??? */
@@ -1422,6 +1839,7 @@ static void setFName(st)
   filename[MAXFNLEN-1] = '\0';  /* make sure it's terminated */
   curPos = strlen(st);
   stPos = 0;  enPos = curPos;
+  unselect();
 
   showFName();
 }
@@ -1437,29 +1855,36 @@ static void showFName()
   if (curPos<stPos) stPos = curPos;
   if (curPos>enPos) enPos = curPos;
 
-  if (stPos>len) stPos = (len>0) ? len-1 : 0;
-  if (enPos>len) enPos = (len>0) ? len-1 : 0;
+  if (stPos>=len) stPos = (len > 0) ? len - 1 : 0;
+  if (enPos>len) enPos = len;
 
-  /* while substring is shorter than window, inc enPos */
+  /* while substring is shorter than window, inc enPos,
+     or if that is maxed out, then decrement stPos
+     (and leave 1 pixel of room for the insertion point) */
 
-  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) < DNAMWIDE
-	 && enPos<len) { enPos++; }
+  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1 <= DNamWide()) {
+    if (enPos < len) enPos++;
+    else if (stPos > 0) stPos--;
+    else break; /* string completely visible */
+  }
 
   /* while substring is longer than window, dec enpos, unless enpos==curpos,
      in which case, inc stpos */
 
-  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) > DNAMWIDE) {
-    if (enPos != curPos) enPos--;
-    else stPos++;
+  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1 > DNamWide()) {
+    if (enPos > curPos) enPos--;
+    else if (stPos < curPos) stPos++;
+    else break; /* did our best ... maybe one really wide character? */
   }
 
 
-  if (ctrlColor) XClearArea(theDisp, dnamW, 2,2, (u_int) DNAMWIDE+5-3,
-			    (u_int) LINEHIGH+4-3, False);
+  if (ctrlColor) XClearArea(theDisp, dnamW, 2,2,
+			    (u_int) DNamWide()+(2*DNAMMORE-1)-3,
+			    (u_int) LINEHIGH+(5-1)-3, False);
   else XClearWindow(theDisp, dnamW);
 
   RedrawDNamW();
-  BTSetActive(&dbut[S_BOK], strlen(filename)!=0);
+  BTSetActive(&dbut[S_BOK], len>0);
 }
 
 
@@ -1491,7 +1916,7 @@ char *GetDirFullName()
 
 /***************************************************/
 void SetDirSaveMode(group, bnum)
-     int group, bnum;
+    int group, bnum;
 {
   if (group == F_COLORS) {
     if (picType == PIC24) {   /* disable REDUCED COLOR */
@@ -1808,7 +2233,7 @@ static int FNameCdable()
 
 /**************************************************************************/
 int Globify(fname)
-  char *fname;
+    char *fname;
 {
   /* expands ~s in file names.  Returns the name inplace 'name'.
      returns 0 if okay, 1 if error occurred (user name not found) */
@@ -1853,11 +2278,9 @@ int Globify(fname)
 }
 
 
-
-
 /***************************************/
 FILE *OpenOutFile(filename)
-     const char *filename;
+    const char *filename;
 {
   /* opens file for output.  does various error handling bits.  Returns
      an open file pointer if success, NULL if failure */
@@ -1871,9 +2294,13 @@ FILE *OpenOutFile(filename)
 
   /* make sure we're in the correct directory */
 #ifdef AUTO_EXPAND
-  if (strlen(path)) Chvdir(path);
+  if (strlen(path))
+    if (Chvdir(path))
+      return NULL;
 #else
-  if (strlen(path)) chdir(path);
+  if (strlen(path))
+    if (chdir(path) == -1)
+      return NULL;
 #endif
 
   if (ISPIPE(filename[0])) {   /* do piping */
@@ -1924,10 +2351,10 @@ FILE *OpenOutFile(filename)
 
 /***************************************/
 int CloseOutFileWhy(fp, filename, failed, why)
-     FILE *fp;
-     const char *filename;
-     int   failed;
-     const char *why;
+    FILE       *fp;
+    const char *filename;
+    int         failed;
+    const char *why;
 {
   char buf[64];
 
@@ -2119,7 +2546,7 @@ static byte *handleBWandReduced(pic, ptype, pw, ph, color, nc, rpp, gpp, bpp)
 
 /***************************************/
 static byte *handleNormSel(pptype, pwide, phigh, pfree)
-     int *pptype, *pwide, *phigh, *pfree;
+    int *pptype, *pwide, *phigh, *pfree;
 {
   /* called to return a pointer to a 'pic', its type, its width & height,
    * and whether or not it should be freed when we're done with it.  The 'pic'
@@ -2182,8 +2609,8 @@ static byte *handleNormSel(pptype, pwide, phigh, pfree)
 
 /***************************************/
 byte *GenSavePic(ptypeP, wP, hP, freeP, ncP, rmapP, gmapP, bmapP)
-     int  *ptypeP, *wP, *hP, *freeP, *ncP;
-     byte **rmapP, **gmapP, **bmapP;
+    int   *ptypeP, *wP, *hP, *freeP, *ncP;
+    byte **rmapP, **gmapP, **bmapP;
 {
   /* handles the whole ugly mess of the various save options.
    * returns an image, of type 'ptypeP', size 'wP,hP'.
@@ -2225,7 +2652,7 @@ byte *GenSavePic(ptypeP, wP, hP, freeP, ncP, rmapP, gmapP, bmapP)
 
 /***************************************/
 void GetSaveSize(wP, hP)
-     int *wP, *hP;
+    int *wP, *hP;
 {
   /* returns the size (in pixels) of the save image.  Takes 'normal size'
      and 'save selection' checkboxes into account */
@@ -2269,6 +2696,7 @@ static struct stat origStat, lastStat;
 static int haveStat = 0, haveLastStat = 0;
 static time_t lastchgtime;
 
+
 /****************************/
 void InitPoll()
 {
@@ -2293,7 +2721,7 @@ void InitPoll()
 
 /****************************/
 int CheckPoll(del)
-     int del;
+    int del;
 {
   /* returns '1' if the file has been modified, and either
       A) the file has stabilized (st = lastStat), or
@@ -2340,7 +2768,7 @@ int CheckPoll(del)
 
 /***************************************************************/
 void DIRDeletedFile(name)
-     char *name;
+    char *name;
 {
   /* called when file 'name' has been deleted.  If any of the browsers
      were showing the directory that the file was in, does a rescan() */
@@ -2357,7 +2785,7 @@ void DIRDeletedFile(name)
 
 /***************************************************************/
 void DIRCreatedFile(name)
-     char *name;
+    char *name;
 {
   DIRDeletedFile(name);
 }
@@ -2366,8 +2794,8 @@ void DIRCreatedFile(name)
 #ifdef HAVE_PIC2
 /**** Stuff for PIC2Dialog box ****/
 FILE *pic2_OpenOutFile(filename, append)
-char *filename;
-int *append;
+    char *filename;
+    int *append;
 {
     /* opens file for output.  does various error handling bits.  Returns
        an open file pointer if success, NULL if failure */
@@ -2382,9 +2810,13 @@ int *append;
 
     /* make sure we're in the correct directory */
 #ifdef AUTO_EXPAND
-    if (strlen(path)) Chvdir(path);
+    if (strlen(path))
+        if (Chvdir(path))
+            return NULL;
 #else
-    if (strlen(path)) chdir(path);
+    if (strlen(path))
+        if (chdir(path) == -1)
+            return NULL;
 #endif
 
     if (ISPIPE(filename[0])) {   /* do piping */
@@ -2448,7 +2880,7 @@ int *append;
 
 /***************************************/
 void pic2_KillNullFile(fp)
-FILE *fp;
+    FILE *fp;
 {
     fseek(fp, (size_t) 0, SEEK_END);
     if (ftell(fp) > 0) {
@@ -2467,7 +2899,7 @@ FILE *fp;
 /**** Stuff for MGCSFX Dialog box ****/
 /***************************************/
 int OpenOutFileDesc(filename)
-     char *filename;
+    char *filename;
 {
   /* opens file for output.  does various error handling bits.  Returns
      an open file pointer if success, NULL if failure */
@@ -2481,9 +2913,13 @@ int OpenOutFileDesc(filename)
 
   /* make sure we're in the correct directory */
 #ifdef AUTO_EXPAND
-  if (strlen(path)) Chvdir(path);
+  if (strlen(path))
+    if (Chvdir(path))
+      return -1;
 #else
-  if (strlen(path)) chdir(path);
+  if (strlen(path))
+    if (chdir(path) == -1)
+      return -1;
 #endif
 
   if (ISPIPE(filename[0])) {   /* do piping */

@@ -3,7 +3,11 @@
  *
  * callable functions:
  *
- *   CenterMapWindow(win,x,y)  -  maps and centers a window around the mouse
+ *   SetMinSizeWindow(win,w,h) -  set minimum allowed size
+ *   SetMaxSizeWindow(win,w,h) -  set maximum allowed size
+ *   SetSizeIncWindow(win,dx,dy) -  set resize increment stepping
+ *   CenterMapFlexWindow(win,x,y,keep) -  maps and centers a window around the mouse
+ *   CenterMapWindow(win,x,y) -  maps and centers a window around the mouse
  *   PopUp(str,...)        -  maps, sets up popW
  *   ErrPopUp(str,str)     -  maps, sets up popW
  *   GetStrPopUp(...)      -  opens a 1-line, editable text popup window
@@ -135,11 +139,59 @@ extern XtAppContext context;
 #endif
 
 /***************************************************/
-void CenterMapWindow(win, dx, dy, w, h)
-     Window win;
-     int    dx, dy, w, h;
+void SetMinSizeWindow(win, w, h)
+    Window win;
+    int    w, h;
 {
   XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.min_width  = w;
+  hints.min_height = h;
+  hints.flags |= PMinSize;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void SetMaxSizeWindow(win, w, h)
+    Window win;
+    int    w, h;
+{
+  XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.max_width  = w;
+  hints.max_height = h;
+  hints.flags |= PMaxSize;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void SetSizeIncWindow(win, dx, dy)
+    Window win;
+    int    dx, dy;
+{
+  XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.base_width  = 0;
+  hints.base_height = 0;
+  hints.flags |= PBaseSize;
+  hints.width_inc  = dx;
+  hints.height_inc = dy;
+  hints.flags |= PResizeInc;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void CenterMapFlexWindow(win, dx, dy, w, h, keepsize)
+    Window win;
+    int    dx, dy, w, h, keepsize;
+{
+  XSizeHints   hints;
   Window       rW,cW;
   int          rx,ry,x,y,wx,wy;
   unsigned int mask;
@@ -158,7 +210,7 @@ void CenterMapWindow(win, dx, dy, w, h)
     if (wy + h > dispHIGH) wy = dispHIGH - h;
   }
 
-
+#if 0
   if (winCtrPosKludge) {
     wx -= (p_offx + ch_offx);
     wy -= (p_offy + ch_offy);
@@ -167,24 +219,40 @@ void CenterMapWindow(win, dx, dy, w, h)
     wx -= (ch_offx);
     wy -= (ch_offy);
   }
+#endif
+
+  /* do this first so the WM can override us */
+  XMoveWindow(theDisp, win, wx, wy);
 
   if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
-  hints.width  = hints.min_width  = hints.max_width  = w;
-  hints.height = hints.min_height = hints.max_height = h;
   hints.x = wx;  hints.y = wy;
-  hints.flags  |= (USSize | PMinSize | PMaxSize | USPosition);
+  hints.width = w;
+  hints.height = h;
+  hints.flags |= PPosition | PSize;
+  if (keepsize) {
+    hints.min_width  = hints.max_width  = w;
+    hints.min_height = hints.max_height = h;
+    hints.flags |= PMinSize | PMaxSize;
+  }
   XSetNormalHints(theDisp, win, &hints);
 
-  XMoveWindow(theDisp, win, wx, wy);
   XMapRaised(theDisp, win);
+}
+
+
+void CenterMapWindow(win, dx, dy, w, h)
+    Window win;
+    int    dx, dy, w, h;
+{
+  CenterMapFlexWindow(win, dx, dy, w, h, TRUE);
 }
 
 
 /***************************************************/
 int PopUp(txt, labels, n)
-     const char *txt;
-     const char *labels[];
-     int         n;
+    const char *txt;
+    const char *labels[];
+    int         n;
 {
   return doPopUp(txt, labels, n, ISPOPUP, "xv confirm");
 }
@@ -192,10 +260,10 @@ int PopUp(txt, labels, n)
 
 /***************************************************/
 static int doPopUp(txt, labels, n, poptyp, wname)
-     const char *txt;
-     const char *labels[];
-     int         n, poptyp;
-     const char *wname;
+    const char *txt;
+    const char *labels[];
+    int         n, poptyp;
+    const char *wname;
 {
   int    i;
   XEvent event;
@@ -414,7 +482,7 @@ int GrabPopUp(pHide, pDelay)
   changedGSBuf();      /* careful!  popW doesn't exist yet! */
 
   /* window value gets filled in in doPopUp() */
-  CBCreate(&ahideCB, (Window) NULL,
+  CBCreate(&ahideCB, (Window) None,
 	   PUWIDE-10-18-StringWidth(HIDESTR),
 	   gsy+2, HIDESTR, infofg, infobg, hicol, locol);
   ahideCB.val = *pHide;
@@ -867,7 +935,7 @@ static void TextRect(win, txt, x, y, w, h, fg)
 static void createPUD()
 {
   popW = CreateWindow("xv confirm", "XVconfirm", "+0+0",
-		      PUWIDE, PUHIGH, infofg, infobg, 0);
+		      PUWIDE, PUHIGH, infofg, infobg, FALSE);
   if (!popW) FatalError("can't create popup window!");
 
   XSelectInput(theDisp, popW, ExposureMask | ButtonPressMask | KeyPressMask

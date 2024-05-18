@@ -216,7 +216,7 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   XSetWindowAttributes xswa;
 
   gamW = CreateWindow("xv color editor", "XVcedit", geom,
-		      GAMW, GAMH, infofg,infobg, 0);
+		      GAMW, GAMH, infofg,infobg, FALSE);
   if (!gamW) FatalError("can't create cedit window!");
 
   cmapF = XCreateSimpleWindow(theDisp,gamW, 10,   8,CMAPF_WIDE,CMAPF_HIGH,

@@ -575,6 +575,13 @@ int HandleEvent(event, donep)
 #endif
     }
 
+    if (cevt->window == dirW) {
+      ResizeDirW(cevt->width, cevt->height);
+    }
+
+    if (cevt->window == ctrlW) {
+      ResizeCtrl(cevt->width, cevt->height);
+    }
 
     if (cevt->window == mainW) {
 
@@ -904,42 +911,40 @@ int HandleEvent(event, donep)
     break;
 
 
-  case SelectionClear:  break;
+  case SelectionClear: {
+    XSelectionClearEvent const *xsclr = &event->xselectionclear;
+    if (xsclr->window == ctrlW) {
+      if (xsclr->selection == XA_PRIMARY) {
+        InactivateDirW();
+      } else {
+
+      }
+    }
+  }
+    break;
 
   case SelectionRequest:
     {
-      XSelectionRequestEvent *xsrevt = (XSelectionRequestEvent *) event;
-      XSelectionEvent  xse;
+      XSelectionRequestEvent const *xsrevt = &event->xselectionrequest;
+      char const *text;
 
-      if (xsrevt->owner     != ctrlW      ||
-	  xsrevt->selection != XA_PRIMARY ||
-	  xsrevt->target    != XA_STRING) {  /* can't do it. */
-	xse.property = None;
-      }
-      else {
-	if (xsrevt->property == None) xse.property = xsrevt->target;
-	                         else xse.property = xsrevt->property;
+      if (xsrevt->owner == ctrlW) {
+        if (xsrevt->selection != XA_PRIMARY ||
+           xsrevt->target    != XA_STRING) {  /* can't do it. */
+         text = NULL;
+        }
+        text = xevPriSel ? xevPriSel : "";
+      } else if (xsrevt->owner == dirW) {
+        if (xsrevt->target != XA_STRING) {
+         text = NULL; /* we don't handle any other format */
+        }
 
-	if (xse.property != None) {
-          xerrcode = 0;
-	  XChangeProperty(theDisp, xsrevt->requestor, xse.property,
-			  XA_STRING, 8, PropModeReplace,
-			  (byte *) ((xevPriSel) ? xevPriSel           : "\0"),
-			  (int)    ((xevPriSel) ? strlen(xevPriSel)+1 : 1));
-          XSync(theDisp, False);
-          if (!xerrcode) xse.property = None;
-	}
+        text = TextOfSelection(xsrevt->selection);
+      } else {
+        text = NULL; /* other windows don't have selections */
       }
 
-      xse.type       = SelectionNotify;
-      xse.send_event = True;
-      xse.display    = theDisp;
-      xse.requestor  = xsrevt->requestor;
-      xse.selection  = xsrevt->selection;
-      xse.target     = xsrevt->target;
-      xse.time       = xsrevt->time;
-      XSendEvent(theDisp, xse.requestor, False, NoEventMask, (XEvent *) &xse);
-      XSync(theDisp, False);
+      SendSelection(xsrevt->selection, xsrevt->requestor, xsrevt->property, xsrevt->target, xsrevt->time, text);
     }
     break;
 
@@ -964,6 +969,46 @@ int HandleEvent(event, donep)
   frominterrupt = 0;
   *donep = done;
   return(retval);
+}
+
+
+/***********************************/
+extern void SendSelection(selection, requestor, property, target, time, text)
+    Atom selection;
+    Window requestor;
+    Atom property;
+    Atom target;
+    Time time;
+    char const *text;
+{
+  XSelectionEvent xse;
+
+  if (property == None)
+    xse.property = target;
+  else
+    xse.property = property;
+
+  if (text) {
+    xerrcode = 0;
+         XChangeProperty(theDisp, requestor, xse.property,
+                         XA_STRING, 8, PropModeReplace,
+                         (byte *)text,
+                         (int)(strlen(text)+1));
+    XSync(theDisp, False);
+    if (xerrcode) xse.property = None;
+  } else {
+    xse.property = None; /* we have anything to return */
+  }
+
+  xse.type       = SelectionNotify;
+  xse.send_event = True;
+  xse.display    = theDisp;
+  xse.requestor  = requestor;
+  xse.selection  = selection;
+  xse.target     = target;
+  xse.time       = time;
+  XSendEvent(theDisp, xse.requestor, False, NoEventMask, (XEvent *)&xse);
+  XSync(theDisp, False);
 }
 
 
@@ -1303,6 +1348,10 @@ static void debugEvent(e)
     fprintf(stderr,"DBGEVT: MapNotify %s\n", win2name(e->xany.window));
     break;
 
+  case MappingNotify:
+    fprintf(stderr,"DBGEVT: MappingNotify %s\n", win2name(e->xany.window));
+    break;
+
   case ReparentNotify:
     fprintf(stderr,"DBGEVT: ReparentNotify %s\n", win2name(e->xany.window));
     break;
@@ -1314,6 +1363,18 @@ static void debugEvent(e)
 	    win2name(e->xany.window));
     break;
 
+  case SelectionClear:
+    fprintf(stderr,"DBGEVT: SelectionClear window=%s selection=0x%06lx\n",
+           win2name(e->xselectionclear.window),
+           e->xselectionclear.selection);
+    break;
+
+  case SelectionRequest:
+    fprintf(stderr,"DBGEVT: SelectionRequest owner=%s selection=0x%06lx target=0x%06lx\n",
+           win2name(e->xselectionrequest.owner),
+           e->xselectionrequest.selection, e->xselectionrequest.target);
+    break;
+
   default:
     fprintf(stderr,"DBGEVT: unknown event type (%d), window %s\n",
 	    e->type, win2name(e->xany.window));
@@ -1322,7 +1383,7 @@ static void debugEvent(e)
 }
 
 static const char *win2name(win)
-     Window win;
+    Window win;
 {
   static char foo[16];
 
@@ -1344,8 +1405,8 @@ static const char *win2name(win)
 
 /***********************************/
 static void handleButtonEvent(event, donep, retvalp)
-  XEvent *event;
-  int    *donep, *retvalp;
+    XEvent *event;
+    int    *donep, *retvalp;
 {
   XButtonEvent *but_event;
   int i,x,y, done, retval, shift;
@@ -1501,10 +1562,23 @@ static void handleButtonEvent(event, donep, retvalp)
       else if (win == nList.scrl.win) SCTrack(&nList.scrl, x, y);
 
       else if (win == dirW) {
-	i=ClickDirW(x,y);
+       static int lastClickX=-1;
+       static int lastClickY=-1;
+       static Time lastClickTime=0;
+
+       if (abs(x - lastClickX) < 5 &&
+           abs(y - lastClickY) < 5 &&
+           (but_event->time - lastClickTime) < DBLCLICKTIME)
+         i = DoubleClickDirW(x, y, 1);
+       else
+         i = ClickDirW(x, y, 1);
+       lastClickX = x;
+       lastClickY = y;
+       lastClickTime = but_event->time;
 
 	switch (i) {
-	case S_BOK:   if (dirUp == BLOAD) {
+       case S_BOK:
+         if (dirUp == BLOAD) {
 	    if (!DirCheckCD()) {
 	      retval = LOADPIC;
 	      done=1;
@@ -1515,7 +1589,9 @@ static void handleButtonEvent(event, donep, retvalp)
 	  }
 	  break;
 
-	case S_BCANC: DirBox(0);  break;
+	case S_BCANC:
+	  DirBox(0);
+	  break;
 
 	case S_BRESCAN:
 	  WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
@@ -1598,8 +1674,8 @@ static void handleButtonEvent(event, donep, retvalp)
 
 /***********************************/
 static void handleKeyEvent(event, donep, retvalp)
-  XEvent *event;
-  int    *donep, *retvalp;
+    XEvent *event;
+    int    *donep, *retvalp;
 {
   /* handles KeyPress and KeyRelease events, called from HandleEvent */
 
@@ -1645,6 +1721,11 @@ static void handleKeyEvent(event, donep, retvalp)
 
     shift = key_event->state & ShiftMask;
     ctrl  = key_event->state & ControlMask;
+    /* FIXME: This is wrong; mod1 can be any modifier.
+     * XV should search for Meta modifier if defined,
+     * else use Alt modifier if defined, else nothing
+     * (or change docs to say Alt and switch the priority)
+     */
     meta  = key_event->state & Mod1Mask;
     dealt = 0;
 
@@ -1778,6 +1859,28 @@ static void handleKeyEvent(event, donep, retvalp)
       else if (ck==CK_UP)    CropKey( 0,-1,shift,ctrl);
       else if (ck==CK_DOWN)  CropKey( 0, 1,shift,ctrl);
       else dealt = 0;
+      if (dealt) break;
+    }
+
+
+    /* check for Dir-specific keys */
+    if (key_event->window == dirW) {
+      dealt = 1;
+      if (meta) {  /* meta is down */
+        if (ks==XK_a)
+          SelectAllDirW();
+        else if (ks==XK_x)
+          CutDirW();
+        else if (ks==XK_c)
+          CopyDirW();
+        else if (ks==XK_v)
+          PasteDirW();
+        else if (ks==XK_d)
+          ClearDirW();
+        else
+          dealt = 0;
+      } else
+        dealt = 0;
       if (dealt) break;
     }
 
@@ -2180,7 +2283,7 @@ static void setSizeCmd()
 
 /***********************************/
 void NewCutBuffer(str)
-     char *str;
+     char const *str;
 {
   /* called whenever contents of CUT_BUFFER0 and PRIMARY selection should
      be changed.  Only works for strings.  Copies the data, so the string
@@ -2211,8 +2314,8 @@ void DrawWindow(x,y,w,h)
 
 
 /***********************************/
-void WResize(w,h)
-     int w,h;
+void WResize(w, h)
+    int w, h;
 {
   XWindowAttributes xwa;
 
@@ -2375,7 +2478,7 @@ void WUnCrop()
 
 /***********************************/
 void GetWindowPos(xwa)
-XWindowAttributes *xwa;
+    XWindowAttributes *xwa;
 {
   Window child;
 
@@ -2392,10 +2495,10 @@ XWindowAttributes *xwa;
 
 /***********************************/
 void SetWindowPos(xwa)
-XWindowAttributes *xwa;
+    XWindowAttributes *xwa;
 {
   /* sets window x,y,w,h values */
-  XWindowChanges    xwc;
+  XWindowChanges xwc;
 
   /* Adjust from window origin, to border origin */
   xwc.x = xwa->x - xwa->border_width - ch_offx;
@@ -2468,7 +2571,7 @@ XWindowAttributes *xwa;
   /* dxwm seems to *only* pay attention to the hints */
   {
     XSizeHints hints;
-    if (DEBUG) fprintf(stderr,"SWP: doing the DXWM thing\n");
+    if (DEBUG) fprintf(stderr, "SWP: doing the DXWM thing\n");
     /* read hints for this window and adjust any position hints */
     if (XGetNormalHints(theDisp, mainW, &hints)) {
       hints.flags |= USPosition | USSize;
@@ -2477,9 +2580,11 @@ XWindowAttributes *xwa;
       XSetNormalHints(theDisp, mainW, &hints);
     }
 
+#if 0
 #ifndef MWM     /* don't do this if you're running MWM */
     xwc.x -= 5;   xwc.y -= 25;    /* EVIL KLUDGE */
 #endif /* MWM */
+#endif
   }
 #endif
 

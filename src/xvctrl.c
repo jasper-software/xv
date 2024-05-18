@@ -54,23 +54,28 @@
 #  include "bits/icon"
 #endif
 
-#define CTRLWIDE 440               /* (fixed) size of control window */
-#define CTRLHIGH 348 /* 379 */
-
-#define DBLCLKTIME 500             /* double-click speed in milliseconds */
+#define DEF_CTRLWIDE 440           /* initial size of control window */
+#define DEF_CTRLHIGH 348
+#define MIN_CTRLWIDE 440
+#define MIN_CTRLHIGH 332
 
 #define INACTIVE(lptr, item) ((lptr)->filetypes && (lptr)->dirsonly && \
 			      (item) >= 0 && (item) < (lptr)->nstr && \
 			      (lptr)->str[(item)][0] != C_DIR && \
 			      (lptr)->str[(item)][0] != C_LNK)
 
-#define NLINES  11                 /* # of lines in list control (keep odd) */
-
 #define BUTTW   71                 /* keep odd for 'half' buttons to work   */
+#define BUTTW8 (BUTTW*3/4)         /* button width on bottom rows if 8 buttons */
 #define BUTTH   24
 #define SBUTTH  21
 
-static int    ptop;                /* y-coord of top of button area in ctrlW */
+#define MBWIDTH 112                /* dimensions for menu buttons */
+#define MBWIDTH4 ((MBWIDTH*3)/4)   /* button width on top rows if 4 buttons */
+#define MBHEIGHT 19
+
+
+static int ctrl_h;                 /* current height of control window */
+static int ptop;                   /* y-coord of top of button area in ctrlW */
 
 static Pixmap fifoPix, chrPix, dirPix, blkPix, lnkPix, sockPix, exePix, regPix;
 static Pixmap rotlPix, rotrPix, fliphPix, flipvPix, p10Pix, m10Pix;
@@ -165,23 +170,180 @@ static const char *windowMList[] = { "Visual Schnauzer\t^v",
 
 
 
-static void drawSel      PARM((LIST *, int));
-static void RedrawNList  PARM((int, SCRL *));
-static void ls3d         PARM((LIST *));
+static int CtrlWide            PARM((void));
+static int CtrlHigh            PARM((void));
+static int roomForLines        PARM((int height));
+static void arrangeButtons     PARM((void));
+static void arrangeMenuButtons PARM((void));
+static void drawSel            PARM((LIST *, int));
+static void RedrawNList        PARM((int, SCRL *));
+static void ls3d               PARM((LIST *));
+
+
+/***************************************************/
+static int CtrlWide()
+{
+  return nList.w + BUTTW + 18;
+}
+
+
+/***************************************************/
+static int CtrlHigh()
+{
+  return ctrl_h;
+}
+
+
+/***************************************************/
+static int roomForLines(height)
+    int height;
+{
+  int num;
+
+  num = (height - 172)/LINEHIGH;
+  if (num < 1)
+    num = 1;
+  if (num > MAXNAMES)
+    num = MAXNAMES;
+
+  return num;
+}
+
+
+/***************************************************/
+static void arrangeButtons()
+
+{
+  int topskip;
+  double skip;
+
+  /* position right-side buttons */
+
+  topskip = nList.y;
+  skip = ((double) (nList.h - (CHIGH+5))) / 6.0;
+  if (skip > SBUTTH+8) {
+    skip = SBUTTH + 7;
+    topskip = nList.y + (nList.h - (6*skip + (CHIGH+5))) / 2;
+  }
+
+#define R_BX(N) (CtrlWide() + (N) - BUTTW - 1 - 5)
+#define R_BY(N) (topskip + (int)((N)*skip))
+
+  BTMove(&but[BNEXT],   R_BX(0), R_BY(0));
+  BTMove(&but[BPREV],   R_BX(0), R_BY(1));
+  BTMove(&but[BLOAD],   R_BX(0), R_BY(2));
+  BTMove(&but[BSAVE],   R_BX(0), R_BY(3));
+  BTMove(&but[BPRINT],  R_BX(0), R_BY(4));
+  BTMove(&but[BDELETE], R_BX(0), R_BY(5));
+
+#undef R_BY
+#undef R_BX
+
+  /* position bottom buttons (6x2 array) */
+
+#define BXSPACE (BUTTW/2+1)
+#define BYSPACE (BUTTH+1)
+
+#define B_BXLFT ((CtrlWide() - (BXSPACE*12))/2)
+#define B_BX(N) (B_BXLFT + BXSPACE*(N))
+#define B_BX24(N) (B_BXLFT + (BXSPACE*(N))/2)
+#define B_BYTOP (CtrlHigh() + 5 - (2*BYSPACE + 5 + 4))
+#define B_BY(N) (B_BYTOP + BYSPACE*(N))
+
+  ptop = B_BYTOP - 5; /* FIXME: this should not be a global */
+
+  butrect.x = B_BX(0)-1;  butrect.y = B_BY(0)-1;
+  butrect.width = 12*BXSPACE + 1;
+  butrect.height = 2*BYSPACE + 1;
+
+  BTMove(&but[BCOPY],   B_BX( 0), B_BY(0));
+  BTMove(&but[BCUT],    B_BX( 1), B_BY(0));
+  BTMove(&but[BPASTE],  B_BX( 2), B_BY(0));
+  BTMove(&but[BCLEAR],  B_BX( 3), B_BY(0));
+  BTMove(&but[BDN10],   B_BX( 4), B_BY(0));
+  BTMove(&but[BUP10],   B_BX( 5), B_BY(0));
+  BTMove(&but[BROTL],   B_BX( 6), B_BY(0));
+  BTMove(&but[BROTR],   B_BX( 7), B_BY(0));
+  BTMove(&but[BFLIPH],  B_BX( 8), B_BY(0));
+  BTMove(&but[BFLIPV],  B_BX( 9), B_BY(0));
+  BTMove(&but[BGRAB],   B_BX(10), B_BY(0));
+
+  BTMove(&but[BPAD],    B_BX24( 0), B_BY(1));
+  BTMove(&but[BANNOT],  B_BX24( 2), B_BY(1));
+  BTMove(&but[BCROP],   B_BX24( 4), B_BY(1));
+  BTMove(&but[BUNCROP], B_BX24( 7), B_BY(1));
+  BTMove(&but[BACROP],  B_BX24(10), B_BY(1));
+  BTMove(&but[BMASKS],  B_BX24(13), B_BY(1));
+  BTMove(&but[BABOUT],  B_BX24(16), B_BY(1));
+  BTMove(&but[BQUIT],   B_BX24(20), B_BY(1));
+
+#undef B_BY
+#undef B_BYTOP
+#undef B_BX
+#undef B_BX24
+#undef B_BXLFT
+
+#undef BYSPACE
+#undef BXSPACE
+}
+
+
+static void arrangeMenuButtons()
+{
+#define T_BX(N)  (T_BXLFT + (MBWIDTH+2)*(N))
+#define T_BX4(N) (T_BXLFT + (MBWIDTH4+2)*(N))
+#define T_BYTOP  (5)
+#define T_BY(N)  (T_BYTOP + (MBHEIGHT+2)*(N))
+#define T_BXLFT  (CtrlWide() - 6 - (MBWIDTH+2)*3)
+
+  MBChange(&dispMB,   T_BX4(0),T_BY(0), MBWIDTH4,MBHEIGHT);
+  MBChange(&conv24MB, T_BX4(1),T_BY(0), MBWIDTH4,MBHEIGHT);
+  MBChange(&algMB,    T_BX4(2),T_BY(0), MBWIDTH4,MBHEIGHT);
+  MBChange(&flmaskMB, T_BX4(3),T_BY(0), MBWIDTH4,MBHEIGHT);
+
+  MBChange(&rootMB,   T_BX(0),T_BY(1), MBWIDTH,MBHEIGHT);
+  MBChange(&windowMB, T_BX(1),T_BY(1), MBWIDTH,MBHEIGHT);
+  MBChange(&sizeMB,   T_BX(2),T_BY(1), MBWIDTH,MBHEIGHT);
+
+#undef T_BX
+#undef T_BX4
+#undef T_BXLFT
+#undef T_BY
+#undef T_BYTOP
+}
+
+
+/***************************************************/
+void ResizeCtrl(w, h)
+    int w, h;
+{
+  int nlines;
+
+  ctrl_h = h;
+
+  nlines = roomForLines(h);
+  LSResize(&nList, (w-BUTTW-18), LINEHIGH*nlines, nlines);
+  arrangeButtons();
+  arrangeMenuButtons();
+}
 
 
 /***************************************************/
 void CreateCtrl(geom)
      const char *geom;
 {
-  int topskip;
-  double skip;
+  int nlines;
+
   XSetWindowAttributes xswa;
   Pixmap oicon1Pix, oicon2Pix;
 
-  ctrlW = CreateWindow("xv controls", "XVcontrols", geom,
-		       CTRLWIDE, CTRLHIGH, infofg, infobg, 0);
+  ctrl_h = DEF_CTRLHIGH;
+  ctrlW = CreateFlexWindow("xv controls", "XVcontrols", geom,
+		  DEF_CTRLWIDE, DEF_CTRLHIGH, infofg, infobg,
+		  FALSE, FALSE, FALSE);
   if (!ctrlW) FatalError("can't create controls window!");
+
+  SetMinSizeWindow(ctrlW, MIN_CTRLWIDE, MIN_CTRLHIGH);
 
 #ifdef BACKING_STORE
   xswa.backing_store = WhenMapped;
@@ -242,90 +404,57 @@ void CreateCtrl(geom)
   XFreePixmap(theDisp, oicon2Pix);
 
 
-
   if (ctrlColor) XSetWindowBackground(theDisp, ctrlW, locol);
             else XSetWindowBackgroundPixmap(theDisp, ctrlW, grayTile);
 
-  LSCreate(&nList, ctrlW, 5, 52, (CTRLWIDE-BUTTW-18),
-	   LINEHIGH*NLINES, NLINES, dispnames, numnames,
-	   infofg, infobg, hicol, locol, RedrawNList, 0, 0);
+  nlines = roomForLines(ctrl_h);
+
+  LSCreate(&nList, ctrlW, 5, 52, (DEF_CTRLWIDE-BUTTW-18),
+          LINEHIGH*nlines, nlines, dispnames, numnames,
+          infofg, infobg, hicol, locol, RedrawNList, FALSE, FALSE);
+
   nList.selected = 0;  /* default to first name selected */
 
 
 #define BCLS infofg, infobg, hicol, locol
 
-  /* expressions for positioning right-side buttons */
+  /* create top button */
 
-  topskip = nList.y;
-  skip =  ((double) (nList.h - (CHIGH+5))) / 6.0;
-  if (skip > SBUTTH+8) {
-    skip = SBUTTH + 7;
-    topskip = nList.y + (nList.h - (6*skip + (CHIGH+5))) / 2;
-  }
+  BTCreate(&but[BXV], ctrlW, 5, 5, 100, (u_int) nList.y - 5 - 2 - 5, "", BCLS);
 
-#define R_BW1 BUTTW
-#define R_BX0 (CTRLWIDE - R_BW1 - 1 - 5)
-#define R_BY0 (topskip)
-#define R_BY1 (topskip + (int)(1*skip))
-#define R_BY2 (topskip + (int)(2*skip))
-#define R_BY3 (topskip + (int)(3*skip))
-#define R_BY4 (topskip + (int)(4*skip))
-#define R_BY5 (topskip + (int)(5*skip))
+  /* create right-side buttons */
+  BTCreate(&but[BNEXT],    ctrlW, 0, 0, BUTTW, SBUTTH, "Next",   BCLS);
+  BTCreate(&but[BPREV],    ctrlW, 0, 0, BUTTW, SBUTTH, "Prev",   BCLS);
+  BTCreate(&but[BLOAD],    ctrlW, 0, 0, BUTTW, SBUTTH, "Load",   BCLS);
+  BTCreate(&but[BSAVE],    ctrlW, 0, 0, BUTTW, SBUTTH, "Save",   BCLS);
+  BTCreate(&but[BPRINT],   ctrlW, 0, 0, BUTTW, SBUTTH, "Print",  BCLS);
+  BTCreate(&but[BDELETE],  ctrlW, 0, 0, BUTTW, SBUTTH, "Delete", BCLS);
 
-  BTCreate(&but[BNEXT],    ctrlW, R_BX0, R_BY0, R_BW1, SBUTTH, "Next",   BCLS);
-  BTCreate(&but[BPREV],    ctrlW, R_BX0, R_BY1, R_BW1, SBUTTH, "Prev",   BCLS);
-  BTCreate(&but[BLOAD],    ctrlW, R_BX0, R_BY2, R_BW1, SBUTTH, "Load",   BCLS);
-  BTCreate(&but[BSAVE],    ctrlW, R_BX0, R_BY3, R_BW1, SBUTTH, "Save",   BCLS);
-  BTCreate(&but[BPRINT],   ctrlW, R_BX0, R_BY4, R_BW1, SBUTTH, "Print",  BCLS);
-  BTCreate(&but[BDELETE],  ctrlW, R_BX0, R_BY5, R_BW1, SBUTTH, "Delete", BCLS);
+  /* first row */
 
+  BTCreate(&but[BCOPY],   ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BCUT],    ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BPASTE],  ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BCLEAR],  ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BDN10],   ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BUP10],   ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BROTL],   ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BROTR],   ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BFLIPH],  ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BFLIPV],  ctrlW, 0, 0, BUTTW/2,BUTTH, "",    BCLS);
+  BTCreate(&but[BGRAB],   ctrlW, 0, 0, BUTTW,  BUTTH, "Grab",BCLS);
 
-  /* expressions for positioning bottom buttons (6x2 array) */
+  /* second row */
 
-#define BXSPACE (BUTTW+1)
-#define BYSPACE (BUTTH+1)
+  BTCreate(&but[BPAD],    ctrlW, 0, 0, BUTTW/2,BUTTH, "",BCLS);
+  BTCreate(&but[BANNOT],  ctrlW, 0, 0, BUTTW/2,BUTTH, "",BCLS);
 
-  ptop = CTRLHIGH - (2*BYSPACE + 5 + 4);
-
-#define BX0 ((CTRLWIDE - (BXSPACE*6))/2)
-#define BX1 (BX0 + BXSPACE)
-#define BX2 (BX0 + BXSPACE*2)
-#define BX3 (BX0 + BXSPACE*3)
-#define BX4 (BX0 + BXSPACE*4)
-#define BX5 (BX0 + BXSPACE*5)
-#define BY0 (ptop+5)
-#define BY1 (BY0 + BYSPACE)
-
-  butrect.x = BX0-1;  butrect.y = BY0-1;
-  butrect.width = 6*BXSPACE + 1;
-  butrect.height = 2*BYSPACE + 1;
-
-  BTCreate(&but[BCOPY],  ctrlW,BX0,            BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BCUT],   ctrlW,BX0+BUTTW/2 + 1,BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BPASTE], ctrlW,BX1,            BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BCLEAR], ctrlW,BX1+BUTTW/2 + 1,BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BDN10],  ctrlW,BX2,            BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BUP10],  ctrlW,BX2+BUTTW/2 + 1,BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BROTL],  ctrlW,BX3,            BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BROTR],  ctrlW,BX3+BUTTW/2 + 1,BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BFLIPH], ctrlW,BX4,            BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BFLIPV], ctrlW,BX4+BUTTW/2 + 1,BY0,BUTTW/2,BUTTH, "",    BCLS);
-  BTCreate(&but[BGRAB],  ctrlW,BX5,            BY0,BUTTW,  BUTTH, "Grab",BCLS);
-
-
-  BTCreate(&but[BPAD],    ctrlW,BX0,          BY1,BUTTW/2,BUTTH,"",BCLS);
-  BTCreate(&but[BANNOT],  ctrlW,BX0+BUTTW/2+1,BY1,BUTTW/2,BUTTH,"",BCLS);
-
-#define NEW_BUTW BUTTW*3/4
-  BTCreate(&but[BCROP],   ctrlW,BX1             ,BY1,NEW_BUTW,BUTTH,"Crp",     BCLS);
-  BTCreate(&but[BUNCROP], ctrlW,BX1+NEW_BUTW  +1,BY1,NEW_BUTW,BUTTH,"UCrp",    BCLS);
-  BTCreate(&but[BACROP],  ctrlW,BX1+NEW_BUTW*2+2,BY1,NEW_BUTW,BUTTH,"ACrp",    BCLS);
-  BTCreate(&but[BMASKS],  ctrlW,BX1+NEW_BUTW*3+3,BY1,NEW_BUTW,BUTTH,"Mask",    BCLS);
-  BTCreate(&but[BABOUT],  ctrlW,BX4,             BY1,BUTTW,   BUTTH,"About XV",BCLS);
-  BTCreate(&but[BQUIT],   ctrlW,BX5,             BY1,BUTTW,   BUTTH,"Quit",    BCLS);
-
-  BTCreate(&but[BXV],     ctrlW,5,5, 100, (u_int) nList.y - 5 - 2 - 5,
-	   "", BCLS);
+  BTCreate(&but[BCROP],   ctrlW, 0, 0, BUTTW8,BUTTH, "Crop",    BCLS);
+  BTCreate(&but[BUNCROP], ctrlW, 0, 0, BUTTW8,BUTTH, "UnCrop",  BCLS);
+  BTCreate(&but[BACROP],  ctrlW, 0, 0, BUTTW8,BUTTH, "ACrop",   BCLS);
+  BTCreate(&but[BMASKS],  ctrlW, 0, 0, BUTTW8,BUTTH, "Mask",    BCLS);
+  BTCreate(&but[BABOUT],  ctrlW, 0, 0, BUTTW, BUTTH, "About XV",BCLS);
+  BTCreate(&but[BQUIT],   ctrlW, 0, 0, BUTTW, BUTTH, "Quit",    BCLS);
 
   SetButtPix(&but[BCOPY],  copyPix,  copy_width,   copy_height);
   SetButtPix(&but[BCUT],   cutPix,   cut_width,    cut_height);
@@ -350,31 +479,33 @@ void CreateCtrl(geom)
   SetButtPix(&but[BXV], uiconPix, uicon_width,  uicon_height);
 #endif
 
+  arrangeButtons();
+
   XMapSubwindows(theDisp, ctrlW);
 
 
   /* have to create menu buttons after XMapSubWindows, as we *don't* want
      the popup menus mapped */
 
-  MBCreate(&dispMB,   ctrlW, CTRLWIDE - 8 - 84 - 3*(84+2), 5,84,19,
-	   "Display",    dispMList,   DMB_MAX,    BCLS);
-  MBCreate(&conv24MB, ctrlW, CTRLWIDE - 8 - 84 - 2*(84+2), 5,84,19,
-	   "24/8 Bit",   conv24MList, CONV24_MAX, BCLS);
-  MBCreate(&algMB,    ctrlW, CTRLWIDE - 8 - 84 -   (84+2), 5,84,19,
-	   "Algorithms", algMList,    ALG_MAX,    BCLS);
-  MBCreate(&flmaskMB, ctrlW, CTRLWIDE - 8 - 84,            5,84,19, 
+  MBCreate(&dispMB,   ctrlW, 0,0, MBWIDTH4,MBHEIGHT,
+ 	   "Display",    dispMList,   DMB_MAX,    BCLS);
+  MBCreate(&conv24MB, ctrlW, 1,0, MBWIDTH4,MBHEIGHT,
+ 	   "24/8 Bit",   conv24MList, CONV24_MAX, BCLS);
+  MBCreate(&algMB,    ctrlW, 2,0, MBWIDTH4,MBHEIGHT,
+ 	   "Algorithms", algMList,    ALG_MAX,    BCLS);
+  MBCreate(&flmaskMB, ctrlW, 3,0, MBWIDTH4,MBHEIGHT,
 	   "FLmask",     mskMList,    MSK_MAX,    BCLS);
 
-  MBCreate(&rootMB,   ctrlW, CTRLWIDE - 8 - 112 - 2*(112+3), 5+21,112,19,
-	   "Root",       rootMList,   RMB_MAX,    BCLS);
-  MBCreate(&windowMB, ctrlW, CTRLWIDE - 8 - 112 - (112+3),   5+21,112,19,
-	   "Windows",    windowMList, WMB_MAX,    BCLS);
-  MBCreate(&sizeMB,   ctrlW, CTRLWIDE - 8 - 112,             5+21,112,19,
-	   "Image Size", sizeMList,   SZMB_MAX,   BCLS);
-
-
+  MBCreate(&rootMB,   ctrlW, 0,1, MBWIDTH,MBHEIGHT,
+ 	   "Root",       rootMList,   RMB_MAX,    BCLS);
+  MBCreate(&windowMB, ctrlW, 1,1, MBWIDTH,MBHEIGHT,
+ 	   "Windows",    windowMList, WMB_MAX,    BCLS);
+  MBCreate(&sizeMB,   ctrlW, 2,1, MBWIDTH,MBHEIGHT,
+ 	   "Image Size", sizeMList,   SZMB_MAX,   BCLS);
 
 #undef BCLS
+
+  arrangeMenuButtons();
 
 
   /* set up initial state for various controls */
@@ -395,11 +526,12 @@ void CreateCtrl(geom)
   BTSetActive(&but[BDELETE], (numnames>=1));
 }
 
+
 /***************************************************/
 void SetButtPix(bp, pix, w,h)
-     BUTT *bp;
-     Pixmap pix;
-     int    w,h;
+    BUTT *bp;
+    Pixmap pix;
+    int    w,h;
 {
   if (!bp) return;
   bp->pix = pix;  bp->pw = w;  bp->ph = h;
@@ -408,9 +540,9 @@ void SetButtPix(bp, pix, w,h)
 
 /***************************************************/
 Pixmap MakePix1(win, bits, w, h)
-     Window win;
-     byte *bits;
-     int   w,h;
+    Window win;
+    byte *bits;
+    int   w,h;
 {
   return XCreatePixmapFromBitmapData(theDisp, win, (char *) bits,
 				     (u_int) w, (u_int) h, 1L,0L,1);
@@ -419,7 +551,7 @@ Pixmap MakePix1(win, bits, w, h)
 
 /***************************************************/
 void CtrlBox(vis)
-int vis;
+    int vis;
 {
   if (vis) XMapRaised(theDisp, ctrlW);
   else     XUnmapWindow(theDisp, ctrlW);
@@ -430,12 +562,12 @@ int vis;
 
 /***************************************************/
 void RedrawCtrl(x,y,w,h)
-int x,y,w,h;
+    int x,y,w,h;
 {
   int i;
 
-  RANGE(w, 0, CTRLWIDE);
-  RANGE(h, 0, CTRLHIGH);
+  RANGE(w, 0, CtrlWide());
+  RANGE(h, 0, CtrlHigh());
 
 #ifdef CLIPRECT
   xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
@@ -485,12 +617,12 @@ void DrawCtrlNumFiles()
   sprintf(foo, "%d file%s", numnames, (numnames==1) ? "" : "s");
 
   XSetForeground(theDisp, theGC, infobg);
-  XFillRectangle(theDisp,ctrlW, theGC, x+1,y+1, (u_int) w-1, (u_int) CHIGH+5);
+  XFillRectangle(theDisp, ctrlW, theGC, x+1,y+1, (u_int) w-1, (u_int) CHIGH+5);
 
   XSetForeground(theDisp,theGC,infofg);
-  XDrawRectangle(theDisp,ctrlW, theGC, x,y,     (u_int) w,   (u_int) CHIGH+6);
+  XDrawRectangle(theDisp, ctrlW, theGC, x,y,     (u_int) w,   (u_int) CHIGH+6);
 
-  Draw3dRect(ctrlW, x+1,y+1,                    (u_int) w-2, (u_int) CHIGH+4,
+  Draw3dRect(ctrlW,                     x+1,y+1, (u_int) w-2, (u_int) CHIGH+4,
 	     R3D_IN, 2, hicol, locol, infobg);
 
   XSetForeground(theDisp,theGC,infofg);
@@ -510,26 +642,26 @@ void DrawCtrlStr()
 
   XSetForeground(theDisp, theGC, infobg);
   XFillRectangle(theDisp, ctrlW, theGC, 0, y+1,
-		 CTRLWIDE, (u_int)((CHIGH+4)*2+1));
+		 CtrlWide(), (u_int)((CHIGH+4)*2+1));
 
   XSetForeground(theDisp, theGC, infofg);
-  XDrawLine(theDisp, ctrlW, theGC, 0, y,   CTRLWIDE, y);
-  XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+4, CTRLWIDE, y+CHIGH+4);
-  XDrawLine(theDisp, ctrlW, theGC, 0, y+(CHIGH+4)*2, CTRLWIDE, y+(CHIGH+4)*2);
+  XDrawLine(theDisp, ctrlW, theGC, 0, y, CtrlWide(), y);
+  XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+4, CtrlWide(), y+CHIGH+4);
+  XDrawLine(theDisp, ctrlW, theGC, 0, y+(CHIGH+4)*2, CtrlWide(), y+(CHIGH+4)*2);
 
   if (ctrlColor) {
     XSetForeground(theDisp, theGC, locol);
-    XDrawLine(theDisp, ctrlW, theGC, 0, y+1,   CTRLWIDE, y+1);
-    XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+5, CTRLWIDE, y+CHIGH+5);
+    XDrawLine(theDisp, ctrlW, theGC, 0, y+1, CtrlWide(), y+1);
+    XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+5, CtrlWide(), y+CHIGH+5);
     XDrawLine(theDisp, ctrlW, theGC, 0, y+(CHIGH+4)*2+1,
-	      CTRLWIDE, y+(CHIGH+4)*2+1);
+	      CtrlWide(), y+(CHIGH+4)*2+1);
   }
 
   if (ctrlColor) XSetForeground(theDisp, theGC, hicol);
-  XDrawLine(theDisp, ctrlW, theGC, 0, y+2, CTRLWIDE, y+2);
-  XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+6, CTRLWIDE, y+CHIGH+6);
+  XDrawLine(theDisp, ctrlW, theGC, 0, y+2, CtrlWide(), y+2);
+  XDrawLine(theDisp, ctrlW, theGC, 0, y+CHIGH+6, CtrlWide(), y+CHIGH+6);
   if (ctrlColor) XSetForeground(theDisp, theGC, infobg);
-  XDrawLine(theDisp, ctrlW, theGC, 0, ptop, CTRLWIDE, ptop);
+  XDrawLine(theDisp, ctrlW, theGC, 0, ptop, CtrlWide(), ptop);
 
   XSetForeground(theDisp, theGC, infofg);
   DrawString(ctrlW, 10, y+ASCENT+3,       st);
@@ -539,7 +671,7 @@ void DrawCtrlStr()
 
 /***************************************************/
 int ClickCtrl(x,y)
-int x,y;
+    int x,y;
 {
   BUTT *bp;
   int   i;
@@ -557,10 +689,9 @@ int x,y;
 }
 
 
-
 /***************************************************/
 void ScrollToCurrent(lst)
-LIST *lst;
+    LIST *lst;
 {
   /* called when selected item on list is changed.  Makes the selected
      item visible.  If it already is, nothing happens.  Otherwise, it
@@ -597,14 +728,12 @@ static void RedrawNList(delta, sptr)
 /***************************************************/
 void LSCreate(lp, win, x, y, w, h, nlines, strlist, nstr, fg, bg, hi, lo,
 	      fptr, typ, donly)
-LIST         *lp;
-Window        win;
-int           x,y,w,h,nlines,nstr,typ,donly;
-unsigned long fg, bg, hi, lo;
-char        **strlist;    /* a pointer to a list of strings */
-
-void        (*fptr)PARM((int,SCRL *));
-
+    LIST         *lp;
+    Window        win;
+    int           x,y,w,h,nlines,nstr,typ,donly;
+    unsigned long fg, bg, hi, lo;
+    char        **strlist;    /* a pointer to a list of strings */
+    void        (*fptr)PARM((int, SCRL *));
 {
   if (ctrlColor) h += 4;
 
@@ -624,19 +753,33 @@ void        (*fptr)PARM((int,SCRL *));
 
   XSelectInput(theDisp, lp->win, ExposureMask | ButtonPressMask);
 
-  SCCreate(&lp->scrl, lp->win, w-20, -1, 1, h, 0,
-	   nstr-nlines, 0, nlines-1, fg, bg, hi, lo, fptr);
+  SCCreate(&lp->scrl, lp->win, w-20, -1, TRUE, h, 0,
+           nstr-nlines, 0, nlines-1, fg, bg, hi, lo, fptr);
 
   XMapSubwindows(theDisp, lp->win);
 }
 
 
+void LSResize(lp, w, h, nlines)
+    LIST *lp;
+    int w, h, nlines;
+{
+  if (ctrlColor) h += 4;
+
+  lp->w = w;
+  lp->h = h;
+  lp->nlines = nlines;
+
+  XResizeWindow(theDisp, lp->win, w, h);
+  SCChange(&lp->scrl, w-20, -1, TRUE, h, 0, lp->nstr-nlines, lp->scrl.val, lp->scrl.page);
+}
+
 
 /***************************************************/
 void LSChangeData(lp, strlist, nstr)
-LIST         *lp;
-char        **strlist;
-int           nstr;
+    LIST         *lp;
+    char        **strlist;
+    int           nstr;
 {
   /* tries to keep list selection and scrollbar in same place, if possible */
 
@@ -651,9 +794,9 @@ int           nstr;
 
 /***************************************************/
 void LSNewData(lp, strlist, nstr)
-LIST         *lp;
-char        **strlist;
-int           nstr;
+    LIST         *lp;
+    char        **strlist;
+    int           nstr;
 {
   lp->str = strlist;
   lp->nstr = nstr;
@@ -664,7 +807,7 @@ int           nstr;
 
 /***************************************************/
 static void ls3d(lp)
-LIST *lp;
+    LIST *lp;
 {
   /* redraws lists 3d-effect, which can be trounced by drawSel() */
   Draw3dRect(lp->win, 0, 0, lp->w-1, lp->h-1, R3D_IN, 2,
@@ -674,8 +817,8 @@ LIST *lp;
 
 /***************************************************/
 static void drawSel(lp,j)
-LIST *lp;
-int j;
+    LIST *lp;
+    int j;
 {
   int i, inactive, x0,y0,wide, selected;
   unsigned long fg, bg;
@@ -751,8 +894,8 @@ int j;
 
 /***************************************************/
 void LSRedraw(lp, delta)
-LIST *lp;
-int   delta;
+    LIST *lp;
+    int   delta;
 {
   int  i;
 
@@ -765,8 +908,8 @@ int   delta;
 
 /***************************************************/
 int LSClick(lp,ev)
-LIST *lp;
-XButtonEvent *ev;
+    LIST *lp;
+    XButtonEvent *ev;
 {
   /* returns '-1' normally.  returns 0 -> numnames-1 for a goto */
 
@@ -784,7 +927,7 @@ XButtonEvent *ev;
   if (sel >= lp->nstr) sel = lp->selected;
 
   /* see if it's a double click */
-  if (ev->time - lasttime < DBLCLKTIME && sel==lastsel
+  if (ev->time - lasttime < DBLCLICKTIME && sel==lastsel
       && (lp->scrl.val + (y-y0)/LINEHIGH) < lp->nstr
       && !INACTIVE(lp,sel)) {
     return (sel);
@@ -841,11 +984,10 @@ XButtonEvent *ev;
 }
 
 
-
 /***************************************************/
 void LSKey(lp, key)
-     LIST         *lp;
-     int           key;
+    LIST         *lp;
+    int           key;
 {
   if      (key==LS_PAGEUP)   SCSetVal(&lp->scrl,lp->scrl.val - (lp->nlines-1));
   else if (key==LS_PAGEDOWN) SCSetVal(&lp->scrl,lp->scrl.val + (lp->nlines-1));

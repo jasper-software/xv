@@ -23,6 +23,9 @@
 #include "xvml.h"
 #endif
 
+#define MIN_TXTWIDE 380
+#define MIN_TXTHIGH 200
+
 #define BUTTW1 80
 #define BUTTW2 60
 #define BUTTW3 110
@@ -65,7 +68,7 @@ struct coding_spec {
 /* data needed per text window */
 typedef struct {  Window win, textW;
 		  int    vis, wasvis;
-		  const char  *text;       /* text to be displayed */
+		  const char *text;        /* text to be displayed */
 		  int    freeonclose;      /* free text when closing win */
 		  int    textlen;          /* length of text */
 		  char   title[TITLELEN];  /* name of file being displayed */
@@ -197,7 +200,6 @@ void CreateTextWins(geom, cmtgeom)
      const char *geom, *cmtgeom;
 {
   int                   i, defwide, defhigh, cmthigh;
-  XSizeHints            hints;
   XSetWindowAttributes  xswa;
   TVINFO               *tv;
 #ifdef TV_MULTILINGUAL
@@ -254,7 +256,7 @@ void CreateTextWins(geom, cmtgeom)
 
   /* creates *all* textview windows at once */
 
-  for (i=0; i<MAXTVWIN; i++) tinfo[i].win = (Window) NULL;
+  for (i=0; i<MAXTVWIN; i++) tinfo[i].win = (Window) None;
 
   for (i=0; i<MAXTVWIN; i++) {
     tv = &tinfo[i];
@@ -272,8 +274,9 @@ void CreateTextWins(geom, cmtgeom)
 			   (i<CMTWIN) ? geom : cmtgeom,
 			   defwide,
 			   (i<CMTWIN) ? defhigh : cmthigh,
-			   infofg, infobg, 1);
+			   infofg, infobg, TRUE);
     if (!tv->win) FatalError("can't create textview window!");
+    SetMinSizeWindow(tv->win, MIN_TXTWIDE, MIN_TXTHIGH);
 
     haveWindows = 1;
     tv->vis = tv->wasvis = 0;
@@ -287,21 +290,11 @@ void CreateTextWins(geom, cmtgeom)
 				     1,infofg,infobg);
     if (!tv->textW) FatalError("can't create textview text window!");
 
-    SCCreate(&(tv->vscrl), tv->win, 0,0, 1,100, 0,0,0,0,
+    SCCreate(&tv->vscrl, tv->win, 0,0, 1,100, 0,0,0,0,
 	     infofg, infobg, hicol, locol, drawTextW);
 
-    SCCreate(&(tv->hscrl), tv->win, 0,0, 0,100, 0,0,0,0,
+    SCCreate(&tv->hscrl, tv->win, 0,0, 0,100, 0,0,0,0,
 	     infofg, infobg, hicol, locol, drawTextW);
-
-    if (XGetNormalHints(theDisp, tv->win, &hints))
-      hints.flags |= PMinSize;
-    else
-      hints.flags = PMinSize;
-
-    hints.min_width  = 380;
-    hints.min_height = 200;
-    XSetNormalHints(theDisp, tv->win, &hints);
-
 
 #ifdef BACKING_STORE
     xswa.backing_store = WhenMapped;
@@ -721,7 +714,7 @@ static int tvChkEvent(tv, xev)
 
   rv = 1;
 
-  if (!hasBeenSized) return 0;  /* ignore evrythng until we get 1st Resize */
+  if (!hasBeenSized) return 0;  /* ignore everythng until we get 1st Resize */
 
   if (xev->type == Expose) {
     XExposeEvent *e = (XExposeEvent *) xev;
@@ -2027,6 +2020,12 @@ void ShowKeyHelp()
   LC("  shift        + Button2 - 'drag-and-drop' cut and paste, constrain");
   LC("          ctrl + Button2 - 'drag-and-drop' copy and paste");
   LC("  shift + ctrl + Button2 - 'drag-and-drop' copy and paste, constrain");
+  LC("  ");
+  LC("Part 1b:  Mouse Usage in File Selection Window");
+  LC("----------------------------------------------");
+  LC("                 Button1 - move text insertion point, highlight text");
+  LC("                 Button2 - paste primary selection into text");
+  LC("    double-click Button1 - highlight entire filename");
   LC("");
   LC("");
   LC("");
@@ -2052,10 +2051,10 @@ void ShowKeyHelp()
   LC("  'q' or");
   LC("  ctrl+'q'      - 'Quit' command");
   LC("");
-  LC("  meta+'x'      - 'cut' command");
-  LC("  meta+'c'      - 'copy' command");
-  LC("  meta+'v'      - 'paste' command");
-  LC("  meta+'d'      - 'clear' command");
+  LC("  meta+'x'      - 'cut' image selection to clipboard");
+  LC("  meta+'c'      - 'copy' image selection to clipboard");
+  LC("  meta+'v'      - 'paste' image selection from clipboard");
+  LC("  meta+'d'      - 'delete' image selection");
   LC("");
   LC("  'n'           - reset image to normal (unexpanded) size");
   LC("  'm'           - maximum image size");
@@ -2067,7 +2066,7 @@ void ShowKeyHelp()
   LC("  'S'           - set image to specified size/expansion");
   LC("  'a'           - reset image to normal aspect ratio");
   LC("  '4'           - make image have a 4x3 width/height ratio");
-  LC("  'I'           - round image size to integer expand/compres ratios");
+  LC("  'I'           - round image size to integer expand/compress ratios");
   LC("");
   LC("  't'           - turn image 90 degrees clockwise");
   LC("  'T'           - turn image 90 degrees counter-clockwise");
@@ -2122,10 +2121,10 @@ void ShowKeyHelp()
   LC("---------------------------");
   LC("The following keys can be used *only* inside the image window.");
   LC("");
-  LC("  ctrl + Up     - crops 1 pixel off the bottom of the image");
-  LC("  ctrl + Down   - crops 1 pixel off the top of the image");
-  LC("  ctrl + Left   - crops 1 pixel off the right side of the image");
-  LC("  ctrl + Right  - crops 1 pixel off the left side of the image");
+  LC("  ctrl+Up       - crops 1 pixel off the bottom of the image");
+  LC("  ctrl+Down     - crops 1 pixel off the top of the image");
+  LC("  ctrl+Left     - crops 1 pixel off the right side of the image");
+  LC("  ctrl+Right    - crops 1 pixel off the left side of the image");
   LC("");
   LC("  If you're viewing a multi-page document:");
   LC("  'p'           -  opens a 'go to page #' dialog box");
@@ -2172,6 +2171,28 @@ void ShowKeyHelp()
   LC("  Space         - load next file");
   LC("  shift+Space   - load next file, keeping previous file(s) selected");
   LC("  Backspace     - load previous file");
+  LC("");
+  LC("");
+  LC("Part 2c:  File Selection Window Keys");
+  LC("------------------------------------");
+  LC("The following keys can be used only in the file load/save window.");
+  LC("");
+  LC("  meta+'a'       - select all filename text");
+  LC("  meta+'d'       - delete selected filename text");
+  LC("  meta+'x'       - cut selected filename text to clipboard");
+  LC("  meta+'c'       - copy selected filename text to clipboard");
+  LC("  meta+'v'        - paste text from clipboard into filename");
+  LC("  Tab            - autocomplete filename");
+  LC("  Up             - highlight previous filename in list");
+  LC("  Down           - highlight next filename in list");
+  LC("  PageUp         - scroll up one screenful in list");
+  LC("  PageDown       - scroll down one screenful in list");
+  LC("  Home, or");
+  LC("  shift+PageUp   - scroll to top of list");
+  LC("  End, or");
+  LC("  shift+PageDown - scroll to bottom of list");
+  LC("  Esc            - close window");
+  LC("  Return         - load/save file from filename text");
 
 #undef LC
   OpenTextView(keyhelp, (int) strlen(keyhelp), "XV Help", 0);
@@ -2228,6 +2249,7 @@ static char *(*cvtrtab[])PARM((char *, int, int *)) = {
     sjis_to_jis,
 };
 
+
 static void createCsWins(geom)
     const char *geom;
 {
@@ -2245,7 +2267,7 @@ static void createCsWins(geom)
 	cs->tv = tv;
 	sprintf(nam, "XVcs%d", i);
 	cs->win = CreateWindow("xv codeset", nam, geom,
-			       CSWIDE, CSHIGH, infofg, infobg, 0);
+			       CSWIDE, CSHIGH, infofg, infobg, FALSE);
 	if (!cs->win) FatalError("couldn't create 'charset' window!");
 #ifdef BACKING_STORE
 	XChangeWindowAttributes(theDisp, cs->win, CWBackingStore, &xswa);
@@ -2272,7 +2294,7 @@ static void createCsWins(geom)
 	    LSCreate(&cs->ls[i], cs->win, x + 15, y + LINEHIGH,
 			200, LINEHIGH * 5, 5,
 			regs, nregs + 2,
-			infofg, infobg, hicol, locol, csLsRedraw, 0, 0);
+			infofg, infobg, hicol, locol, csLsRedraw, FALSE, FALSE);
 	    cs->ls[i].selected = 0;
 	}
 

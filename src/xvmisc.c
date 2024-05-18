@@ -2,6 +2,7 @@
  * xvmisc.c - random 'handy' routines used in XV
  *
  *  Contains:
+ *     Window CreateFlexWindow(name, clname, geom, w, h, fg, bg, usesize, keepsize, userspec)
  *     Window CreateWindow(name, clname, geom, w, h, fg, bg, usesize)
  *     void   CenterString(win, str, x, y)
  *     void   ULineString(win, str, x, y)
@@ -58,6 +59,7 @@ static void set_cursors PARM((Cursor, Cursor));
 static Atom atom_DELWIN = 0;
 static Atom atom_PROTOCOLS = 0;
 
+
 /***************************************************/
 void StoreDeleteWindowProp (win)
      Window win;
@@ -78,13 +80,14 @@ void StoreDeleteWindowProp (win)
 
 
 /***************************************************/
-Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
+Window CreateFlexWindow(name,clname,geom,defw,defh,fg,bg,usesize,keepsize,userspec)
      const char   *name;
      const char   *clname;
      const char   *geom;
      int           defw,defh;
      unsigned long fg, bg;
      int           usesize;
+     int           keepsize;
 {
   Window               win;
   XSetWindowAttributes xswa;
@@ -106,7 +109,20 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   if (!usesize || !(i&WidthValue))  w = defw;
   if (!usesize || !(i&HeightValue)) h = defh;
 
-  hints.flags |= USSize | PWinGravity;
+  if (forcegeom)
+    userspec = TRUE; /* pretend it is user specified to get direct placement */
+
+  if (userspec && (i&XValue) && (i&YValue))
+    hints.flags = USPosition;
+  else
+    hints.flags = PPosition;
+
+  if (userspec && (i&WidthValue) && (i&HeightValue))
+    hints.flags |= USSize;
+  else
+    hints.flags |= PSize;
+
+  hints.flags |= PWinGravity;
 
   hints.win_gravity = NorthWestGravity;
   if (i&XValue && i&XNegative) {
@@ -134,10 +150,10 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   hints.x = x;                  hints.y = y;
   hints.width = w;              hints.height = h;
 
-  if (!usesize) {
+  if (keepsize) {
     hints.min_width  = w;         hints.min_height = h;
     hints.max_width  = w;         hints.max_height = h;
-    hints.flags |= PMaxSize | PMinSize;
+    hints.flags |= PMinSize | PMaxSize;
   }
 
   xswa.background_pixel = bg;
@@ -145,7 +161,7 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   xswa.colormap         = theCmap;
   xswa.bit_gravity      = StaticGravity;
   xswamask = CWBackPixel | CWBorderPixel | CWColormap;
-  if (!usesize) xswamask |= CWBitGravity;
+  if (keepsize) xswamask |= CWBitGravity; /* reduce redraw flicker */
 
   win = XCreateWindow(theDisp, rootW, x, y, (u_int) w, (u_int) h,
 		      (u_int) bwidth, (int) dispDEEP, InputOutput,
@@ -169,6 +185,21 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   return(win);
 }
 
+
+/***************************************************/
+Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
+     const char   *name;
+     const char   *clname;
+     const char   *geom;
+     int           defw,defh;
+     unsigned long fg, bg;
+     int           usesize;
+{
+  /* note: we assume the geom string was provided by the user */
+
+  return CreateFlexWindow(name, clname, geom, defw, defh,
+                         fg, bg, usesize, !usesize, usesize);
+}
 
 
 /**************************************************/
@@ -296,7 +327,7 @@ BUTT *bp;
   ev.display = theDisp;
   ev.window = bp->win;
   ev.root = rootW;
-  ev.subwindow = (Window) NULL;
+  ev.subwindow = (Window) None;
   ev.x = bp->x;
   ev.y = bp->y;
   ev.state = 0;
@@ -322,7 +353,7 @@ void FakeKeyPress(win, ksym)
   ev.display = theDisp;
   ev.window = win;
   ev.root = rootW;
-  ev.subwindow = (Window) NULL;
+  ev.subwindow = (Window) None;
   ev.time = CurrentTime;
   ev.x = ev.y = ev.x_root = ev.y_root = 0;
   ev.state = 0;
@@ -618,7 +649,7 @@ void LoadFishCursors()
   Pixmap fl1pix, fl1mpix, fr1pix, fr1mpix;
   XColor fg, bg;
 
-  flcurs = fl1curs = fmcurs = fr1curs = frcurs = (Pixmap) NULL;
+  flcurs = fl1curs = fmcurs = fr1curs = frcurs = (Pixmap) None;
 
   flpix = XCreatePixmapFromBitmapData(theDisp, ctrlW, (char *) fc_left_bits,
 	     fc_w, fc_h, 1L, 0L, 1);
@@ -659,7 +690,7 @@ void LoadFishCursors()
   frcurs = XCreatePixmapCursor(theDisp, frpix, frmpix, &fg, &bg, 8,8);
 
   if (!flcurs || !fmcurs || !frcurs || !fl1curs || !fr1curs)
-    { flcurs = fmcurs = frcurs = (Cursor) NULL; }
+    { flcurs = fmcurs = frcurs = (Cursor) None; }
 }
 
 
@@ -680,7 +711,7 @@ void WaitCursor()
     xwmh.input       = True;
     xwmh.icon_pixmap = riconPix;
     xwmh.icon_mask   = riconmask;
-    xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
+    xwmh.flags = InputHint | IconPixmapHint | IconMaskHint;
     if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
     if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
   }
@@ -712,7 +743,7 @@ void SetCursors(n)
       xwmh.input       = True;
       xwmh.icon_pixmap = iconPix;
       xwmh.icon_mask   = iconmask;
-      xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
+      xwmh.flags = InputHint | IconPixmapHint | IconMaskHint;
       if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
       if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
     }
@@ -967,7 +998,7 @@ void ProgressMeter(min, max, val, str)
 
 /***************************************************/
 void XVDeletedFile(fullname)
-     char *fullname;
+    char *fullname;
 {
   /* called whenever a file has been deleted.  Updates browser & dir windows,
      if necessary */
@@ -979,7 +1010,7 @@ void XVDeletedFile(fullname)
 
 /***************************************************/
 void XVCreatedFile(fullname)
-     char *fullname;
+    char *fullname;
 {
   /* called whenever a file has been created.  Updates browser & dir windows,
      if necessary */
@@ -991,9 +1022,9 @@ void XVCreatedFile(fullname)
 
 /***************************************************/
 void xvbcopy(src, dst, len)
-     const char *src;
-     char *dst;
-     size_t  len;
+    const char *src;
+    char *dst;
+    size_t  len;
 {
   /* Modern OS's (Solaris, etc.) frown upon the use of bcopy(),
    * and only want you to use memcpy().  However, memcpy() is broken,
@@ -1019,17 +1050,18 @@ void xvbcopy(src, dst, len)
     for ( ; len>0; len--, src--, dst--) *dst = *src;
   }
 
-  else {  /* they either overlap (src>dst) or they don't overlap */
-    /* do a forward copy */
+  else if (src>dst && src<dst+len) {  /* do a forward copy */
     for ( ; len>0; len--, src++, dst++) *dst = *src;
   }
+  else /* no overlap, use the fast method */
+    memcpy(dst, src, len);
 }
 
 
 /***************************************************/
 int xvbcmp (s1, s2, len)
-     const char   *s1, *s2;
-     size_t  len;
+    const char   *s1, *s2;
+    size_t  len;
 {
   for ( ; len>0; len--, s1++, s2++) {
     if      (*s1 < *s2) return -1;
@@ -1038,10 +1070,11 @@ int xvbcmp (s1, s2, len)
   return 0;
 }
 
+
 /***************************************************/
 void xvbzero(s, len)
-     char   *s;
-     size_t  len;
+    char   *s;
+    size_t  len;
 {
   for ( ; len>0; len--) *s++ = 0;
 }

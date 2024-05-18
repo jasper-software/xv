@@ -8,6 +8,7 @@
 #  define NEEDSARGS
 #endif
 
+#include <string.h>
 #include "xv.h"
 
 #ifdef HAVE_TIFF

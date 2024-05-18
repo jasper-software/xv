@@ -874,6 +874,11 @@ char *name, *uncompname;
     mktemp(uncompname);
 #endif
 
+  /* FIXME: need to escape any special characters (spaces, dollar signs,
+   * backticks, quotes, etc., or use ticks) in the filename before calling system().
+   * Maybe one of the exec() variants would be better...
+   * (and why can't this be merged with the similar code in xv.c?)
+   */
     sprintf(buf,"%s -c %s", UNCOMPRESS, fname);
     SetISTR(ISTR_INFO, "Uncompressing Header '%s'...", BaseName(fname));
     if ((pfp = popen_nul(buf, "r")) == NULL) {

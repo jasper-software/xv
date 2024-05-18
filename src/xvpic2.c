@@ -3223,7 +3223,7 @@ static RBUTT *depthRB;
 /***************************************************/
 void CreatePIC2W()
 {
-    int	     y;
+    int y;
 
     pic2W = CreateWindow("xv pic2", "XVpic2", NULL,
 			TWIDE, THIGH, infofg, infobg, 0);

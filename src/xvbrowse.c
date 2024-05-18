@@ -169,8 +169,6 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define ISPACE_TTOP 4                 /* dist btwn bot of icon and title */
 #define ISPACE_HIGH (ISIZE_HIGH+ISPACE_TOP+ISPACE_TTOP+16+4)
 
-#define DBLCLICKTIME 300  /* milliseconds */
-
 #define COUNT(x) (sizeof (x) / sizeof (x)[0])
 
 /* button/menu indices */
@@ -206,6 +204,10 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define DEF_BROWWIDE  (ISPACE_WIDE * INUM_WIDE + LRMARGINS * 2 + 29)
 #define DEF_BROWHIGH  (ISPACE_HIGH * INUM_HIGH + BUTTH * 2 + 16 + 28)
 /* last number is a fudge--e.g., extra spaces, borders, etc. -----^  */
+
+#define MIN_BROWWIDE  (325 + 96)
+#define MIN_BROWHIGH  180
+
 
 static const char *showHstr = "Show hidden files";
 static const char *hideHstr = "Hide 'hidden' files";
@@ -386,12 +388,12 @@ static void clipChanges      PARM((BROWINFO *));
 
 
 /***************************************************************/
-void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
-     const char *geom;
-     const char *fgstr, *bgstr, *histr, *lostr;
+void CreateBrowse(geom, userspec, fgstr, bgstr, histr, lostr)
+    const char *geom;
+    const char *fgstr, *bgstr, *histr, *lostr;
+    int userspec;
 {
   int                   i;
-  XSizeHints            hints;
   XSetWindowAttributes  xswa;
   BROWINFO             *br;
   XColor                ecdef, cursfg, cursbg;
@@ -400,7 +402,10 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
   unsigned int          uw, uh;
   char                  wgeom[64];
 
-  if (!geom) geom = "";
+  if (!geom) {
+    geom = "";
+    userspec = FALSE;
+  }
 
   /* map color spec strings into browCmap, if we're in browPerfect mode */
   if (browPerfect && browCmap) {
@@ -441,7 +446,7 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
 
   /* creates *all* schnauzer windows at once */
 
-  for (i=0; i<MAXBRWIN; i++) binfo[i].win = (Window) NULL;
+  for (i=0; i<MAXBRWIN; i++) binfo[i].win = (Window) None;
 
   for (i=0; i<MAXBRWIN; i++) {
     char wname[64];
@@ -470,9 +475,11 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
     if (i) sprintf(wname, "xv visual schnauzer (%d)", i);
       else sprintf(wname, "xv visual schnauzer");
 
-    br->win = CreateWindow(wname, "XVschnauze", wgeom,
-			   DEF_BROWWIDE, DEF_BROWHIGH, browfg, browbg, 1);
+    br->win = CreateFlexWindow(wname, "XVschnauze", wgeom,
+                              DEF_BROWWIDE, DEF_BROWHIGH, browfg, browbg,
+                              TRUE, FALSE, userspec);
     if (!br->win) FatalError("can't create schnauzer window!");
+    SetMinSizeWindow(br->win, MIN_BROWWIDE, MIN_BROWHIGH);
 
     haveWindows = 1;
     br->vis = br->wasvis = 0;
@@ -488,19 +495,11 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
     /* note: everything is sized and positioned in ResizeBrowse() */
 
     br->iconW = XCreateSimpleWindow(theDisp, br->win, 1,1, 100,100,
-				     1,browfg,browbg);
+				   1, browfg, browbg);
     if (!br->iconW) FatalError("can't create schnauzer icon window!");
 
-    SCCreate(&(br->scrl), br->win, 0,0, 1,100, 0,0,0,0,
+    SCCreate(&br->scrl, br->win, 0,0, 1,100, 0,0,0,0,
 	     browfg, browbg, browhi, browlo, drawIconWin);
-
-
-    if (XGetNormalHints(theDisp, br->win, &hints)) {
-      hints.min_width  = 325 + 96;
-       hints.min_height = 180;
-      hints.flags |= PMinSize;
-      XSetNormalHints(theDisp, br->win, &hints);
-    }
 
 #ifdef BACKING_STORE
     xswa.backing_store = WhenMapped;

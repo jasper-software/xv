@@ -49,7 +49,7 @@
 #include "bits/mb_chk"
 
 
-static Pixmap cboard50 = (Pixmap) NULL;   /* 50% gray checkerboard */
+static Pixmap cboard50 = (Pixmap) None;   /* 50% gray checkerboard */
 
 
 static int    rbpixmade = 0;
@@ -72,12 +72,12 @@ static void drawCB     PARM((CBUTT *, int));
 
 /**********************************************/
 void BTCreate(bp,win,x,y,w,h,str,fg,bg,hi,lo)
-     BUTT         *bp;
-     Window        win;
-     int           x,y;
-     unsigned int  w,h;
-     const char   *str;
-     unsigned long fg,bg,hi,lo;
+    BUTT         *bp;
+    Window        win;
+    int           x,y;
+    unsigned int  w,h;
+    const char   *str;
+    unsigned long fg,bg,hi,lo;
 {
   bp->win = win;
   bp->x = x;  bp->y = y;  bp->w = w;  bp->h = h;
@@ -98,11 +98,21 @@ void BTCreate(bp,win,x,y,w,h,str,fg,bg,hi,lo)
 }
 
 
+/**********************************************/
+void BTMove(bp, x, y)
+    BUTT *bp;
+    int   x,y;
+{
+  bp->x = x;
+  bp->y = y;
+}
+
 
 /**********************************************/
-void BTSetActive(bp,act)
-BUTT         *bp;
-int           act;
+
+void BTSetActive(bp, act)
+    BUTT *bp;
+    int   act;
 {
   if (bp->active != act) {
     bp->active = act;
@@ -114,7 +124,7 @@ int           act;
 
 /**********************************************/
 void BTRedraw(bp)
-BUTT *bp;
+    BUTT *bp;
 {
   int          x,y,r,x1,y1;
   unsigned int w,h;
@@ -659,11 +669,11 @@ int RBTrack(rblist, n)
 
 /***********************************************/
 void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
-      CBUTT        *cb;
-      Window        win;
-      int           x,y;
-      const char   *str;
-      unsigned long fg,bg,hi,lo;
+    CBUTT        *cb;
+    Window        win;
+    int           x,y;
+    const char   *str;
+    unsigned long fg,bg,hi,lo;
 {
   /* fill in the fields of the structure */
   cb->win      = win;
@@ -689,6 +699,14 @@ void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
   }
 }
 
+
+void CBMove(cb, x, y)
+    CBUTT *cb;
+    int    x, y;
+{
+  cb->x = x;
+  cb->y = y;
+}
 
 
 
@@ -829,14 +847,14 @@ int lit;
 
 /***********************************************/
 void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
-     MBUTT        *mb;
-     Window        win;
-     int           x,y;
-     unsigned int  w,h;
-     const char   *title;
-     const char  **list;
-     int           nlist;
-     unsigned long fg,bg,hi,lo;
+    MBUTT        *mb;
+    Window        win;
+    int           x,y;
+    unsigned int  w,h;
+    const char   *title;
+    const char  **list;
+    int           nlist;
+    unsigned long fg,bg,hi,lo;
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
@@ -865,7 +883,7 @@ void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
   mb->hi       = hi;
   mb->lo       = lo;
 
-  mb->pix      = (Pixmap) NULL;
+  mb->pix      = (Pixmap) None;
   mb->pw = mb->ph = 0;
 
   for (i=0; i<MAXMBLEN; i++) {
@@ -890,11 +908,22 @@ void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
 }
 
 
+void MBChange(mb, x, y, w, h)
+    MBUTT        *mb;
+    int           x, y;
+    unsigned int  w, h;
+{
+  mb->x = x;
+  mb->y = y;
+  mb->w = w;
+  mb->h = h;
+  XMoveResizeWindow(theDisp, mb->mwin, x, y, w, h);
+}
 
 
 /***********************************************/
 void MBRedraw(mb)
-     MBUTT *mb;
+    MBUTT *mb;
 {
   /* draws a menu button in it's normal state.  (When it's actively being
      used (to select an item), all drawing is handled in MBTrack) */
@@ -974,8 +1003,8 @@ void MBRedraw(mb)
 
 /**********************************************/
 void MBSetActive(mb,act)
-     MBUTT *mb;
-     int    act;
+    MBUTT *mb;
+    int    act;
 {
   if (mb->active != act) {
     mb->active = act;
@@ -986,7 +1015,7 @@ void MBSetActive(mb,act)
 
 /**********************************************/
 int MBWhich(mb)
-     MBUTT *mb;
+    MBUTT *mb;
 {
   /* returns index of first checked selection, or '-1' if nothing selected */
 
@@ -1003,8 +1032,8 @@ int MBWhich(mb)
 
 /**********************************************/
 void MBSelect(mb, n)
-     MBUTT *mb;
-     int    n;
+    MBUTT *mb;
+    int    n;
 {
   /* makes entry #n the selected entry (ie, the only one with a check mark)
      Does all redrawing.  Does nothing if entry #n already selected.
@@ -1036,7 +1065,7 @@ int    mx,my;
 
 /***********************************************/
 int MBTrack(mb)
-     MBUTT *mb;
+    MBUTT *mb;
 {
   Window       rW, cW, win;
   int          i, x, y, rx, ry, extratop, hascheck;
@@ -1051,7 +1080,7 @@ int MBTrack(mb)
 
   if (!mb->active || !mb->nlist) return -1;
 
-  extratop = (mb->title) ? LINEHIGH+3 : 1-SPACING; /*add extra line for title*/
+  extratop = (mb->title) ? LINEHIGH+3 : 1-SPACING; /* add extra line for title */
 
   mtabwide = 0;
 

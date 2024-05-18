@@ -102,6 +102,7 @@ set(xv_sources
 	xvrle.c
 	xvroot.c
 	xvscrl.c
+	xvselect.c
 	xvsmooth.c
 	xvsunras.c
 	xvtarga.c

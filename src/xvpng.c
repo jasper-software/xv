@@ -124,7 +124,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 void CreatePNGW()
 {
   pngW = CreateWindow("xv png", "XVPNG", NULL,
-                      PWIDE, PHIGH, infofg, infobg, 0);
+                      PWIDE, PHIGH, infofg, infobg, FALSE);
   if (!pngW) FatalError("can't create PNG window!");
 
   XSelectInput(theDisp, pngW, ExposureMask | ButtonPressMask | KeyPressMask);
