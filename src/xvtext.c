@@ -1606,6 +1606,7 @@ static void computeText(tv)
 
   if (!tv->text) {
     tv->numlines = tv->hexlines = 0;
+    if (tv->lines != NULL) free(tv->lines);
     tv->lines = (const char **) NULL;
 #ifdef TV_MULTILINGUAL
     if (tv->cv_text != NULL) {
