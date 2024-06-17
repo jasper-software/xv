@@ -4662,7 +4662,7 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
   while (*numn < maxn) {
     char *s, *nlp, fbuf[MAXPATHLEN];
     if (!fgets(fbuf, MAXPATHLEN, fp) ||
-	!(s = (char *) malloc(strlen(fbuf)))) break;
+	!(s = (char *) malloc(strlen(fbuf)+1))) break;
 
     nlp = (char *) rindex(fbuf, '\n');
     if (nlp) *nlp = '\0';
