@@ -3750,9 +3750,6 @@ static void genIcon(br, bf)
   char    str[256], str1[256], readname[128], uncompname[128];
   /* char    *uncName; */
   char    *uncName;
-#if (defined(VMS) && !defined(GUNZIP))
-  char    basefname[128];
-#endif
 
 
   if (!bf || !bf->name || bf->name[0] == '\0') return;   /* shouldn't happen */
@@ -3781,8 +3778,13 @@ static void genIcon(br, bf)
 #if (defined(VMS) && !defined(GUNZIP))
     /* VMS decompress doesn't like the file to have a trailing .Z in fname
        however, GUnZip is OK with it, which we are calling UnCompress */
-    strcpy (basefname, bf->name);
-    *rindex (basefname, '.') = '\0';
+    char basefname[128];
+    char *dot;
+    basefname[0] = '\0';
+    strncpy (basefname, bf->name, 128 - 1);
+    basefname[ 128 - 1 ] = '\0';
+    dot = rindex (basefname, '.');
+    if (dot != NULL) *dot = '\0';
     uncName = basefname;
 #else
     uncName = bf->name;
