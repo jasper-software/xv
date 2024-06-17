@@ -400,11 +400,14 @@ int TextView(fname)
 #ifndef VMS
     if (!UncompressFile(filename, rfname, filetype)) return FALSE;
 #else
-    char *basefname[128];  /* just current fname, no path */
+    char basefname[128];  /* just current fname, no path */
+    char *dot;
     basefname[0] = '\0';
     /* chop off trailing '.Z' from friendly displayed basefname, if any */
     strncpy (basefname, filename, 128 - 1);
-    *rindex (basefname, '.') = '\0';
+    basefname[ 128 - 1 ] = '\0';
+    dot = rindex (basefname, '.');
+    if (dot != NULL) *dot = '\0';
     if (!UncompressFile(basefname, rfname, filetype)) return FALSE;
 #endif
   }
@@ -2416,9 +2419,9 @@ static int csCheckEvent(cs, xev)
     int i, n;
 
     if (xev->type == Expose) {
-	int x, y, w, h;
+	/* int x, y, w, h; */
 	XExposeEvent *e = (XExposeEvent *) xev;
-	x = e->x; y = e->y; w = e->width; h = e->height;
+	/* x = e->x; y = e->y; w = e->width; h = e->height; */
 
 	if (cs->win == e->window){
 	    csRedraw(cs);

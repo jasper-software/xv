@@ -1978,7 +1978,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	/* change cursors */
 	for (i=0; i<MAXBRWIN; i++) {
 	  XDefineCursor(theDisp,binfo[i].iconW, curs);
-    }
+	}
 
 	/* samepos = oldx = oldy = oldbrnum = 0; */
 	oldx = oldy = oldbrnum = 0;
@@ -3748,8 +3748,11 @@ static void genIcon(br, bf)
   int     iwide, ihigh;
   byte   *icon24, *icon8;
   char    str[256], str1[256], readname[128], uncompname[128];
-  /* char    basefname[128], *uncName; */
+  /* char    *uncName; */
   char    *uncName;
+#if (defined(VMS) && !defined(GUNZIP))
+  char    basefname[128];
+#endif
 
 
   if (!bf || !bf->name || bf->name[0] == '\0') return;   /* shouldn't happen */
