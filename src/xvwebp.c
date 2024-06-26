@@ -217,7 +217,9 @@ int LoadWEBP(fname, pinfo)
   int                   filesize;
   int                   bufsize;
   int                   linesize;
-  uint8_t               *raw_data;
+  int                   w, h;
+  unsigned int          npixels;
+  uint8_t               *raw_data, *rgba, alpha;
   WebPBitstreamFeatures features;
   VP8StatusCode         status;
 
@@ -269,6 +271,7 @@ int LoadWEBP(fname, pinfo)
   /* Set sizing information */
   pinfo->w = pinfo->normw = features.width;
   pinfo->h = pinfo->normh = features.height;
+  npixels = pinfo->h * pinfo->w;
 
   /* Basic sanity checking */
   if (pinfo->w <= 0 || pinfo->h <= 0) {
@@ -338,30 +341,57 @@ int LoadWEBP(fname, pinfo)
     return 0;
   }
 
-  pinfo->pic = (byte*)malloc(bufsize);
+  /*
+   * Get data. Since we're reading RGBA values, we can no longer
+   * decode directly in to pinfo->pic, which expects RGB. So read
+   * into a separate buffer, and then we'll copy the appropriate
+   * pixel values over afterwards.
+   */
+  if ((rgba = WebPDecodeRGBA(raw_data, filesize, &w, &h)) == NULL)
+  {
+    free(raw_data);
+    SetISTR(ISTR_WARNING, "failed to decode WEBP data");
+    return 0;
+  }
+
+  /* Check that the image we read is the size we expected */
+  if (w != pinfo->w || h != pinfo->h)
+  {
+    free(raw_data);
+    WebPFree(rgba);
+    SetISTR(ISTR_WARNING, "image size mismatch (expected %ux%u, got %ux%u)",
+	    pinfo->w, pinfo-h, w, h);
+    return 0;
+  }
+
+  /* Allocate the xv picture buffer */
+  pinfo->pic = (byte*)malloc(npixels * 3);
 
   if (!pinfo->pic) {
     free(raw_data);
+    WebPFree(rgba);
     FatalError("malloc failure in LoadWEBP");
     return 0;
   }
 
-  /*
-   * Get data.  Note that there's an RGBA version of this call if we want
-   * to get a fourth (32 bit) alpha channel byte, but I don't think xv
-   * supports that (at least not in a modern and smart way) so I'm just
-   * loading RGB right now.
-   */
-  if (!WebPDecodeRGBInto(raw_data, filesize, (uint8_t*)pinfo->pic,
-                         bufsize, linesize)) {
-    free(raw_data);
-    free(pinfo->pic);
-    pinfo->pic = NULL;
-    SetISTR(ISTR_WARNING, "failed to load WebP");
-    return 0;
+  /*** We can't show transparency, but we can simulate it by
+  **** proportionally reducing the intensity of the relevant
+  **** pixel, giving an effect as if the image had an alpha
+  **** channel and was overlaid on a black background. This
+  **** will almost always be preferable to just throwing
+  **** away the transparency information in the image.
+  ***/
+
+  for (int i=0; i < npixels; i++)
+  {
+    alpha = *(rgba + i*4 + 3);
+    pinfo->pic[i*3 + 0] = *(rgba + i*4 + 0) * alpha/255;
+    pinfo->pic[i*3 + 1] = *(rgba + i*4 + 1) * alpha/255;
+    pinfo->pic[i*3 + 2] = *(rgba + i*4 + 2) * alpha/255;
   }
 
   free(raw_data);
+  WebPFree(rgba);
   return 1;
 }
 
