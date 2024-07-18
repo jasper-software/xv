@@ -6123,7 +6123,7 @@ static void recIconVisible(name, icon)
     }
   }
 
-  ptr = calloc(sizeof(IVIS), 1);
+  ptr = calloc(1, sizeof(IVIS));
   if (!ptr)
     return;
 
