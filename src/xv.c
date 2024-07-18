@@ -2139,9 +2139,9 @@ static int openPic(filenum)
   int   oldCXOFF, oldCYOFF, oldCWIDE, oldCHIGH, wascropped;
   char *tmp;
   char *fullname,       /* full name of the original file */
-        filename[512];  /* full name of file to load (could be /tmp/xxx)*/
+        filename[MAXPATHLEN];	/* full name of file to load (could be /tmp/xxx)*/
 #ifdef MACBINARY
-  char origname[512];	/* file name of original file (NO processing) */
+  char origname[MAXPATHLEN];	/* file name of original file (NO processing) */
   origname[0] = '\0';
 #endif
 
@@ -2523,8 +2523,8 @@ ms_auto_no:
 #endif /* HAVE_MGCSFX_AUTO */
 
   if (filetype == RFT_ERROR) {
-    char  foostr[512 + 128];
-    sprintf(foostr,"Can't open file '%s'\n\n  %s.",filename, ERRSTR(errno));
+    char  foostr[MAXPATHLEN + 512];
+    snprintf(foostr, sizeof(foostr), "Can't open file '%s'\n\n  %s.", filename, ERRSTR(errno));
 
     if (!polling) ErrPopUp(foostr, "\nBummer!");
 
@@ -4097,8 +4097,8 @@ static void setWinIconNames(name)
     sprintf(iconname,"xv");
   }
   else {
-    sprintf(winname,"xv %s: %s", VERSTR, name);
-    sprintf(iconname,"%s",name);
+    sprintf(winname, "xv %s: %.*s", VERSTR, NAME_MAX, name);
+    sprintf(iconname, "%.*s", NAME_MAX, name);
   }
 
 #ifndef REGSTR
@@ -4470,7 +4470,7 @@ void HandleDispMode()
 
 
   if (dispMode == RMB_WINDOW) {        /* windowed */
-    char fnam[256];
+    char fnam[MAXPATHLEN];
 
     BTSetActive(&but[BANNOT], 1);
 
