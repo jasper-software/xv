@@ -1354,6 +1354,7 @@ WHERE int           bwidth,        /* border width of created windows */
                     viewonly,      /* if true, ignore any user input */
                     noFreeCols,    /* don't free colors when loading new pic */
                     autoquit,      /* quit in '-root' or when click on win */
+                    nopos,         /* if true, don't set PPosition, USPosition hints */
                     xerrcode,      /* errorcode of last X error */
                     grabDelay,     /* # of seconds to sleep at start of Grab */
                     startGrab;     /* start immediate grab ? */

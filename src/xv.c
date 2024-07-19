@@ -147,7 +147,7 @@ extern int RRevent_number, RRerror_number;
 /* formerly local vars in main, made local to this module when
    parseResources() and parseCmdLine() were split out of main() */
 
-static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, nopos, limit2x;
+static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, limit2x;
 static const char *histr, *lostr, *fgstr, *bgstr, *tmpstr;
 static const char *infogeom, *ctrlgeom, *gamgeom, *browgeom, *textgeom, *cmtgeom;
 static char *display, *whitestr, *blackstr;
@@ -1874,11 +1874,6 @@ static void verifyArgs()
   if (stdcmap) colorMapMode = CM_STDCMAP;
 
   defaultCmapMode = colorMapMode;  /* default mode for 8-bit images */
-
-  if (nopos) {
-    maingeom = infogeom = ctrlgeom = gamgeom = browgeom = textgeom = cmtgeom =
-      (const char *) NULL;
-  }
 
   /* if -root and -maxp, disallow 'integer' tiling modes */
   if (useroot && fixedaspect && automax && !rmodeset &&

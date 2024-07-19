@@ -104,8 +104,9 @@ Window CreateFlexWindow(name,clname,geom,defw,defh,fg,bg,usesize,keepsize,usersp
   x = y = 1;
   i = XParseGeometry(geom,&x,&y, (unsigned int *) &w, (unsigned int *) &h);
 
-  if ((i&XValue || i&YValue)) hints.flags = USPosition;
-                         else hints.flags = PPosition;
+  if (nopos) hints.flags = 0;
+  else if ((i&XValue || i&YValue)) hints.flags = USPosition;
+  else hints.flags = PPosition;
 
   if (!usesize || !(i&WidthValue))  w = defw;
   if (!usesize || !(i&HeightValue)) h = defh;
