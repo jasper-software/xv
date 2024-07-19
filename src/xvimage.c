@@ -967,12 +967,12 @@ static int doAutoCrop24()
     for (i=0, misses=0, cp1=cp; i<cWIDE && misses<maxmiss; i++, cp1+=3) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
       oldr=r; oldg=g; oldb=b;
     }
 
@@ -991,12 +991,12 @@ static int doAutoCrop24()
     for (i=0, misses=0, cp1=cp; i<cWIDE && misses<maxmiss; i++, cp1+=3) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cWIDE) { cp -= cWIDE*3;  cbot++; }
@@ -1017,12 +1017,12 @@ static int doAutoCrop24()
 	 i++, cp1 += (cWIDE * 3)) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cHIGH) { cp+=3; cleft++; }
@@ -1041,12 +1041,12 @@ static int doAutoCrop24()
 	 i++, cp1 += (cWIDE*3)) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cHIGH) { cp-=3; cright++; }
