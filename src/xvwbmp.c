@@ -58,7 +58,7 @@ static const char *st_err;
 static int    fail	PARM((const char *, const char *));
 static int    read_mb	PARM((int *, int));
 static void   write_mb	PARM((uint32, FILE *));
-static int    read_ext	PARM((int, uint8));
+static int    read_ext	PARM((int, int));
 static void  *mymalloc	PARM((int));
 static void   myfree	PARM((void));
 static uint8 *render1	PARM((uint8 *, int, int));
@@ -254,9 +254,11 @@ static int read_mb(dst, fd)
 
 static int read_ext(fd, fixed)
      int fd;
-     uint8 fixed;
+     int fixed;
 {
     XV_UNUSED(fd);
+
+    fixed &= 0xFF; /* reduce to uint8 */
 
     if (!(fixed&0x7f)) {    /* no extensions */
 	return 1;
@@ -298,7 +300,7 @@ static int read_ext(fd, fixed)
 static void *mymalloc(numbytes)
      int numbytes;
 {
-    mymem = (void**)realloc(mymem, mymems+1);
+    mymem = (void**)realloc(mymem, (mymems+1)*sizeof(void *));
     if (!mymem)
 	FatalError("LoadWBMP: can't realloc buffer");
     return (mymem[mymems++] = malloc(numbytes));
@@ -341,15 +343,22 @@ static uint8 *render1(data, size, npixels)
     /* expand bits into bytes */
     /* memset(pic, 0, npixels); */
 
-    for (i=0; i<npixels; i++) {
+    if (npixels > 0) {
+	i = 0;
+	for (;;) {
 
-	pic[i] = (cb>>7)&1;
+	    pic[i++] = (cb>>7)&1;
 
-	if ((++cnt)==8) {
-	    cb = *(++data);
-	    cnt = 0;
-	} else {
-	    cb <<=1;
+	    if (i >= npixels) {
+		break;
+	    }
+
+	    if ((++cnt)==8) {
+		cb = *(++data);
+		cnt = 0;
+	    } else {
+		cb <<=1;
+	    }
 	}
     }
     return pic;

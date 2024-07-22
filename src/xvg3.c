@@ -40,6 +40,7 @@ static int endoffile;
 static int eols;
 static int rawzeros;
 static int shdata;
+static int shbit;
 static int kludge;
 static int reversebits;
 
@@ -59,6 +60,7 @@ static int getfaxrow ARGS(( FILE* inf, int row, byte* bitrow ));
 static void skiptoeol ARGS(( FILE* file ));
 static int rawgetbit ARGS(( FILE* file ));
 
+extern int lowresfax;
 extern int highresfax;
 
 int
@@ -72,16 +74,21 @@ LoadG3 ( fname, pinfo )
     byte* bp;
 
     endoffile = 0;
+    eols = 0;
+    rawzeros = 0;
+    shdata = 0;
+    shbit = 0;
     kludge = 0;
     reversebits = 0;
-    pinfo->pic =  (byte *) NULL;
+
+    pinfo->pic = (byte *) NULL;
     pinfo->comment = (char *) NULL;
     pinfo->numpages = 0;
 
     if ( (fp = fopen(fname, "r")) == NULL )
 	{
 	SetISTR(ISTR_WARNING, "Cannot open %s", fname);
-	return 0 ;
+	return 0;
 	}
 
     eols = 0;
@@ -115,7 +122,8 @@ LoadG3 ( fname, pinfo )
 
     cols = 0;
     bytes[0] = NULL;
-    for ( rows = 0; rows < MAXROWS; ++rows ) {
+    rows = 0;
+    for ( ; ; ) {
 	if ((bytes[rows] = (byte*) 
                malloc(MAXCOLS * sizeof(byte))) == (byte*) NULL)
 	    return 0;
@@ -124,10 +132,18 @@ LoadG3 ( fname, pinfo )
 	    break;
 	if ( col > cols )
 	    cols = col;
-	if ( !highresfax ) {
+	if ( lowresfax ) {
+	    if ( rows + 1 >= MAXROWS ) {
+		/* invalid file */
+	        break;
+	    }
 	    bytes[rows + 1] = bytes[rows];
 	    ++rows;
 	}
+	if ( rows + 1 >= MAXROWS ) {
+	    break;
+	}
+	rows++;
     }
 
     fclose( fp );
@@ -313,8 +329,6 @@ skiptoeol( file )
 	    break;
 	}
     }
-
-static int shbit = 0;
 
 static int
 rawgetbit( file )

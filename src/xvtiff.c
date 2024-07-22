@@ -9,6 +9,7 @@
 #endif
 
 #include <string.h>
+#include <stdint.h>
 #include "xv.h"
 
 #ifdef HAVE_TIFF

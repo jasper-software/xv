@@ -55,7 +55,7 @@ static int    randomShow = 0;   /* do a 'random' slideshow */
 static int    startIconic = 0;  /* '-iconic' option */
 static int    defaultVis  = 0;  /* true if using DefaultVisual */
 #ifdef HAVE_G3
-static int    lowresfax = 0;    /* temporary(?) kludge */
+int           lowresfax = 0;    /* temporary(?) kludge */
 int           highresfax = 0;
 #endif
 static double hexpand = 1.0;    /* '-expand' argument */
@@ -150,6 +150,7 @@ extern int RRevent_number, RRerror_number;
 static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, limit2x;
 static const char *histr, *lostr, *fgstr, *bgstr, *tmpstr;
 static const char *infogeom, *ctrlgeom, *gamgeom, *browgeom, *textgeom, *cmtgeom;
+static int userspecbrowgeom;
 static char *display, *whitestr, *blackstr;
 static char *rootfgstr, *rootbgstr, *imagebgstr, *visualstr;
 static char *monofontname, *flistName;
@@ -289,7 +290,7 @@ int main(argc, argv)
 
   /* init command-line options flags */
   infogeom = DEFINFOGEOM;  ctrlgeom = DEFCTRLGEOM;
-  gamgeom  = DEFGAMGEOM;   browgeom = DEFBROWGEOM;
+  gamgeom  = DEFGAMGEOM;   browgeom = DEFBROWGEOM; userspecbrowgeom = 0;
   textgeom = DEFTEXTGEOM;  cmtgeom  = DEFCMTGEOM;
 
   ncols = -1;  mono = 0;
@@ -966,7 +967,7 @@ int main(argc, argv)
   if (!novbrowse) {
     MakeBrowCmap();
     /* create the visual browser window */
-    CreateBrowse(browgeom, browgeom != DEFBROWGEOM, fgstr, bgstr, histr, lostr);
+    CreateBrowse(browgeom, userspecbrowgeom, fgstr, bgstr, histr, lostr);
 
     if (browmap) OpenBrowse();
   }
@@ -1415,7 +1416,7 @@ static void parseResources(argc, argv)
   if (rd_flag("vsadjust"))       vsadjust    = def_int;
 #endif
   if (rd_flag("vsDisable"))      novbrowse   = def_int;
-  if (rd_str ("vsGeometry"))     browgeom    = def_str;
+  if (rd_str ("vsGeometry"))     { browgeom  = def_str; userspecbrowgeom = 1; }
   if (rd_flag("vsMap"))          browmap     = def_int;
   if (rd_flag("vsPerfect"))      browPerfect = def_int;
   if (rd_str ("white"))          whitestr    = def_str;
@@ -1776,7 +1777,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-vsdisable",4,1,&novbrowse)); /* disable sch? */
 
     else if (!argcmp(argv[i],"-vsgeometry",4,0,&pm))	/* visSchnauzer geom */
-      { if (++i<argc) browgeom = argv[i]; }
+      { if (++i<argc) { browgeom = argv[i]; userspecbrowgeom = 1; } }
 
     else if (!argcmp(argv[i],"-vsmap",4,1,&browmap));	/* visSchnauzer map */
 
@@ -3204,17 +3205,6 @@ int ReadFileType(fname)
            strncmp((char *) magicno, "%PDF",   (size_t) 4)==0) rv = RFT_PS;
 #endif
 
-#ifdef HAVE_G3
-  else if ((magicno[0]==  1 && magicno[1]==  1 &&
-            magicno[2]== 77 && magicno[3]==154 &&
-            magicno[4]==128 && magicno[5]==  0 &&
-            magicno[6]==  1 && magicno[7]== 77) ||
-            highresfax || lowresfax || !strcmp(fname+strlen(fname)-3,".g3")) {
-               if (!lowresfax) highresfax = 1;
-               rv = RFT_G3;
-  }
-#endif
-
 #ifdef HAVE_MAG
   else if (strncmp((char *) magicno,"MAKI02  ", (size_t) 8)==0) rv = RFT_MAG;
 #endif
@@ -3239,6 +3229,17 @@ int ReadFileType(fname)
 #ifdef HAVE_PCD
   else if (magicno[0]==0xff && magicno[1]==0xff &&
            magicno[2]==0xff && magicno[3]==0xff)              rv = RFT_PCD;
+#endif
+
+#ifdef HAVE_G3
+  else if ((magicno[0]==  1 && magicno[1]==  1 &&
+            magicno[2]== 77 && magicno[3]==154 &&
+            magicno[4]==128 && magicno[5]==  0 &&
+            magicno[6]==  1 && magicno[7]== 77) ||
+            (rv == RFT_UNKNOWN &&
+             (highresfax || lowresfax || (strlen(fname)>3 && !strcmp(fname+strlen(fname)-3,".g3"))))) {
+               rv = RFT_G3;
+  }
 #endif
 
 #ifdef MACBINARY
