@@ -220,3 +220,7 @@ install(DIRECTORY docs/manuals/html
 # Install files into share/pixmaps
 install(FILES contrib/xv.xpm
   DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pixmaps")
+
+# Install files into share/applications
+install(FILES contrib/xv.desktop
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications")
