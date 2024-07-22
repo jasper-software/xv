@@ -216,3 +216,7 @@ install(FILES
 # Install directories into DOCDIR/manuals.
 install(DIRECTORY docs/manuals/html
   DESTINATION "${CMAKE_INSTALL_DOCDIR}/manuals")
+
+# Install files into share/pixmaps
+install(FILES contrib/xv.xpm
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pixmaps")
