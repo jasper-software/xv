@@ -1062,7 +1062,8 @@ int read_var(ibuf,host)
   case 3: /*******************************************************/
           /* VAX host with variable-length support               */
           /*******************************************************/
-    if (read(infile,ibuf,(size_t) 2048/* upper bound */) <= 0) return 0;
+    length = read(infile,ibuf,(size_t) 2048/* upper bound */);
+    if (length <= 0) return 0;
     return (length);
 
   case 4: /*******************************************************/

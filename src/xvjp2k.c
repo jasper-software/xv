@@ -792,7 +792,7 @@ static void StoreJP2K(char *options) {
 					if (mode == 0) {
 						v = *src;
 						v = MONO(r[v], g[v], b[v]);
-					} else if (mode == 1) {
+					} else /* if (mode == 1) */ {
 						v = MONO(src[0], src[1], src[2]);
 					}
 					*dst = v;

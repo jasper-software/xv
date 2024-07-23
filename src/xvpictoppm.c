@@ -104,6 +104,7 @@ static byte *loadThumbFile(wptr, hptr)
 
 
   /* read width, height, maxval */
+  w = h = maxval = 0;
   if (!fgets(buf, 256, fp) || sscanf(buf, "%d %d %d", &w, &h, &maxval) != 3)
     errexit();
 

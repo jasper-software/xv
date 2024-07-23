@@ -480,7 +480,8 @@ static int loadpam(fp, pinfo, raw, maxv)	/* unofficial RGBA extension */
      int      raw, maxv;
 {
   byte *p, *pix, *pic24, *linebuf, scale[256], bgR, bgG, bgB, r, g, b, a;
-  int   i, j, bitshift, w, h, npixels, bufsize, linebufsize, holdmaxv;
+  int   i, j, w, h, npixels, bufsize, linebufsize, holdmaxv;
+  /* int bitshift; */
 
   w = pinfo->w;
   h = pinfo->h;
@@ -513,8 +514,8 @@ static int loadpam(fp, pinfo, raw, maxv)	/* unofficial RGBA extension */
 
   /* if maxv>255, keep dropping bits until it's reasonable */
   holdmaxv = maxv;
-  bitshift = 0;
-  while (maxv>255) { maxv = maxv>>1;  bitshift++; }
+  /* bitshift = 0; */
+  while (maxv>255) { maxv = maxv>>1;  /* bitshift++; */ }
 
 
   numgot = 0;

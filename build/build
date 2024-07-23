@@ -34,6 +34,8 @@ usage()
 	    Strict build to treat warnings as errors.
 	-o \$configure_options
 	    Add \$configure_options to the cmake command line.
+	-p clang|gcc
+	    Set compiler
 	-v
 	    Enable verbose mode.
 	-h
@@ -52,9 +54,10 @@ tmp_dir=
 mode=release
 strict=0
 clean=0
+c_compiler=
 configure_options=()
 
-while getopts vhcb:i:o:t:drs opt; do
+while getopts vhcb:i:o:t:p:drs opt; do
 	case $opt in
 	s)
 		strict=1;;
@@ -72,6 +75,8 @@ while getopts vhcb:i:o:t:drs opt; do
 		configure_options+=("$OPTARG");;
 	c)
 		clean=1;;
+	p)
+		c_compiler="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
 	h)
@@ -106,6 +111,12 @@ if [ "$clean" -ge 1 ]; then
 		panic "Not cleaning install dir ${install_dir}. Does not look match *tmp*install.";;
 	esac
 fi
+
+case "$c_compiler" in
+gcc) configure_options+=(-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++) ;;
+clang) configure_options+=(-DCMAKE_C_COMPILER="$c_compiler" -DCMAKE_CXX_COMPILER="${c_compiler}++") ;;
+*) if [ -n "$c_compiler" ] ; then panic "Unknown compiler ${c_compiler}." ; fi
+esac
 
 cmake --version || panic "cannot run cmake"
 

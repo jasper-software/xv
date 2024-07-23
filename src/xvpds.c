@@ -265,7 +265,7 @@ int LoadPDS(fname, pinfo)
   char	*tmp;
   const char   *ftypstr;
   unsigned long filesize;
-  char  sampletype[64];
+  char  sampletype[64+1];
 
   pinfo->type = PIC8;
   isfixed = TRUE;
