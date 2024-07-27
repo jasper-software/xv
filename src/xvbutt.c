@@ -8,7 +8,7 @@
  *   BTRedraw()             -  redraw button
  *   BTTrack()              -  clicked in button.  track until mouse up
  *
- *   RBCreate()             -  create an RBUTT and append to supplied list
+ *   RBCreate()             -  create an RBUTT (radio button) and append to supplied list
  *   RBRedraw()             -  redraw one or all RBUTTs in a list
  *   RBSelect()             -  change selected item in list of RBUTTs
  *   RBWhich()              -  returns index of selected RBUTT in list

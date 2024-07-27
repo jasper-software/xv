@@ -1207,6 +1207,7 @@ WHERE int           theScreen;
 WHERE unsigned int  ncells, dispDEEP; /* root color sizes */
 WHERE unsigned int  dispWIDE, dispHIGH; /* screen sizes */
 WHERE unsigned int  vrWIDE, vrHIGH, maxWIDE, maxHIGH; /* virtual root and max image sizes */
+WHERE int dpiMult;  /* multiplier for hidpi displays */
 WHERE Colormap      theCmap, LocalCmap;
 WHERE Window        spec_window, rootW, mainW, vrootW;
 WHERE GC            theGC;
@@ -1923,6 +1924,7 @@ void  InfoBox              PARM((int));
 void  RedrawInfo           PARM((int, int, int, int));
 void  SetInfoMode          PARM((int));
 char *GetISTR              PARM((int));
+Pixmap ScalePixmap         PARM((Pixmap src_pixmap, int src_width, int src_height));
 
 #if defined(__STDC__) && !defined(NOSTDHDRS)
 void  SetISTR(int, ...);
@@ -2195,6 +2197,7 @@ void  CreatePIC2W          PARM((void));
 void  PIC2Dialog           PARM((int));
 int   PIC2CheckEvent       PARM((XEvent *));
 int   PIC2SetParamOptions  PARM((char *));
+int   PIC2SaveParams       PARM((char *, int));
 
 /**************************** XVPM.C ****************************/
 int LoadPM                 PARM((char *, PICINFO *));

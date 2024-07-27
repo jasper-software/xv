@@ -616,12 +616,12 @@ pcdError(const char *fname, const char *st)
 
 /**** Stuff for PCDDialog box ****/
 
-#define TWIDE 380
-#define THIGH 160
+#define TWIDE (380*dpiMult)
+#define THIGH (160*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int, int, int, int));
 static void clickTD   PARM((int, int));
@@ -645,25 +645,25 @@ void CreatePCDW()
 
   XSelectInput(theDisp, pcdW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  BTCreate(&tbut[T_BOK], pcdW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BOK], pcdW, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
           "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&tbut[T_BCANC], pcdW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BCANC], pcdW, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
           "Cancel", infofg, infobg, hicol, locol);
 
-  y = 55;
-  resnRB = RBCreate(NULL, pcdW, 36, y,   "192*128   Base/16",
+  y = 55*dpiMult;
+  resnRB = RBCreate(NULL, pcdW, 36*dpiMult, y,       "192*128   Base/16",
            infofg, infobg,hicol,locol);
-  RBCreate(resnRB, pcdW, 36, y+18,       "384*256   Base/4",
+  RBCreate(resnRB, pcdW, 36*dpiMult, y + 18*dpiMult, "384*256   Base/4",
            infofg, infobg,hicol,locol);
-  RBCreate(resnRB, pcdW, 36, y+36,       "768*512   Base",
+  RBCreate(resnRB, pcdW, 36*dpiMult, y + 36*dpiMult, "768*512   Base",
            infofg, infobg, hicol, locol);
-  RBCreate(resnRB, pcdW, TWIDE/2, y,     "1536*1024 4Base",
+  RBCreate(resnRB, pcdW, TWIDE/2, y,                 "1536*1024 4Base",
            infofg, infobg, hicol, locol);
-  RBCreate(resnRB, pcdW, TWIDE/2, y+18,  "3072*2048 16Base",
+  RBCreate(resnRB, pcdW, TWIDE/2, y + 18*dpiMult,    "3072*2048 16Base",
            infofg, infobg, hicol, locol);
 
-  CBCreate(&lutCB, pcdW, TWIDE/2, y+36,  "Linear LUT",
+  CBCreate(&lutCB, pcdW, TWIDE/2, y + 36*dpiMult,    "Linear LUT",
            infofg, infobg, hicol, locol);
 
   RBSelect(resnRB, 2);
@@ -782,11 +782,11 @@ drawTD(int x, int y, int w, int h)
 
   for (i=0; i<T_NBUTTS; i++) BTRedraw(&tbut[i]);
 
-  ULineString(pcdW, resnRB->x-16, resnRB->y-10-DESCENT, "Resolution");
+  ULineString(pcdW, resnRB->x - 16*dpiMult, resnRB->y - 10*dpiMult - DESCENT, "Resolution");
   RBRedraw(resnRB, -1);
   CBRedraw(&lutCB);
 
-  XDrawString(theDisp, pcdW, theGC, 20, 19, title, strlen(title));
+  XDrawString(theDisp, pcdW, theGC, 20*dpiMult, 19*dpiMult, title, strlen(title));
 
   XSetClipMask(theDisp, theGC, None);
 }
@@ -929,7 +929,7 @@ gethufftable(void)
     return NULL;
   }
  */
-  if((hufftab = (int *)malloc(bufsize)) == NULL)
+  if((hufftab = (int *)malloc((bufsize < 2*sizeof(int))? 2*sizeof(int): bufsize)) == NULL)
     FatalError("couldn't malloc initial Huffman table");
   hufftab[0] = hufftab[1] = 0;
 

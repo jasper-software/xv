@@ -54,24 +54,24 @@
 #  include "bits/icon"
 #endif
 
-#define DEF_CTRLWIDE 440           /* initial size of control window */
-#define DEF_CTRLHIGH 348
-#define MIN_CTRLWIDE 440
-#define MIN_CTRLHIGH 332
+#define DEF_CTRLWIDE (440*dpiMult) /* initial size of control window */
+#define DEF_CTRLHIGH (348*dpiMult)
+#define MIN_CTRLWIDE (440*dpiMult)
+#define MIN_CTRLHIGH (332*dpiMult)
 
 #define INACTIVE(lptr, item) ((lptr)->filetypes && (lptr)->dirsonly && \
 			      (item) >= 0 && (item) < (lptr)->nstr && \
 			      (lptr)->str[(item)][0] != C_DIR && \
 			      (lptr)->str[(item)][0] != C_LNK)
 
-#define BUTTW   71                 /* keep odd for 'half' buttons to work   */
-#define BUTTW8 (BUTTW*3/4)         /* button width on bottom rows if 8 buttons */
-#define BUTTH   24
-#define SBUTTH  21
+#define BUTTW   (71*dpiMult)       /* keep odd for 'half' buttons to work   */
+#define BUTTW8  ((BUTTW*3)/4)      /* button width on bottom rows if 8 buttons */
+#define BUTTH   (24*dpiMult)
+#define SBUTTH  (21*dpiMult)
 
-#define MBWIDTH 112                /* dimensions for menu buttons */
+#define MBWIDTH  (112*dpiMult)     /* dimensions for menu buttons */
 #define MBWIDTH4 ((MBWIDTH*3)/4)   /* button width on top rows if 4 buttons */
-#define MBHEIGHT 19
+#define MBHEIGHT (19*dpiMult)
 
 
 static int ctrl_h;                 /* current height of control window */
@@ -183,7 +183,7 @@ static void ls3d               PARM((LIST *));
 /***************************************************/
 static int CtrlWide()
 {
-  return nList.w + BUTTW + 18;
+  return nList.w + BUTTW + 18 * dpiMult;
 }
 
 
@@ -200,7 +200,7 @@ static int roomForLines(height)
 {
   int num;
 
-  num = (height - 172)/LINEHIGH;
+  num = (height - 172*dpiMult)/LINEHIGH;
   if (num < 1)
     num = 1;
   if (num > MAXNAMES)
@@ -226,7 +226,7 @@ static void arrangeButtons()
     topskip = nList.y + (nList.h - (6*skip + (CHIGH+5))) / 2;
   }
 
-#define R_BX(N) (CtrlWide() + (N) - BUTTW - 1 - 5)
+#define R_BX(N) (CtrlWide() + (N) - BUTTW - (1 + 5) * dpiMult)
 #define R_BY(N) (topskip + (int)((N)*skip))
 
   BTMove(&but[BNEXT],   R_BX(0), R_BY(0));
@@ -322,7 +322,7 @@ void ResizeCtrl(w, h)
   ctrl_h = h;
 
   nlines = roomForLines(h);
-  LSResize(&nList, (w-BUTTW-18), LINEHIGH*nlines, nlines);
+  LSResize(&nList, (w-BUTTW-18*dpiMult), LINEHIGH*nlines, nlines);
   arrangeButtons();
   arrangeMenuButtons();
 }
@@ -409,7 +409,7 @@ void CreateCtrl(geom)
 
   nlines = roomForLines(ctrl_h);
 
-  LSCreate(&nList, ctrlW, 5, 52, (DEF_CTRLWIDE-BUTTW-18),
+  LSCreate(&nList, ctrlW, 5, 52*dpiMult, (DEF_CTRLWIDE-BUTTW-18*dpiMult),
           LINEHIGH*nlines, nlines, dispnames, numnames,
           infofg, infobg, hicol, locol, RedrawNList, FALSE, FALSE);
 
@@ -420,7 +420,7 @@ void CreateCtrl(geom)
 
   /* create top button */
 
-  BTCreate(&but[BXV], ctrlW, 5, 5, 100, (u_int) nList.y - 5 - 2 - 5, "", BCLS);
+  BTCreate(&but[BXV], ctrlW, 5, 5, 100, (u_int) nList.y - (5 + 2 + 5) * dpiMult, "", BCLS);
 
   /* create right-side buttons */
   BTCreate(&but[BNEXT],    ctrlW, 0, 0, BUTTW, SBUTTH, "Next",   BCLS);

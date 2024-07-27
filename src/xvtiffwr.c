@@ -213,12 +213,12 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
 
 /**** Stuff for TIFFDialog box ****/
 
-#define TWIDE 280
-#define THIGH 160
+#define TWIDE (280*dpiMult)
+#define THIGH (160*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int, int, int, int));
 static void clickTD   PARM((int, int));
@@ -237,7 +237,7 @@ static RBUTT *compRB;
 /***************************************************/
 void CreateTIFFW()
 {
-  int y;
+  int x, y;
 
   tiffW = CreateWindow("xv tiff", "XVtiff", NULL,
 		       TWIDE, THIGH, infofg, infobg, FALSE);
@@ -245,23 +245,25 @@ void CreateTIFFW()
 
   XSelectInput(theDisp, tiffW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  BTCreate(&tbut[T_BOK], tiffW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BOK], tiffW, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&tbut[T_BCANC], tiffW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BCANC], tiffW, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
-  y = 55;
-  compRB = RBCreate(NULL, tiffW, 36, y,   "None", infofg, infobg,hicol,locol);
-  RBCreate(compRB, tiffW, 36, y+18,       "LZW", infofg, infobg,hicol,locol);
-  RBCreate(compRB, tiffW, 36, y+36,       "PackBits", infofg, infobg,
+  x = 36*dpiMult;
+  y = 55*dpiMult;
+  compRB = RBCreate(NULL, tiffW, x, y,         "None", infofg, infobg,hicol,locol);
+  RBCreate(compRB, tiffW, x, y + 18*dpiMult,   "LZW", infofg, infobg,hicol,locol);
+  RBCreate(compRB, tiffW, x, y + 36*dpiMult,   "PackBits", infofg, infobg,
            hicol, locol);
-  RBCreate(compRB, tiffW, TWIDE/2, y,     "CCITT Group3", infofg, infobg,
+  x = TWIDE/2;
+  RBCreate(compRB, tiffW, x, y,                "CCITT Group3", infofg, infobg,
 	   hicol, locol);
-  RBCreate(compRB, tiffW, TWIDE/2, y+18,  "CCITT Group4", infofg, infobg,
+  RBCreate(compRB, tiffW, x, y + 18*dpiMult,   "CCITT Group4", infofg, infobg,
 	   hicol, locol);
   if (ALLOW_JPEG) {
-    RBCreate(compRB, tiffW, TWIDE/2, y+36,  "JPEG", infofg, infobg,
+    RBCreate(compRB, tiffW, x, y + 36*dpiMult, "JPEG", infofg, infobg,
 	     hicol, locol);
   }
 
@@ -392,10 +394,10 @@ int x,y,w,h;
 
   for (i=0; i<T_NBUTTS; i++) BTRedraw(&tbut[i]);
 
-  ULineString(tiffW, compRB->x-16, compRB->y-3-DESCENT, "Compression");
+  ULineString(tiffW, compRB->x - 16*dpiMult, compRB->y - 3*dpiMult - DESCENT, "Compression");
   RBRedraw(compRB, -1);
 
-  DrawString(tiffW, 20, 29, title);
+  DrawString(tiffW, 20*dpiMult, 29*dpiMult, title);
 
   XSetClipMask(theDisp, theGC, None);
 }

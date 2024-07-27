@@ -418,16 +418,16 @@ int LoadJPC(char *fname, register PICINFO *pinfo, int quick) {
    complicated data-entry problem, and perhaps someday we can invent a clever
    solution using the rest of the parent window's space.
 */
-#define JP2KW 275 /* Window width, in pixels */
-#define JP2KH 400 /* Window height, in pixels */
-#define BUTTW 51  /* Button width, in pixels (odd for half-toning) */
-#define BUTTH 20  /* Button height, in pixels */
-#define MENUW 75  /* Menu-button width, in pixels (odd for half-toning) */
-#define MENUH 24  /* Menu-button height, in pixels */
-#define RBUTH 20  /* Radio button height, in pixels */
-#define RBUTW 51  /* Radio button width, in pixels (odd for half-toning) */
-#define TEXTH (LINEHIGH + 5) /* Text subwindow height, in pixels */
-#define TEXTW 75			 /* Text subwindow width, in pixels */
+#define JP2KW (275*dpiMult) /* Window width, in pixels */
+#define JP2KH (400*dpiMult) /* Window height, in pixels */
+#define BUTTW (51*dpiMult)  /* Button width, in pixels (odd for half-toning) */
+#define BUTTH (20*dpiMult)  /* Button height, in pixels */
+#define MENUW (75*dpiMult)  /* Menu-button width, in pixels (odd for half-toning) */
+#define MENUH (24*dpiMult)  /* Menu-button height, in pixels */
+#define RBUTH (20*dpiMult)  /* Radio button height, in pixels */
+#define RBUTW (51*dpiMult)  /* Radio button width, in pixels (odd for half-toning) */
+#define TEXTH (LINEHIGH + 5*dpiMult) /* Text subwindow height, in pixels */
+#define TEXTW (75*dpiMult)  /* Text subwindow width, in pixels */
 
 #define J_BOK 0	  /* Boolean "Ok" button */
 #define J_BCANC 1 /* Boolean "Cancel" button */
@@ -478,6 +478,7 @@ void CreateJP2KW(void) {
 		EXP2_0, EXP2_1, EXP2_2,	 EXP2_3,  EXP2_4,  EXP2_5,	EXP2_6,	 EXP2_7,
 		EXP2_8, EXP2_9, EXP2_10, EXP2_11, EXP2_12, EXP2_13, EXP2_14, EXP2_15};
 	static const char hstr[] = {"Height"}, wstr[] = {"Width"};
+	int dx, dy;
 
 	if (!(jp2kW = CreateWindow("xvjp2k", "XVjp2k", 0, JP2KW, JP2KH, infofg,
 							   infobg, 0)))
@@ -487,93 +488,78 @@ void CreateJP2KW(void) {
 	/* Create a row of 2 boolean-valued, regular buttons ("Ok" and "Cancel") in
 	   the window's bottom right corner.
 	*/
-	BTCreate(&button[J_BOK], jp2kW, JP2KW - 2 * BUTTW - 20,
-			 JP2KH - 10 - BUTTH - 1, BUTTW, BUTTH, "Ok", infofg, infobg, hicol,
+	dy = JP2KH - 10*dpiMult - BUTTH - 1*dpiMult;
+	BTCreate(&button[J_BOK], jp2kW, JP2KW - 2 * BUTTW - 20*dpiMult,
+			 dy, BUTTW, BUTTH, "Ok", infofg, infobg, hicol,
 			 locol);
-	BTCreate(&button[J_BCANC], jp2kW, JP2KW - BUTTW - 10,
-			 JP2KH - 10 - BUTTH - 1, BUTTW, BUTTH, "Cancel", infofg, infobg,
+	BTCreate(&button[J_BCANC], jp2kW, JP2KW - BUTTW - 10*dpiMult,
+			 dy, BUTTW, BUTTH, "Cancel", infofg, infobg,
 			 hicol, locol);
 
 	/* Create a vertical column of 8 boolean-valued, check-box buttons (for
 	   encoding-style options) down the window's left side.
 	*/
-	CBCreate(&chkbut[J_CSOP], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 0 * BUTTH, "sop", infofg,
+	dx = 10*dpiMult;
+	dy = 10*dpiMult + ASCENT + SPACING + 2 * LINEHIGH;
+	CBCreate(&chkbut[J_CSOP], jp2kW, dx, dy + 0 * BUTTH, "sop", infofg,
 			 infobg, hicol, locol);
-	CBCreate(&chkbut[J_CEPH], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 1 * BUTTH, "eph", infofg,
+	CBCreate(&chkbut[J_CEPH], jp2kW, dx, dy + 1 * BUTTH, "eph", infofg,
 			 infobg, hicol, locol);
-	CBCreate(&chkbut[J_CLAZY], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 2 * BUTTH, "lazy", infofg,
+	CBCreate(&chkbut[J_CLAZY], jp2kW, dx, dy + 2 * BUTTH, "lazy", infofg,
 			 infobg, hicol, locol);
-	CBCreate(&chkbut[J_CTERM], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 3 * BUTTH, "termall",
+	CBCreate(&chkbut[J_CTERM], jp2kW, dx, dy + 3 * BUTTH, "termall",
 			 infofg, infobg, hicol, locol);
-	CBCreate(&chkbut[J_CSEGS], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 4 * BUTTH, "segsym", infofg,
+	CBCreate(&chkbut[J_CSEGS], jp2kW, dx, dy + 4 * BUTTH, "segsym", infofg,
 			 infobg, hicol, locol);
-	CBCreate(&chkbut[J_CVCAU], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 5 * BUTTH, "vcausal",
+	CBCreate(&chkbut[J_CVCAU], jp2kW, dx, dy + 5 * BUTTH, "vcausal",
 			 infofg, infobg, hicol, locol);
-	CBCreate(&chkbut[J_CPTRM], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 6 * BUTTH, "pterm", infofg,
+	CBCreate(&chkbut[J_CPTRM], jp2kW, dx, dy + 6 * BUTTH, "pterm", infofg,
 			 infobg, hicol, locol);
-	CBCreate(&chkbut[J_CRSTP], jp2kW, 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 7 * BUTTH, "resetprob",
+	CBCreate(&chkbut[J_CRSTP], jp2kW, dx, dy + 7 * BUTTH, "resetprob",
 			 infofg, infobg, hicol, locol);
 	/* Create text subwindows for unsigned decimal integer values. */
 
-	text[J_TGBIT] = XCreateSimpleWindow(theDisp, jp2kW, JP2KW - TEXTW - 10,
-										10 + ASCENT + SPACING + 2 * LINEHIGH +
-											3 * MENUH + 0 * TEXTH,
+	dx = JP2KW - TEXTW - 10*dpiMult;
+	dy = 10*dpiMult + ASCENT + SPACING + 2 * LINEHIGH + 3 * MENUH;
+	text[J_TGBIT] = XCreateSimpleWindow(theDisp, jp2kW, dx, dy + 0 * TEXTH,
 										TEXTW, TEXTH, 1, infofg, infobg);
 	XSelectInput(theDisp, text[J_TGBIT], ExposureMask | KeyPressMask);
-	text[J_TRES] = XCreateSimpleWindow(theDisp, jp2kW, JP2KW - TEXTW - 10,
-									   10 + ASCENT + SPACING + 2 * LINEHIGH +
-										   3 * MENUH + 1 * TEXTH,
+	text[J_TRES] = XCreateSimpleWindow(theDisp, jp2kW, dx, dy + 1 * TEXTH,
 									   TEXTW, TEXTH, 1, infofg, infobg);
 	XSelectInput(theDisp, text[J_TRES], ExposureMask | KeyPressMask);
-	text[J_TRATE] = XCreateSimpleWindow(theDisp, jp2kW, JP2KW - TEXTW - 10,
-										10 + ASCENT + SPACING + 2 * LINEHIGH +
-											3 * MENUH + 2 * TEXTH,
+	text[J_TRATE] = XCreateSimpleWindow(theDisp, jp2kW, dx, dy + 2 * TEXTH,
 										TEXTW, TEXTH, 1, infofg, infobg);
 	XSelectInput(theDisp, text[J_TRATE], ExposureMask | KeyPressMask);
 
 	/* Create a row of 2 boolean-valued radio buttons (for the "Rate" subwindow
 	   value's unit of measure).  The 1st button is "selected" by default.
 	*/
-	radio = RBCreate(0, jp2kW, JP2KW - 19 * RBUTW / 8 - 10,
-					 10 + ASCENT + SPACING + 2 * LINEHIGH + 3 * MENUH +
-						 3 * TEXTH + 4,
+	radio = RBCreate(0, jp2kW, JP2KW - 19 * RBUTW / 8 - 10*dpiMult, dy + 3 * TEXTH + 4*dpiMult,
 					 "Percent", infofg, infobg, hicol, locol);
-	(void)RBCreate(radio, jp2kW, JP2KW - 1 * RBUTW - 10,
-				   10 + ASCENT + SPACING + 2 * LINEHIGH + 3 * MENUH +
-					   3 * TEXTH + 4,
+	(void)RBCreate(radio, jp2kW, JP2KW - 1 * RBUTW - 10 * dpiMult, dy + 3 * TEXTH + 4*dpiMult,
 				   "Bytes", infofg, infobg, hicol, locol);
 
 	/* Create pop-up menu-selection buttons after mapping the above subwindows,
 	   since we don't want the pop-up menus mapped unless the corresponding
 	   button is selected.
 	*/
+	dx = JP2KW - 2 * MENUW - 10*dpiMult;
+	dy = 10*dpiMult + ASCENT + SPACING + 2 * LINEHIGH;
 	XMapSubwindows(theDisp, jp2kW);
-	MBCreate(&menu[J_MCBXW], jp2kW, JP2KW - 2 * MENUW - 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 0 * MENUH, MENUW, MENUH,
+	MBCreate(&menu[J_MCBXW], jp2kW, dx, dy + 0 * MENUH, MENUW, MENUH,
 			 wstr, CBoxList, sizeof CBoxList / sizeof *CBoxList, infofg, infobg,
 			 hicol, locol);
-	MBCreate(&menu[J_MCBXH], jp2kW, JP2KW - 2 * MENUW - 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 1 * MENUH, MENUW, MENUH,
+	MBCreate(&menu[J_MCBXH], jp2kW, dx, dy + 1 * MENUH, MENUW, MENUH,
 			 hstr, CBoxList, sizeof CBoxList / sizeof *CBoxList, infofg, infobg,
 			 hicol, locol);
-	MBCreate(&menu[J_MPREW], jp2kW, JP2KW - 1 * MENUW - 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 0 * MENUH, MENUW, MENUH,
+	dx = JP2KW - 1 * MENUW - 10*dpiMult;
+	MBCreate(&menu[J_MPREW], jp2kW, dx, dy + 0 * MENUH, MENUW, MENUH,
 			 wstr, PrecList, sizeof PrecList / sizeof *PrecList, infofg, infobg,
 			 hicol, locol);
-	MBCreate(&menu[J_MPREH], jp2kW, JP2KW - 1 * MENUW - 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 1 * MENUH, MENUW, MENUH,
+	MBCreate(&menu[J_MPREH], jp2kW, dx, dy + 1 * MENUH, MENUW, MENUH,
 			 hstr, PrecList, sizeof PrecList / sizeof *PrecList, infofg, infobg,
 			 hicol, locol);
-	MBCreate(&menu[J_MPROG], jp2kW, JP2KW - 1 * MENUW - 10,
-			 10 + ASCENT + SPACING + 2 * LINEHIGH + 2 * MENUH, MENUW, MENUH,
+	MBCreate(&menu[J_MPROG], jp2kW, dx, dy + 2 * MENUH, MENUW, MENUH,
 			 "Order", ProgList, sizeof ProgList / sizeof *ProgList, infofg,
 			 infobg, hicol, locol);
 
@@ -858,19 +844,19 @@ static void TWRedraw(Window w, unsigned int val) {
 	*/
 	sprintf(buf, "%u", val);
 	if (ctrlColor)
-		XClearArea(theDisp, w, 2, 2, TEXTW - 4, TEXTH - 4, False);
+		XClearArea(theDisp, w, 2*dpiMult, 2*dpiMult, TEXTW - 4*dpiMult, TEXTH - 4*dpiMult, False);
 	else
 		XClearWindow(theDisp, w);
-	Draw3dRect(w, 0, 0, TEXTW - 1, TEXTH - 1, R3D_IN, 2, hicol, locol, infobg);
+	Draw3dRect(w, 0, 0, TEXTW - 1*dpiMult, TEXTH - 1*dpiMult, R3D_IN, 2, hicol, locol, infobg);
 	XSetForeground(theDisp, theGC, infofg);
-	XDrawString(theDisp, w, theGC, 3, ASCENT + 3, buf, i = strlen(buf));
+	XDrawString(theDisp, w, theGC, 3*dpiMult, ASCENT + 3*dpiMult, buf, i = strlen(buf));
 
 	/* Draw a "cursor" icon after the numeric string. */
 
 	i = XTextWidth(mfinfo, buf, i);
-	XDrawLine(theDisp, w, theGC, i + 3, 2, i + 3, 2 + CHIGH + 1);
-	XDrawLine(theDisp, w, theGC, i + 3, 2 + CHIGH + 1, i + 5, 2 + CHIGH + 3);
-	XDrawLine(theDisp, w, theGC, i + 3, 2 + CHIGH + 1, i + 1, 2 + CHIGH + 3);
+	XDrawLine(theDisp, w, theGC, i + 3*dpiMult, 2*dpiMult,                     i + 3*dpiMult, 2*dpiMult + CHIGH + 1*dpiMult);
+	XDrawLine(theDisp, w, theGC, i + 3*dpiMult, 2*dpiMult + CHIGH + 1*dpiMult, i + 5*dpiMult, 2*dpiMult + CHIGH + 3*dpiMult);
+	XDrawLine(theDisp, w, theGC, i + 3*dpiMult, 2*dpiMult + CHIGH + 1*dpiMult, i + 1*dpiMult, 2*dpiMult + CHIGH + 3*dpiMult);
 }
 
 int JP2KCheckEvent(register XEvent *xev) {
@@ -911,25 +897,25 @@ int JP2KCheckEvent(register XEvent *xev) {
 			while (--i >= 0)
 				MBRedraw(&menu[i]);
 			RBRedraw(radio, -1);
-			DrawString(jp2kW, 10, 10 + ASCENT, "Save JPEG 2000 File...");
-			DrawString(jp2kW, 10, 10 + ASCENT + 2 * LINEHIGH, "Style options:");
-			DrawString(jp2kW, JP2KW - 2 * MENUW - 10,
-					   10 + ASCENT + 2 * LINEHIGH, "Coding Blk");
-			DrawString(jp2kW, JP2KW - 1 * MENUW - 10,
-					   10 + ASCENT + 2 * LINEHIGH, "  Precinct");
-			DrawString(jp2kW, JP2KW - 2 * MENUW - 10,
-					   10 + ASCENT + SPACING + 3 * LINEHIGH + 2 * MENUH,
+			DrawString(jp2kW, 10*dpiMult, 10*dpiMult + ASCENT, "Save JPEG 2000 File...");
+			DrawString(jp2kW, 10*dpiMult, 10*dpiMult + ASCENT + 2 * LINEHIGH, "Style options:");
+			DrawString(jp2kW, JP2KW - 2 * MENUW - 10*dpiMult,
+					   10*dpiMult + ASCENT + 2 * LINEHIGH, "Coding Blk");
+			DrawString(jp2kW, JP2KW - 1 * MENUW - 10*dpiMult,
+					   10*dpiMult + ASCENT + 2 * LINEHIGH, "  Precinct");
+			DrawString(jp2kW, JP2KW - 2 * MENUW - 10*dpiMult,
+					   10*dpiMult + ASCENT + SPACING + 3 * LINEHIGH + 2 * MENUH,
 					   "Progression:");
-			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10,
-					   10 + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
+			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10*dpiMult,
+					   10*dpiMult + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
 						   0 * TEXTH,
 					   "Guard bits:");
-			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10,
-					   10 + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
+			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10*dpiMult,
+					   10*dpiMult + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
 						   1 * TEXTH,
 					   "Res levels:");
-			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10,
-					   10 + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
+			DrawString(jp2kW, JP2KW - 2 * TEXTW - 10*dpiMult,
+					   10*dpiMult + ASCENT + SPACING + 3 * LINEHIGH + 3 * MENUH +
 						   2 * TEXTH,
 					   "Rate:");
 			XSetClipMask(theDisp, theGC, None);

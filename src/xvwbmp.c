@@ -171,11 +171,12 @@ int WriteWBMP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
 	bit |= (((pic[i]&1)<<(7-(count++))));
 	if (count == 8) {
 	    putc(bit, fp);
+	    bit = 0;
 	    count = 0;
 	}
     }
 
-    if (!count) {
+    if (count > 0) {
 	putc(bit, fp);
     }
 

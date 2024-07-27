@@ -35,27 +35,27 @@
 #endif
 
 
-#define DEF_DIRWIDE 350            /* initial size of directory window */
-#define DEF_DIRHIGH 400
-#define MIN_DIRWIDE 330
-#define MIN_DIRHIGH 300
+#define DEF_DIRWIDE (350*dpiMult)  /* initial size of directory window */
+#define DEF_DIRHIGH (400*dpiMult)
+#define MIN_DIRWIDE (330*dpiMult)
+#define MIN_DIRHIGH (300*dpiMult)
 
-#define DLIST_X  10                /* left of directory list box */
-#define DLIST_Y  30                /* top of directory list box */
-#define DNAM_X   80                /* left of filename box */
+#define DLIST_X  (10*dpiMult)      /* left of directory list box */
+#define DLIST_Y  (30*dpiMult)      /* top of directory list box */
+#define DNAM_X   (80*dpiMult)      /* left of filename box */
 
 #define NLINES   15                /* initial # of lines in list control (keep odd) */
-#define BUTTW    80                /* width of buttons */
-#define BUTTH    24                /* height of buttons */
-#define MBDIRPAD 10                /* space around directory name in menu button */
-#define DNAMMORE 3                 /* width of "more off screen" markers */
+#define BUTTW    (80*dpiMult)      /* width of buttons */
+#define BUTTH    (24*dpiMult)      /* height of buttons */
+#define MBDIRPAD (10*dpiMult)      /* space around directory name in menu button */
+#define DNAMMORE (3*dpiMult)       /* width of "more off screen" markers */
 #define MAXDEEP  30                /* max num of directories in cwd path */
 #define MAXFNLEN 256               /* max len of filename being entered */
 
 #define FMTLABEL "Format:"         /* label shown next to fmtMB */
 #define COLLABEL "Colors:"         /* label shown next to colMB */
-#define FMTWIDE  150               /* width of fmtMB */
-#define COLWIDE  150               /* width of colMB */
+#define FMTWIDE  (150*dpiMult)     /* width of fmtMB */
+#define COLWIDE  (150*dpiMult)     /* width of colMB */
 
 /* NOTE: make sure these match up with F_* definitions in xv.h */
 static const char *saveColors[] = { "Full Color",
@@ -116,9 +116,6 @@ static const char *saveFormats[] = {
 					MBSEP,
 					"Filename List" };
 
-#ifdef HAVE_PIC2
-extern int PIC2SaveParams       PARM((char *, int));
-#endif
 
 static int  DirHigh             PARM((void));
 static int  DirWide             PARM((void));
@@ -193,7 +190,7 @@ static int DirHigh()
 /***************************************************/
 static int DirWide()
 {
-  return dList.w + 113;
+  return dList.w + 113*dpiMult;
 }
 
 
@@ -203,7 +200,7 @@ static int roomForLines(height)
 {
   int num;
 
-  num = (height - (dList.y + 66))/LINEHIGH;
+  num = (height - (dList.y + 66*dpiMult))/LINEHIGH;
   if (num < 1)
     num = 1;
   if (num > MAXNAMES)
@@ -222,7 +219,7 @@ void ResizeDirW(w, h)
   dir_h = h;
 
   nlines = roomForLines(h);
-  LSResize(&dList, w - 113, LINEHIGH*nlines, nlines);
+  LSResize(&dList, w - 113*dpiMult, LINEHIGH*nlines, nlines);
   arrangeElements(savemode);
   showFName();
 }
@@ -231,14 +228,14 @@ void ResizeDirW(w, h)
 /***************************************************/
 static int DNamWide()
 {
-  return DirWide() - 100;
+  return DirWide() - 100*dpiMult;
 }
 
 
 /***************************************************/
 static int DNamY()
 {
-  return DirHigh() - (10 + 2 + LINEHIGH+5);
+  return DirHigh() - (10*dpiMult + 2*dpiMult + LINEHIGH + 5*dpiMult);
 }
 
 
@@ -260,7 +257,7 @@ void CreateDirW()
 
   nlines = roomForLines(dir_h);
 
-  LSCreate(&dList, dirW, DLIST_X, 5 + 3*(6+LINEHIGH) + 6, DEF_DIRWIDE - 113,
+  LSCreate(&dList, dirW, DLIST_X, 5*dpiMult + 3*(6*dpiMult + LINEHIGH) + 6*dpiMult, DEF_DIRWIDE - 113*dpiMult,
 	   LINEHIGH*nlines, nlines, fnames, numfnames, infofg, infobg,
 	   hicol, locol, RedrawDList, TRUE, FALSE);
 
@@ -301,17 +298,17 @@ void CreateDirW()
    * create MBUTTs *after* calling XMapSubWindows() to keep popup unmapped
    */
 
-  MBCreate(&dirMB, dirW, 0, 0, 1, 1,
+  MBCreate(&dirMB, dirW, 0, 0, 1*dpiMult, 1*dpiMult,
 	   NULL, NULL, 0,
 	   infofg,infobg,hicol,locol);
 
-  MBCreate(&fmtMB, dirW, 0, 0, 1, 1,
+  MBCreate(&fmtMB, dirW, 0, 0, 1*dpiMult, 1*dpiMult,
 	   NULL, saveFormats, F_MAXFMTS,
 	   infofg,infobg,hicol,locol);
   fmtMB.hascheck = 1;
   MBSelect(&fmtMB, 0);
 
-  MBCreate(&colMB, dirW, 0, 0, 1, 1,
+  MBCreate(&colMB, dirW, 0, 0, 1*dpiMult, 1*dpiMult,
 	   NULL, saveColors, F_MAXCOLORS,
 	   infofg,infobg,hicol,locol);
   colMB.hascheck = 1;
@@ -422,27 +419,27 @@ static void arrangeElements(savemode)
   szdiff = dList.h - (nbts * BUTTH);
   gap    = szdiff / ngaps;
 
-  if (gap>16) {
-    gap = 16;
+  if (gap>16*dpiMult) {
+    gap = 16*dpiMult;
     top = dList.y + (dList.h - (nbts*BUTTH) - (ngaps*gap))/2;
 
     for (i=0; i<nbts; i++)
       BTMove(&dbut[i],
-             dList.x + dList.w + 12,
+             dList.x + dList.w + 12*dpiMult,
              top + i*(BUTTH+gap));
   }
   else {
     for (i=0; i<nbts; i++)
       BTMove(&dbut[i],
-             dList.x + dList.w + 12,
+             dList.x + dList.w + 12*dpiMult,
              dList.y + ((dList.h-BUTTH)*i) / ngaps);
   }
 
   /* checkboxes */
 
-  CBMove(&browseCB, DirWide()/2, dList.y + (int) dList.h + 6);
-  CBMove(&savenormCB, 220, dList.y + (int) dList.h + 6);
-  CBMove(&saveselCB, 80, dList.y + (int) dList.h + 6);
+  CBMove(&browseCB,   DirWide()/2, dList.y + (int) dList.h + 6*dpiMult);
+  CBMove(&savenormCB, 220*dpiMult, dList.y + (int) dList.h + 6*dpiMult);
+  CBMove(&saveselCB,   80*dpiMult, dList.y + (int) dList.h + 6*dpiMult);
 
   /* filename box */
 
@@ -454,15 +451,15 @@ static void arrangeElements(savemode)
 
   MBChange(&dirMB,
            dList.x + dList.w/2 - dirMB.w/2,
-	   dList.y - (LINEHIGH+6),
+	   dList.y - (LINEHIGH + 6*dpiMult),
 	   (u_int) dirMB.w, (u_int) LINEHIGH);
 
   MBChange(&fmtMB,
-           DirWide()-FMTWIDE-10, 5,
+           DirWide() - FMTWIDE - 10*dpiMult, 5*dpiMult,
 	   (u_int) FMTWIDE, (u_int) LINEHIGH);
 
   MBChange(&colMB,
-           DirWide()-COLWIDE-10, 5+LINEHIGH+6,
+           DirWide() - COLWIDE - 10*dpiMult, 5*dpiMult + LINEHIGH + 6*dpiMult,
 	   (u_int) COLWIDE, (u_int) LINEHIGH);
 }
 
@@ -483,29 +480,29 @@ void RedrawDirW(x, y, w, h)
   else
     sprintf(foo, "%d files", dList.nstr);
 
-  ypos = dList.y + dList.h + 8 + ASCENT;
+  ypos = dList.y + dList.h + 8*dpiMult + ASCENT;
   XSetForeground(theDisp, theGC, infobg);
-  XFillRectangle(theDisp, dirW, theGC, 10, ypos-ASCENT,
+  XFillRectangle(theDisp, dirW, theGC, 10*dpiMult, ypos-ASCENT,
 		 (u_int) DirWide(), (u_int) CHIGH);
   XSetForeground(theDisp, theGC, infofg);
-  DrawString(dirW, 10, ypos, foo);
+  DrawString(dirW, 10*dpiMult, ypos, foo);
 
 
   if (dirUp == BLOAD)
     str = "Load file:";
   else
     str = "Save file:";
-  DrawString(dirW, 10, DNamY() + 1 + ASCENT + 3, str);
+  DrawString(dirW, 10*dpiMult, DNamY() + 1*dpiMult + ASCENT + 3*dpiMult, str);
 
   /* draw dividing line */
   XSetForeground(theDisp,    theGC, infofg);
-  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-6, DirWide(), dirMB.y-6);
+  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y - 6*dpiMult, DirWide(), dirMB.y - 6*dpiMult);
   if (ctrlColor) {
     XSetForeground(theDisp,  theGC, locol);
-    XDrawLine(theDisp, dirW, theGC, 0, dirMB.y-5, DirWide(), dirMB.y-5);
+    XDrawLine(theDisp, dirW, theGC, 0, dirMB.y - 5*dpiMult, DirWide(), dirMB.y - 5*dpiMult);
     XSetForeground(theDisp,  theGC, hicol);
   }
-  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y-4, DirWide(), dirMB.y-4);
+  XDrawLine(theDisp, dirW,   theGC, 0, dirMB.y - 4*dpiMult, DirWide(), dirMB.y - 4*dpiMult);
 
 
 
@@ -523,23 +520,23 @@ void RedrawDirW(x, y, w, h)
 
   if (!savemode) {
     XCopyArea(theDisp, d_loadPix, dirW, theGC, 0,0,d_load_width,d_load_height,
-	      10, (dirMB.y-6)/2 - d_load_height/2);
+	      10, (dirMB.y - 6*dpiMult)/2 - d_load_height/2);
 
     XSetFillStyle(theDisp, theGC, FillStippled);
     XSetStipple(theDisp, theGC, dimStip);
-    DrawString(dirW, fmtMB.x-6-txtw, 5+3+ASCENT, FMTLABEL);
-    DrawString(dirW, fmtMB.x-6-txtw, 5+3+ASCENT + (LINEHIGH+6), COLLABEL);
+    DrawString(dirW, fmtMB.x - 6*dpiMult - txtw, 5*dpiMult + 3*dpiMult + ASCENT, FMTLABEL);
+    DrawString(dirW, fmtMB.x - 6*dpiMult - txtw, 5*dpiMult + 3*dpiMult + ASCENT + (LINEHIGH + 6*dpiMult), COLLABEL);
     XSetFillStyle(theDisp,theGC,FillSolid);
 
     CBRedraw(&browseCB);
   }
   else {
     XCopyArea(theDisp, d_savePix, dirW, theGC, 0,0,d_save_width,d_save_height,
-	      10, (dirMB.y-6)/2 - d_save_height/2);
+	      10*dpiMult, (dirMB.y - 6*dpiMult)/2 - d_save_height/2);
 
     XSetForeground(theDisp, theGC, infofg);
-    DrawString(dirW, fmtMB.x-6-txtw, 5+3+ASCENT, FMTLABEL);
-    DrawString(dirW, fmtMB.x-6-txtw, 5+3+ASCENT + (LINEHIGH+6), COLLABEL);
+    DrawString(dirW, fmtMB.x - 6*dpiMult - txtw, 5*dpiMult + 3*dpiMult + ASCENT, FMTLABEL);
+    DrawString(dirW, fmtMB.x - 6*dpiMult - txtw, 5*dpiMult + 3*dpiMult + ASCENT + (LINEHIGH + 6*dpiMult), COLLABEL);
 
     CBRedraw(&savenormCB);
     CBRedraw(&saveselCB);
@@ -619,7 +616,7 @@ int ClickDirW(x, y, button)
              dname = namelist[numnames];
 
              /* figure out how much of name can be shown */
-             if (StringWidth(dname) > (nList.w-10-16)) {   /* truncate */
+             if (StringWidth(dname) > (nList.w - 10*dpiMult - 16*dpiMult)) {   /* truncate */
                char *tmp;
                int   prelen = 0;
 
@@ -630,7 +627,7 @@ int ClickDirW(x, y, button)
 
                  tmp++;                   /* move to char following the '/' */
                  prelen = tmp - dname;
-                 if (StringWidth(tmp) <= (nList.w-10-16)) break; /* cool now */
+                 if (StringWidth(tmp) <= (nList.w - 10*dpiMult - 16*dpiMult)) break; /* cool now */
                }
                dispnames[numnames] = dname + prelen;
              }
@@ -668,7 +665,7 @@ int ClickDirW(x, y, button)
     if (x > DNAM_X &&
         x < DNAM_X + DNamWide()+2*DNAMMORE &&
         y > DNamY() &&
-        y < DNamY() + LINEHIGH+5) {
+        y < DNamY() + LINEHIGH + 5*dpiMult) {
       Window dummy_root, dummy_child;
       int dummy_rx, dummy_ry;
       int wx, wy;
@@ -678,7 +675,7 @@ int ClickDirW(x, y, button)
 
       /* make coordinates relative to dnamW */
       /* left side plus the border plus the space for the "more stuff" sign */
-      clkx_start = x - (DNAM_X + 1 + DNAMMORE);
+      clkx_start = x - (DNAM_X + 1*dpiMult + DNAMMORE);
       pos_start = posOfCoordinate(clkx_start);
 
       clkx_now = clkx_start;
@@ -689,7 +686,7 @@ int ClickDirW(x, y, button)
                            &wx, &wy, &mask)) {
         if (!(mask & Button1Mask)) break;    /* button released */
 
-        clkx_now = wx - (DNAM_X + 1 + DNAMMORE);
+        clkx_now = wx - (DNAM_X + 1*dpiMult + DNAMMORE);
         pos_prev = pos_now;
         pos_now = posOfCoordinate(clkx_now);
 
@@ -722,12 +719,12 @@ int ClickDirW(x, y, button)
     if (x > DNAM_X &&
         x < DNAM_X + DNamWide()+2*DNAMMORE &&
         y > DNamY() &&
-        y < DNamY() + LINEHIGH+5) {
+        y < DNamY() + LINEHIGH + 5*dpiMult) {
       int   clkx;
       char *text;
 
       /* make coordinates relative to dnamW */
-      clkx = x - (DNAM_X + 1 + DNAMMORE); /* left side plus the border plus the space for the "more stuff" sign */
+      clkx = x - (DNAM_X + 1*dpiMult + DNAMMORE); /* left side plus the border plus the space for the "more stuff" sign */
       moveInsertionPoint(clkx);
 
       text = GetPrimaryText();
@@ -753,7 +750,7 @@ int DoubleClickDirW(x, y, button)
       x > DNAM_X &&
       x < DNAM_X + DNamWide()+2*DNAMMORE &&
       y > DNamY() &&
-      y < DNamY() + LINEHIGH+5) {
+      y < DNamY() + LINEHIGH + 5*dpiMult) {
     SelectAllDirW();
     return -1;
   }
@@ -767,7 +764,7 @@ static int posOfCoordinate(clkx)
   int dx, pos;
 
   for (pos=stPos; pos < enPos; pos++) {
-    if (XTextWidth(mfinfo, &filename[stPos], pos-stPos) + 1 > clkx)
+    if (XTextWidth(mfinfo, &filename[stPos], pos-stPos) + 1*dpiMult > clkx)
       break;
   }
   /* if we are more than halfway past this char, put the insertion point after it */
@@ -1051,7 +1048,7 @@ void LoadCurrentDirectory()
   dirMB.list = dirMBlist;
   dirMB.nlist = ndirs;
   XClearArea(theDisp, dirMB.win, dirMB.x, dirMB.y,
-	     (u_int) dirMB.w+3, (u_int) dirMB.h+3, False);
+	     (u_int) dirMB.w + 3*dpiMult, (u_int) dirMB.h + 3*dpiMult, False);
   dirMB.w = StringWidth(dirMBlist[0]) + 2*MBDIRPAD;
   arrangeElements(savemode);
   MBRedraw(&dirMB);
@@ -1499,7 +1496,7 @@ void RedrawDNamW()
 
   /* draw substring filename[stPos:enPos] and cursor */
 
-  Draw3dRect(dnamW, 0, 0, (u_int) DNamWide()+2*DNAMMORE-1, (u_int) LINEHIGH+4, R3D_IN, 2,
+  Draw3dRect(dnamW, 0, 0, (u_int) DNamWide() + 2*DNAMMORE - 1*dpiMult, (u_int) LINEHIGH + 4*dpiMult, R3D_IN, 2,
 	     hicol, locol, infobg);
 
   XSetForeground(theDisp, theGC, infofg);
@@ -1508,45 +1505,45 @@ void RedrawDNamW()
   if (selLen == 0 ||
       selPos + selLen < stPos ||
       selPos > enPos) {
-    XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[stPos], enPos-stPos);
+    XDrawString(theDisp, dnamW, theGC, xoff, ASCENT + 3*dpiMult, &filename[stPos], enPos-stPos);
   } else {
     if (selPos > stPos) {
-      XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[stPos], selPos-stPos);
+      XDrawString(theDisp, dnamW, theGC, xoff, ASCENT + 3*dpiMult, &filename[stPos], selPos-stPos);
       xoff += XTextWidth(mfinfo, &filename[stPos], selPos-stPos);
     }
     if (selPos + selLen > enPos) {
       XSetForeground(theDisp, theGC, infobg);
       XSetBackground(theDisp, theGC, infofg);
-      XDrawImageString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos], enPos-selPos);
+      XDrawImageString(theDisp, dnamW, theGC, xoff, ASCENT + 3*dpiMult, &filename[selPos], enPos-selPos);
       XSetForeground(theDisp, theGC, infofg);
       XSetBackground(theDisp, theGC, infobg);
     } else {
       XSetForeground(theDisp, theGC, infobg);
       XSetBackground(theDisp, theGC, infofg);
-      XDrawImageString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos], selLen);
+      XDrawImageString(theDisp, dnamW, theGC, xoff, ASCENT + 3*dpiMult, &filename[selPos], selLen);
       xoff += XTextWidth(mfinfo, &filename[selPos], selLen);
       XSetForeground(theDisp, theGC, infofg);
       XSetBackground(theDisp, theGC, infobg);
-      XDrawString(theDisp, dnamW, theGC, xoff,ASCENT+3, &filename[selPos + selLen], enPos - (selPos + selLen));
+      XDrawString(theDisp, dnamW, theGC, xoff, ASCENT + 3*dpiMult, &filename[selPos + selLen], enPos - (selPos + selLen));
     }
   }
 
   /* draw a "there's more over here" doowah on the left */
   if (stPos > 0)
     for (i=0; i<DNAMMORE; i++)
-      XDrawLine(theDisp, dnamW, theGC, i,0,i,LINEHIGH+5);
+      XDrawLine(theDisp, dnamW, theGC, i*dpiMult, 0, i*dpiMult, LINEHIGH + 5*dpiMult);
 
   /* draw a "there's more over here" doowah on the right */
   if ((size_t) enPos < strlen(filename))
     for (i=0; i<DNAMMORE; i++)
-      XDrawLine(theDisp, dnamW, theGC, DNamWide()+DNAMMORE+i,0,DNamWide()+DNAMMORE+i,LINEHIGH+5);
+      XDrawLine(theDisp, dnamW, theGC, DNamWide() + DNAMMORE + i*dpiMult, 0, DNamWide() + DNAMMORE + i*dpiMult, LINEHIGH + 5*dpiMult);
 
   /* draw insertion point */
   if (selLen == 0) {
     cpos = DNAMMORE + XTextWidth(mfinfo, &filename[stPos], curPos-stPos);
-    XDrawLine(theDisp, dnamW, theGC, cpos, 2,         cpos,   2+CHIGH+1);
-    XDrawLine(theDisp, dnamW, theGC, cpos, 2+CHIGH+1, cpos+2, 2+CHIGH+3);
-    XDrawLine(theDisp, dnamW, theGC, cpos, 2+CHIGH+1, cpos-2, 2+CHIGH+3);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2*dpiMult,                     cpos,             2*dpiMult + CHIGH + 1*dpiMult);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2*dpiMult + CHIGH + 1*dpiMult, cpos + 2*dpiMult, 2*dpiMult + CHIGH + 3*dpiMult);
+    XDrawLine(theDisp, dnamW, theGC, cpos, 2*dpiMult + CHIGH + 1*dpiMult, cpos - 2*dpiMult, 2*dpiMult + CHIGH + 3*dpiMult);
   }
 }
 
@@ -1796,6 +1793,13 @@ int DoSave()
 		     picComments);
     break;
 #endif /* HAVE_PI */
+  default:
+    {
+      char str[256];
+      sprintf(str, "Saving to '%s' is not supported.", saveFormats[ fmt ]);
+      ErrPopUp(str, "\nOk");
+    }
+   break;
   }
 
 
@@ -1862,7 +1866,7 @@ static void showFName()
      or if that is maxed out, then decrement stPos
      (and leave 1 pixel of room for the insertion point) */
 
-  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1 <= DNamWide()) {
+  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1*dpiMult <= DNamWide()) {
     if (enPos < len) enPos++;
     else if (stPos > 0) stPos--;
     else break; /* string completely visible */
@@ -1871,16 +1875,16 @@ static void showFName()
   /* while substring is longer than window, dec enpos, unless enpos==curpos,
      in which case, inc stpos */
 
-  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1 > DNamWide()) {
+  while (XTextWidth(mfinfo, &filename[stPos], enPos-stPos) + 1*dpiMult > DNamWide()) {
     if (enPos > curPos) enPos--;
     else if (stPos < curPos) stPos++;
     else break; /* did our best ... maybe one really wide character? */
   }
 
 
-  if (ctrlColor) XClearArea(theDisp, dnamW, 2,2,
-			    (u_int) DNamWide()+(2*DNAMMORE-1)-3,
-			    (u_int) LINEHIGH+(5-1)-3, False);
+  if (ctrlColor) XClearArea(theDisp, dnamW, 2*dpiMult, 2*dpiMult,
+			    (u_int) DNamWide() + (2*DNAMMORE - 1*dpiMult) - 3*dpiMult,
+			    (u_int) LINEHIGH + ((5-1)-3)*dpiMult, False);
   else XClearWindow(theDisp, dnamW);
 
   RedrawDNamW();

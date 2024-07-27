@@ -18,21 +18,21 @@
 #include "bits/h_desat"
 
 
-#define GAMW 664
-#define GAMH 518
+#define GAMW (664 * dpiMult)
+#define GAMH (518 * dpiMult)
 
-#define GAMbutF 386
+#define GAMbutF (386 * dpiMult)
 
-#define CMAPX  10
-#define CMAPY  17
-#define CMAPCW 12
-#define CMAPCH  9
+#define CMAPX  (10 * dpiMult)
+#define CMAPY  (17 * dpiMult)
+#define CMAPCW (12 * dpiMult)
+#define CMAPCH ( 9 * dpiMult)
 #define CMAPW  (CMAPCW * 16)
 #define CMAPH  (CMAPCH * 16)
 
 #define MAXUNDO 32
 
-#define BUTTH   23
+#define BUTTH   (23 * dpiMult)
 #define N_HMAP   6     /* # of Hue modification remappings */
 
 #define N_HDBUTT 5
@@ -57,7 +57,7 @@
 #define HD_BUTTS  0x80
 #define HD_ALL   (HD_FRAME | HD_HANDS | HD_DIR | HD_VALS | HD_TITLE | HD_BUTTS)
 
-#define HD_RADIUS 30   /* radius of bounding circle of HDIALs */
+#define HD_RADIUS (30 * dpiMult)   /* radius of bounding circle of HDIALs */
 
 #define DEG2RAD (3.14159 / 180.0)
 #define RAD2DEG (180.0 / 3.14159)
@@ -170,16 +170,16 @@ static void build_hremap     PARM((void));
 
 
 
-#define CMAPF_WIDE 212
-#define CMAPF_HIGH 322
-#define BUTF_WIDE  212
-#define BUTF_HIGH   96
-#define MODF_WIDE  212
-#define MODF_HIGH   70
-#define HSVF_WIDE  205
-#define HSVF_HIGH  500
-#define RGBF_WIDE  185
-#define RGBF_HIGH  500
+#define CMAPF_WIDE (212 * dpiMult)
+#define CMAPF_HIGH (322 * dpiMult)
+#define BUTF_WIDE  (212 * dpiMult)
+#define BUTF_HIGH  ( 96 * dpiMult)
+#define MODF_WIDE  (212 * dpiMult)
+#define MODF_HIGH  ( 70 * dpiMult)
+#define HSVF_WIDE  (205 * dpiMult)
+#define HSVF_HIGH  (500 * dpiMult)
+#define RGBF_WIDE  (185 * dpiMult)
+#define RGBF_HIGH  (500 * dpiMult)
 
 
 #undef TIMING_TEST
@@ -219,15 +219,15 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 		      GAMW, GAMH, infofg,infobg, FALSE);
   if (!gamW) FatalError("can't create cedit window!");
 
-  cmapF = XCreateSimpleWindow(theDisp,gamW, 10,   8,CMAPF_WIDE,CMAPF_HIGH,
+  cmapF = XCreateSimpleWindow(theDisp,gamW,  10*dpiMult,   8*dpiMult,CMAPF_WIDE,CMAPF_HIGH,
 			      1,infofg,infobg);
-  butF  = XCreateSimpleWindow(theDisp,gamW, 10, 336,BUTF_WIDE,BUTF_HIGH,
+  butF  = XCreateSimpleWindow(theDisp,gamW,  10*dpiMult, 336*dpiMult,BUTF_WIDE,BUTF_HIGH,
 			      1,infofg,infobg);
-  modF  = XCreateSimpleWindow(theDisp,gamW, 10, 438,MODF_WIDE,MODF_HIGH,
+  modF  = XCreateSimpleWindow(theDisp,gamW,  10*dpiMult, 438*dpiMult,MODF_WIDE,MODF_HIGH,
 			      1,infofg,infobg);
-  hsvF  = XCreateSimpleWindow(theDisp,gamW, 242,  8,HSVF_WIDE,HSVF_HIGH,
+  hsvF  = XCreateSimpleWindow(theDisp,gamW, 242*dpiMult,   8*dpiMult,HSVF_WIDE,HSVF_HIGH,
 			      1,infofg,infobg);
-  rgbF  = XCreateSimpleWindow(theDisp,gamW, 467,  8,RGBF_WIDE,RGBF_HIGH,
+  rgbF  = XCreateSimpleWindow(theDisp,gamW, 467*dpiMult,   8*dpiMult,RGBF_WIDE,RGBF_HIGH,
 			      1,infofg,infobg);
 
   if (!cmapF || !butF || !modF || !hsvF || !rgbF)
@@ -254,25 +254,25 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   /********** COLORMAP editing doo-wahs ***********/
 
 
-  BTCreate(&gbut[G_BCOLUNDO], cmapF, 5, 165, 66, BUTTH,
+  BTCreate(&gbut[G_BCOLUNDO], cmapF, 5 * dpiMult, 165 * dpiMult, 66 * dpiMult, BUTTH,
 	   "ColUndo", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BCOLREV], cmapF,  5 + 66 + 1, 165, 67, BUTTH,
+  BTCreate(&gbut[G_BCOLREV], cmapF,  (5 + 66 + 1) * dpiMult, 165 * dpiMult, 67 * dpiMult, BUTTH,
 	   "Revert", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BHSVRGB], cmapF,  5+66+67+2,  165, 66, BUTTH,
+  BTCreate(&gbut[G_BHSVRGB], cmapF,  (5 + 66 + 67 + 2) * dpiMult,  165 * dpiMult, 66 * dpiMult, BUTTH,
 	   "RGB/HSV", infofg, infobg, hicol, locol);
 
-  BTCreate(&gbut[G_BMONO], cmapF,    5, 189, 66, BUTTH,
+  BTCreate(&gbut[G_BMONO], cmapF,    5 * dpiMult, 189 * dpiMult, 66 * dpiMult, BUTTH,
 	   "Grey", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BRV],   cmapF,    5 + 66 + 1, 189, 67, BUTTH,
+  BTCreate(&gbut[G_BRV],   cmapF,    (5 + 66 + 1) * dpiMult, 189 * dpiMult, 67 * dpiMult, BUTTH,
 	   "RevVid", infofg, infobg, hicol, locol);
-  BTCreate(&gbut[G_BRNDCOL], cmapF,  5 + 66 + 67 + 2, 189, 66, BUTTH,
+  BTCreate(&gbut[G_BRNDCOL], cmapF,  (5 + 66 + 67 + 2) * dpiMult, 189 * dpiMult, 66 * dpiMult, BUTTH,
 	   "Random", infofg, infobg, hicol, locol);
 
-  DCreate(&rhDial, cmapF, 5, 215, 66, 100,   0.0, 360.0, 180.0, 1.0, 5.0,
+  DCreate(&rhDial, cmapF, 5 * dpiMult, 215 * dpiMult, 66 * dpiMult, 100 * dpiMult,   0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Hue", NULL);
-  DCreate(&gsDial, cmapF, 72, 215, 66, 100,  0.0, 360.0, 180.0, 1.0, 5.0,
+  DCreate(&gsDial, cmapF, 72 * dpiMult, 215 * dpiMult, 66 * dpiMult, 100 * dpiMult,  0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Sat.", NULL);
-  DCreate(&bvDial, cmapF, 139, 215, 66, 100, 0.0, 360.0, 180.0, 1.0, 5.0,
+  DCreate(&bvDial, cmapF, 139 * dpiMult, 215 * dpiMult, 66 * dpiMult, 100 * dpiMult, 0.0, 360.0, 180.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Value", NULL);
 
   rhDial.drawobj = gsDial.drawobj = bvDial.drawobj = dragEditColor;
@@ -281,7 +281,7 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   /*********** CONTROL BUTTONS ***********/
 
 /* positioning constants for buttons.  (arranged as 4x4 grid...) */
-#define BXSPACE 53
+#define BXSPACE (53 * dpiMult)
 #define BYSPACE (BUTTH+1)
 
 #define BX0 0
@@ -294,44 +294,44 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 #define BY2 (BY0 + BYSPACE*2)
 #define BY3 (BY0 + BYSPACE*3)
 
-  BTCreate(&gbut[G_BAPPLY],  butF, BX0,BY0, 52,BUTTH,"Apply",
+  BTCreate(&gbut[G_BAPPLY],  butF, BX0,BY0, 52 * dpiMult,BUTTH,"Apply",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BNOGAM],  butF, BX0,BY1, 52,BUTTH,"NoMod",
+  BTCreate(&gbut[G_BNOGAM],  butF, BX0,BY1, 52 * dpiMult,BUTTH,"NoMod",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BMAXCONT],butF, BX0,BY2, 52,BUTTH,"Norm",
+  BTCreate(&gbut[G_BMAXCONT],butF, BX0,BY2, 52 * dpiMult,BUTTH,"Norm",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BHISTEQ], butF, BX0,BY3, 52,BUTTH,"HistEq",
-	   infofg,infobg,hicol,locol);
-
-  BTCreate(&gbut[G_BUP_BR],butF, BX1,BY0, 52,BUTTH,"Brite",
-	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BDN_BR],butF, BX1,BY1, 52,BUTTH,"Dim",
-	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BUP_CN],butF, BX1,BY2, 52,BUTTH,"Sharp",
-	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BDN_CN],butF, BX1,BY3, 52,BUTTH,"Dull",
+  BTCreate(&gbut[G_BHISTEQ], butF, BX0,BY3, 52 * dpiMult,BUTTH,"HistEq",
 	   infofg,infobg,hicol,locol);
 
-  BTCreate(&gbut[G_BRESET],butF, BX2,   BY0, 52,BUTTH,"Reset",
+  BTCreate(&gbut[G_BUP_BR],butF, BX1,BY0, 52 * dpiMult,BUTTH,"Brite",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B1],    butF, BX2,   BY1, 25,BUTTH,"1",
+  BTCreate(&gbut[G_BDN_BR],butF, BX1,BY1, 52 * dpiMult,BUTTH,"Dim",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B2],    butF, BX2+26,BY1, 26,BUTTH,"2",
+  BTCreate(&gbut[G_BUP_CN],butF, BX1,BY2, 52 * dpiMult,BUTTH,"Sharp",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B3],    butF, BX2,   BY2, 25,BUTTH,"3",
-	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_B4],    butF, BX2+26,BY2, 26,BUTTH,"4",
-	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BSET],  butF, BX2,   BY3, 52,BUTTH,"Set",
+  BTCreate(&gbut[G_BDN_CN],butF, BX1,BY3, 52 * dpiMult,BUTTH,"Dull",
 	   infofg,infobg,hicol,locol);
 
-  BTCreate(&gbut[G_BUNDO], butF, BX3, BY0, 52,BUTTH,"Undo",
+  BTCreate(&gbut[G_BRESET],butF, BX2,   BY0, 52 * dpiMult,BUTTH,"Reset",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BREDO], butF, BX3, BY1, 52,BUTTH,"Redo",
+  BTCreate(&gbut[G_B1],    butF, BX2,   BY1, 25 * dpiMult,BUTTH,"1",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BGETRES],butF,BX3, BY2, 52,BUTTH,"CutRes",
+  BTCreate(&gbut[G_B2],    butF, BX2+26*dpiMult,BY1, 26 * dpiMult,BUTTH,"2",
 	   infofg,infobg,hicol,locol);
-  BTCreate(&gbut[G_BCLOSE],butF, BX3, BY3, 52,BUTTH,"Close",
+  BTCreate(&gbut[G_B3],    butF, BX2,   BY2, 25 * dpiMult,BUTTH,"3",
+	   infofg,infobg,hicol,locol);
+  BTCreate(&gbut[G_B4],    butF, BX2+26*dpiMult,BY2, 26 * dpiMult,BUTTH,"4",
+	   infofg,infobg,hicol,locol);
+  BTCreate(&gbut[G_BSET],  butF, BX2,   BY3, 52 * dpiMult,BUTTH,"Set",
+	   infofg,infobg,hicol,locol);
+
+  BTCreate(&gbut[G_BUNDO], butF, BX3, BY0, 52 * dpiMult,BUTTH,"Undo",
+	   infofg,infobg,hicol,locol);
+  BTCreate(&gbut[G_BREDO], butF, BX3, BY1, 52 * dpiMult,BUTTH,"Redo",
+	   infofg,infobg,hicol,locol);
+  BTCreate(&gbut[G_BGETRES],butF,BX3, BY2, 52 * dpiMult,BUTTH,"CutRes",
+	   infofg,infobg,hicol,locol);
+  BTCreate(&gbut[G_BCLOSE],butF, BX3, BY3, 52 * dpiMult,BUTTH,"Close",
 	   infofg,infobg,hicol,locol);
 
 
@@ -339,13 +339,13 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   gbut[G_BUNDO].active = 0;
   gbut[G_BREDO].active = 0;
 
-  CBCreate(&enabCB, modF,2,2,     "Display with HSV/RGB mods.",
+  CBCreate(&enabCB, modF,2 * dpiMult,2 * dpiMult,     "Display with HSV/RGB mods.",
 	   infofg,infobg,hicol,locol);
-  CBCreate(&autoCB, modF,2,2+17,  "Auto-apply HSV/RGB mods.",
+  CBCreate(&autoCB, modF,2 * dpiMult,(2+17) * dpiMult,  "Auto-apply HSV/RGB mods.",
 	   infofg,infobg,hicol,locol);
-  CBCreate(&dragCB, modF,2,2+17*2,"Auto-apply while dragging.",
+  CBCreate(&dragCB, modF,2 * dpiMult,(2+17*2) * dpiMult,"Auto-apply while dragging.",
 	   infofg,infobg,hicol,locol);
-  CBCreate(&resetCB,modF,2,2+17*3,"Auto-reset on new image.",
+  CBCreate(&resetCB,modF,2 * dpiMult,(2+17*3) * dpiMult,"Auto-reset on new image.",
 	   infofg,infobg,hicol,locol);
 
   enabCB.val = autoCB.val = resetCB.val = dragCB.val = 1;
@@ -355,30 +355,30 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   /************ HSV editing doo-wahs **************/
 
 
-  HDCreate(&srcHD, hsvF,  52, 65, 1, 0, 30, 0, "From", infofg, infobg);
-  HDCreate(&dstHD, hsvF, 154, 65, 1, 0, 30, 0, "To",   infofg, infobg);
+  HDCreate(&srcHD, hsvF,  52 * dpiMult, 65 * dpiMult, 1, 0, 30, 0, "From", infofg, infobg);
+  HDCreate(&dstHD, hsvF, 154 * dpiMult, 65 * dpiMult, 1, 0, 30, 0, "To",   infofg, infobg);
 
-  HDCreate(&whtHD, hsvF,  50,243, 0, 0,  0, 0, "White",infofg, infobg);
+  HDCreate(&whtHD, hsvF,  50 * dpiMult,243 * dpiMult, 0, 0,  0, 0, "White",infofg, infobg);
 
   srcHD.drawobj = dstHD.drawobj = whtHD.drawobj = dragHueDial;
 
-  DCreate(&satDial, hsvF, 100, 199, 100, 121, -100.0, 100.0, 0.0, 1.0, 5.0,
+  DCreate(&satDial, hsvF, 100 * dpiMult, 199 * dpiMult, 100 * dpiMult, 121 * dpiMult, -100.0, 100.0, 0.0, 1.0, 5.0,
 	   infofg, infobg,hicol,locol, "Saturation", "%");
 
-  hueRB = RBCreate(NULL, hsvF,  7, 153, "1",
+  hueRB = RBCreate(NULL, hsvF,  7 * dpiMult, 153 * dpiMult, "1",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 47, 153, "2",
+  RBCreate        (hueRB,hsvF, 47 * dpiMult, 153 * dpiMult, "2",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 87, 153, "3",
+  RBCreate        (hueRB,hsvF, 87 * dpiMult, 153 * dpiMult, "3",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF,  7, 170, "4",
+  RBCreate        (hueRB,hsvF,  7 * dpiMult, 170 * dpiMult, "4",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 47, 170, "5",
+  RBCreate        (hueRB,hsvF, 47 * dpiMult, 170 * dpiMult, "5",
 		   infofg, infobg,hicol,locol);
-  RBCreate        (hueRB,hsvF, 87, 170, "6",
+  RBCreate        (hueRB,hsvF, 87 * dpiMult, 170 * dpiMult, "6",
 		   infofg, infobg,hicol,locol);
 
-  BTCreate(&hueclrB, hsvF, 127, 158, 70, BUTTH, "Reset",
+  BTCreate(&hueclrB, hsvF, 127 * dpiMult, 158 * dpiMult, 70 * dpiMult, BUTTH, "Reset",
 	   infofg, infobg,hicol,locol);
 
   initHmap();
@@ -386,20 +386,20 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
   build_hremap();
 
   InitGraf(&intGraf);
-  CreateGraf(&intGraf, hsvF, 20, 339, infofg, infobg, "Intensity");
+  CreateGraf(&intGraf, hsvF, 20 * dpiMult, 339 * dpiMult, infofg, infobg, "Intensity");
 
 
   /********* RGB color correction doo-wahs ***********/
 
 
   InitGraf(&rGraf);
-  CreateGraf(&rGraf, rgbF, 10, 20, infofg, infobg, "Red");
+  CreateGraf(&rGraf, rgbF, 10 * dpiMult, 20 * dpiMult, infofg, infobg, "Red");
 
   InitGraf(&gGraf);
-  CreateGraf(&gGraf, rgbF, 10, 179, infofg, infobg, "Green");
+  CreateGraf(&gGraf, rgbF, 10 * dpiMult, 179 * dpiMult, infofg, infobg, "Green");
 
   InitGraf(&bGraf);
-  CreateGraf(&bGraf, rgbF, 10, 338, infofg, infobg, "Blue");
+  CreateGraf(&bGraf, rgbF, 10 * dpiMult, 338 * dpiMult, infofg, infobg, "Blue");
 
   satDial.drawobj = dragGamma;
   intGraf.drawobj = rGraf.drawobj = gGraf.drawobj = bGraf.drawobj = dragGamma;
@@ -765,8 +765,8 @@ int x,y,w,h;
   xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
   XSetClipRectangles(theDisp, theGC, 0,0, &xr, 1, Unsorted);
 
-  drawArrow(232,178);
-  drawArrow(457,178);
+  drawArrow(232 * dpiMult, 178 * dpiMult);
+  drawArrow(457 * dpiMult, 178 * dpiMult);
 
   XSetClipMask(theDisp, theGC, None);
 }
@@ -796,14 +796,14 @@ int x,y;
 {
   XPoint pts[8];
 
-  pts[0].x = x+10;     pts[0].y = y;
-  pts[1].x = x-4;      pts[1].y = y-100;
-  pts[2].x = x-4;      pts[2].y = y-40;
-  pts[3].x = x-10;     pts[3].y = y-40;
-  pts[4].x = x-10;     pts[4].y = y+40;
-  pts[5].x = x-4;      pts[5].y = y+40;
-  pts[6].x = x-4;      pts[6].y = y+100;
-  pts[7].x = pts[0].x; pts[7].y = pts[0].y;
+  pts[0].x = x + 10 * dpiMult;  pts[0].y = y;
+  pts[1].x = x -  4 * dpiMult;  pts[1].y = y - 100 * dpiMult;
+  pts[2].x = x -  4 * dpiMult;  pts[2].y = y -  40 * dpiMult;
+  pts[3].x = x - 10 * dpiMult;  pts[3].y = y -  40 * dpiMult;
+  pts[4].x = x - 10 * dpiMult;  pts[4].y = y +  40 * dpiMult;
+  pts[5].x = x -  4 * dpiMult;  pts[5].y = y +  40 * dpiMult;
+  pts[6].x = x -  4 * dpiMult;  pts[6].y = y + 100 * dpiMult;
+  pts[7].x = pts[0].x;          pts[7].y = pts[0].y;
 
   XSetForeground(theDisp, theGC, infobg);
   XFillPolygon(theDisp, gamW, theGC, pts, 8, Convex, CoordModeOrigin);
@@ -896,13 +896,13 @@ void RedrawCMap()
     y = CMAPY + (i/16)*CMAPCH;
 
     XSetForeground(theDisp, theGC, cols[i]);
-    XFillRectangle(theDisp, cmapF, theGC, x+1, y+1, CMAPCW-1,CMAPCH-1);
+    XFillRectangle(theDisp, cmapF, theGC, x+1*dpiMult, y+1*dpiMult, CMAPCW-1*dpiMult,CMAPCH-1*dpiMult);
 
     if (i == editColor || (curgroup && (cellgroup[i]==curgroup))) {
       XSetForeground(theDisp, theGC, infobg);
-      XDrawRectangle(theDisp, cmapF, theGC, x+1, y+1, CMAPCW-2,CMAPCH-2);
+      XDrawRectangle(theDisp, cmapF, theGC, x+1*dpiMult, y+1*dpiMult, CMAPCW-2*dpiMult,CMAPCH-2*dpiMult);
       XSetForeground(theDisp, theGC, infofg);
-      XDrawRectangle(theDisp, cmapF, theGC, x+2, y+2, CMAPCW-4,CMAPCH-4);
+      XDrawRectangle(theDisp, cmapF, theGC, x+2*dpiMult, y+2*dpiMult, CMAPCW-4*dpiMult,CMAPCH-4*dpiMult);
     }
   }
 }
@@ -921,13 +921,13 @@ int cellno, sel;
 
   if (!sel) {   /* unhighlight a cell */
     XSetForeground(theDisp, theGC, cols[cellno]);
-    XFillRectangle(theDisp, cmapF, theGC, x+1, y+1, CMAPCW-1,CMAPCH-1);
+    XFillRectangle(theDisp, cmapF, theGC, x+1*dpiMult, y+1*dpiMult, CMAPCW-1*dpiMult,CMAPCH-1*dpiMult);
   }
   else {  /* highlight a cell */
     XSetForeground(theDisp, theGC, infobg);
-    XDrawRectangle(theDisp, cmapF, theGC, x+1, y+1, CMAPCW-2,CMAPCH-2);
+    XDrawRectangle(theDisp, cmapF, theGC, x+1*dpiMult, y+1*dpiMult, CMAPCW-2*dpiMult,CMAPCH-2*dpiMult);
     XSetForeground(theDisp, theGC, infofg);
-    XDrawRectangle(theDisp, cmapF, theGC, x+2, y+2, CMAPCW-4,CMAPCH-4);
+    XDrawRectangle(theDisp, cmapF, theGC, x+2*dpiMult, y+2*dpiMult, CMAPCW-4*dpiMult,CMAPCH-4*dpiMult);
   }
 }
 
@@ -2476,11 +2476,11 @@ static void HDCreate(hd, win, x, y, r, st, en, ccwise, str, fg, bg)
 #define BCOLS fg,bg,hicol,locol
 
   if (hd->range) {
-    BTCreate(&hd->hdbutt[HDB_ROTL], win, x-50,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_ROTR], win, x-30,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_FLIP], win, x-10,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_EXPND],win, x+10,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_SHRNK],win, x+30,y+60,18,18,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_ROTL], win, x-50*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_ROTR], win, x-30*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_FLIP], win, x-10*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_EXPND],win, x+10*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_SHRNK],win, x+30*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
 
     for (i=0; i<N_HDBUTT; i++) {
       hd->hdbutt[i].pix = hdbpix1[i];
@@ -2490,11 +2490,11 @@ static void HDCreate(hd, win, x, y, r, st, en, ccwise, str, fg, bg)
   }
 
   else {
-    BTCreate(&hd->hdbutt[HDB_ROTL], win, x-39,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_ROTR], win, x-19,y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_DESAT],win, x+1, y+60,18,18,NULL, BCOLS);
-    BTCreate(&hd->hdbutt[HDB_SAT],  win, x+21,y+60,18,18,NULL, BCOLS);
-    CBCreate(&hd->enabCB, win, x+23, y-44, "", BCOLS);
+    BTCreate(&hd->hdbutt[HDB_ROTL], win, x-39*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_ROTR], win, x-19*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_DESAT],win, x+1*dpiMult, y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    BTCreate(&hd->hdbutt[HDB_SAT],  win, x+21*dpiMult,y+60*dpiMult,18*dpiMult,18*dpiMult,NULL, BCOLS);
+    CBCreate(&hd->enabCB, win, x+23*dpiMult, y-44*dpiMult, "", BCOLS);
     hd->enabCB.val = 1;
 
     for (i=0; i<N_HDBUTT2; i++) {
@@ -2664,14 +2664,14 @@ int flags;
 
     XDrawImageString(theDisp, hd->win, theGC,
 		     hd->x - XTextWidth(monofinfo, vstr, (int) strlen(vstr))/2,
-		     hd->y + HD_RADIUS + 24, vstr, (int) strlen(vstr));
+		     hd->y + HD_RADIUS + 24*dpiMult, vstr, (int) strlen(vstr));
     XSetFont(theDisp, theGC, mfont);
   }
 
 
   if (flags & HD_TITLE) {
     XSetForeground(theDisp, theGC, hd->fg);
-    ULineString(hd->win, hd->x - HD_RADIUS - 15, hd->y - HD_RADIUS - 4,
+    ULineString(hd->win, hd->x - HD_RADIUS - 15*dpiMult, hd->y - HD_RADIUS - 4*dpiMult,
 		hd->str);
   }
 
@@ -2688,8 +2688,8 @@ int flags;
 
   if (!hd->range && !hd->enabCB.val) {  /* draw dimmed */
     XSync(theDisp, False);
-    DimRect(hd->win, hd->x-HD_RADIUS-15, hd->y-HD_RADIUS-4-ASCENT,
-	    (u_int) 2*HD_RADIUS+30, (u_int) (2*HD_RADIUS+4+ASCENT+80), hd->bg);
+    DimRect(hd->win, hd->x-HD_RADIUS-15*dpiMult, hd->y-HD_RADIUS-4*dpiMult-ASCENT,
+	    (u_int) 2*HD_RADIUS+30*dpiMult, (u_int) (2*HD_RADIUS+4*dpiMult+ASCENT+80*dpiMult), hd->bg);
     XSync(theDisp, False);
     CBRedraw(&hd->enabCB);
   }

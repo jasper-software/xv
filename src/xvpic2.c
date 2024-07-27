@@ -702,6 +702,8 @@ pixel cc;
     };
     unsigned short b;
 
+    XV_UNUSED(y);
+
     b = c_tab[pi->flag_now[x] + 5];
     if (!pic2_arith_decode_bit(pi, b++)) {
 	if (pic2_arith_decode_bit(pi, b++))      {	/* down */
@@ -1196,6 +1198,10 @@ byte **xp, *rp, *gp, *bp;
     short colbits;
     byte colmask;
 
+    XV_UNUSED(rp);
+    XV_UNUSED(gp);
+    XV_UNUSED(bp);
+
     if (*xp == NULL)
 	*xp = pic2_new((size_t) pi->x_max * pi->y_max * 3, "pic2_make_xvpic");   // GRR POSSIBLE OVERFLOW / FIXME
 
@@ -1300,6 +1306,8 @@ char *comment;
     struct pic2_info pic2;
     char creator[256], title[256], saver[256];
     int e;
+
+    XV_UNUSED(numcols);
 
     if (DEBUG)
 	fputs("WritePIC2:\n", stderr);
@@ -2429,6 +2437,8 @@ int type, depth;
     pixel *linep;
     short colbits;
 
+    XV_UNUSED(depth);
+
     colbits = pi->header->depth / 3;
 
     line = pic2_save_block(pi, &linep, x_offset, y_offset, w, h,
@@ -3195,12 +3205,12 @@ char *fn;
 
 /**** Stuff for PIC2Dialog box ****/
 
-#define TWIDE    320
-#define THIGH	 178
+#define TWIDE    (320*dpiMult)
+#define THIGH	 (178*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int,int,int,int));
 static void clickTD   PARM((int,int));
@@ -3223,7 +3233,7 @@ static RBUTT *depthRB;
 /***************************************************/
 void CreatePIC2W()
 {
-    int y;
+    int x, y;
 
     pic2W = CreateWindow("xv pic2", "XVpic2", NULL,
 			TWIDE, THIGH, infofg, infobg, 0);
@@ -3233,37 +3243,41 @@ void CreatePIC2W()
     XSelectInput(theDisp, pic2W,
 		 ExposureMask | ButtonPressMask | KeyPressMask);
 
-    BTCreate(&tbut[T_BOK], pic2W, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
+    BTCreate(&tbut[T_BOK], pic2W, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	     "Ok", infofg, infobg, hicol, locol);
 
-    BTCreate(&tbut[T_BCANC], pic2W, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
+    BTCreate(&tbut[T_BCANC], pic2W, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	     "Cancel", infofg, infobg, hicol, locol);
 
-    y = 55;
-    typeRB = RBCreate(NULL, pic2W, 36, y,          "P2SS",
+    x = 36*dpiMult;
+    y = 55*dpiMult;
+    typeRB = RBCreate(NULL, pic2W, x, y,           "P2SS",
 		      infofg, infobg,hicol,locol);
-    RBCreate(typeRB, pic2W, 36, y+18,              "P2SF",
+    RBCreate(typeRB, pic2W, x, y + 18*dpiMult,     "P2SF",
 	     infofg, infobg,hicol,locol);
-    RBCreate(typeRB, pic2W, 36, y+36,              "P2BM",
+    RBCreate(typeRB, pic2W, x, y + 36*dpiMult,     "P2BM",
 	     infofg, infobg, hicol, locol);
-    RBCreate(typeRB, pic2W, 36, y+54,              "P2BI",
+    RBCreate(typeRB, pic2W, x, y + 54*dpiMult,     "P2BI",
 	     infofg, infobg, hicol, locol);
 
-    depthRB = RBCreate(NULL, pic2W, TWIDE/2-16, y, "  3bit",
+    x = TWIDE/2 - 16*dpiMult;
+    depthRB = RBCreate(NULL, pic2W, x, y,          "  3bit",
 		       infofg, infobg,hicol,locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+18,     "  6bit",
+    RBCreate(depthRB, pic2W, x, y + 18*dpiMult,    "  6bit",
 	     infofg, infobg,hicol,locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+36,     "  9bit",
+    RBCreate(depthRB, pic2W, x, y + 36*dpiMult,    "  9bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+54,     "12bit",
+    RBCreate(depthRB, pic2W, x, y + 54*dpiMult,    "12bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y,      "15bit",
+
+    x = TWIDE/4*3 - 16*dpiMult;
+    RBCreate(depthRB, pic2W, x, y,                 "15bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+18,   "18bit",
+    RBCreate(depthRB, pic2W, x, y + 18*dpiMult,    "18bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+36,   "21bit",
+    RBCreate(depthRB, pic2W, x, y + 36*dpiMult,    "21bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+54,   "24bit",
+    RBCreate(depthRB, pic2W, x, y + 54*dpiMult,    "24bit",
 	     infofg, infobg, hicol, locol);
 
     XMapSubwindows(theDisp, pic2W);
@@ -3469,12 +3483,12 @@ int x,y,w,h;
     for (i = 0; i < T_NBUTTS; i++)
 	BTRedraw(&tbut[i]);
 
-    ULineString(pic2W, typeRB->x-16, typeRB->y-3-DESCENT,   "FormatType");
-    ULineString(pic2W, depthRB->x-16, depthRB->y-3-DESCENT, "ColorDepth");
+    ULineString(pic2W, typeRB->x  - 16*dpiMult, typeRB->y  - 3*dpiMult - DESCENT, "FormatType");
+    ULineString(pic2W, depthRB->x - 16*dpiMult, depthRB->y - 3*dpiMult - DESCENT, "ColorDepth");
     RBRedraw(typeRB, -1);
     RBRedraw(depthRB, -1);
 
-    DrawString(pic2W, 20, 29, title);
+    DrawString(pic2W, 20*dpiMult, 29*dpiMult, title);
 
     XSetClipMask(theDisp, theGC, None);
 }

@@ -23,17 +23,17 @@
 #include "xvml.h"
 #endif
 
-#define MIN_TXTWIDE 380
-#define MIN_TXTHIGH 200
+#define MIN_TXTWIDE (380 * dpiMult)
+#define MIN_TXTHIGH (200 * dpiMult)
 
-#define BUTTW1 80
-#define BUTTW2 60
-#define BUTTW3 110
-#define BUTTH 24
+#define BUTTW1 (80 * dpiMult)
+#define BUTTW2 (60 * dpiMult)
+#define BUTTW3 (110 * dpiMult)
+#define BUTTH  (24 * dpiMult)
 
-#define TOPMARGIN 30       /* from top of window to top of text window */
-#define BOTMARGIN (5+BUTTH+5) /* room for a row of buttons at bottom */
-#define LRMARGINS 5        /* left and right margins */
+#define TOPMARGIN (30 * dpiMult) /* from top of window to top of text window */
+#define BOTMARGIN (5*dpiMult + BUTTH + 5*dpiMult) /* room for a row of buttons at bottom */
+#define LRMARGINS (5*dpiMult) /* left and right margins */
 
 #define MAXTVWIN    2      /* total # of windows */
 #define MAXTEXTWIN  1      /* # of windows for text file viewing */
@@ -250,9 +250,9 @@ void CreateTextWins(geom, cmtgeom)
   /* compute default size of textview windows.  should be big enough to
      hold an 80x24 text window */
 
-  defwide = 80 * mfwide + 2*LRMARGINS + 8 + 20;   /* -ish */
-  defhigh = 24 * mfhigh + TOPMARGIN + BOTMARGIN + 8 + 20;   /* ish */
-  cmthigh = 6  * mfhigh + TOPMARGIN + BOTMARGIN + 8 + 20;   /* ish */
+  defwide = 80 * mfwide + 2*LRMARGINS + (8 + 20) * dpiMult;   /* -ish */
+  defhigh = 24 * mfhigh + TOPMARGIN + BOTMARGIN + (8 + 20) * dpiMult;   /* ish */
+  cmthigh = 6  * mfhigh + TOPMARGIN + BOTMARGIN + (8 + 20) * dpiMult;   /* ish */
 
   /* creates *all* textview windows at once */
 
@@ -352,9 +352,9 @@ void CreateTextWins(geom, cmtgeom)
 #ifdef TV_MULTILINGUAL
   get_monofont_size(&mfwide, &mfhigh);
   /* recalculate sizes. */
-  defwide = 80 * mfwide + 2*LRMARGINS + 8 + 20;   /* -ish */
-  defhigh = 24 * mfhigh + TOPMARGIN + BOTMARGIN + 8 + 20;   /* ish */
-  cmthigh = 6  * mfhigh + TOPMARGIN + BOTMARGIN + 8 + 20;   /* ish */
+  defwide = 80 * mfwide + 2*LRMARGINS + (8 + 20) * dpiMult;   /* -ish */
+  defhigh = 24 * mfhigh + TOPMARGIN + BOTMARGIN + (8 + 20) * dpiMult;   /* ish */
+  cmthigh = 6  * mfhigh + TOPMARGIN + BOTMARGIN + (8 + 20) * dpiMult;   /* ish */
 #endif
 
   for (i=0; i<MAXTVWIN; i++) {
@@ -491,7 +491,7 @@ void OpenTextView(text, len, title, freeonclose)
   anyTextUp = 1;
   if (!tv->vis) XMapRaised(theDisp, tv->win);
   else {
-    XClearArea(theDisp, tv->win, 0, 0, (u_int) tv->wide, (u_int) 30, False);
+    XClearArea(theDisp, tv->win, 0, 0, (u_int) tv->wide, (u_int) 30*dpiMult, False);
     drawTextView(tv);
   }
   tv->vis = 1;
@@ -550,7 +550,7 @@ void ChangeCommentText()
   computeText(tv);      /* compute # lines and linestarts array */
 
   if (tv->vis) {
-    XClearArea(theDisp, tv->win, 0, 0, (u_int) tv->wide, (u_int) 30, False);
+    XClearArea(theDisp, tv->win, 0, 0, (u_int) tv->wide, (u_int) 30 * dpiMult, False);
     drawTextView(tv);
   }
 
@@ -877,32 +877,32 @@ static void resizeText(tv,w,h)
   tv->wide = w;  tv->high = h;
 
   /* compute maximum size of text window */
-  maxw = tv->wide - (2*LRMARGINS) - (tv->vscrl.tsize+1) - 2;
-  maxh = tv->high - (TOPMARGIN + BOTMARGIN) - (tv->hscrl.tsize+1) - 2;
+  maxw = tv->wide - (2*LRMARGINS) - (tv->vscrl.tsize+1) - 2*dpiMult;
+  maxh = tv->high - (TOPMARGIN + BOTMARGIN) - (tv->hscrl.tsize+1) - 2*dpiMult;
 
-  tv->chwide = ((maxw - 6) / mfwide);
-  tv->chhigh = ((maxh - 6) / mfhigh);
+  tv->chwide = ((maxw - 6*dpiMult) / mfwide);
+  tv->chhigh = ((maxh - 6*dpiMult) / mfhigh);
 
-  tv->twWide = tv->chwide * mfwide + 6;
-  tv->twHigh = tv->chhigh * mfhigh + 6;
+  tv->twWide = tv->chwide * mfwide + 6*dpiMult;
+  tv->twHigh = tv->chhigh * mfhigh + 6*dpiMult;
 
   XMoveResizeWindow(theDisp, tv->textW, LRMARGINS, TOPMARGIN,
 		    (u_int) tv->twWide, (u_int) tv->twHigh);
 
   for (i=0; i<TV_E_NBUTTS; i++) {
-    tv->but[i].x = tv->wide - (TV_E_NBUTTS-i) * (BUTTW1+5);
-    tv->but[i].y = tv->high - BUTTH - 5;
+    tv->but[i].x = tv->wide - (TV_E_NBUTTS-i) * (BUTTW1+5*dpiMult);
+    tv->but[i].y = tv->high - BUTTH - 5*dpiMult;
   }
 #ifdef TV_MULTILINGUAL
-  tv->csbut.x = 5;
-  tv->csbut.y = tv->high - BUTTH - 5;
+  tv->csbut.x = 5*dpiMult;
+  tv->csbut.y = tv->high - BUTTH - 5*dpiMult;
 #endif
 
 #ifdef TV_L10N
   if (xlocale) {
     for (; i<TV_J_NBUTTS; i++) {
-      tv->but[i].x = 5 + (i-TV_E_NBUTTS) * (BUTTW2+5);
-      tv->but[i].y = tv->high - BUTTH - 5;
+      tv->but[i].x = 5*dpiMult + (i-TV_E_NBUTTS) * (BUTTW2+5*dpiMult);
+      tv->but[i].y = tv->high - BUTTH - 5*dpiMult;
     }
   }
 #endif
@@ -993,21 +993,21 @@ static void drawTextView(tv)
   int i, y;
 
   if (strlen(tv->title)) {    /* draw the title */
-    y = 5;
+    y = 5*dpiMult;
 
     XSetForeground(theDisp, theGC, infobg);
-    XFillRectangle(theDisp, tv->win, theGC, 5+1, y+1,
-		   (u_int) StringWidth(tv->title)+6, (u_int) CHIGH+4);
+    XFillRectangle(theDisp, tv->win, theGC, 5*dpiMult+1, y+1,
+		   (u_int) StringWidth(tv->title)+6*dpiMult, (u_int) CHIGH+4*dpiMult);
 
     XSetForeground(theDisp, theGC, infofg);
-    XDrawRectangle(theDisp, tv->win, theGC, 5, y,
-		   (u_int) StringWidth(tv->title)+7, (u_int) CHIGH+5);
+    XDrawRectangle(theDisp, tv->win, theGC, 5*dpiMult, y,
+		   (u_int) StringWidth(tv->title)+7*dpiMult, (u_int) CHIGH+5*dpiMult);
 
-    Draw3dRect(tv->win, 5+1, y+1, (u_int) StringWidth(tv->title)+5,
-	       (u_int) CHIGH+3, R3D_IN, 2, hicol, locol, infobg);
+    Draw3dRect(tv->win, 5*dpiMult+1, y+1, (u_int) StringWidth(tv->title)+5*dpiMult,
+	       (u_int) CHIGH+3*dpiMult, R3D_IN, 2, hicol, locol, infobg);
 
     XSetForeground(theDisp, theGC, infofg);
-    DrawString(tv->win, 5+3, y+ASCENT+3, tv->title);
+    DrawString(tv->win, (5+3)*dpiMult, y+ASCENT+3*dpiMult, tv->title);
   }
 
   drawNumLines(tv);
@@ -1043,20 +1043,20 @@ static void drawNumLines(tv)
 
   w = StringWidth(tmpstr) + 7;  /* width of frame */
   x = LRMARGINS + tv->twWide + tv->vscrl.tsize+1;     /* right align point */
-  y = 6;
+  y = 5*dpiMult;
 
   XSetForeground(theDisp, theGC, infobg);
   XFillRectangle(theDisp, tv->win, theGC, (x-w)+1, y+1,
-		 (u_int) (w-1), (u_int) CHIGH+4);
+		 (u_int) (w-1), (u_int) CHIGH+4*dpiMult);
 
   XSetForeground(theDisp, theGC, infofg);
-  XDrawRectangle(theDisp, tv->win, theGC, x-w, y, (u_int) w, (u_int) CHIGH+5);
+  XDrawRectangle(theDisp, tv->win, theGC, x-w, y, (u_int) w, (u_int) CHIGH+5*dpiMult);
 
-  Draw3dRect(tv->win, (x-w)+1, y+1, (u_int) (w-2), (u_int) CHIGH+3,
+  Draw3dRect(tv->win, (x-w)+1, y+1, (u_int) (w-2), (u_int) CHIGH+3*dpiMult,
 	     R3D_IN,2,hicol,locol,infobg);
 
   XSetForeground(theDisp, theGC, infofg);
-  DrawString(tv->win, (x-w)+3, y+ASCENT+3, tmpstr);
+  DrawString(tv->win, (x-w)+3*dpiMult, y+ASCENT+3*dpiMult, tmpstr);
 }
 
 
@@ -1073,11 +1073,11 @@ static void eraseNumLines(tv)
 	  tv->textlen, (tv->textlen>1) ? "s" : "",
 	  nl, (nl>1) ? "s" : "");
 
-  w = StringWidth(tmpstr) + 7;  /* width of frame */
+  w = StringWidth(tmpstr) + 7*dpiMult;  /* width of frame */
   x = LRMARGINS + tv->twWide + tv->vscrl.tsize+1;     /* right align point */
-  y = 5;
+  y = 5*dpiMult;
 
-  XClearArea(theDisp, tv->win, x-w, y, (u_int) w+1, (u_int) CHIGH+7, False);
+  XClearArea(theDisp, tv->win, x-w, y, (u_int) w+1, (u_int) CHIGH+7*dpiMult, False);
 }
 
 
@@ -1120,7 +1120,7 @@ static void drawTextW(delta, sptr)
 
   hpos = tv->hscrl.val;
   vpos = tv->vscrl.val;
-  lwide = (tv->chwide < 500) ? tv->chwide : 500;
+  lwide = (tv->chwide < (500*dpiMult)) ? tv->chwide : (500*dpiMult);
 
   /* draw text */
   if (!tv->hexmode) {     /* ASCII mode */
@@ -1141,7 +1141,7 @@ static void drawTextW(delta, sptr)
 	for (lp2 = &tp->lines[vpos], i = tp->nlines - vpos;
 		i > 0; lp2++, i--) {
 	    XDrawText16(theDisp, tv->textW, theGC,
-			-mfwide * hpos + 3, y + lp2->ascent,
+			-mfwide * hpos + 3*dpiMult, y + lp2->ascent,
 			lp2->items, lp2->nitems);
 	    y += lp2->ascent + lp2->descent;
 	    if (y > tv->twHigh)
@@ -1349,11 +1349,11 @@ static void drawTextW(delta, sptr)
 #ifdef TV_L10N
       if (xlocale)
 	XmbDrawImageString(theDisp, tv->textW, monofset, theGC,
-		3, i*mfhigh + 1 + mfascent, linestr, strlen(linestr));
+		3*dpiMult, i*mfhigh + 1 + mfascent, linestr, strlen(linestr));
       else
 #endif
 	XDrawImageString(theDisp, tv->textW, theGC,
-		3, i*mfhigh + 3 + mfascent, linestr, lwide);
+		3*dpiMult, i*mfhigh + 3*dpiMult + mfascent, linestr, lwide);
     }  /* for i ... */
 #endif /* TV_MULTILINGUAL */
   }  /* if hexmode */
@@ -1417,7 +1417,7 @@ static void drawTextW(delta, sptr)
 
       /* draw the line */
       XDrawImageString(theDisp, tv->textW, theGC,
-		       3, i*mfhigh + 3 + mfascent, linestr, lwide);
+		       3*dpiMult, i*mfhigh + 3*dpiMult + mfascent, linestr, lwide);
     }  /* for i ... */
   }  /* else hexmode */
 
@@ -1684,10 +1684,10 @@ static void computeText(tv)
       tv->cv_text = NULL;
   }
   if (tv->ccs.converter == NULL) {
-      tv->txt = ml_draw_text(tv->ctx, tv->text, tv->textlen);
+      tv->txt = ml_draw_text(tv->ctx, (char *) tv->text, tv->textlen);
   } else {
-      tv->cv_text = (*tv->ccs.converter)(tv->text, tv->textlen, &tv->cv_len);
-      tv->txt = ml_draw_text(tv->ctx, tv->cv_text, tv->cv_len);
+      tv->cv_text = (*tv->ccs.converter)( (char *) tv->text, tv->textlen, &tv->cv_len);
+      tv->txt = ml_draw_text(tv->ctx, (char *) tv->cv_text, tv->cv_len);
   }
   tv->maxwide = tv->txt->width / mfwide;
   tv->numlines = tv->txt->height / mfhigh + 1;
@@ -2224,8 +2224,8 @@ void ShowKeyHelp()
 
 #define TV_ML_NLISTS	4
 
-#define CSWIDE (BUTTW3 * 5 + 5 * 6)
-#define CSHIGH 450
+#define CSWIDE (BUTTW3 * 5 + 5 * 6 * dpiMult)
+#define CSHIGH (450 * dpiMult)
 
 typedef struct csinfo_t {
     TVINFO *tv;
@@ -2278,25 +2278,25 @@ static void createCsWins(geom)
 #endif
 	XSelectInput(theDisp, cs->win, ExposureMask | ButtonPressMask);
 
-	DrawString(cs->win, 5, 5 + ASCENT, "Initial States");
+	DrawString(cs->win, 5*dpiMult, 5*dpiMult + ASCENT, "Initial States");
 	for (i = 0; i < TV_ML_NLISTS; i++) {
 	    int x, y;
 	    char buf[80];
 
 	    if (i / 2 == 0)
-		x = 15;
+		x = 15 * dpiMult;
 	    else
-		x = 280;
+		x = 280 * dpiMult;
 	    if (i % 2 == 0)
-		y = 5 + LINEHIGH * 1;
+		y = 5*dpiMult + LINEHIGH * 1;
 	    else
-		y = 5 + LINEHIGH * 7 + SPACING * 3;
+		y = 5*dpiMult + LINEHIGH * 7 + SPACING * 3;
 
 	    sprintf(buf, "Designation for G%d:", i + 1);
 	    DrawString(cs->win, x, y + ASCENT, buf);
 
-	    LSCreate(&cs->ls[i], cs->win, x + 15, y + LINEHIGH,
-			200, LINEHIGH * 5, 5,
+	    LSCreate(&cs->ls[i], cs->win, x + 15*dpiMult, y + LINEHIGH,
+			200*dpiMult, LINEHIGH * 5, 5,
 			regs, nregs + 2,
 			infofg, infobg, hicol, locol, csLsRedraw, FALSE, FALSE);
 	    cs->ls[i].selected = 0;
@@ -2312,55 +2312,55 @@ static void createCsWins(geom)
 	    strcpy(p, "G1 G2 G3 G4");
 	    p[2] = p[5] = p[8] = '\0';
 	    n = (i == 0 ? TV_ML_GL : TV_ML_GR);
-	    x = (i == 0 ? 15 : 280);
-	    y = 235;
+	    x = (i == 0 ? 15 : 280) * dpiMult;
+	    y = 235 * dpiMult;
 	    DrawString(cs->win, x, y + ASCENT, "Assignment for GL:");
-	    x += 15;
+	    x += (15 * dpiMult);
 	    y += LINEHIGH;
 	    cs->rbt[n] = RBCreate(NULL, cs->win,
 				  x, y, p, infofg, infobg, hicol, locol);
 	    for (j = 1; j < 4; j++) {
 		p += 3;
-		x += 50;
+		x += (50 * dpiMult);
 		RBCreate(cs->rbt[n], cs->win,
 			 x, y, p, infofg, infobg, hicol, locol);
 	    }
 	}
 
-	DrawString(cs->win, 5, 280 + ASCENT, "Ret Code:");
+	DrawString(cs->win, 5*dpiMult, 280*dpiMult + ASCENT, "Ret Code:");
 	cs->rbt[TV_ML_RETCODE] =
-	    RBCreate(NULL, cs->win, 20, 300, "LF", infofg,infobg, hicol,locol);
-	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 20, 300 + 20, "CR+LF",
+	    RBCreate(NULL, cs->win, 20*dpiMult, 300*dpiMult, "LF", infofg,infobg, hicol,locol);
+	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 20*dpiMult, (300 + 20)*dpiMult, "CR+LF",
 		 infofg, infobg, hicol, locol);
-	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 90, 300, "CR",
+	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 90*dpiMult, 300*dpiMult, "CR",
 		 infofg, infobg, hicol, locol);
-	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 90, 300 + 20, "Any",
+	RBCreate(cs->rbt[TV_ML_RETCODE], cs->win, 90*dpiMult, (300 + 20)*dpiMult, "Any",
 		 infofg, infobg, hicol, locol);
 
-	DrawString(cs->win, 350, 280 + ASCENT, "Converter:");
+	DrawString(cs->win, 350*dpiMult, 280*dpiMult + ASCENT, "Converter:");
 	cs->rbt[TV_ML_CVTR] =
-	    RBCreate(NULL, cs->win, 365, 300, "Nothing",
+	    RBCreate(NULL, cs->win, 365*dpiMult, 300*dpiMult, "Nothing",
 		     infofg, infobg, hicol, locol);
-	RBCreate(cs->rbt[TV_ML_CVTR], cs->win, 365, 300 + 20, "Shift JIS",
+	RBCreate(cs->rbt[TV_ML_CVTR], cs->win, 365*dpiMult, (300 + 20)*dpiMult, "Shift JIS",
 		 infofg, infobg, hicol, locol);
 
-	CBCreate(&cs->cbt[TV_ML_SHORT], cs->win, 200, 300, "Short Form",
+	CBCreate(&cs->cbt[TV_ML_SHORT], cs->win, 200*dpiMult, 300*dpiMult, "Short Form",
 		 infofg, infobg, hicol, locol);
-	CBCreate(&cs->cbt[TV_ML_LOCK], cs->win, 200, 320, "Locking Shift",
+	CBCreate(&cs->cbt[TV_ML_LOCK], cs->win, 200*dpiMult, 320*dpiMult, "Locking Shift",
 		 infofg, infobg, hicol, locol);
 
 	for (j = 0; j < TV_NCSS; j++) {
 	    BTCreate(&cs->bt[j], cs->win,
-		     5 + (BUTTW3 + 5) * (j % 5),
-		     350 + 5 + (BUTTH + 5) * (j / 5),
+		     5*dpiMult + (BUTTW3 + 5*dpiMult) * (j % 5),
+		     350*dpiMult + 5*dpiMult + (BUTTH + 5*dpiMult) * (j / 5),
 		     BUTTW3, BUTTH, codeSetNames[j],
 		     infofg, infobg, hicol, locol);
 	}
 	BTCreate(&cs->bt[TV_ML_ACCEPT], cs->win,
-		 CSWIDE - 10 - BUTTW3 * 2, CSHIGH - 5 - BUTTH, BUTTW3, BUTTH,
+		 CSWIDE - 10*dpiMult - BUTTW3 * 2, CSHIGH - 5*dpiMult - BUTTH, BUTTW3, BUTTH,
 		 "Accept", infofg, infobg, hicol, locol);
 	BTCreate(&cs->bt[TV_ML_CLOSE], cs->win,
-		 CSWIDE - 5 - BUTTW3, CSHIGH - 5 - BUTTH, BUTTW3, BUTTH,
+		 CSWIDE - 5*dpiMult - BUTTW3, CSHIGH - 5*dpiMult - BUTTH, BUTTW3, BUTTH,
 		 "Close", infofg, infobg, hicol, locol);
 
 	XMapSubwindows(theDisp, cs->win);
@@ -2591,28 +2591,28 @@ static void csRedraw(cs)
     int i;
 
     XSetForeground(theDisp, theGC, infofg);
-    DrawString(cs->win,  5,5 + ASCENT, "Initial States");
+    DrawString(cs->win,  5*dpiMult, 5*dpiMult + ASCENT, "Initial States");
     for (i = 0; i < TV_ML_NLISTS; i++) {
 	int x, y;
 	char buf[80];
 
 	if (i / 2 == 0)
-	    x = 15;
+	    x = 15*dpiMult;
 	else
-	    x = 280;
+	    x = 280*dpiMult;
 	if (i % 2 == 0)
-	    y = 5 + LINEHIGH * 1;
+	    y = 5*dpiMult + LINEHIGH * 1;
 	else
-	    y = 5 + LINEHIGH * 7 + SPACING * 3;
+	    y = 5*dpiMult + LINEHIGH * 7 + SPACING * 3;
 
 	sprintf(buf, "Designation for G%d:", i);
 	DrawString(cs->win, x, y + ASCENT, buf);
     }
 
-    DrawString(cs->win,  15, 235 + ASCENT, "Invocation for GL:");
-    DrawString(cs->win, 280, 235 + ASCENT, "Invocation for GR:");
-    DrawString(cs->win,   5, 280 + ASCENT, "Ret Code:");
-    DrawString(cs->win, 350, 280 + ASCENT, "Converter:");
+    DrawString(cs->win,  15*dpiMult, 235*dpiMult + ASCENT, "Invocation for GL:");
+    DrawString(cs->win, 280*dpiMult, 235*dpiMult + ASCENT, "Invocation for GR:");
+    DrawString(cs->win,   5*dpiMult, 280*dpiMult + ASCENT, "Ret Code:");
+    DrawString(cs->win, 350*dpiMult, 280*dpiMult + ASCENT, "Converter:");
 
     for (i = 0; i < TV_ML_NBUTTS; i++)
 	BTRedraw(&cs->bt[i]);

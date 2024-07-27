@@ -35,19 +35,19 @@ static char *filename;
 static int   colorType;
 
 /*** Stuff for WEBP Dialog box ***/
-#define WEBPWIDE 288
-#define WEBPHIGH 185
+#define WEBPWIDE (288*dpiMult)
+#define WEBPHIGH (185*dpiMult)
 
 #define QUALITY   70     /* default quality */
 
-#define DWIDE    86
-#define DHIGH    104
+#define DWIDE    (86*dpiMult)
+#define DHIGH    (104*dpiMult)
 
 #define P_BOK    0
 #define P_BCANC  1
 #define P_NBUTTS 2
 
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static DIAL  qDial;
 static BUTT  pbut[P_NBUTTS];
@@ -66,6 +66,7 @@ static void drawWEBPD(x, y, w, h)
   const char *ctitle4 = "quality = bigger file.";
 
   int i;
+  int dx, dy;
   XRectangle xr;
 
   xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
@@ -76,13 +77,16 @@ static void drawWEBPD(x, y, w, h)
 
   for (i=0; i<P_NBUTTS; i++) BTRedraw(&pbut[i]);
 
-  DrawString(webpW,       15,  6+ASCENT,                          title);
+  DrawString(webpW, 15*dpiMult, 6*dpiMult + ASCENT, title);
+
+  dx = 110*dpiMult;
+  dy = 6*dpiMult + qDial.y + ASCENT*dpiMult;
 
   sprintf(ctitle1, "Default = %d", QUALITY);
-  DrawString(webpW,      110,  6+qDial.y+ASCENT,            ctitle1);
-  DrawString(webpW,      110,  6+qDial.y+ASCENT+LINEHIGH,   ctitle2);
-  DrawString(webpW,      110,  6+qDial.y+ASCENT+2*LINEHIGH, ctitle3);
-  DrawString(webpW,      110,  6+qDial.y+ASCENT+3*LINEHIGH, ctitle4);
+  DrawString(webpW,      dx,  dy,            ctitle1);
+  DrawString(webpW,      dx,  dy+LINEHIGH,   ctitle2);
+  DrawString(webpW,      dx,  dy+2*LINEHIGH, ctitle3);
+  DrawString(webpW,      dx,  dy+3*LINEHIGH, ctitle4);
 
   CBRedraw(&FlosslessCB);
 
@@ -193,17 +197,17 @@ void CreateWEBPW()
 
   XSelectInput(theDisp, webpW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  DCreate(&qDial, webpW,  12, 25, DWIDE, DHIGH, 0.0,
+  DCreate(&qDial, webpW,  12*dpiMult, 25*dpiMult, DWIDE, DHIGH, 0.0,
           100.0, QUALITY, 1.0, 3.0,
           infofg, infobg, hicol, locol, "Quality", NULL);
 
-  CBCreate(&FlosslessCB,   webpW, 110, 6+qDial.y+ASCENT+4*LINEHIGH, "Lossless",
+  CBCreate(&FlosslessCB,   webpW, 110*dpiMult, 6*dpiMult + qDial.y + ASCENT + 4*LINEHIGH, "Lossless",
            infofg, infobg, hicol, locol);
   FlosslessCB.val = 0;
 
-  BTCreate(&pbut[P_BOK], webpW, WEBPWIDE-180-1, WEBPHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&pbut[P_BOK], webpW, WEBPWIDE - 180*dpiMult - 1*dpiMult, WEBPHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
           "Ok", infofg, infobg, hicol, locol);
-  BTCreate(&pbut[P_BCANC], webpW, WEBPWIDE-90-1, WEBPHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&pbut[P_BCANC], webpW, WEBPWIDE - 90*dpiMult - 1*dpiMult, WEBPHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
           "Cancel", infofg, infobg, hicol, locol);
 
   XMapSubwindows(theDisp, webpW);

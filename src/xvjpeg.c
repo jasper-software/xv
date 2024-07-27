@@ -27,20 +27,20 @@
 
 
 /*** Stuff for JPEG Dialog box ***/
-#define JWIDE 400
-#define JHIGH 200
+#define JWIDE (400*dpiMult)
+#define JHIGH (200*dpiMult)
 #define J_NBUTTS 2
 #define J_BOK    0
 #define J_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 /* Minimum size compression when doing a 'quick' image load.  (Of course, if
    the image *is* smaller than this, you'll get whatever size it actually is.)
    This is currently hardcoded to be twice the size of a schnauzer icon, as
    the schnauzer's the only thing that does a quick load... */
 
-#define QUICKWIDE 160
-#define QUICKHIGH 120
+#define QUICKWIDE (160*dpiMult)
+#define QUICKHIGH (120*dpiMult)
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub;
@@ -105,16 +105,16 @@ void CreateJPEGW()
 
   XSelectInput(theDisp, jpegW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  DCreate(&qDial, jpegW, 10, 10, 80, 100, 1.0, 100.0, 75.0, 1.0, 5.0,
+  DCreate(&qDial, jpegW, 10*dpiMult, 10*dpiMult, 80*dpiMult, 100*dpiMult, 1.0, 100.0, 75.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Quality", "%");
 
-  DCreate(&smDial, jpegW, 120, 10, 80, 100, 0.0, 100.0, 0.0, 1.0, 5.0,
+  DCreate(&smDial, jpegW, 120*dpiMult, 10*dpiMult, 80*dpiMult, 100*dpiMult, 0.0, 100.0, 0.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Smoothing", "%");
 
-  BTCreate(&jbut[J_BOK], jpegW, JWIDE-180-1, JHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&jbut[J_BOK], jpegW, JWIDE - 180*dpiMult - 1*dpiMult, JHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&jbut[J_BCANC], jpegW, JWIDE-90-1, JHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&jbut[J_BCANC], jpegW, JWIDE - 90*dpiMult - 1*dpiMult, JHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
   XMapSubwindows(theDisp, jpegW);
@@ -239,6 +239,7 @@ static void drawJD(x,y,w,h)
   const char *smtitle3 = "for typical GIFs.";
 
   int  i;
+  int dx, dy;
   XRectangle xr;
 
   xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
@@ -249,20 +250,31 @@ static void drawJD(x,y,w,h)
 
   for (i=0; i<J_NBUTTS; i++) BTRedraw(&jbut[i]);
 
-  DrawString(jpegW, 220, 10+ASCENT,                   title);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*1,        title1);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*2,        title2);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*3,        title3);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*4,        title4);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*5,        title5);
+  dx = 220*dpiMult;
+  dy = 10*dpiMult + ASCENT;
 
-  DrawString(jpegW,  15, 10+100+10+ASCENT,            qtitle1);
-  DrawString(jpegW,  15, 10+100+10+ASCENT+LINEHIGH,   qtitle2);
-  DrawString(jpegW,  15, 10+100+10+ASCENT+LINEHIGH*2, qtitle3);
+  DrawString(jpegW, dx, dy,              title);
 
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*0, smtitle1);
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*1, smtitle2);
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*2, smtitle3);
+  dx = 230*dpiMult;
+
+  DrawString(jpegW, dx, dy + LINEHIGH*1, title1);
+  DrawString(jpegW, dx, dy + LINEHIGH*2, title2);
+  DrawString(jpegW, dx, dy + LINEHIGH*3, title3);
+  DrawString(jpegW, dx, dy + LINEHIGH*4, title4);
+  DrawString(jpegW, dx, dy + LINEHIGH*5, title5);
+
+  dx = 15*dpiMult;
+  dy = (10 + 100 + 10)*dpiMult + ASCENT;
+
+  DrawString(jpegW,  dx, dy,              qtitle1);
+  DrawString(jpegW,  dx, dy + LINEHIGH,   qtitle2);
+  DrawString(jpegW,  dx, dy + LINEHIGH*2, qtitle3);
+
+  dx = 115*dpiMult;
+
+  DrawString(jpegW, dx, dy + LINEHIGH*0, smtitle1);
+  DrawString(jpegW, dx, dy + LINEHIGH*1, smtitle2);
+  DrawString(jpegW, dx, dy + LINEHIGH*2, smtitle3);
 
   XSetClipMask(theDisp, theGC, None);
 }

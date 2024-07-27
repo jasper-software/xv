@@ -24,19 +24,6 @@
 #endif
 
 
-/* program needs one of the following fonts.  Trys them in ascending order */
-#define FONT1 "-*-lucida-medium-r-*-*-12-*-*-*-*-*-*-*"
-#define FONT2 "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*"
-#define FONT3 "-*-helvetica-medium-r-*-*-11-*-*-*-*-*-*-*"
-#define FONT4 "6x13"
-#define FONT5 "fixed"
-
-/* a mono-spaced font needed for the 'pixel value tracking' feature */
-#define MFONT1 "-misc-fixed-medium-r-normal-*-13-*"
-#define MFONT2 "6x13"
-#define MFONT3 "-*-courier-medium-r-*-*-12-*"
-#define MFONT4 "fixed"
-
 
 /* default positions for various windows */
 #define DEFINFOGEOM "-10+10"       /* default position of info window */
@@ -63,6 +50,7 @@ static double vexpand = 1.0;    /* '-expand' argument */
 static const char *maingeom = NULL;
 static const char *icongeom = NULL;
 static Atom   __SWM_VROOT = None;
+static int dpiMultSet = 0;
 
 static char   basefname[NAME_MAX+1];   /* just the current fname, no path */
 
@@ -139,6 +127,7 @@ static void deleteFromList           PARM((int));
 static int  argcmp                   PARM((const char *, const char *,
                                            int, int, int *));
 static void add_filelist_to_namelist PARM((char *, char **, int *, int));
+static void makeFontName             PARM((char *, int, int, int));
 
 #ifdef HAVE_XRR
 extern int RRevent_number, RRerror_number;
@@ -309,6 +298,7 @@ int main(argc, argv)
   pscomp = 0;
   preset = 0;
   viewonly = 0;
+  dpiMult = 1;
 
 #ifdef ENABLE_FIXPIX_SMOOTH
   do_fixpix_smooth = 0;
@@ -438,6 +428,58 @@ int main(argc, argv)
   maxWIDE   = vrWIDE  = dispWIDE  = DisplayWidth(theDisp,theScreen);
   maxHIGH   = vrHIGH  = dispHIGH  = DisplayHeight(theDisp,theScreen);
 
+
+#ifdef HAVE_XRR
+  if (!dpiMultSet && XRRQueryExtension(theDisp, &RRevent_number, &RRerror_number)) {
+    XRRScreenResources *screenRes;
+    XRROutputInfo *outputInfo;
+    XRRCrtcInfo *crtcInfo;
+    int outputNum;
+
+    /* Get screen resources */
+    screenRes = XRRGetScreenResources(theDisp, rootW);
+    if (screenRes == NULL) {
+      fprintf(stderr, "Unable to get screen resources to check for hidpi\n");
+    } else {
+      /* Loop through each output to get the DPI */
+      for (outputNum = 0; outputNum < screenRes->noutput; outputNum++) {
+        outputInfo = XRRGetOutputInfo(theDisp, screenRes, screenRes->outputs[ outputNum ]);
+        if (outputInfo->crtc) {
+          crtcInfo = XRRGetCrtcInfo(theDisp, screenRes, outputInfo->crtc);
+
+          /* Physical size in inches */
+          double width_in = outputInfo->mm_width / 25.4;
+          double height_in = outputInfo->mm_height / 25.4;
+
+          /* Screen resolution in pixels */
+          int width_px = crtcInfo->width;
+          int height_px = crtcInfo->height;
+
+          /* Calculate the DPI */
+          double dpi_x = ((width_in < 1)? 0: (width_px / width_in));
+          double dpi_y = ((height_in < 1)? 0: (height_px / height_in));
+
+          XRRFreeCrtcInfo(crtcInfo);
+
+#if 0
+          /* Print the DPI values */
+          fprintf(stderr, "Output: %s\n", outputInfo->name);
+          fprintf(stderr, "Resolution: %dx%d pixels\n", width_px, height_px);
+          fprintf(stderr, "Physical size: %.2fx%.2f inches\n", width_in, height_in);
+          fprintf(stderr, "DPI: %.2f x %.2f\n", dpi_x, dpi_y);
+#endif
+
+          /* Check for a HiDPI display (common threshold: 144 DPI) */
+          if (dpi_x > 144 || dpi_y > 144) {
+	    dpiMult = 2;
+	  }
+        }
+        XRRFreeOutputInfo(outputInfo);
+      }
+    }
+    XRRFreeScreenResources(screenRes);
+  }
+#endif
 
   /* rootDEEP = dispDEEP; */
 
@@ -761,15 +803,23 @@ int main(argc, argv)
 
 
   /* try to load fonts */
-  if ( (mfinfo = XLoadQueryFont(theDisp,FONT1))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT2))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT3))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT4))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT5))==NULL) {
-    sprintf(dummystr,
-	    "couldn't open the following fonts:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s",
-	    FONT1, FONT2, FONT3, FONT4, FONT5);
-    FatalError(dummystr);
+  {
+    int fontnum;
+    char fontname[80];
+    mfinfo = NULL;
+    strcpy(dummystr, "couldn't open the following fonts:");
+    for (fontnum = 0; fontnum < 5; fontnum++) {
+      makeFontName(fontname, sizeof(fontname), /* mono */ 0, fontnum);
+      mfinfo = XLoadQueryFont(theDisp,fontname);
+      if (mfinfo != NULL) break;
+      if (strlen(dummystr) + strlen(fontname) + 8 < sizeof(dummystr)) {
+        strcat(dummystr,"\n\t");
+        strcat(dummystr,fontname);
+      }
+    }
+    if (mfinfo == NULL) {
+      FatalError(dummystr);
+    }
   }
   mfont=mfinfo->fid;
   XSetFont(theDisp,theGC,mfont);
@@ -783,13 +833,19 @@ int main(argc, argv)
   }
 
   if (!monofinfo) {
-    if ((monofinfo = XLoadQueryFont(theDisp,MFONT1))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT2))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT3))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT4))==NULL) {
-      sprintf(dummystr,"couldn't open %s fonts:\n\t%s\n\t%s\n\t%s\n\t%s",
-	      "any of the following",
-	      MFONT1, MFONT2, MFONT3, MFONT4);
+    int fontnum;
+    char fontname[80];
+    strcpy(dummystr, "couldn't open any of the following monospaced fonts:");
+    for (fontnum = 0; fontnum < 4; fontnum++) {
+      makeFontName(fontname, sizeof(fontname), /* mono */ 1, fontnum);
+      monofinfo = XLoadQueryFont(theDisp,fontname);
+      if (monofinfo != NULL) break;
+      if (strlen(dummystr) + strlen(fontname) + 8 < sizeof(dummystr)) {
+	strcat(dummystr,"\n\t");
+	strcat(dummystr,fontname);
+      }
+    }
+    if (monofinfo == NULL) {
       FatalError(dummystr);
     }
   }
@@ -802,7 +858,7 @@ int main(argc, argv)
     while (mfontsize[i]) {
       xlocale = 1;	/* True */
 
-      sprintf(mfontset, TV_FONTSET, mfontsize[i]);
+      sprintf(mfontset, TV_FONTSET, mfontsize[i] * dpiMult);
 /*fprintf(stderr, "FontSet: %s\n", mfontset);*/
 
       monofset = XCreateFontSet(theDisp, mfontset,
@@ -827,7 +883,7 @@ int main(argc, argv)
 
       if (xlocale) {
 	monofsetinfo = XExtentsOfFontSet(monofset);
-	monofsetinfo->max_logical_extent.width = mfontsize[i];
+	monofsetinfo->max_logical_extent.width = mfontsize[i] * dpiMult;
 		/* correct size of TextViewer
 		   in case that JIS X 0208 is not found */
 	break;
@@ -1442,8 +1498,10 @@ static void parseCmdLine(argc, argv)
      int argc;  char **argv;
 {
   int i, oldi, not_in_first_half, pm;
+  int hidpi;
 
   orignumnames = 0;
+  hidpi = 0;
 
   for (i=1, numnames=0; i<argc; i++) {
     oldi = i;
@@ -1630,6 +1688,16 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-lowresfax",4,0,&lowresfax)); /* low resolution fax */
     else if (!argcmp(argv[i],"-highresfax",4,0,&highresfax));/* high res. fax */
 #endif
+
+    else if (!argcmp(argv[i],"-hidpi", 4,1,&hidpi))        /* hi dpi */
+      { dpiMult = (hidpi? 2: 1); dpiMultSet = 1; }
+
+    else if (!argcmp(argv[i],"-dpimult", 4,0,&pm))         /* dpi mult */
+      { if (++i<argc) dpiMult = atoi(argv[i]);
+        if (dpiMult < 1) dpiMult = 1;
+        else if (dpiMult > 5) dpiMult = 5;
+        dpiMultSet = 1;
+      }
 
     else if (!argcmp(argv[i],"-hist", 4,1,&autohisteq));   /* hist eq */
 
@@ -4891,5 +4959,57 @@ int rd_str_cl (name_str, class_str, reinit)
   def_str = result.addr;
   if (def_str) return 1;
   else return 0;
+}
+
+/* Generate a variable or fixed font name */
+
+static void makeFontName(buf, buf_size, is_mono, font_num)
+char *buf;
+int buf_size;
+int is_mono;
+int font_num;
+{
+  const char *pattern;
+  int size, bigsize;
+
+  pattern = "fixed";
+  size = 0;
+  bigsize = 0;
+
+  if (is_mono) {
+    /* a mono-spaced font needed for the 'pixel value tracking' feature, was MFONT# defines */
+    if (dpiMult <= 1) {
+      switch (font_num) {
+      case 0: pattern = "-misc-fixed-medium-r-normal-*-%d-*"; size = 13; break;
+      case 1: pattern = "6x13"; break;
+      case 2: pattern = "-*-courier-medium-r-*-*-%d-*"; size = 12; break;
+      }
+    } else {
+      switch (font_num) {
+      case 0: pattern = "-misc-fixed-medium-r-normal-*-%d-*"; size = 13; bigsize = 20; break;
+      case 1: pattern = "-*-courier-medium-r-*-*-%d-*"; size = 12; bigsize = 25; break;
+      case 2: pattern = "12x24"; break;
+      }
+    }
+  } else {
+    /* program needs one of the following fonts.  Tries them in ascending order, was FONT# defines */
+    switch (font_num) {
+    case 0: pattern = "-*-lucida-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 12; bigsize = 25; break;
+    case 1: pattern = "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 12; bigsize = 25; break;
+    case 2: pattern = "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 11; bigsize = 20; break;
+    case 3: pattern = ((dpiMult <= 1)? "6x13": "12x24"); break;
+    }
+  }
+
+  if (size > 0) {
+    if (dpiMult > 1) size = ((bigsize > 0)? bigsize: (size * dpiMult));
+    snprintf(buf, buf_size, pattern, size);
+  } else {
+    strncpy(buf, pattern, buf_size);
+  }
+
+  buf[ buf_size-1 ] = '\0';
+
+  /* fprintf(stderr, "makeFontName, mono %d num %d -> %s\n", is_mono, font_num, buf); */
 }
 

@@ -35,8 +35,8 @@
 #include "png.h"
 
 /*** Stuff for PNG Dialog box ***/
-#define PWIDE 318
-#define PHIGH 215
+#define PWIDE (318*dpiMult)
+#define PHIGH (215*dpiMult)
 
 #define DISPLAY_GAMMA 2.20  /* default display gamma */
 #define COMPRESSION   6     /* default zlib compression level, not max
@@ -46,17 +46,17 @@
 #define HAVE_tRNS  (info_ptr->valid & PNG_INFO_tRNS) */
 #define HAVE_tRNS  png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS)
 
-#define DWIDE    86
-#define DHIGH    104
-#define PFX      (PWIDE-93)
-#define PFY      44
-#define PFH      20
+#define DWIDE    (86*dpiMult)
+#define DHIGH    (104*dpiMult)
+#define PFX      (PWIDE - 93*dpiMult)
+#define PFY      (44*dpiMult)
+#define PFH      (20*dpiMult)
 
 #define P_BOK    0
 #define P_BCANC  1
 #define P_NBUTTS 2
 
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 #define LF       10   /* a.k.a. '\n' on ASCII machines */
 #define CR       13   /* a.k.a. '\r' on ASCII machines */
@@ -129,21 +129,21 @@ void CreatePNGW()
 
   XSelectInput(theDisp, pngW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  DCreate(&cDial, pngW,  12, 25, DWIDE, DHIGH, (double)Z_NO_COMPRESSION,
+  DCreate(&cDial, pngW,  12*dpiMult, 25*dpiMult, DWIDE, DHIGH, (double)Z_NO_COMPRESSION,
           (double)Z_BEST_COMPRESSION, COMPRESSION, 1.0, 3.0,
           infofg, infobg, hicol, locol, "Compression", NULL);
 
-  DCreate(&gDial, pngW, DWIDE+27, 25, DWIDE, DHIGH, 1.0, 3.5,DISPLAY_GAMMA,0.01,0.2,
+  DCreate(&gDial, pngW, DWIDE + 27*dpiMult, 25*dpiMult, DWIDE, DHIGH, 1.0, 3.5,DISPLAY_GAMMA,0.01,0.2,
           infofg, infobg, hicol, locol, "Disp. Gamma", NULL);
 
-  CBCreate(&interCB, pngW,  DWIDE+30, DHIGH+3*LINEHIGH+2, "interlace",
+  CBCreate(&interCB, pngW,  DWIDE + 30*dpiMult, DHIGH + 3*LINEHIGH + 2*dpiMult, "interlace",
            infofg, infobg, hicol, locol);
 
   CBCreate(&FdefCB,   pngW, PFX, PFY, "Default",
            infofg, infobg, hicol, locol);
   FdefCB.val = 1;
 
-  CBCreate(&FnoneCB,  pngW, PFX, FdefCB.y + PFH + 4, "none",
+  CBCreate(&FnoneCB,  pngW, PFX, FdefCB.y + PFH + 4*dpiMult, "none",
            infofg, infobg, hicol, locol);
   CBCreate(&FsubCB,   pngW, PFX, FnoneCB.y + PFH, "sub",
            infofg, infobg, hicol, locol);
@@ -161,9 +161,9 @@ void CreatePNGW()
   CBSetActive(&FavgCB, !FdefCB.val);
   CBSetActive(&FPaethCB, !FdefCB.val);
 
-  BTCreate(&pbut[P_BOK], pngW, PWIDE-180-1, PHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&pbut[P_BOK], pngW, PWIDE - 180*dpiMult - 1*dpiMult, PHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
           "Ok", infofg, infobg, hicol, locol);
-  BTCreate(&pbut[P_BCANC], pngW, PWIDE-90-1, PHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&pbut[P_BCANC], pngW, PWIDE - 90*dpiMult - 1*dpiMult, PHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
           "Cancel", infofg, infobg, hicol, locol);
 
   XMapSubwindows(theDisp, pngW);
@@ -293,23 +293,23 @@ static void drawPD(x, y, w, h)
 
   for (i=0; i<P_NBUTTS; i++) BTRedraw(&pbut[i]);
 
-  DrawString(pngW,       15,  6+ASCENT,                          title);
+  DrawString(pngW,       15*dpiMult,  6*dpiMult + ASCENT,                              title);
 
   sprintf(ctitle1, "Default = %d", COMPRESSION);
-  DrawString(pngW,       18,  6+DHIGH+cDial.y+ASCENT,            ctitle1);
-  DrawString(pngW,       17,  6+DHIGH+cDial.y+ASCENT+LINEHIGH,   ctitle2);
-  DrawString(pngW,       17,  6+DHIGH+cDial.y+ASCENT+2*LINEHIGH, ctitle3);
-  DrawString(pngW,       17,  6+DHIGH+cDial.y+ASCENT+3*LINEHIGH, ctitle4);
+  DrawString(pngW,       18*dpiMult,  6*dpiMult + DHIGH + cDial.y+ASCENT,              ctitle1);
+  DrawString(pngW,       17*dpiMult,  6*dpiMult + DHIGH + cDial.y+ASCENT + LINEHIGH,   ctitle2);
+  DrawString(pngW,       17*dpiMult,  6*dpiMult + DHIGH + cDial.y+ASCENT + 2*LINEHIGH, ctitle3);
+  DrawString(pngW,       17*dpiMult,  6*dpiMult + DHIGH + cDial.y+ASCENT + 3*LINEHIGH, ctitle4);
 
   sprintf(gtitle, "Default = %g", DISPLAY_GAMMA);
-  DrawString(pngW, DWIDE+30,  6+DHIGH+gDial.y+ASCENT,            gtitle);
+  DrawString(pngW, DWIDE + 30*dpiMult,  6*dpiMult + DHIGH + gDial.y+ASCENT,            gtitle);
 
-  ULineString(pngW, FdefCB.x, FdefCB.y-3-DESCENT, ftitle);
-  XDrawRectangle(theDisp, pngW, theGC, FdefCB.x-11, FdefCB.y-LINEHIGH-3,
-                                       93, 8*LINEHIGH+15);
+  ULineString(pngW, FdefCB.x, FdefCB.y - 3*dpiMult - DESCENT, ftitle);
+  XDrawRectangle(theDisp, pngW, theGC, FdefCB.x - 11*dpiMult, FdefCB.y - LINEHIGH - 3*dpiMult,
+                                       93*dpiMult, 8*LINEHIGH + 15*dpiMult);
   CBRedraw(&FdefCB);
-  XDrawLine(theDisp, pngW, theGC, FdefCB.x-11, FdefCB.y+LINEHIGH+4,
-                                  FdefCB.x+82, FdefCB.y+LINEHIGH+4);
+  XDrawLine(theDisp, pngW, theGC, FdefCB.x - 11*dpiMult, FdefCB.y + LINEHIGH + 4*dpiMult,
+                                  FdefCB.x + 82*dpiMult, FdefCB.y + LINEHIGH + 4*dpiMult);
 
   CBRedraw(&FnoneCB);
   CBRedraw(&FupCB);

@@ -140,17 +140,17 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define TEMP_LIT  3        /* temporarily selected, normally off */
 #define TEMP_LIT1 4        /* temporarily selected, normally on */
 
-#define TOPMARGIN 30       /* from top of window to top of iconwindow */
-#define BOTMARGIN 58       /* room for a row of buttons and a line of text */
+#define TOPMARGIN (30 * dpiMult) /* from top of window to top of iconwindow */
+#define BOTMARGIN (58 * dpiMult) /* room for a row of buttons and a line of text */
 #define LRMARGINS 5        /* left and right margins */
 
 /* some people like bigger icons; 4:3 aspect ratio is recommended
  * (NOTE:  standard XV binaries will not be able to read larger icons!) */
 #ifndef ISIZE_WIDE
-#  define ISIZE_WIDE 80    /* maximum size of an icon */
+#  define ISIZE_WIDE (80 * dpiMult)   /* maximum size of an icon */
 #endif
 #ifndef ISIZE_HIGH
-#  define ISIZE_HIGH 60
+#  define ISIZE_HIGH (60 /* * dpiMult */)
 #endif
 
 #ifndef ISIZE_WPAD
@@ -167,7 +167,7 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define ISPACE_WIDE (ISIZE_WIDE+ISIZE_WPAD)   /* icon spacing */
 #define ISPACE_TOP  4                 /* dist btwn top of ISPACE and ISIZE */
 #define ISPACE_TTOP 4                 /* dist btwn bot of icon and title */
-#define ISPACE_HIGH (ISIZE_HIGH+ISPACE_TOP+ISPACE_TTOP+16+4)
+#define ISPACE_HIGH (ISIZE_HIGH+ISPACE_TOP+ISPACE_TTOP+(16+4)*dpiMult)
 
 #define COUNT(x) (sizeof (x) / sizeof (x)[0])
 
@@ -197,16 +197,16 @@ typedef unsigned int mode_t;  /* file mode bits */
 #  define BR_NCMDS    17   /* # of menu commands */
 #endif
 
-#define BUTTW 80
-#define BUTTH 24
+#define BUTTW (80 * dpiMult)
+#define BUTTH (24 * dpiMult)
 
 /* original size of window was 615 x 356 (for 80x60 thumbnails in 6x3 array) */
 #define DEF_BROWWIDE  (ISPACE_WIDE * INUM_WIDE + LRMARGINS * 2 + 29)
 #define DEF_BROWHIGH  (ISPACE_HIGH * INUM_HIGH + BUTTH * 2 + 16 + 28)
 /* last number is a fudge--e.g., extra spaces, borders, etc. -----^  */
 
-#define MIN_BROWWIDE  (325 + 96)
-#define MIN_BROWHIGH  180
+#define MIN_BROWWIDE  ((325 + 96) * dpiMult)
+#define MIN_BROWHIGH  (180 * dpiMult)
 
 
 static const char *showHstr = "Show hidden files";
@@ -541,10 +541,10 @@ void CreateBrowse(geom, userspec, fgstr, bgstr, histr, lostr)
 
     XMapSubwindows(theDisp, br->win);
 
-    MBCreate(&(br->dirMB), br->win, 0,0,100,19, NULL,NULL,0,
+    MBCreate(&(br->dirMB), br->win, 0,0,100,19*dpiMult, NULL,NULL,0,
 	     browfg,browbg,browhi,browlo);
 
-    MBCreate(&(br->cmdMB), br->win, 0,0,160,19, "Misc. Commands",
+    MBCreate(&(br->cmdMB), br->win, 0,0,160*dpiMult,19*dpiMult, "Misc. Commands",
 	     cmdMList, BR_NCMDS, browfg,browbg,browhi,browlo);
 
     br->showhidden   = 0;
