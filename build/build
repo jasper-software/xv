@@ -34,6 +34,8 @@ usage()
 	    Strict build to treat warnings as errors.
 	-o \$configure_options
 	    Add \$configure_options to the cmake command line.
+	-f
+	    Fast build, don't install.
 	-p clang|gcc
 	    Set compiler
 	-v
@@ -46,18 +48,21 @@ usage()
 
 program_dir=$(dirname "$0") || exit 1
 top_dir="$program_dir/.."
+real_top_dir=$(realpath "$top_dir")
+if [ -n "$real_top_dir" ] && [ -d "$real_top_dir" ] ; then top_dir="$real_top_dir" ; fi
 
 verbose=0
 build_dir=
 install_dir=
 tmp_dir=
+install=1
 mode=release
 strict=0
 clean=0
 c_compiler=
 configure_options=()
 
-while getopts vhcb:i:o:t:p:drs opt; do
+while getopts vhcb:i:o:t:fp:drs opt; do
 	case $opt in
 	s)
 		strict=1;;
@@ -75,6 +80,8 @@ while getopts vhcb:i:o:t:p:drs opt; do
 		configure_options+=("$OPTARG");;
 	c)
 		clean=1;;
+	f)
+		install=0;;
 	p)
 		c_compiler="$OPTARG";;
 	v)
@@ -98,6 +105,7 @@ if [ -z "$install_dir" ]; then
 fi
 
 if [ "$clean" -ge 1 ]; then
+	echo "Cleaning..."
 	case "$build_dir" in
 	*tmp*/*build*)
 		rm -rf "$build_dir" || panic "Could not clean build dir ${build_dir}.";;
@@ -135,9 +143,17 @@ if [ "$strict" -ne 0 ]; then
 	configure_options+=(-DXV_STRICT=1)
 fi
 
+echo "Starting $mode build"
+echo "Top dir: $top_dir"
+echo "Build dir: $build_dir"
+echo "Install dir: $install_dir"
+echo "Options: ${configure_options[*]}"
+
 cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \
   panic "configure failed"
 
 cmake --build "$build_dir" || panic "build failed"
 
-cmake --build "$build_dir" --target install || panic "install failed"
+if [ "$install" -ne 0 ]; then
+	cmake --build "$build_dir" --target install || panic "install failed"
+fi
