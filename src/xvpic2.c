@@ -277,6 +277,7 @@ static void pic2_show_pic2_info        PARM((struct pic2_info*));
 static char *pic2_strncpy              PARM((char*,char*,size_t));
 static void *pic2_malloc               PARM((size_t,char*));
 static void *pic2_new                  PARM((size_t,char*));
+static void pic2_xvbzero               PARM((char *, size_t));
 
 static int WritePIC2                   PARM((FILE*,byte*,int,int,int,
 					     byte*,byte*,byte*,int,int,char*,
@@ -1203,7 +1204,7 @@ byte **xp, *rp, *gp, *bp;
     XV_UNUSED(bp);
 
     if (*xp == NULL)
-	*xp = pic2_new((size_t) pi->x_max * pi->y_max * 3, "pic2_make_xvpic");   // GRR POSSIBLE OVERFLOW / FIXME
+	*xp = pic2_new((size_t) pi->x_max * pi->y_max * 3, "pic2_make_xvpic");   /* GRR POSSIBLE OVERFLOW / FIXME */
 
     if (pi->block->flag & 1)
 	opaque = pi->block->opaque;
@@ -1920,6 +1921,17 @@ struct pic2_info *pi;
     }
 }
 
+/* unchecked xvbzero for accessing negative indices in flag2 buffers */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((no_sanitize("address")))
+#endif
+static void pic2_xvbzero(s, len)
+char *s;
+size_t len;
+{
+    for ( ; len>0; len--) *s++ = 0;
+}
+
 static int pic2_arith_press_line(pi, line)
 struct pic2_info *pi;
 pixel **line;
@@ -1934,7 +1946,7 @@ pixel **line;
 
     pic2_handle_para(pi, 0);
 
-    xvbzero((char *) pi->flag2_next2 - 4,
+    pic2_xvbzero((char *) pi->flag2_next2 - 4,
 	    (8 + xw) * sizeof(pi->flag2_next2[0]));
 
     if (pi->ynow == 0) {			/* first line */
@@ -1975,9 +1987,9 @@ pixel **line;
 	xvbzero((char *) pi->cache, 8 * 8 * 8 * sizeof(pi->cache[0]));
 	xvbzero((char *) pi->cache_pos, 8 * 8 * 8 * sizeof(pi->cache_pos[0]));
 
-	xvbzero((char *) pi->flag2_next - 4,
+	pic2_xvbzero((char *) pi->flag2_next - 4,
 		(8 + xw) * sizeof(pi->flag2_next[0]));
-	xvbzero((char *) pi->flag2_next2 - 4,
+	pic2_xvbzero((char *) pi->flag2_next2 - 4,
 		(8 + xw) * sizeof(pi->flag2_next2[0]));
 
 	pi->vram_next[-1] = cc;
@@ -2808,7 +2820,7 @@ struct pic2_info *pi;
 
     wid = pi->block->x_wid;
 
-    p = pi->buf = (byte *) pic2_new((wid + 8) * sizeof(pixel) * 3   // GRR POSSIBLE OVERFLOW / FIXME
+    p = pi->buf = (byte *) pic2_new((wid + 8) * sizeof(pixel) * 3   /* GRR POSSIBLE OVERFLOW / FIXME */
 				    + sizeof(pi->cache[0]) * 8 * 8 * 8
 				    + sizeof(pi->cache_pos[0]) * 8 * 8 * 8
 				    + sizeof(pi->mulu_tab[0]) * 16384

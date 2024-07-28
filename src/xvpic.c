@@ -797,7 +797,9 @@ static void pic_write_length(pi, len)
 	max = (max + 1) * 2;
 	bits++;
     }
-    pic_write_bits(pi, 0xffffffff, bits);
+    if (bits > 0){
+	pic_write_bits(pi, 0xffffffff, bits);
+    }
     pic_write_bits(pi, 0, 1);
     pic_write_bits(pi, len - max / 2, bits + 1);
 }
