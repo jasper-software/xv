@@ -190,8 +190,7 @@ static void build_hremap     PARM((void));
 
 
 /***************************/
-static void printUTime(str)
-     const char *str;
+static void printUTime(const char *str)
 {
 #ifdef TIMING_TEST
   int i;
@@ -208,10 +207,7 @@ static void printUTime(str)
 
 
 /***************************************************/
-void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
-     const char *geom;
-     double      gam, rgam, ggam, bgam;
-     int         defpreset;
+void CreateGam(const char *geom, double gam, double rgam, double ggam, double bgam, int defpreset)
 {
   XSetWindowAttributes xswa;
 
@@ -486,8 +482,7 @@ void CreateGam(geom, gam, rgam, ggam, bgam, defpreset)
 
 
 /***************************************************/
-int GamCheckEvent(xev)
-XEvent *xev;
+int GamCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -711,7 +706,7 @@ XEvent *xev;
 
 
 /***************************************************/
-static void computeHSVlinear()
+static void computeHSVlinear(void)
 {
   /* determine linearity of HSV controls to avoid semi-expensive (and
      error-inducing) HSV calculations */
@@ -734,7 +729,7 @@ static void computeHSVlinear()
 
 
 /***************************************************/
-static void changedGam()
+static void changedGam(void)
 {
   /* called whenever an HSV/RGB gamma ctrl has changed
      applies change to image if autoCB.val is set */
@@ -746,8 +741,7 @@ static void changedGam()
 
 
 /***************************************************/
-void GamBox(vis)
-int vis;
+void GamBox(int vis)
 {
   if (vis) XMapRaised(theDisp, gamW);
   else     XUnmapWindow(theDisp, gamW);
@@ -757,8 +751,7 @@ int vis;
 
 
 /***************************************************/
-static void drawGam(x,y,w,h)
-int x,y,w,h;
+static void drawGam(int x, int y, int w, int h)
 {
   XRectangle xr;
 
@@ -773,8 +766,7 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawBut(x,y,w,h)
-int x,y,w,h;
+static void drawBut(int x, int y, int w, int h)
 {
   int i;
   XRectangle xr;
@@ -791,8 +783,7 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawArrow(x,y)
-int x,y;
+static void drawArrow(int x, int y)
 {
   XPoint pts[8];
 
@@ -813,7 +804,7 @@ int x,y;
 
 
 /***************************************************/
-static void drawCmap()
+static void drawCmap(void)
 {
   int i;
 
@@ -833,7 +824,7 @@ static void drawCmap()
 
 
 /***************************************************/
-void NewCMap()
+void NewCMap(void)
 {
   /* called when we've loaded a new picture */
 
@@ -866,7 +857,7 @@ void NewCMap()
 
 
 /***************************************************/
-void RedrawCMap()
+void RedrawCMap(void)
 {
   int i;
 
@@ -909,8 +900,7 @@ void RedrawCMap()
 
 
 /***************************************************/
-static void selectCell(cellno, sel)
-int cellno, sel;
+static void selectCell(int cellno, int sel)
 {
   int x,y;
 
@@ -933,8 +923,7 @@ int cellno, sel;
 
 
 /***************************************************/
-static void clickGam(x,y)
-int x,y;
+static void clickGam(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -960,8 +949,7 @@ int x,y;
 
 
 /***************************************************/
-static void clickCmap(x,y,but)
-int x,y,but;
+static void clickCmap(int x, int y, int but)
 {
   int i, recolor;
   BUTT *bp;
@@ -1131,8 +1119,7 @@ int x,y,but;
 
 
 /***************************************************/
-static int deladdCell(cnum, first)
-int cnum, first;
+static int deladdCell(int cnum, int first)
 {
   int i,j,rv;
   static int mode;
@@ -1254,8 +1241,7 @@ int cnum, first;
 
 
 /*********************/
-void ChangeEC(num)
-int num;
+void ChangeEC(int num)
 {
   /* given a color # that is to become the new editColor, do all
      highlighting/unhighlighting, copy editColor's rgb values to
@@ -1307,7 +1293,7 @@ int num;
 
 
 /*********************/
-void ApplyECctrls()
+void ApplyECctrls(void)
 {
   /* sets values of {r,g,b}cmap[editColor] based on dial settings */
 
@@ -1328,7 +1314,7 @@ void ApplyECctrls()
 
 
 /*********************/
-void GenerateFSGamma()
+void GenerateFSGamma(void)
 {
   /* this function generates the Floyd-Steinberg gamma curve (fsgamcr)
 
@@ -1358,8 +1344,7 @@ void GenerateFSGamma()
 
 
 /*********************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
   int i;
   GRAF_STATE gs;
@@ -1556,7 +1541,7 @@ int cmd;
 
 
 /*********************/
-static void SetHSVmode()
+static void SetHSVmode(void)
 {
   if (!hsvmode) {
     rhDial.title = "Red";
@@ -1595,8 +1580,7 @@ static void SetHSVmode()
 
 
 /*********************/
-static void applyGamma(cmapchange)
-     int cmapchange;
+static void applyGamma(int cmapchange)
 {
   /* called to regenerate the image based on r/g/bcmap or output of rgb/hsv
      filters.  Doesn't check autoCB.  Note: if cmap change, and we have
@@ -1679,8 +1663,7 @@ static void applyGamma(cmapchange)
 
 
 /*********************/
-static void calcHistEQ(histeq, rminv, rmaxv)
-     int *histeq, *rminv, *rmaxv;
+static void calcHistEQ(int *histeq, int *rminv, int *rmaxv)
 {
   int i, maxv, topbin, hist[256], rgb[256];
   byte *ep;
@@ -1761,7 +1744,7 @@ static void calcHistEQ(histeq, rminv, rmaxv)
 
 
 /*********************/
-void DoHistEq()
+void DoHistEq(void)
 {
   int i, histeq[256], minv, maxv;
 
@@ -1785,7 +1768,7 @@ void DoHistEq()
 
 
 /*********************/
-void DoNorm()
+void DoNorm(void)
 {
   int i, minv, maxv, v;
   GRAF_STATE gs;
@@ -1825,7 +1808,7 @@ void DoNorm()
 
 
 /*********************/
-void GammifyColors()
+void GammifyColors(void)
 {
   int i;
 
@@ -1850,8 +1833,7 @@ void GammifyColors()
 #define NOHUE -1
 
 /*********************/
-void Gammify1(col)
-int col;
+void Gammify1(int col)
 {
   int rv, gv, bv, vi, hi;
   double h,s,v;
@@ -1915,9 +1897,7 @@ int col;
 
 
 /*********************/
-void rgb2hsv(r,g,b, hr, sr, vr)
-int r, g, b;
-double *hr, *sr, *vr;
+void rgb2hsv(int r, int g, int b, double *hr, double *sr, double *vr)
 {
   double rd, gd, bd, h, s, v, max, min, del, rc, gc, bc;
 
@@ -1959,9 +1939,7 @@ double *hr, *sr, *vr;
 
 
 /*********************/
-void hsv2rgb(h, s, v, rr, gr, br)
-double h, s, v;
-int *rr, *gr, *br;
+void hsv2rgb(double h, double s, double v, int *rr, int *gr, int *br)
 {
   int    j;
   double rd, gd, bd;
@@ -1998,8 +1976,7 @@ int *rr, *gr, *br;
 
 
 /*********************/
-static void ctrls2gamstate(gs)
-     struct gamstate *gs;
+static void ctrls2gamstate(struct gamstate *gs)
 {
   xvbcopy((char *) hmap, (char *) gs->hmap, sizeof(hmap));
 
@@ -2018,8 +1995,7 @@ static void ctrls2gamstate(gs)
 
 
 /*********************/
-static void gamstate2ctrls(gs)
-struct gamstate *gs;
+static void gamstate2ctrls(struct gamstate *gs)
 {
   int changed = 0;
   struct hmap *hm;
@@ -2083,7 +2059,7 @@ struct gamstate *gs;
 static int nosave_kludge = 0;
 
 /*********************/
-static void saveGamState()
+static void saveGamState(void)
 {
   /* increment uptr, sticks current state into uptr
      set utail = uptr
@@ -2104,7 +2080,7 @@ static void saveGamState()
 
 
 /*********************/
-static void gamUndo()
+static void gamUndo(void)
 {
   /* if uptr!=uhead  decements uptr, restores state pointed to by uptr
                      if uptr now == uhead, turn off 'Undo' button
@@ -2123,7 +2099,7 @@ static void gamUndo()
 
 
 /*********************/
-static void gamRedo()
+static void gamRedo(void)
 {
   /* if uptr != utail   increments uptr, restores state pointed to by uptr
                         if uptr now == utail, turn off 'Redo' button */
@@ -2142,7 +2118,7 @@ static void gamRedo()
 
 
 /*********************/
-static void rndCols()
+static void rndCols(void)
 {
   int i,j;
 
@@ -2168,8 +2144,7 @@ static void rndCols()
 
 
 /*********************/
-static void saveCMap(cst)
-struct cmapstate *cst;
+static void saveCMap(struct cmapstate *cst)
 {
   int i;
 
@@ -2187,8 +2162,7 @@ struct cmapstate *cst;
 
 
 /*********************/
-static void restoreCMap(cst)
-struct cmapstate *cst;
+static void restoreCMap(struct cmapstate *cst)
 {
   int i;
 
@@ -2208,7 +2182,7 @@ struct cmapstate *cst;
 
 
 /*********************/
-static void parseResources()
+static void parseResources(void)
 {
   char gname[80], tmp[512], tmp1[256];
   int  i,j;
@@ -2314,7 +2288,7 @@ static void parseResources()
 
 
 /*********************/
-static void makeResources()
+static void makeResources(void)
 {
   char rsrc[2000];     /* wild over-estimation */
   char gname[40], rname[64], tmp[512], tmp1[256];
@@ -2377,7 +2351,7 @@ static void makeResources()
 
 
 /*****************************/
-static void dragGamma ()
+static void dragGamma (void)
 {
   /* called through DIAL.drawobj and GRAF.drawobj
      while gamma ctrls are being dragged
@@ -2392,7 +2366,7 @@ static void dragGamma ()
 
 
 /*****************************/
-static void dragHueDial()
+static void dragHueDial(void)
 {
   /* called through HDIAL.drawobj
      while hue gamma ctrls are being dragged
@@ -2409,7 +2383,7 @@ static void dragHueDial()
 
 
 /*****************************/
-static void dragEditColor()
+static void dragEditColor(void)
 {
   /* called through DIAL.drawobj
      while color editor ctrls are being dragged
@@ -2436,12 +2410,7 @@ static Pixmap hdbpix2[N_HDBUTT2];
 #define PH 15
 
 /**************************************************/
-static void HDCreate(hd, win, x, y, r, st, en, ccwise, str, fg, bg)
-     HDIAL      *hd;
-     Window      win;
-     int         x, y, r, st, en, ccwise;
-     const char *str;
-     u_long      fg, bg;
+static void HDCreate(HDIAL *hd, Window win, int x, int y, int r, int st, int en, int ccwise, const char *str, u_long fg, u_long bg)
 {
   int i;
 
@@ -2508,9 +2477,7 @@ static void HDCreate(hd, win, x, y, r, st, en, ccwise, str, fg, bg)
 
 
 /**************************************************/
-static void HDRedraw(hd, flags)
-HDIAL *hd;
-int flags;
+static void HDRedraw(HDIAL *hd, int flags)
 {
   int    i, x, y, x1, y1;
   double a;
@@ -2698,9 +2665,7 @@ int flags;
 
 
 /**************************************************/
-static int HDClick(hd,mx,my)
-HDIAL *hd;
-int mx, my;
+static int HDClick(HDIAL *hd, int mx, int my)
 {
   /* called when a click received.  checks whether HDTrack needs to be
      called.  Returns '1' if click is in HD dial area, 0 otherwise */
@@ -2845,9 +2810,7 @@ int mx, my;
 
 
 /**************************************************/
-static int HDTrack(hd,mx,my)
-HDIAL *hd;
-int mx,my;
+static int HDTrack(HDIAL *hd, int mx, int my)
 {
   /* called when clicked in dial area.  tracks dragging handles around...
      returns '1' if anything changed */
@@ -2992,8 +2955,7 @@ int mx,my;
 
 
 /**************************************************/
-static int hdg2xdg(hdg)
-int hdg;
+static int hdg2xdg(int hdg)
 {
   int xdg;
 
@@ -3006,9 +2968,7 @@ int hdg;
 
 
 /**************************************************/
-static void pol2xy(cx, cy, ang, rad, xp, yp)
-int cx, cy, rad, *xp, *yp;
-double ang;
+static void pol2xy(int cx, int cy, double ang, int rad, int *xp, int *yp)
 {
   *xp = cx + (int) (cos(ang) * (double) rad);
   *yp = cy - (int) (sin(ang) * (double) rad);
@@ -3016,9 +2976,7 @@ double ang;
 
 
 /***************************************************/
-static int computeHDval(hd, x, y)
-HDIAL *hd;
-int x, y;
+static int computeHDval(HDIAL *hd, int x, int y)
 {
   int dx, dy;
   double angle;
@@ -3048,7 +3006,7 @@ int x, y;
 
 
 /****************************************************/
-static void initHmap()
+static void initHmap(void)
 {
   int i;
   for (i=0; i<N_HMAP; i++) init1hmap(i);
@@ -3056,8 +3014,7 @@ static void initHmap()
 
 
 /****************************************************/
-static void init1hmap(i)
-int i;
+static void init1hmap(int i)
 {
   int cang, width;
 
@@ -3071,7 +3028,7 @@ int i;
 
 
 /****************************************************/
-static void dials2hmap()
+static void dials2hmap(void)
 {
   int i;
   i = RBWhich(hueRB);
@@ -3087,7 +3044,7 @@ static void dials2hmap()
 
 
 /****************************************************/
-static void hmap2dials()
+static void hmap2dials(void)
 {
   int i;
   i = RBWhich(hueRB);
@@ -3106,7 +3063,7 @@ static void hmap2dials()
 
 
 /****************************************************/
-static void build_hremap()
+static void build_hremap(void)
 {
   int i,j, st1, en1, inc1, len1, st2, en2, inc2, len2;
   int a1, a2;
@@ -3170,9 +3127,7 @@ static void build_hremap()
 
 
 /*********************/
-byte *GammifyPic24(pic24, wide, high)
-     byte *pic24;
-     int   wide,high;
+byte *GammifyPic24(byte *pic24, int wide, int high)
 {
   /* applies HSV/RGB modifications to each pixel in given 24-bit image.
      creates and returns a new picture, or NULL on failure.
@@ -3333,8 +3288,7 @@ byte *GammifyPic24(pic24, wide, high)
 
 
 /*********************/
-void GamSetAutoApply(val)
-     int val;
+void GamSetAutoApply(int val)
 {
   /* turns auto apply checkbox on/off.  If val == -1, sets to 'default' val */
 

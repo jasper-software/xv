@@ -139,9 +139,7 @@ extern XtAppContext context;
 #endif
 
 /***************************************************/
-void SetMinSizeWindow(win, w, h)
-    Window win;
-    int    w, h;
+void SetMinSizeWindow(Window win, int w, int h)
 {
   XSizeHints hints;
 
@@ -154,9 +152,7 @@ void SetMinSizeWindow(win, w, h)
 
 
 /***************************************************/
-void SetMaxSizeWindow(win, w, h)
-    Window win;
-    int    w, h;
+void SetMaxSizeWindow(Window win, int w, int h)
 {
   XSizeHints hints;
 
@@ -169,9 +165,7 @@ void SetMaxSizeWindow(win, w, h)
 
 
 /***************************************************/
-void SetSizeIncWindow(win, dx, dy)
-    Window win;
-    int    dx, dy;
+void SetSizeIncWindow(Window win, int dx, int dy)
 {
   XSizeHints hints;
 
@@ -187,9 +181,7 @@ void SetSizeIncWindow(win, dx, dy)
 
 
 /***************************************************/
-void CenterMapFlexWindow(win, dx, dy, w, h, keepsize)
-    Window win;
-    int    dx, dy, w, h, keepsize;
+void CenterMapFlexWindow(Window win, int dx, int dy, int w, int h, int keepsize)
 {
   XSizeHints   hints;
   Window       rW,cW;
@@ -240,30 +232,21 @@ void CenterMapFlexWindow(win, dx, dy, w, h, keepsize)
 }
 
 
-void CenterMapWindow(win, dx, dy, w, h)
-    Window win;
-    int    dx, dy, w, h;
+void CenterMapWindow(Window win, int dx, int dy, int w, int h)
 {
   CenterMapFlexWindow(win, dx, dy, w, h, TRUE);
 }
 
 
 /***************************************************/
-int PopUp(txt, labels, n)
-    const char *txt;
-    const char *labels[];
-    int         n;
+int PopUp(const char *txt, const char **labels, int n)
 {
   return doPopUp(txt, labels, n, ISPOPUP, "xv confirm");
 }
 
 
 /***************************************************/
-static int doPopUp(txt, labels, n, poptyp, wname)
-    const char *txt;
-    const char *labels[];
-    int         n, poptyp;
-    const char *wname;
+static int doPopUp(const char *txt, const char **labels, int n, int poptyp, const char *wname)
 {
   int    i;
   XEvent event;
@@ -399,9 +382,7 @@ static int doPopUp(txt, labels, n, poptyp, wname)
 
 
 /***************************************************/
-void ErrPopUp(txt, label)
-     const char *txt;
-     const char *label;
+void ErrPopUp(const char *txt, const char *label)
 {
   /* simplified interface to PopUp.  Takes a string and the label for the
      (one) button */
@@ -411,12 +392,7 @@ void ErrPopUp(txt, label)
 
 
 /***************************************************/
-int GetStrPopUp(txt, labels, n, buf, buflen, filstr, allow)
-     const char *txt;
-     const char *labels[];
-     char *buf;
-     const char *filstr;
-     int   n, buflen, allow;
+int GetStrPopUp(const char *txt, const char **labels, int n, char *buf, int buflen, const char *filstr, int allow)
 {
   /* pops up a window with a prompt string, a 1-line editable
      text thingy, and a row of buttons.  'txt' is the prompt
@@ -458,8 +434,7 @@ int GetStrPopUp(txt, labels, n, buf, buflen, filstr, allow)
 
 
 /***************************************************/
-int GrabPopUp(pHide, pDelay)
-     int *pHide, *pDelay;
+int GrabPopUp(int *pHide, int *pDelay)
 {
   /* pops up Grab options dialog box */
 
@@ -503,9 +478,7 @@ int GrabPopUp(pHide, pDelay)
 
 
 /***************************************************/
-int PadPopUp(pMode, pStr, pWide,pHigh, pOpaque, pOmode)
-     int  *pMode, *pWide, *pHigh, *pOpaque, *pOmode;
-     char **pStr;
+int PadPopUp(int *pMode, char **pStr, int *pWide, int *pHigh, int *pOpaque, int *pOmode)
 {
   /* pops up 'Pad' options dialog box */
 
@@ -600,7 +573,7 @@ int PadPopUp(pMode, pStr, pWide,pHigh, pOpaque, pOmode)
 
 
 /***************************************************/
-static void buildPadLists()
+static void buildPadLists(void)
 {
   /* generates padCol* and padBg* lists used in 'Defaults' MBUTT.  Grabs
      all the X resources values it can, and adds appropriate defaults */
@@ -619,11 +592,7 @@ static void buildPadLists()
 
 
 /***************************************************/
-static void build1PadList(typstr, vals, nams, lenp, dvals, dnams, dlen)
-     const char  *typstr;
-     const char **vals, **nams;
-     const char **dvals, **dnams;
-     int         *lenp, dlen;
+static void build1PadList(const char *typstr, const char **vals, const char **nams, int *lenp, const char **dvals, const char **dnams, int dlen)
 {
   int   i;
   char  resname[128];
@@ -682,7 +651,7 @@ static void build1PadList(typstr, vals, nams, lenp, dvals, dnams, dlen)
 
 
 /***************************************************/
-void ClosePopUp()
+void ClosePopUp(void)
 {
   /* closes popW:  if it's a pop-up, returns 'cancel'.  If it's an alert,
      simply closes it */
@@ -696,8 +665,7 @@ void ClosePopUp()
 
 
 /***************************************************/
-void OpenAlert(txt)
-     const char *txt;
+void OpenAlert(const char *txt)
 {
   /* pops up a window with txt displayed in it (*no buttons*).
      returns immediately.  window is closed by 'CloseAlert()'.
@@ -736,7 +704,7 @@ void OpenAlert(txt)
 
 
 /***************************************************/
-void CloseAlert()
+void CloseAlert(void)
 {
   popUp = 0;
   XUnmapWindow(theDisp, popW);
@@ -744,8 +712,7 @@ void CloseAlert()
 
 
 /***************************************************/
-int PUCheckEvent(xev)
-     XEvent *xev;
+int PUCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for us.  If so, return 1, otherwise 0 */
 
@@ -859,11 +826,7 @@ int PUCheckEvent(xev)
 #define TR_MAXLN 10
 
 /***************************************************/
-static void TextRect(win, txt, x, y, w, h, fg)
-     Window      win;
-     const char *txt;
-     int         x,y,w,h;
-     u_long      fg;
+static void TextRect(Window win, const char *txt, int x, int y, int w, int h, u_long fg)
 {
   /* draws semi-complex strings in a rectangle */
 
@@ -932,7 +895,7 @@ static void TextRect(win, txt, x, y, w, h, fg)
 
 
 /***************************************************/
-static void createPUD()
+static void createPUD(void)
 {
   popW = CreateWindow("xv confirm", "XVconfirm", "+0+0",
 		      PUWIDE, PUHIGH, infofg, infobg, FALSE);
@@ -949,7 +912,7 @@ static void createPUD()
 
 
 /***************************************************/
-static void attachPUD()
+static void attachPUD(void)
 {
   /* used to make PUD a transient window of something.  Doesn't
      do anything anymore, as I got tired of having window layering
@@ -961,8 +924,7 @@ static void attachPUD()
 
 
 /***************************************************/
-static void drawPUD(x,y,w,h)
-int x,y,w,h;
+static void drawPUD(int x, int y, int w, int h)
 {
   int  i,xt,yt;
   XRectangle xr;
@@ -1044,15 +1006,14 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawPadOMStr()
+static void drawPadOMStr(void)
 {
   CenterString(popW, padODial.x + (padODial.w - 13*dpiMult)/2,
 	       puhigh - 16*dpiMult - 100*dpiMult - 12*dpiMult, padOMStr[padOMode]);
 }
 
 /***************************************************/
-static void clickPUD(x,y)
-     int x,y;
+static void clickPUD(int x, int y)
 {
   int i;
   BUTT *bp = NULL;
@@ -1164,16 +1125,14 @@ static void clickPUD(x,y)
 
 
 /***************************************************/
-static void doGetStrKey(c)
-     int c;
+static void doGetStrKey(int c)
 {
   if (doGSKey(c)) XBell(theDisp, 0);
 }
 
 
 /***************************************************/
-static int doGSKey(c)
-     int c;
+static int doGSKey(int c)
 {
   /* handle characters typed at GetStrPopUp window.  Button accel. keys
      have already been checked for elsewhere.  Practical upshot is that
@@ -1272,7 +1231,7 @@ static int doGSKey(c)
 
 
 /***************************************************/
-static void changedGSBuf()
+static void changedGSBuf(void)
 {
   /* cursor position (or whatever) may have changed.  adjust displayed
      portion of gsBuf */
@@ -1303,7 +1262,7 @@ static void changedGSBuf()
 
 
 /***************************************************/
-static void drawGSBuf()
+static void drawGSBuf(void)
 {
   /* draw edittext thingy in GetStrPopUp window */
 

@@ -49,9 +49,7 @@ static void  writePPM      PARM((byte *, int, int));
 
 
 /****************************/
-int main(argc, argv)
-     int    argc;
-     char **argv;
+int main(int argc, char **argv)
 {
   byte *pic;
   int   w,h;
@@ -67,7 +65,7 @@ int main(argc, argv)
 
 
 /****************************/
-static void errexit()
+static void errexit(void)
 {
   perror("Unable to convert thumbnail file");
   exit(-1);
@@ -75,8 +73,7 @@ static void errexit()
 
 
 /****************************/
-static byte *loadThumbFile(wptr, hptr)
-     int  *wptr, *hptr;
+static byte *loadThumbFile(int *wptr, int *hptr)
 {
   /* read a thumbnail file from stdin */
 
@@ -145,9 +142,7 @@ static byte *loadThumbFile(wptr, hptr)
 
 
 /*******************************************/
-static void writePPM(pic, w, h)
-     byte *pic;
-     int   w,h;
+static void writePPM(byte *pic, int w, int h)
 {
   FILE *fp;
   byte *pix;

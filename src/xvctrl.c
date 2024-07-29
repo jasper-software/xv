@@ -181,22 +181,21 @@ static void ls3d               PARM((LIST *));
 
 
 /***************************************************/
-static int CtrlWide()
+static int CtrlWide(void)
 {
   return nList.w + BUTTW + 18 * dpiMult;
 }
 
 
 /***************************************************/
-static int CtrlHigh()
+static int CtrlHigh(void)
 {
   return ctrl_h;
 }
 
 
 /***************************************************/
-static int roomForLines(height)
-    int height;
+static int roomForLines(int height)
 {
   int num;
 
@@ -211,8 +210,7 @@ static int roomForLines(height)
 
 
 /***************************************************/
-static void arrangeButtons()
-
+static void arrangeButtons(void)
 {
   int topskip;
   double skip;
@@ -288,7 +286,7 @@ static void arrangeButtons()
 }
 
 
-static void arrangeMenuButtons()
+static void arrangeMenuButtons(void)
 {
 #define T_BX(N)  (T_BXLFT + (MBWIDTH+2)*(N))
 #define T_BX4(N) (T_BXLFT + (MBWIDTH4+2)*(N))
@@ -314,8 +312,7 @@ static void arrangeMenuButtons()
 
 
 /***************************************************/
-void ResizeCtrl(w, h)
-    int w, h;
+void ResizeCtrl(int w, int h)
 {
   int nlines;
 
@@ -329,8 +326,7 @@ void ResizeCtrl(w, h)
 
 
 /***************************************************/
-void CreateCtrl(geom)
-     const char *geom;
+void CreateCtrl(const char *geom)
 {
   int nlines;
 
@@ -528,10 +524,7 @@ void CreateCtrl(geom)
 
 
 /***************************************************/
-void SetButtPix(bp, pix, w,h)
-    BUTT *bp;
-    Pixmap pix;
-    int    w,h;
+void SetButtPix(BUTT *bp, Pixmap pix, int w, int h)
 {
   if (!bp) return;
   bp->pix = pix;  bp->pw = w;  bp->ph = h;
@@ -539,10 +532,7 @@ void SetButtPix(bp, pix, w,h)
 
 
 /***************************************************/
-Pixmap MakePix1(win, bits, w, h)
-    Window win;
-    byte *bits;
-    int   w,h;
+Pixmap MakePix1(Window win, byte *bits, int w, int h)
 {
   return XCreatePixmapFromBitmapData(theDisp, win, (char *) bits,
 				     (u_int) w, (u_int) h, 1L,0L,1);
@@ -550,8 +540,7 @@ Pixmap MakePix1(win, bits, w, h)
 
 
 /***************************************************/
-void CtrlBox(vis)
-    int vis;
+void CtrlBox(int vis)
 {
   if (vis) XMapRaised(theDisp, ctrlW);
   else     XUnmapWindow(theDisp, ctrlW);
@@ -561,8 +550,7 @@ void CtrlBox(vis)
 
 
 /***************************************************/
-void RedrawCtrl(x,y,w,h)
-    int x,y,w,h;
+void RedrawCtrl(int x, int y, int w, int h)
 {
   int i;
 
@@ -602,7 +590,7 @@ void RedrawCtrl(x,y,w,h)
 
 
 /***************************************************/
-void DrawCtrlNumFiles()
+void DrawCtrlNumFiles(void)
 {
   int x,y,w;
   char foo[40];
@@ -631,7 +619,7 @@ void DrawCtrlNumFiles()
 
 
 /***************************************************/
-void DrawCtrlStr()
+void DrawCtrlStr(void)
 {
   int   y;
   char *st,*st1;
@@ -670,8 +658,7 @@ void DrawCtrlStr()
 
 
 /***************************************************/
-int ClickCtrl(x,y)
-    int x,y;
+int ClickCtrl(int x, int y)
 {
   BUTT *bp;
   int   i;
@@ -690,8 +677,7 @@ int ClickCtrl(x,y)
 
 
 /***************************************************/
-void ScrollToCurrent(lst)
-    LIST *lst;
+void ScrollToCurrent(LIST *lst)
 {
   /* called when selected item on list is changed.  Makes the selected
      item visible.  If it already is, nothing happens.  Otherwise, it
@@ -712,9 +698,7 @@ void ScrollToCurrent(lst)
 
 
 /***************************************************/
-static void RedrawNList(delta, sptr)
-     int delta;
-     SCRL *sptr;
+static void RedrawNList(int delta, SCRL *sptr)
 {
   XV_UNUSED(sptr);
   LSRedraw(&nList, delta);
@@ -726,14 +710,11 @@ static void RedrawNList(delta, sptr)
 /***************** LIST STUFF *********************/
 
 /***************************************************/
-void LSCreate(lp, win, x, y, w, h, nlines, strlist, nstr, fg, bg, hi, lo,
-	      fptr, typ, donly)
-    LIST         *lp;
-    Window        win;
-    int           x,y,w,h,nlines,nstr,typ,donly;
-    unsigned long fg, bg, hi, lo;
-    char        **strlist;    /* a pointer to a list of strings */
-    void        (*fptr)PARM((int, SCRL *));
+void LSCreate(LIST *lp, Window win, int x, int y, int w, int h, int nlines,
+    char **strlist /* a pointer to a list of strings */, int nstr,
+    unsigned long fg, unsigned long bg, unsigned long hi, unsigned long lo,
+    void (*fptr)PARM((int, SCRL *)),
+    int typ, int donly)
 {
   if (ctrlColor) h += 4;
 
@@ -760,9 +741,7 @@ void LSCreate(lp, win, x, y, w, h, nlines, strlist, nstr, fg, bg, hi, lo,
 }
 
 
-void LSResize(lp, w, h, nlines)
-    LIST *lp;
-    int w, h, nlines;
+void LSResize(LIST *lp, int w, int h, int nlines)
 {
   if (ctrlColor) h += 4;
 
@@ -776,10 +755,7 @@ void LSResize(lp, w, h, nlines)
 
 
 /***************************************************/
-void LSChangeData(lp, strlist, nstr)
-    LIST         *lp;
-    char        **strlist;
-    int           nstr;
+void LSChangeData(LIST *lp, char **strlist, int nstr)
 {
   /* tries to keep list selection and scrollbar in same place, if possible */
 
@@ -793,10 +769,7 @@ void LSChangeData(lp, strlist, nstr)
 
 
 /***************************************************/
-void LSNewData(lp, strlist, nstr)
-    LIST         *lp;
-    char        **strlist;
-    int           nstr;
+void LSNewData(LIST *lp, char **strlist, int nstr)
 {
   lp->str = strlist;
   lp->nstr = nstr;
@@ -806,8 +779,7 @@ void LSNewData(lp, strlist, nstr)
 
 
 /***************************************************/
-static void ls3d(lp)
-    LIST *lp;
+static void ls3d(LIST *lp)
 {
   /* redraws lists 3d-effect, which can be trounced by drawSel() */
   Draw3dRect(lp->win, 0, 0, lp->w-1, lp->h-1, R3D_IN, 2,
@@ -816,9 +788,7 @@ static void ls3d(lp)
 
 
 /***************************************************/
-static void drawSel(lp,j)
-    LIST *lp;
-    int j;
+static void drawSel(LIST *lp, int j)
 {
   int i, inactive, x0,y0,wide, selected;
   unsigned long fg, bg;
@@ -893,9 +863,7 @@ static void drawSel(lp,j)
 
 
 /***************************************************/
-void LSRedraw(lp, delta)
-    LIST *lp;
-    int   delta;
+void LSRedraw(LIST *lp, int delta)
 {
   int  i;
 
@@ -907,9 +875,7 @@ void LSRedraw(lp, delta)
 
 
 /***************************************************/
-int LSClick(lp,ev)
-    LIST *lp;
-    XButtonEvent *ev;
+int LSClick(LIST *lp, XButtonEvent *ev)
 {
   /* returns '-1' normally.  returns 0 -> numnames-1 for a goto */
 
@@ -985,9 +951,7 @@ int LSClick(lp,ev)
 
 
 /***************************************************/
-void LSKey(lp, key)
-    LIST         *lp;
-    int           key;
+void LSKey(LIST *lp, int key)
 {
   if      (key==LS_PAGEUP)   SCSetVal(&lp->scrl,lp->scrl.val - (lp->nlines-1));
   else if (key==LS_PAGEDOWN) SCSetVal(&lp->scrl,lp->scrl.val + (lp->nlines-1));

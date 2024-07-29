@@ -47,12 +47,7 @@ static void drawHandPos PARM((GRAF *, int));
 
 
 /***************************************************/
-void CreateGraf(gp, parent, x, y, fg, bg, title)
-     GRAF *gp;
-     Window parent;
-     int x,y;
-     unsigned long fg,bg;
-     const char *title;
+void CreateGraf(GRAF *gp, Window parent, int x, int y, long unsigned int fg, long unsigned int bg, const char *title)
 {
   /* NOTE:  CreateGraf does not initialize hands[], nhands, or spline,
      as these could be initialized by X resources (or whatever),
@@ -123,8 +118,7 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
 
 
 /***************************************************/
-void InitGraf(gp)
-GRAF *gp;
+void InitGraf(GRAF *gp)
 {
   gp->nhands = 4;
   gp->spline = 1;
@@ -138,9 +132,7 @@ GRAF *gp;
 
 
 /***************************************************/
-void RedrawGraf(gp, gwin)
-GRAF *gp;
-int gwin;
+void RedrawGraf(GRAF *gp, int gwin)
 {
   int i;
 
@@ -162,9 +154,7 @@ int gwin;
 
 
 /***************************************************/
-static void drawGraf(gp,erase)
-GRAF *gp;
-int   erase;
+static void drawGraf(GRAF *gp, int erase)
 {
   int i,x,y;
   XPoint  pts[129], *pt;
@@ -236,10 +226,7 @@ int   erase;
 
 
 /***************************************************/
-int ClickGraf(gp,child,mx,my)
-GRAF *gp;
-Window child;
-int mx,my;
+int ClickGraf(GRAF *gp, Window child, int mx, int my)
 {
   /* returns '1' if GrafFunc was changed, '0' otherwise */
 
@@ -478,9 +465,7 @@ int mx,my;
 }
 
 
-static void drawHandPos(gp, hnum)
-     GRAF *gp;
-     int   hnum;
+static void drawHandPos(GRAF *gp, int hnum)
 {
   int w;
   const char *tstr = "888,888";
@@ -503,9 +488,7 @@ static void drawHandPos(gp, hnum)
 
 
 /***************************************************/
-int GrafKey(gp,str)
-GRAF *gp;
-char *str;
+int GrafKey(GRAF *gp, char *str)
 {
   int len, ok;
 
@@ -599,9 +582,7 @@ char *str;
 
 
 /*********************/
-void GenerateGrafFunc(gp,redraw)
-GRAF *gp;
-int redraw;
+void GenerateGrafFunc(GRAF *gp, int redraw)
 {
   /* generate new gp->func data (ie, handles have moved, or line/spline
      setting has changed) and redraw the entire graph area */
@@ -702,9 +683,7 @@ int redraw;
 
 
 /*********************/
-void Graf2Str(gp, str)
-GRAF_STATE *gp;
-char *str;
+void Graf2Str(GRAF_STATE *gp, char *str)
 {
   /* generates strings of the form: "S 3 : 0,0 : 63,63 : 255,255",
      (meaning SPLINE, 3 points, and the 3 sets of handle coordinates)
@@ -731,9 +710,7 @@ char *str;
 
 
 /*********************/
-int Str2Graf(gp, str)
-     GRAF_STATE *gp;
-     const char *str;
+int Str2Graf(GRAF_STATE *gp, const char *str)
 {
   /* parses strings of the form: "S 3 : 0,0 : 63,63 : 255,255",
      (meaning SPLINE, 3 points, and the 3 sets of handle coordinates)
@@ -810,9 +787,7 @@ int Str2Graf(gp, str)
 
 
 /*********************/
-void GetGrafState(gp, gsp)
-GRAF *gp;
-GRAF_STATE *gsp;
+void GetGrafState(GRAF *gp, GRAF_STATE *gsp)
 {
   int i;
 
@@ -830,9 +805,7 @@ GRAF_STATE *gsp;
 
 
 /*********************/
-int SetGrafState(gp, gsp)
-GRAF *gp;
-GRAF_STATE *gsp;
+int SetGrafState(GRAF *gp, GRAF_STATE *gsp)
 {
 #define IFSET(a,b) if ((a) != (b)) { a = b;  rv++; }
   int i;
@@ -870,9 +843,7 @@ GRAF_STATE *gsp;
 
 
 /*********************/
-void InitSpline(x,y,n,y2)
-     int *x, *y, n;
-     double *y2;
+void InitSpline(int *x, int *y, int n, double *y2)
 {
   /* given arrays of data points x[0..n-1] and y[0..n-1], computes the
      values of the second derivative at each of the data points
@@ -901,9 +872,7 @@ void InitSpline(x,y,n,y2)
 
 
 /*********************/
-double EvalSpline(xa,ya,y2a,n,x)
-double y2a[],x;
-int n,xa[],ya[];
+double EvalSpline(int *xa, int *ya, double *y2a, int n, double x)
 {
   int klo,khi,k;
   double h,b,a;

@@ -155,9 +155,7 @@ static double gamval, rgamval, ggamval, bgamval;
 XtAppContext context;
 
 /*******************************************/
-int main(argc, argv)
-     int    argc;
-     char **argv;
+int main(int argc, char **argv)
 /*******************************************/
 {
   int    i;
@@ -883,10 +881,12 @@ int main(argc, argv)
 
       if (xlocale) {
 	monofsetinfo = XExtentsOfFontSet(monofset);
-	monofsetinfo->max_logical_extent.width = mfontsize[i] * dpiMult;
+	if (monofsetinfo != NULL) {
+	  monofsetinfo->max_logical_extent.width = mfontsize[i] * dpiMult;
 		/* correct size of TextViewer
 		   in case that JIS X 0208 is not found */
-	break;
+	  break;
+	}
       }
 
       i++;
@@ -1146,7 +1146,7 @@ int main(argc, argv)
 
 
 /*****************************************************/
-static void makeDirectCmap()
+static void makeDirectCmap(void)
 {
   int    i, cmaplen, numgot;
   byte   origgot[256];
@@ -1220,8 +1220,7 @@ static void makeDirectCmap()
 }
 
 
-static int highbit(ul)
-     unsigned long ul;
+static int highbit(long unsigned int ul)
 {
   /* returns position of highest set bit in 'ul' as an integer (0-31),
    or -1 if none */
@@ -1236,9 +1235,7 @@ static int highbit(ul)
 
 
 /*****************************************************/
-static void useOtherVisual(vinfo, best)
-     XVisualInfo *vinfo;
-     int best;
+static void useOtherVisual(XVisualInfo *vinfo, int best)
 {
   if (!vinfo || best<0) return;
 
@@ -1311,9 +1308,7 @@ static void useOtherVisual(vinfo, best)
 
 
 /*****************************************************/
-static void parseResources(argc, argv)
-  int argc;
-  char **argv;
+static void parseResources(int argc, char **argv)
 {
   int i, pm;
 
@@ -1494,8 +1489,7 @@ static void parseResources(argc, argv)
 
 
 /*****************************************************/
-static void parseCmdLine(argc, argv)
-     int argc;  char **argv;
+static void parseCmdLine(int argc, char **argv)
 {
   int i, oldi, not_in_first_half, pm;
   int hidpi;
@@ -1876,7 +1870,7 @@ static void parseCmdLine(argc, argv)
 
 
 /*****************************************************************/
-static void verifyArgs()
+static void verifyArgs(void)
 {
   /* check options for validity */
 
@@ -1955,8 +1949,7 @@ static void verifyArgs()
 static int cpos = 0;
 
 /***********************************/
-static void printoption(st)
-     const char *st;
+static void printoption(const char *st)
 {
   if (strlen(st) + cpos > 78) {
     fprintf(stderr,"\n   ");
@@ -1968,8 +1961,7 @@ static void printoption(st)
 }
 
 
-static void cmdSyntax(i)
-     int i;
+static void cmdSyntax(int i)
 {
   /* GRR 19980605:  added version info for most common libraries */
   fprintf(stderr, "XV - %s.\n", REVDATE);
@@ -2137,7 +2129,7 @@ static void cmdSyntax(i)
 
 
 /***********************************/
-static void rmodeSyntax()
+static void rmodeSyntax(void)
 {
   fprintf(stderr,"%s: unknown root mode '%d'.  Valid modes are:\n",
 	  cmd, rootMode);
@@ -2158,10 +2150,7 @@ static void rmodeSyntax()
 
 
 /***********************************/
-static int argcmp(a1, a2, minlen, plusallowed, plusminus)
-     const char *a1, *a2;
-     int  minlen, plusallowed;
-     int *plusminus;
+static int argcmp(const char *a1, const char *a2, int minlen, int plusallowed, int *plusminus)
 {
   /* does a string compare between a1 and a2.  To return '0', a1 and a2
      must match to the length of a1, and that length has to
@@ -2185,8 +2174,7 @@ static int argcmp(a1, a2, minlen, plusallowed, plusminus)
 
 
 /***********************************/
-static int openPic(filenum)
-     int filenum;
+static int openPic(int filenum)
 {
   /* tries to load file #filenum (from 'namelist' list)
    * returns 0 on failure (cleans up after itself)
@@ -3127,8 +3115,7 @@ extern byte ZXheader[128];	/* [JCE] Spectrum screen magic number is
 
 
 /********************************/
-int ReadFileType(fname)
-     char *fname;
+int ReadFileType(char *fname)
 {
   /* opens fname (which *better* be an actual file by this point!) and
      reads the first couple o' bytes.  Figures out what the file's likely
@@ -3337,10 +3324,7 @@ int ReadFileType(fname)
 
 
 /********************************/
-int ReadPicFile(fname, ftype, pinfo, quick)
-     char    *fname;
-     int      ftype, quick;
-     PICINFO *pinfo;
+int ReadPicFile(char *fname, int ftype, PICINFO *pinfo, int quick)
 {
   /* if quick is set, we're being called to generate icons, or something
      like that.  We should load the image as quickly as possible.  Previously,
@@ -3448,9 +3432,7 @@ int ReadPicFile(fname, ftype, pinfo, quick)
 
 
 /********************************/
-int UncompressFile(name, uncompname, filetype)
-     char *name, *uncompname;
-     int filetype;
+int UncompressFile(char *name, char *uncompname, int filetype)
 {
   /* returns '1' on success, with name of uncompressed file in uncompname
      returns '0' on failure */
@@ -3619,9 +3601,7 @@ int RemoveMacbinary(src, dst)
 
 
 /********************************/
-void KillPageFiles(bname, numpages)
-  char *bname;
-  int   numpages;
+void KillPageFiles(char *bname, int numpages)
 {
   /* deletes any page files (numbered 1 through numpages) that might exist */
   char tmp[128];
@@ -3641,8 +3621,7 @@ void KillPageFiles(bname, numpages)
 
 
 /********************************/
-void NewPicGetColors(donorm, dohist)
-     int donorm, dohist;
+void NewPicGetColors(int donorm, int dohist)
 {
   int i;
 
@@ -3731,8 +3710,7 @@ void NewPicGetColors(donorm, dohist)
 
 
 /***********************************/
-static int readpipe(cmd, fname)
-     char *cmd, *fname;
+static int readpipe(char *cmd, char *fname)
 {
   /* cmd is something like: "! bggen 100 0 0"
    *
@@ -3793,7 +3771,7 @@ static int readpipe(cmd, fname)
 
 
 /****************/
-static void openFirstPic()
+static void openFirstPic(void)
 {
   int i;
 
@@ -3818,7 +3796,7 @@ static void openFirstPic()
 
 
 /****************/
-static void openNextPic()
+static void openNextPic(void)
 {
   int i;
 
@@ -3836,7 +3814,7 @@ static void openNextPic()
 
 
 /****************/
-static void openNextQuit()
+static void openNextQuit(void)
 {
   int i;
 
@@ -3855,7 +3833,7 @@ static void openNextQuit()
 
 
 /****************/
-static void openNextLoop()
+static void openNextLoop(void)
 {
   int i,j,loop;
 
@@ -3884,7 +3862,7 @@ static void openNextLoop()
 
 
 /****************/
-static void openPrevPic()
+static void openPrevPic(void)
 {
   int i;
 
@@ -3902,14 +3880,14 @@ static void openPrevPic()
 
 
 /****************/
-static void openNamedPic()
+static void openNamedPic(void)
 {
   /* if (!openPic(LOADPIC)) openPic(DFLTPIC); */
   openPic(LOADPIC);
 }
 
 /****************/
-static void mainLoop()
+static void mainLoop(void)
 {
   /* search forward until we manage to display a picture,
      then call EventLoop.  EventLoop will eventually return
@@ -3973,8 +3951,7 @@ static void mainLoop()
 
 
 /***********************************/
-static void createMainWindow(geom, name)
-     const char *geom, *name;
+static void createMainWindow(const char *geom, const char *name)
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
@@ -4147,8 +4124,7 @@ static void createMainWindow(geom, name)
 
 
 /***********************************/
-static void setWinIconNames(name)
-     const char *name;
+static void setWinIconNames(const char *name)
 {
   char winname[NAME_MAX+sizeof("xv : ")+sizeof(VERSTR)+sizeof(" <unregistered>")+1], iconname[NAME_MAX+1];
 
@@ -4177,9 +4153,7 @@ static void setWinIconNames(name)
 
 
 /***********************************/
-void FixAspect(grow,w,h)
-     int   grow;
-     int   *w, *h;
+void FixAspect(int grow, int *w, int *h)
 {
   /* computes new values of eWIDE and eHIGH which will have aspect ratio
      'normaspect'.  If 'grow' it will preserve aspect by enlarging,
@@ -4231,7 +4205,7 @@ void FixAspect(grow,w,h)
 
 
 /***********************************/
-static void makeDispNames()
+static void makeDispNames(void)
 {
   int   prelen, n, i, done;
   char *suffix;
@@ -4260,7 +4234,7 @@ static void makeDispNames()
 
 
 /***********************************/
-static void fixDispNames()
+static void fixDispNames(void)
 {
   /* fix dispnames array so that names don't go off right edge */
 
@@ -4289,8 +4263,7 @@ static void fixDispNames()
 
 
 /***********************************/
-void StickInCtrlList(select)
-     int select;
+void StickInCtrlList(int select)
 {
   /* stick current name (from 'load/save' box) and current working directory
      into 'namelist'.  Does redraw list.  */
@@ -4313,8 +4286,7 @@ void StickInCtrlList(select)
 
 
 /***********************************/
-void AddFNameToCtrlList(fpath,fname)
-     const char *fpath, *fname;
+void AddFNameToCtrlList(const char *fpath, const char *fname)
 {
   /* stick given path/name into 'namelist'.  Doesn't redraw list */
 
@@ -4367,7 +4339,7 @@ void AddFNameToCtrlList(fpath,fname)
 
 
 /***********************************/
-void ChangedCtrlList()
+void ChangedCtrlList(void)
 {
   /* called when the namelist/dispnames arrays have changed, and list needs
      to be re-displayed */
@@ -4389,7 +4361,7 @@ void ChangedCtrlList()
 
 
 /***********************************/
-void ActivePrevNext()
+void ActivePrevNext(void)
 {
   /* called to enable/disable the Prev/Next buttons whenever curname and/or
      numnames and/or nList.selected change */
@@ -4410,7 +4382,7 @@ void ActivePrevNext()
 
 
 /***********************************/
-int DeleteCmd()
+int DeleteCmd(void)
 {
   /* 'delete' button was pressed.  Pop up a dialog box to determine
      what should be deleted, then do it.
@@ -4470,8 +4442,7 @@ int DeleteCmd()
 
 
 /********************************************/
-static void deleteFromList(delnum)
-     int delnum;
+static void deleteFromList(int delnum)
 {
   int i;
 
@@ -4512,7 +4483,7 @@ static void deleteFromList(delnum)
 
 
 /***********************************/
-void HandleDispMode()
+void HandleDispMode(void)
 {
   /* handles a change in the display mode (windowed/root).
      Also, called to do the 'right' thing when opening a picture
@@ -4708,10 +4679,7 @@ void HandleDispMode()
 
 
 /*******************************************************/
-static void add_filelist_to_namelist(flist, nlist, numn, maxn)
-     char  *flist;
-     char **nlist;
-     int   *numn, maxn;
+static void add_filelist_to_namelist(char *flist, char **nlist, int *numn, int maxn)
 {
   /* written by Brian Gregory  (bgregory@megatest.com) */
 
@@ -4750,8 +4718,7 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
 /************************************************************************/
 
 /***********************************/
-char *lower_str(str)
-     char *str;
+char *lower_str(char *str)
 {
   char *p;
   for (p=str; *p; p++) if (isupper(*p)) *p = tolower(*p);
@@ -4760,8 +4727,7 @@ char *lower_str(str)
 
 
 /***********************************/
-int rd_int(name)
-     const char *name;
+int rd_int(const char *name)
 {
   /* returns '1' if successful.  result in def_int */
 
@@ -4778,16 +4744,14 @@ int rd_int(name)
 
 
 /***********************************/
-int rd_str(name)
-     const char *name;
+int rd_str(const char *name)
 {
   return rd_str_cl(name, "", 0);
 }
 
 
 /***********************************/
-int rd_flag(name)
-     const char *name;
+int rd_flag(const char *name)
 {
   /* returns '1' if successful.  result in def_int */
 
@@ -4813,10 +4777,7 @@ int rd_flag(name)
 static int xrm_initted = 0;
 
 /***********************************/
-int rd_str_cl (name_str, class_str, reinit)
-     const char *name_str;
-     const char *class_str;
-     int  reinit;
+int rd_str_cl (const char *name_str, const char *class_str, int reinit)
 {
   /* note: *all* X resource reading goes through this routine... */
 
@@ -4963,11 +4924,7 @@ int rd_str_cl (name_str, class_str, reinit)
 
 /* Generate a variable or fixed font name */
 
-static void makeFontName(buf, buf_size, is_mono, font_num)
-char *buf;
-int buf_size;
-int is_mono;
-int font_num;
+static void makeFontName(char *buf, int buf_size, int is_mono, int font_num)
 {
   const char *pattern;
   int size, bigsize;

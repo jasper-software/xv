@@ -20,7 +20,7 @@ static void killRootPix PARM((void));
 
 
 /***********************************/
-void MakeRootPic()
+void MakeRootPic(void)
 {
   /* called after 'epic' has been generated (if we're using root).
      creates the XImage and the pixmap, sets the root to the new
@@ -257,7 +257,7 @@ void MakeRootPic()
 
 
 /************************************************************************/
-void ClearRoot()
+void ClearRoot(void)
 {
   killRootPix();
   XClearWindow(theDisp, vrootW);
@@ -266,7 +266,7 @@ void ClearRoot()
 
 
 /************************************************************************/
-static void killRootPix()
+static void killRootPix(void)
 {
   Pixmap pix, bitmap;
   GC gc;
@@ -300,7 +300,7 @@ static void killRootPix()
 
 
 /***********************************/
-void SaveRootInfo()
+void SaveRootInfo(void)
 {
   /* called when using root window.  stores the pixmap ID used to draw the
      root window in a property.  This will be used later to free all resources
@@ -328,7 +328,7 @@ void SaveRootInfo()
 
 
 /***********************************/
-void KillOldRootInfo()
+void KillOldRootInfo(void)
 {
   /* get the pixmap ID from the _XSETROOT_ID property, and kill it */
 

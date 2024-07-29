@@ -98,7 +98,7 @@ char errbuffer[JMSG_LENGTH_MAX];
 
 
 /***************************************************/
-void CreateJPEGW()
+void CreateJPEGW(void)
 {
   jpegW = CreateWindow("xv jpeg","XVjpeg",NULL,JWIDE,JHIGH,infofg,infobg,FALSE);
   if (!jpegW) FatalError("can't create jpeg window!");
@@ -122,8 +122,7 @@ void CreateJPEGW()
 
 
 /***************************************************/
-void JPEGDialog(vis)
-     int vis;
+void JPEGDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(jpegW, jbut[J_BOK].x + (int) jbut[J_BOK].w/2,
@@ -135,8 +134,7 @@ void JPEGDialog(vis)
 
 
 /***************************************************/
-int JPEGCheckEvent(xev)
-     XEvent *xev;
+int JPEGCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -210,9 +208,7 @@ int JPEGCheckEvent(xev)
 
 
 /***************************************************/
-void JPEGSaveParams(fname, col)
-     char *fname;
-     int col;
+void JPEGSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -220,8 +216,7 @@ void JPEGSaveParams(fname, col)
 
 
 /***************************************************/
-static void drawJD(x,y,w,h)
-     int x,y,w,h;
+static void drawJD(int x, int y, int w, int h)
 {
   const char *title  = "Save JPEG file...";
   const char *title1 = "Quality value determines";
@@ -281,8 +276,7 @@ static void drawJD(x,y,w,h)
 
 
 /***************************************************/
-static void clickJD(x,y)
-     int x,y;
+static void clickJD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -302,8 +296,7 @@ static void clickJD(x,y)
 
 
 /***************************************************/
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
 
   switch (cmd) {
@@ -332,7 +325,7 @@ static void doCmd(cmd)
 
 
 /*******************************************/
-static void writeJPEG()
+static void writeJPEG(void)
 {
   FILE          *fp;
   int            i, nc, rv, w, h, npixels, ptype, pfree;
@@ -449,11 +442,10 @@ static void writeJPEG()
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_error_exit(cinfo)
+METHODDEF(void) xv_error_exit(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_error_exit(cinfo)
+METHODDEF void  xv_error_exit(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
   my_error_ptr myerr;
 
@@ -465,11 +457,10 @@ METHODDEF void  xv_error_exit(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_error_output(cinfo)
+METHODDEF(void) xv_error_output(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_error_output(cinfo)
+METHODDEF void  xv_error_output(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
   char         buffer[JMSG_LENGTH_MAX];
 
@@ -481,11 +472,10 @@ METHODDEF void  xv_error_output(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_prog_meter(cinfo)
+METHODDEF(void) xv_prog_meter(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_prog_meter(cinfo)
+METHODDEF void  xv_prog_meter(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
   struct jpeg_progress_mgr *prog;
 
@@ -508,10 +498,7 @@ METHODDEF void  xv_prog_meter(cinfo)
 
 
 /*******************************************/
-int LoadJFIF(fname, pinfo, quick)
-     char    *fname;
-     PICINFO *pinfo;
-     int      quick;
+int LoadJFIF(char *fname, PICINFO *pinfo, int quick)
 {
   /* returns '1' on success, '0' on failure */
 
@@ -794,8 +781,7 @@ L2:
 
 
 /**************************************************/
-static unsigned int j_getc(cinfo)
-     j_decompress_ptr cinfo;
+static unsigned int j_getc(j_decompress_ptr cinfo)
 {
   struct jpeg_source_mgr *datasrc = cinfo->src;
 
@@ -810,11 +796,10 @@ static unsigned int j_getc(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(boolean) xv_process_comment(cinfo)
+METHODDEF(boolean) xv_process_comment(j_decompress_ptr cinfo)
 #else
-METHODDEF boolean  xv_process_comment(cinfo)
+METHODDEF boolean  xv_process_comment(j_decompress_ptr cinfo)
 #endif
-     j_decompress_ptr cinfo;
 {
   int          length, hasnull;
   unsigned int ch;
@@ -849,11 +834,10 @@ METHODDEF boolean  xv_process_comment(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(boolean) xv_process_app1(cinfo)   /* Geoff H. Kuenning 20030331 */
+METHODDEF(boolean) xv_process_app1(j_decompress_ptr cinfo)   /* Geoff H. Kuenning 20030331 */
 #else
-METHODDEF boolean  xv_process_app1(cinfo)
+METHODDEF boolean  xv_process_app1(j_decompress_ptr cinfo)
 #endif
-     j_decompress_ptr cinfo;
 {
   int          length;
   unsigned int ch;
@@ -892,10 +876,7 @@ METHODDEF boolean  xv_process_app1(cinfo)
 /* WRITE ROUTINES **********************************************************/
 /***************************************************************************/
 
-static int writeJFIF(fp, pic, w,h, coltype)
-     FILE *fp;
-     byte *pic;
-     int   w,h,coltype;
+static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
 {
   struct     jpeg_compress_struct cinfo;
   struct     jpeg_progress_mgr    prog;
@@ -1018,7 +999,7 @@ static int writeJFIF(fp, pic, w,h, coltype)
 
 /*******************************************/
 void
-VersionInfoJPEG()	/* GRR 19980605, 19980607 */
+VersionInfoJPEG(void)	/* GRR 19980605, 19980607 */
 {
   int major = JPEG_LIB_VERSION / 10;
   int minor = JPEG_LIB_VERSION % 10;

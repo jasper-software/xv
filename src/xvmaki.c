@@ -88,9 +88,7 @@ static char *maki_msgs[] = {
 #define L4(b) ((b)      & 0xf)
 #define error(msg_num) longjmp(mi->jmp, msg_num)
 
-int LoadMAKI(fname, pinfo)
-    char *fname;
-    PICINFO *pinfo;
+int LoadMAKI(char *fname, PICINFO *pinfo)
 {
     struct maki_info maki;
     int e;
@@ -129,9 +127,7 @@ int LoadMAKI(fname, pinfo)
     return 1;
 }
 
-static void maki_open_file(mi, fname)
-    struct maki_info *mi;
-    char *fname;
+static void maki_open_file(struct maki_info *mi, char *fname)
 {
     if((mi->fp = fopen(fname, "rb")) == NULL)
 	maki_file_error(mi, MAKI_OPEN);
@@ -140,8 +136,7 @@ static void maki_open_file(mi, fname)
     fseek(mi->fp, (size_t) 0, SEEK_SET);
 }
 
-static void maki_check_id(mi)
-    struct maki_info *mi;
+static void maki_check_id(struct maki_info *mi)
 {
     char buf[8];
     if(fread(buf, (size_t) 8, (size_t) 1, mi->fp) != 1)
@@ -152,8 +147,7 @@ static void maki_check_id(mi)
     mi->m_maki01b = (buf[6] == 'B');
 }
 
-static void maki_skip_comment(mi)
-    struct maki_info *mi;
+static void maki_skip_comment(struct maki_info *mi)
 {
     int i;
     int c;
@@ -170,8 +164,7 @@ static void maki_skip_comment(mi)
     fseek(mi->fp, 32L, SEEK_SET);
 }
 
-static void maki_read_header(mi)
-    struct maki_info *mi;
+static void maki_read_header(struct maki_info *mi)
 {
     byte buf[16];
 
@@ -196,9 +189,7 @@ static void maki_read_header(mi)
     if(DEBUG) maki_show_maki_info(mi);
 }
 
-static void maki_read_palette(mi, r, g, b)
-    struct maki_info *mi;
-    byte *r, *g, *b;
+static void maki_read_palette(struct maki_info *mi, byte *r, byte *g, byte *b)
 {
     byte buf[48], *p;
 
@@ -212,8 +203,7 @@ static void maki_read_palette(mi, r, g, b)
     }
 }
 
-static void maki_read_flags(mi)
-    struct maki_info *mi;
+static void maki_read_flags(struct maki_info *mi)
 {
     mi->fa = maki_malloc((size_t) 1000       , "maki_read_flags#1");
     mi->fb = maki_malloc((size_t) mi->fb_size, "maki_read_flags#2");
@@ -224,8 +214,7 @@ static void maki_read_flags(mi)
 	maki_file_warning(mi, MAKI_CORRUPT);
 }
 
-static void maki_read_pixel_data(mi)
-    struct maki_info *mi;
+static void maki_read_pixel_data(struct maki_info *mi)
 {
     mi->pa = maki_malloc((size_t) mi->pa_size, "maki_read_pixel_data#1");
     mi->pb = maki_malloc((size_t) mi->pb_size, "maki_read_pixel_data#2");
@@ -236,8 +225,7 @@ static void maki_read_pixel_data(mi)
 	maki_file_warning(mi, MAKI_CORRUPT);
 }
 
-static void maki_expand_virtual_screen(mi)
-    struct maki_info *mi;
+static void maki_expand_virtual_screen(struct maki_info *mi)
 {
     int x, y, fai, fbi;
     int bpl = mi->width / 2 / 8;		/* bytes per line */
@@ -286,9 +274,7 @@ static void maki_expand_virtual_screen(mi)
     }
 }
 
-static void maki_expand_pixel_data(mi, pic)
-    struct maki_info *mi;
-    byte **pic;
+static void maki_expand_pixel_data(struct maki_info *mi, byte **pic)
 {
     int x, y;
     int vsi, pi, max_pi;
@@ -336,12 +322,7 @@ static void maki_expand_pixel_data(mi, pic)
 }
 
 
-int WriteMAKI(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
-    FILE *fp;
-    byte *pic;
-    int ptype, w, h;
-    byte *rmap, *gmap, *bmap;
-    int numcols, colorstyle;
+int WriteMAKI(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
     byte rtemp[256], gtemp[256], btemp[256];
     struct maki_info maki, *mi = &maki;
@@ -400,9 +381,7 @@ int WriteMAKI(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
     return 0;
 }
 
-static void maki_make_pixel_data(mi, pic)
-    struct maki_info *mi;
-    byte *pic;
+static void maki_make_pixel_data(struct maki_info *mi, byte *pic)
 {
     int x, y, i;
     int nza, nzb;
@@ -453,8 +432,7 @@ static void maki_make_pixel_data(mi, pic)
     }
 }
 
-static void maki_make_virtual_screen(mi)
-    struct maki_info *mi;
+static void maki_make_virtual_screen(struct maki_info *mi)
 {
     int bpl = mi->width / 2 / 8;
     int vsi, pai, pbi, max_pai, max_pbi;
@@ -507,8 +485,7 @@ static void maki_make_virtual_screen(mi)
     mi->pb_size = pbi;
 }
 
-static void maki_make_flags(mi)
-    struct maki_info *mi;
+static void maki_make_flags(struct maki_info *mi)
 {
     int bpl = mi->width / 2 / 8;
     int fbi, max_fbi;
@@ -571,16 +548,14 @@ static void maki_make_flags(mi)
     mi->fb_size = fbi;
 }
 
-static void maki_write_check_id(mi)
-    struct maki_info *mi;
+static void maki_write_check_id(struct maki_info *mi)
 {
     char *id = mi->m_maki01b ? maki_id_b : maki_id_a;
     if(fwrite(id, (size_t) 8, (size_t) 1, mi->fp) != 1)
 	maki_file_error(mi, MAKI_WRITE);
 }
 
-static void maki_write_comment(mi)
-    struct maki_info *mi;
+static void maki_write_comment(struct maki_info *mi)
 {
     char buf[24];
     char *p;
@@ -604,8 +579,7 @@ static void maki_write_comment(mi)
 	maki_file_error(mi, MAKI_WRITE);
 }
 
-static void maki_write_header(mi)
-    struct maki_info *mi;
+static void maki_write_header(struct maki_info *mi)
 {
     byte buf[16];
 
@@ -626,10 +600,7 @@ static void maki_write_header(mi)
 	maki_file_error(mi, MAKI_WRITE);
 }
 
-static void maki_write_palette(mi, r, g, b, grey)
-    struct maki_info *mi;
-    byte *r, *g, *b;
-    int grey;
+static void maki_write_palette(struct maki_info *mi, byte *r, byte *g, byte *b, int grey)
 {
     int i;
     char buf[3];
@@ -648,8 +619,7 @@ static void maki_write_palette(mi, r, g, b, grey)
     }
 }
 
-static void maki_write_flags(mi)
-    struct maki_info *mi;
+static void maki_write_flags(struct maki_info *mi)
 {
     int bpl = mi->width / 2 / 8;
     if(fwrite(mi->fa, (size_t) bpl * mi->height / 16, (size_t) 1, mi->fp) != 1)
@@ -659,8 +629,7 @@ static void maki_write_flags(mi)
 	maki_file_error(mi, MAKI_WRITE);
 }
 
-static void maki_write_pixel_data(mi)
-    struct maki_info *mi;
+static void maki_write_pixel_data(struct maki_info *mi)
 {
     if(fwrite(mi->pa, (size_t) mi->pa_size, (size_t) 1, mi->fp) != 1)
 	maki_file_error(mi, MAKI_WRITE);
@@ -671,8 +640,7 @@ static void maki_write_pixel_data(mi)
 
 
 
-static void maki_init_info(mi)
-    struct maki_info *mi;
+static void maki_init_info(struct maki_info *mi)
 {
     xvbzero((char *)mi, sizeof(struct maki_info));
     mi->fp = NULL;
@@ -689,9 +657,7 @@ static void maki_init_info(mi)
     mi->forma = mi->formb = NULL;
 }
 
-static void maki_cleanup_maki_info(mi, writing)
-    struct maki_info *mi;
-    int writing;
+static void maki_cleanup_maki_info(struct maki_info *mi, int writing)
 {
     if(mi->fp && !writing)
 	fclose(mi->fp);
@@ -711,8 +677,7 @@ static void maki_cleanup_maki_info(mi, writing)
 	free(mi->formb);
 }
 
-static void maki_cleanup_pinfo(pi)
-    PICINFO *pi;
+static void maki_cleanup_pinfo(PICINFO *pi)
 {
     if(pi->pic){
 	free(pi->pic);
@@ -720,25 +685,20 @@ static void maki_cleanup_pinfo(pi)
     }
 }
 
-static void maki_memory_error(scm, fn)
-    char *scm, *fn;
+static void maki_memory_error(char *scm, char *fn)
 {
     char buf[128];
     sprintf(buf, "%s: coulndn't allocate memory. (%s)", scm, fn);
     FatalError(buf);
 }
 
-static void maki_error(mi, mn)
-    struct maki_info *mi;
-    int mn;
+static void maki_error(struct maki_info *mi, int mn)
 {
     SetISTR(ISTR_WARNING, "%s", maki_msgs[mn]);
     longjmp(mi->jmp, 1);
 }
 
-static void maki_file_error(mi, mn)
-    struct maki_info *mi;
-    int mn;
+static void maki_file_error(struct maki_info *mi, int mn)
 {
     if(feof(mi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", maki_msgs[mn]);
@@ -747,9 +707,7 @@ static void maki_file_error(mi, mn)
     longjmp(mi->jmp, 1);
 }
 
-static void maki_file_warning(mi, mn)
-    struct maki_info *mi;
-    int mn;
+static void maki_file_warning(struct maki_info *mi, int mn)
 {
     if(feof(mi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", maki_msgs[mn]);
@@ -757,8 +715,7 @@ static void maki_file_warning(mi, mn)
 	SetISTR(ISTR_WARNING, "%s (%s)", maki_msgs[mn], ERRSTR(errno));
 }
 
-static void maki_show_maki_info(mi)
-    struct maki_info *mi;
+static void maki_show_maki_info(struct maki_info *mi)
 {
     fprintf(stderr, "  file size: %ld.\n", mi->fsize);
     fprintf(stderr, "  image size: %dx%d.\n", mi->width, mi->height);
@@ -771,9 +728,7 @@ static void maki_show_maki_info(mi)
     fprintf(stderr, "  digital 8 colors: %s.\n", mi->m_dig8 ? "true" : "false");
 }
 
-static void *maki_malloc(n, fn)
-    size_t n;
-    char *fn;
+static void *maki_malloc(size_t n, char *fn)
 {
     void *r = (void *) malloc(n);
     if(r == NULL)
@@ -781,10 +736,7 @@ static void *maki_malloc(n, fn)
     return r;
 }
 
-static void *maki_realloc(p, n, fn)
-    void *p;
-    size_t n;
-    char *fn;
+static void *maki_realloc(void *p, size_t n, char *fn)
 {
     void *r = (p == NULL) ? (void *) malloc(n) : (void *) realloc(p, n);
     if(r == NULL)

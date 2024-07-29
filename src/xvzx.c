@@ -32,9 +32,7 @@ static int zxError PARM((const char *, const char *));
 static const char *bname;
 
 /*******************************************/
-int LoadZX(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadZX(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -155,8 +153,7 @@ int LoadZX(fname, pinfo)
 
 
 /*******************************************/
-static int zxError(fname, st)
-     const char *fname, *st;
+static int zxError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -180,11 +177,7 @@ byte ZXheader[128] =
 
 /* Get the Spectrum colour/bright byte (0-15) from a pixel */
 
-static int PointZX(pic, w, h, rmap, gmap, bmap, x, y)
-	byte *pic;
-	int w,h;
-	byte *rmap, *gmap, *bmap;
-	int x,y;
+static int PointZX(byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int x, int y)
 {
 	int index, r, g, b, zxc;
 
@@ -217,12 +210,7 @@ static int PointZX(pic, w, h, rmap, gmap, bmap, x, y)
 
 /* Work out what colours should be used in a cell */
 
-static void CellZX(pic, w, h, rmap, gmap, bmap, cx, cy, zxfile)
-        byte *pic;
-        int w,h;
-        byte *rmap, *gmap, *bmap;
-        int cx,cy;
-	byte *zxfile;
+static void CellZX(byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int cx, int cy, byte *zxfile)
 {
 	byte counts[16];	/* Count of no. of colours */
 	int offset, ink, paper, n, m, x, y, x0, y0, di, dp;
@@ -300,13 +288,7 @@ static void CellZX(pic, w, h, rmap, gmap, bmap, cx, cy, zxfile)
 
 
 /*******************************************/
-int WriteZX(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *comment;
+int WriteZX(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle, char *comment)
 {
 	int rv, x, y;
 	byte *zxfile;

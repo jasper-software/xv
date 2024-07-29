@@ -111,9 +111,7 @@ static const char  *bname;
 
 
 /*************************************/
-int LoadXWD(fname, pinfo)
-     char *fname;
-     PICINFO *pinfo;
+int LoadXWD(char *fname, PICINFO *pinfo)
 {
   /* returns '1' on success */
 
@@ -260,14 +258,7 @@ int LoadXWD(fname, pinfo)
 
 
 /*********************/
-static int getinit(file, colsP, rowsP, padrightP, visualclassP, maxv, pinfo)
-     FILE* file;
-     int* colsP;
-     int* rowsP;
-     int* padrightP;
-     CARD32 * visualclassP;
-     CARD32   maxv;
-     PICINFO *pinfo;
+static int getinit(FILE *file, int *colsP, int *rowsP, int *padrightP, CARD32 *visualclassP, CARD32 maxv, PICINFO *pinfo)
 {
   int              i;
   int              grayscale;
@@ -513,8 +504,7 @@ static void getcolorshift (CARD32 mask, int *rightshift, int *leftshift)
 
 
 /******************************/
-static CARD32 getpixnum(file)
-     FILE* file;
+static CARD32 getpixnum(FILE *file)
 {
   int n;
 
@@ -585,8 +575,7 @@ static CARD32 getpixnum(file)
 
 
 /***************************/
-static int xwdError(st)
-     const char *st;
+static int xwdError(const char *st)
 {
   if (pic8  != NULL) free(pic8);
   if (pic24 != NULL) free(pic24);
@@ -597,8 +586,7 @@ static int xwdError(st)
 
 
 /***************************/
-static void xwdWarning(st)
-     const char *st;
+static void xwdWarning(const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", bname, st);
 }
@@ -617,8 +605,7 @@ union cheat {
   CARD8  c[sizeof(CARD32)];
 };
 
-static int bs_short(s)
-     int s;
+static int bs_short(int s)
 {
   union cheat u;
   unsigned char t;
@@ -628,8 +615,7 @@ static int bs_short(s)
   return (int) u.s;
 }
 
-static CARD32 bs_long(l)
-     CARD32 l;
+static CARD32 bs_long(CARD32 l)
 {
   union cheat u;
   unsigned char t;
@@ -649,9 +635,7 @@ static CARD32 bs_long(l)
  * Endian I/O.
  */
 
-static int readbigshort(in, sP)
-     FILE  *in;
-     CARD16 *sP;
+static int readbigshort(FILE *in, CARD16 *sP)
 {
   *sP = (getc(in) & 0xff) << 8;
   *sP |= getc(in) & 0xff;
@@ -660,9 +644,7 @@ static int readbigshort(in, sP)
   return 0;
 }
 
-static int readbiglong(in, lP)
-     FILE *in;
-     CARD32 *lP;
+static int readbiglong(FILE *in, CARD32 *lP)
 {
   *lP  = (getc(in) & 0xff) << 24;
   *lP |= (getc(in) & 0xff) << 16;
@@ -674,9 +656,7 @@ static int readbiglong(in, lP)
 }
 
 
-static int readlittleshort(in, sP)
-     FILE  *in;
-     CARD16 *sP;
+static int readlittleshort(FILE *in, CARD16 *sP)
 {
   *sP  =  getc(in) & 0xff;
   *sP |= (getc(in) & 0xff) << 8;
@@ -686,9 +666,7 @@ static int readlittleshort(in, sP)
 }
 
 
-static int readlittlelong(in, lP)
-     FILE *in;
-     CARD32 *lP;
+static int readlittlelong(FILE *in, CARD32 *lP)
 {
   *lP  =  getc(in) & 0xff;
   *lP |= (getc(in) & 0xff) << 8;

@@ -59,9 +59,7 @@ static int   bmpError   PARM((const char *, const char *));
 #define FERROR(fp) (ferror(fp) || feof(fp))
 
 /*******************************************/
-int LoadBMP(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadBMP(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   FILE       *fp;
@@ -360,11 +358,7 @@ int LoadBMP(fname, pinfo)
 
 
 /*******************************************/
-static int loadBMP1(fp, pic8, w, h, rightsideup)
-     FILE *fp;
-     byte *pic8;
-     u_int  w,h;
-     int rightsideup;
+static int loadBMP1(FILE *fp, byte *pic8, u_int w, u_int h, int rightsideup)
 {
   int   i,j,c,bitnum,padw,ibegin,iend,iinc;
   byte *pp = pic8 + ((h - 1) * w);
@@ -407,11 +401,7 @@ static int loadBMP1(fp, pic8, w, h, rightsideup)
 
 
 /*******************************************/
-static int loadBMP4(fp, pic8, w, h, comp, rightsideup)
-     FILE *fp;
-     byte *pic8;
-     u_int  w,h,comp;
-     int rightsideup;
+static int loadBMP4(FILE *fp, byte *pic8, u_int w, u_int h, u_int comp, int rightsideup)
 {
   int   i,j,c,c1,x,y,nybnum,padw,rv;
   int   begin, end, inc;
@@ -506,11 +496,7 @@ static int loadBMP4(fp, pic8, w, h, comp, rightsideup)
 
 
 /*******************************************/
-static int loadBMP8(fp, pic8, w, h, comp, rightsideup)
-     FILE *fp;
-     byte *pic8;
-     u_int  w,h,comp;
-     int rightsideup;
+static int loadBMP8(FILE *fp, byte *pic8, u_int w, u_int h, u_int comp, int rightsideup)
 {
   int   i,j,c,c1,padw,x,y,rv;
   int   begin, end, inc;
@@ -599,11 +585,7 @@ static int loadBMP8(fp, pic8, w, h, comp, rightsideup)
 
 
 /*******************************************/
-static int loadBMP16(fp, pic24, w, h, mask, rightsideup)
-     FILE  *fp;
-     byte  *pic24;
-     u_int w, h, *mask;
-     int rightsideup;
+static int loadBMP16(FILE *fp, byte *pic24, u_int w, u_int h, u_int *mask, int rightsideup)
 {
   int	 x, y, ybegin, yend, yinc;
   byte	*pp = pic24 + ((h - 1) * w * 3);
@@ -715,11 +697,7 @@ static int loadBMP16(fp, pic24, w, h, mask, rightsideup)
 
 
 /*******************************************/
-static int loadBMP24(fp, pic24, w, h, bits, rightsideup)   /* also handles 32-bit BI_RGB */
-     FILE *fp;
-     byte *pic24;
-     u_int  w,h, bits;
-     int rightsideup;
+static int loadBMP24(FILE *fp, byte *pic24, u_int w, u_int h, u_int bits, int rightsideup)   /* also handles 32-bit BI_RGB */
 {
   int   i,j,padb,rv,ibegin,iend,iinc;
   byte *pp = pic24 + ((h - 1) * w * 3);
@@ -765,11 +743,7 @@ static int loadBMP24(fp, pic24, w, h, bits, rightsideup)   /* also handles 32-bi
 
 
 /*******************************************/
-static int loadBMP32(fp, pic24, w, h, colormask, rightsideup) /* 32-bit BI_BITFIELDS only */
-     FILE  *fp;
-     byte  *pic24;
-     u_int w, h, *colormask;
-     int rightsideup;
+static int loadBMP32(FILE *fp, byte *pic24, u_int w, u_int h, u_int *colormask, int rightsideup) /* 32-bit BI_BITFIELDS only */
 {
   int	 x, y, ybegin, yend, yinc;
   byte	*pp;
@@ -841,8 +815,7 @@ static int loadBMP32(fp, pic24, w, h, colormask, rightsideup) /* 32-bit BI_BITFI
 
 
 /*******************************************/
-static u_int getshort(fp)
-     FILE *fp;
+static u_int getshort(FILE *fp)
 {
   int c, c1;
   c = getc(fp);  c1 = getc(fp);
@@ -851,8 +824,7 @@ static u_int getshort(fp)
 
 
 /*******************************************/
-static u_int getint(fp)
-     FILE *fp;
+static u_int getint(FILE *fp)
 {
   int c, c1, c2, c3;
   c = getc(fp);  c1 = getc(fp);  c2 = getc(fp);  c3 = getc(fp);
@@ -864,9 +836,7 @@ static u_int getint(fp)
 
 
 /*******************************************/
-static void putshort(fp, i)
-     FILE *fp;
-     int i;
+static void putshort(FILE *fp, int i)
 {
   int c, c1;
 
@@ -876,9 +846,7 @@ static void putshort(fp, i)
 
 
 /*******************************************/
-static void putint(fp, i)
-     FILE *fp;
-     int i;
+static void putint(FILE *fp, int i)
 {
   int c, c1, c2, c3;
   c  =  ((u_int) i)      & 0xff;
@@ -896,12 +864,7 @@ static byte pc2nc[256],r1[256],g1[256],b1[256];
 
 
 /*******************************************/
-int WriteBMP(fp,pic824,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle)
-     FILE *fp;
-     byte *pic824;
-     int   ptype,w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
+int WriteBMP(FILE *fp, byte *pic824, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
   /*
    * if PIC8, and colorstyle == F_FULLCOLOR, F_GREYSCALE, or F_REDUCED,
@@ -1055,10 +1018,7 @@ int WriteBMP(fp,pic824,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle)
 
 
 /*******************************************/
-static void writeBMP1(fp, pic8, w, h)
-     FILE *fp;
-     byte *pic8;
-     int  w,h;
+static void writeBMP1(FILE *fp, byte *pic8, int w, int h)
 {
   int   i,j,c,bitnum,padw;
   byte *pp;
@@ -1087,10 +1047,7 @@ static void writeBMP1(fp, pic8, w, h)
 
 
 /*******************************************/
-static void writeBMP4(fp, pic8, w, h)
-     FILE *fp;
-     byte *pic8;
-     int  w,h;
+static void writeBMP4(FILE *fp, byte *pic8, int w, int h)
 {
   int   i,j,c,nybnum,padw;
   byte *pp;
@@ -1121,10 +1078,7 @@ static void writeBMP4(fp, pic8, w, h)
 
 
 /*******************************************/
-static void writeBMP8(fp, pic8, w, h)
-     FILE *fp;
-     byte *pic8;
-     int  w,h;
+static void writeBMP8(FILE *fp, byte *pic8, int w, int h)
 {
   int   i,j,padw;
   byte *pp;
@@ -1142,10 +1096,7 @@ static void writeBMP8(fp, pic8, w, h)
 
 
 /*******************************************/
-static void writeBMP24(fp, pic24, w, h)
-     FILE *fp;
-     byte *pic24;
-     int  w,h;
+static void writeBMP24(FILE *fp, byte *pic24, int w, int h)
 {
   int   i,j,padb;
   byte *pp;
@@ -1173,8 +1124,7 @@ static void writeBMP24(fp, pic24, w, h)
 
 
 /*******************************************/
-static int bmpError(fname, st)
-     const char *fname, *st;
+static int bmpError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

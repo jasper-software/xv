@@ -40,9 +40,7 @@ static const char *bname;
 
 
 /*******************************************/
-int LoadTarga(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadTarga(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -174,12 +172,7 @@ int LoadTarga(fname, pinfo)
 
 
 /*******************************************/
-int WriteTarga(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
+int WriteTarga(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 /*******************************************/
 {
   int i, j;

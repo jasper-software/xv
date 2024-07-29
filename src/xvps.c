@@ -123,8 +123,7 @@ static int   firsttime=1;       /* first time PSDialog being opened ? */
 
 
 /***************************************************/
-void CreatePSD(geom)
-char *geom;
+void CreatePSD(char *geom)
 {
   psW = CreateWindow("xv postscript", "XVps", geom,
 		     PSWIDE, PSHIGH, infofg, infobg, FALSE);
@@ -252,8 +251,7 @@ char *geom;
 
 
 /***************************************************/
-void PSDialog(vis)
-int vis;
+void PSDialog(int vis)
 {
   if (vis) {
     if (picType == PIC24) {  /* no comp in 24-bit mode */
@@ -275,8 +273,7 @@ int vis;
 
 
 /***************************************************/
-int PSCheckEvent(xev)
-XEvent *xev;
+int PSCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -382,9 +379,7 @@ XEvent *xev;
 
 
 /***************************************************/
-void PSSaveParams(fname, col)
-     char *fname;
-     int col;
+void PSSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -392,7 +387,7 @@ void PSSaveParams(fname, col)
 
 
 /***************************************************/
-void PSResize()
+void PSResize(void)
 {
   changedScale();
 }
@@ -403,8 +398,7 @@ void PSResize()
 
 
 /***************************************************/
-static void drawPSD(x,y,w,h)
-int x,y,w,h;
+static void drawPSD(int x, int y, int w, int h)
 {
   const char *title = "Save PostScript File...";
   int  i,cx;
@@ -464,7 +458,7 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawPosStr()
+static void drawPosStr(void)
 {
   int         x,y;
   double      cmx, cmy, inx, iny;
@@ -504,7 +498,7 @@ static void drawPosStr()
 
 
 /***************************************************/
-static void drawSizeStr()
+static void drawSizeStr(void)
 {
   int x,y;
   double cmx, cmy;
@@ -529,7 +523,7 @@ static void drawSizeStr()
 
 
 /***************************************************/
-static void drawResStr()
+static void drawResStr(void)
 {
   int x,y;
   char   str[64];
@@ -549,7 +543,7 @@ static void drawResStr()
 
 
 /***************************************************/
-static void drawPage()
+static void drawPage(void)
 {
   /* draw page */
   XSetForeground(theDisp, theGC, infobg);
@@ -565,8 +559,7 @@ static void drawPage()
 
 
 /***************************************************/
-static void clickPSD(x,y)
-int x,y;
+static void clickPSD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -608,8 +601,7 @@ int x,y;
 
 
 /***************************************************/
-static void clickPage(mx,my)
-int mx,my;
+static void clickPage(int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry,x,y;
@@ -641,8 +633,7 @@ int mx,my;
 
 
 /***************************************************/
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
   char *fullname;
 
@@ -693,7 +684,7 @@ static void doCmd(cmd)
 
 
 /***************************************************/
-static void changedScale()
+static void changedScale(void)
 {
   double oldx,oldy;
 
@@ -718,7 +709,7 @@ static void changedScale()
 
 
 /***************************************************/
-static void setScale()
+static void setScale(void)
 {
   double hsx, hsy;
 
@@ -749,7 +740,7 @@ static void setScale()
 
 
 /***************************************************/
-static void changedPaper()
+static void changedPaper(void)
 {
   setPaper();
   XClearWindow(theDisp, pageF);
@@ -760,7 +751,7 @@ static void changedPaper()
 
 
 /***************************************************/
-static void setPaper()
+static void setPaper(void)
 {
   int    i;
   double tmp;
@@ -783,8 +774,7 @@ static void setPaper()
 
 
 /***************************************************/
-static void drawIRect(draw)
-     int draw;
+static void drawIRect(int draw)
 {
   int x,y,w,h;
   XRectangle xr;
@@ -812,7 +802,7 @@ static void drawIRect(draw)
 
 
 /***************************************************/
-static void centerImage()
+static void centerImage(void)
 {
   pos_inx = psizex/2 - sz_inx/2;
   pos_iny = psizey/2 - sz_iny/2;
@@ -824,7 +814,7 @@ static void centerImage()
 
 
 /***************************************************/
-static void maxImage()
+static void maxImage(void)
 {
   double scx, scy;
   int w,h;
@@ -864,8 +854,7 @@ static void maxImage()
 
 
 /***************************************************/
-static void moveImage(newx,newy)
-double newx, newy;
+static void moveImage(double newx, double newy)
 {
   double hsx, hsy;
 
@@ -890,7 +879,7 @@ double newx, newy;
 
 
 /***************************************************/
-static void writePS()
+static void writePS(void)
 {
   FILE *fp;
   int   i, j, err, rpix, gpix, bpix, nc, ptype;
@@ -1145,9 +1134,7 @@ static void writePS()
 
 
 /**********************************************/
-static int rle_encode(scanline, rleline, wide)
-     byte *scanline, *rleline;
-     int wide;
+static int rle_encode(byte *scanline, byte *rleline, int wide)
 {
   /* generates a rle-compressed version of the scan line.
    * rle is encoded as such:
@@ -1252,8 +1239,7 @@ static int rle_encode(scanline, rleline, wide)
 
 
 /**********************************************/
-static void psColorImage(fp)
-FILE *fp;
+static void psColorImage(FILE *fp)
 {
   /* spits out code that checks if the PostScript device in question
      knows about the 'colorimage' operator.  If it doesn't, it defines
@@ -1318,10 +1304,7 @@ FILE *fp;
 
 
 /**********************************************/
-static void psColorMap(fp, color, nc, rmap, gmap, bmap)
-     FILE *fp;
-     int color, nc;
-     byte *rmap, *gmap, *bmap;
+static void psColorMap(FILE *fp, int color, int nc, byte *rmap, byte *gmap, byte *bmap)
 {
   /* spits out code for the colormap of the following image
      if !color, it spits out a mono-ized graymap */
@@ -1347,9 +1330,7 @@ static void psColorMap(fp, color, nc, rmap, gmap, bmap)
 
 
 /**********************************************/
-static void psRleCmapImage(fp, color)
-FILE *fp;
-int   color;
+static void psRleCmapImage(FILE *fp, int color)
 {
   /* spits out code that defines the 'rlecmapimage' operator */
 
@@ -1418,13 +1399,8 @@ int   color;
 
 
 /**********************************************/
-static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
-		       landscape)
-     FILE *fp;
-     byte *pic;
-     int   ptype, colorType;
-     int   w, h, landscape;
-     byte *rmap, *gmap, *bmap;
+static void epsPreview(FILE *fp, byte *pic, int ptype, int colorType, int w, int h, byte *rmap, byte *gmap, byte *bmap,
+		       int landscape)
 {
   byte *prev;
   int flipbw;
@@ -1492,11 +1468,7 @@ static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
 
 
 /***********************************/
-static int writeBWStip(fp, pic, prompt, w, h, flipbw)
-     FILE *fp;
-     byte *pic;
-     const char *prompt;
-     int  w, h, flipbw;
+static int writeBWStip(FILE *fp, byte *pic, const char *prompt, int w, int h, int flipbw)
 {
   /* write the given 'pic' (B/W stippled, 1 byte per pixel, 0=blk,1=wht)
      out as hexadecimal, max of 72 hex chars per line.
@@ -1552,10 +1524,7 @@ static int writeBWStip(fp, pic, prompt, w, h, flipbw)
 
 
 /***********************************/
-int LoadPS(fname, pinfo, quick)
-     char    *fname;
-     PICINFO *pinfo;
-     int      quick;
+int LoadPS(char *fname, PICINFO *pinfo, int quick)
 {
   /* returns '1' if successful.  If the document is a single page, the
      a temporary PNM file is created, loaded, and deleted.  If the
@@ -1738,9 +1707,7 @@ int LoadPS(fname, pinfo, quick)
 
 /******************************************************************/
 #ifdef GS_PATH
-void buildCmdStr(str, gscmd, xname, quick, epsf)
-     char *str, *gscmd, *xname;
-     int   quick, epsf;
+void buildCmdStr(char *str, char *gscmd, char *xname, int quick, int epsf)
 {
   /* note 'epsf' set only on files that don't have a showpage cmd */
   char *x, *y, *fname;

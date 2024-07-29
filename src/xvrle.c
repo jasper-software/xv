@@ -33,9 +33,7 @@ static int  rleError PARM((const char *, const char *));
 
 
 /*******************************************/
-int LoadRLE(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadRLE(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   FILE  *fp;
@@ -289,10 +287,7 @@ int LoadRLE(fname, pinfo)
 
 
 /*******************************************/
-static void read_rle(fp, img, w, h, ncolors, ncmap)
-     FILE *fp;
-     byte *img;
-     int   w, h, ncolors, ncmap;
+static void read_rle(FILE *fp, byte *img, int w, int h, int ncolors, int ncmap)
 {
   int posx, posy, plane, bperpix, i, pixval, skipcalls;
   int opcode, operand, done, c, c1;
@@ -375,8 +370,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
 
 
 /*******************************************/
-static int rleError(fname,st)
-     const char *fname, *st;
+static int rleError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

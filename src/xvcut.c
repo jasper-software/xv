@@ -101,7 +101,7 @@ static Cursor cutcurs  = (Cursor) 0;
 
 
 /********************************************/
-int CutAllowed()
+int CutAllowed(void)
 {
   /* returns '1' if cut/copy/clear commands should be enabled (ie, if
      there's a selection of some sort */
@@ -111,7 +111,7 @@ int CutAllowed()
 
 
 /********************************************/
-int PasteAllowed()
+int PasteAllowed(void)
 {
   Atom        clipAtom;
   struct stat st;
@@ -137,7 +137,7 @@ int PasteAllowed()
 
 
 /********************************************/
-void DoImgCopy()
+void DoImgCopy(void)
 {
   /*
    * called when 'Copy' command is issued.  does entire user interface,
@@ -161,7 +161,7 @@ void DoImgCopy()
 
 
 /********************************************/
-void DoImgCut()
+void DoImgCut(void)
 {
   /*
    * called when 'Cut' command is issued.  does entire user interface,
@@ -187,7 +187,7 @@ void DoImgCut()
 
 
 /********************************************/
-void DoImgClear()
+void DoImgClear(void)
 {
   /* called when 'Clear' command is issued */
 
@@ -200,7 +200,7 @@ void DoImgClear()
 
 
 /********************************************/
-void DoImgPaste()
+void DoImgPaste(void)
 {
   byte *cimg;
 
@@ -219,8 +219,7 @@ void DoImgPaste()
 
 
 /********************************************/
-static void doPaste(cimg)
-     byte *cimg;
+static void doPaste(byte *cimg)
 {
   /*
    * This is fairly hairy.
@@ -570,7 +569,7 @@ static void doPaste(cimg)
 
 
 /********************************************/
-static void buildCursors()
+static void buildCursors(void)
 {
   Pixmap p1,p2,p3,p4;
   XColor cfg, cbg;
@@ -603,7 +602,7 @@ static void buildCursors()
 
 
 /********************************************/
-static byte *getSelection()
+static byte *getSelection(void)
 {
   /* alloc's and builds image with values based on currently selected
    * portion of the image.  Returns NULL on failure
@@ -725,7 +724,7 @@ static byte *getSelection()
 
 
 /********************************************/
-static byte *getFromClip()
+static byte *getFromClip(void)
 {
   /* gets whatever data is on the clipboard, in CIMG_* format */
 
@@ -851,8 +850,7 @@ static byte *getFromClip()
 
 
 /********************************************/
-void SaveToClip(cimg)
-     byte *cimg;
+void SaveToClip(byte *cimg)
 {
   /* takes the 'thing' pointed to by data and sticks it on the clipboard.
      always tries to use the property method.  If it gets a BadAlloc
@@ -923,7 +921,7 @@ void SaveToClip(cimg)
 
 
 /********************************************/
-static void clearSelectedArea()
+static void clearSelectedArea(void)
 {
   /* called by 'Cut' or 'Clear' functions.  fills the selected area of the
      image with either clearR,clearG,clearB (in PIC24 mode), or editColor
@@ -961,7 +959,7 @@ static void clearSelectedArea()
 
 
 /********************************************/
-static void makeClipFName()
+static void makeClipFName(void)
 {
   const char *homedir;
 
@@ -983,9 +981,7 @@ static void makeClipFName()
 
 
 /********************************************/
-static int countcols24(pic, pwide, phigh, x, y, w, h)
-     byte *pic;
-     int   pwide, phigh, x,y,w,h;
+static int countcols24(byte *pic, int pwide, int phigh, int x, int y, int w, int h)
 {
   /* counts the # of unique colors in a selected rect of a 24-bit image
      returns '0-256' or >256 */
@@ -1013,9 +1009,7 @@ static int countcols24(pic, pwide, phigh, x, y, w, h)
 
 
 /********************************************/
-static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
-     byte *newpic, *newcmap;
-     int   w,h, is24, cx,cy,cw,ch;
+static int countNewCols(byte *newpic, int w, int h, byte *newcmap, int is24, int cx, int cy, int cw, int ch)
 {
   /* computes the number of NEW colors in the specified region of the
    * new pic, with respect to 'pic'.  returns 0-257 (where 257 means
@@ -1084,8 +1078,7 @@ static int countNewCols(newpic, w,h, newcmap, is24, cx,cy,cw,ch)
 
 
 /********************************************/
-void CropRect2Rect(xp,yp,wp,hp, cx,cy,cw,ch)
-    int *xp, *yp, *wp, *hp, cx, cy, cw, ch;
+void CropRect2Rect(int *xp, int *yp, int *wp, int *hp, int cx, int cy, int cw, int ch)
 {
   /* crops rect xp,yp,wp,hp to be entirely within bounds of cx,cy,cw,ch */
 
@@ -1112,7 +1105,7 @@ void CropRect2Rect(xp,yp,wp,hp, cx,cy,cw,ch)
 
 
 /********************************************/
-void InitSelection()
+void InitSelection(void)
 {
   selrx = selry = selrw = selrh = 0;
   haveSel     = 0;
@@ -1124,22 +1117,21 @@ void InitSelection()
 
 
 /********************************************/
-int HaveSelection()
+int HaveSelection(void)
 {
   return haveSel;
 }
 
 
 /********************************************/
-int GetSelType()
+int GetSelType(void)
 {
   return selType;
 }
 
 
 /********************************************/
-void GetSelRCoords(xp, yp, wp, hp)
-     int *xp, *yp, *wp, *hp;
+void GetSelRCoords(int *xp, int *yp, int *wp, int *hp)
 {
   /* returns selection rectangle x,y,w,h in pic coordinates */
 
@@ -1152,8 +1144,7 @@ void GetSelRCoords(xp, yp, wp, hp)
 
 
 /********************************************/
-void EnableSelection(enab)
-     int enab;
+void EnableSelection(int enab)
 {
   haveSel = enab;
   BTSetActive(&but[BCROP], enab);
@@ -1169,8 +1160,7 @@ void EnableSelection(enab)
 
 
 /***********************************/
-int DoSelection(ev)
-     XButtonEvent *ev;
+int DoSelection(XButtonEvent *ev)
 {
   int          px, py, rv;
   static Time  lastClickTime   = 0;
@@ -1247,8 +1237,7 @@ int DoSelection(ev)
 
 
 /********************************************/
-static int dragHandle(ev)
-     XButtonEvent *ev;
+static int dragHandle(XButtonEvent *ev)
 {
   /* called on a B1 press inside the selection area.  if mouse clicked on
    * one of the selection handles, drag the handle until released.
@@ -1411,10 +1400,7 @@ static int dragHandle(ev)
 
 
 /********************************************/
-static void dragSelection(ev, bmask, dragndrop)
-     XButtonEvent *ev;
-     unsigned int bmask;
-     int          dragndrop;
+static void dragSelection(XButtonEvent *ev, unsigned int bmask, int dragndrop)
 {
   /* called on a button press inside the selection area.  drags selection
    * around until button has been released.  Selection may be dragged outside
@@ -1525,8 +1511,7 @@ static void dragSelection(ev, bmask, dragndrop)
 
 
 /***********************************/
-static void rectSelection(ev)
-     XButtonEvent *ev;
+static void rectSelection(XButtonEvent *ev)
 {
   Window       rW,cW;
   int          rx,ry,ox,oy,x,y,active, x1, y1, x2, y2, cnstrain;
@@ -1608,8 +1593,7 @@ static void rectSelection(ev)
 
 
 /***********************************/
-void DrawSelection(newcol)
-     int newcol;
+void DrawSelection(int newcol)
 {
   /* doesn't affect 'haveSel', as when moving/resizing/tracking the
      selection we need to erase it and redraw it.  If 'chcol' is
@@ -1701,8 +1685,7 @@ void DrawSelection(newcol)
 
 
 /********************************************/
-void MoveGrowSelection(dx,dy,dw,dh)
-     int dx,dy,dw,dh;
+void MoveGrowSelection(int dx, int dy, int dw, int dh)
 {
   /* moves and/or grows the selection by the specified amount
      (in pic coords).  keeps the selection entirely within 'pic'.
@@ -1732,8 +1715,7 @@ void MoveGrowSelection(dx,dy,dw,dh)
 
 
 /***********************************/
-void BlinkSelection(cnt)
-     int cnt;
+void BlinkSelection(int cnt)
 {
   if (!HaveSelection()) return;
 
@@ -1746,8 +1728,7 @@ void BlinkSelection(cnt)
 
 
 /***********************************/
-void FlashSelection(cnt)
-     int cnt;
+void FlashSelection(int cnt)
 {
   int i;
 
@@ -1766,8 +1747,7 @@ void FlashSelection(cnt)
 
 
 /********************************************/
-static void makePasteSel(cimg)
-     byte *cimg;
+static void makePasteSel(byte *cimg)
 {
   /* makes a selection rectangle the size of the beastie on the clipboard,
    * centered on cpic.  selection is allowed to be bigger than pic
@@ -1796,8 +1776,7 @@ static void makePasteSel(cimg)
 /********************************************/
 
 
-void CoordE2C(ex, ey, cx_ret, cy_ret)
-     int ex, ey, *cx_ret, *cy_ret;
+void CoordE2C(int ex, int ey, int *cx_ret, int *cy_ret)
 {
   /* the weirdness causes everything to round towards neg infinity */
   *cx_ret = ((ex*cWIDE) / eWIDE) + ((ex<0) ? -1 : 0);
@@ -1805,8 +1784,7 @@ void CoordE2C(ex, ey, cx_ret, cy_ret)
 }
 
 
-void CoordC2E(cx, cy, ex_ret, ey_ret)
-     int cx, cy, *ex_ret, *ey_ret;
+void CoordC2E(int cx, int cy, int *ex_ret, int *ey_ret)
 {
   /* this makes positive #s round to +inf, and neg # round to -inf */
   if (cx>=0) *ex_ret = (cx*eWIDE + (cWIDE-1)) / cWIDE;
@@ -1816,24 +1794,21 @@ void CoordC2E(cx, cy, ex_ret, ey_ret)
 }
 
 
-void CoordP2C(px, py, cx_ret, cy_ret)
-     int px, py, *cx_ret, *cy_ret;
+void CoordP2C(int px, int py, int *cx_ret, int *cy_ret)
 {
   *cx_ret = px - cXOFF;
   *cy_ret = py - cYOFF;
 }
 
 
-void CoordC2P(cx, cy, px_ret, py_ret)
-     int cx, cy, *px_ret, *py_ret;
+void CoordC2P(int cx, int cy, int *px_ret, int *py_ret)
 {
   *px_ret = cx + cXOFF;
   *py_ret = cy + cYOFF;
 }
 
 
-void CoordP2E(px, py, ex_ret, ey_ret)
-     int px, py, *ex_ret, *ey_ret;
+void CoordP2E(int px, int py, int *ex_ret, int *ey_ret)
 {
   int cx, cy;
   CoordP2C(px, py, &cx, &cy);
@@ -1841,8 +1816,7 @@ void CoordP2E(px, py, ex_ret, ey_ret)
 }
 
 
-void CoordE2P(ex, ey, px_ret, py_ret)
-     int ex, ey, *px_ret, *py_ret;
+void CoordE2P(int ex, int ey, int *px_ret, int *py_ret)
 {
   int cx, cy;
   CoordE2C(ex, ey, &cx, &cy);
@@ -1850,8 +1824,7 @@ void CoordE2P(ex, ey, px_ret, py_ret)
 }
 
 
-static void CoordE2Prnd(ex, ey, px_ret, py_ret)
-     int ex, ey, *px_ret, *py_ret;
+static void CoordE2Prnd(int ex, int ey, int *px_ret, int *py_ret)
 {
   int cx, cy;
   cx = ((ex*cWIDE + (eWIDE/2)) / eWIDE) + ((ex<0) ? -1 : 0);
@@ -1861,8 +1834,7 @@ static void CoordE2Prnd(ex, ey, px_ret, py_ret)
 }
 
 
-void MaskSelect (x1,x2,y1,y2)
-int x1,x2,y1,y2;
+void MaskSelect (int x1, int x2, int y1, int y2)
 {
 	selrx = x1;  selry = y1;  selrw = x2;  selrh = y2;
 	EnableSelection(1);

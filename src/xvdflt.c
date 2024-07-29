@@ -33,8 +33,7 @@ static void gen_bg         PARM((byte *, PICINFO *));
 
 
 /*******************************************/
-void LoadDfltPic(pinfo)
-     PICINFO *pinfo;
+void LoadDfltPic(PICINFO *pinfo)
 {
   char  str[256];
   byte *dfltpic;
@@ -145,8 +144,7 @@ void LoadDfltPic(pinfo)
 
 
 /*******************************************/
-static void loadOldDfltPic(pinfo)
-     PICINFO *pinfo;
+static void loadOldDfltPic(PICINFO *pinfo)
 {
   /* load up the stuff XV expects us to load up */
 
@@ -244,10 +242,7 @@ static void loadOldDfltPic(pinfo)
 
 
 /*******************************************/
-void xbm2pic(bits, bwide, bhigh, pic, pwide, phigh, cx, cy, col)
-     byte *bits;
-     byte *pic;
-     int   bwide, bhigh, pwide, phigh, cx, cy, col;
+void xbm2pic(byte *bits, int bwide, int bhigh, byte *pic, int pwide, int phigh, int cx, int cy, int col)
 /*******************************************/
 {
   /* draws an X bitmap into an 8-bit 'pic'.  Only '1' bits from the bitmap
@@ -278,9 +273,7 @@ void xbm2pic(bits, bwide, bhigh, pic, pwide, phigh, cx, cy, col)
 
 
 /*******************************************/
-static void setcolor(pinfo, i, rv, gv, bv)
-     PICINFO *pinfo;
-     int i, rv, gv, bv;
+static void setcolor(PICINFO *pinfo, int i, int rv, int gv, int bv)
 {
   pinfo->r[i] = rv;
   pinfo->g[i] = gv;
@@ -289,9 +282,7 @@ static void setcolor(pinfo, i, rv, gv, bv)
 
 
 /*******************************************/
-static void gen_bg(dfltpic, pinfo)
-     byte    *dfltpic;
-     PICINFO *pinfo;
+static void gen_bg(byte *dfltpic, PICINFO *pinfo)
 {
   int i,j, dr, dg, db;
   byte *pp;
@@ -334,10 +325,7 @@ static void gen_bg(dfltpic, pinfo)
 
 
 /*******************************************/
-void DrawStr2Pic(str, cx, cy, pic, pw, ph, col)
-     char *str;
-     byte *pic;
-     int   cx, cy, pw, ph, col;
+void DrawStr2Pic(char *str, int cx, int cy, byte *pic, int pw, int ph, int col)
 {
   /* draw string (in 5x9 font) centered around cx,cy, in color 'col' */
 

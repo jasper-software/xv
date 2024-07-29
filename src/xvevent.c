@@ -85,7 +85,7 @@ extern XtAppContext context;
 #endif
 
 /****************/
-int EventLoop()
+int EventLoop(void)
 /****************/
 {
   XEvent event;
@@ -213,9 +213,7 @@ int EventLoop()
 
 
 /****************/
-int HandleEvent(event, donep)
-     XEvent *event;
-     int    *donep;
+int HandleEvent(XEvent *event, int *donep)
 {
   static int wasInfoUp=0, wasCtrlUp=0, wasDirUp=0, wasGamUp=0, wasPsUp=0;
 #ifdef HAVE_JPEG
@@ -973,13 +971,7 @@ int HandleEvent(event, donep)
 
 
 /***********************************/
-extern void SendSelection(selection, requestor, property, target, time, text)
-    Atom selection;
-    Window requestor;
-    Atom property;
-    Atom target;
-    Time time;
-    char const *text;
+extern void SendSelection(Atom selection, Window requestor, Atom property, Atom target, Time time, const char *text)
 {
   XSelectionEvent xse;
 
@@ -1013,8 +1005,7 @@ extern void SendSelection(selection, requestor, property, target, time, text)
 
 
 /***********************************/
-static void SelectDispMB(i)
-     int i;
+static void SelectDispMB(int i)
 {
   /* called to handle selection of a dispMB item */
 
@@ -1063,8 +1054,7 @@ static void SelectDispMB(i)
 
 
 /***********************************/
-static void SelectRootMB(i)
-     int i;
+static void SelectRootMB(int i)
 {
   /* called to handle selection of a rootMB item */
 
@@ -1083,8 +1073,7 @@ static void SelectRootMB(i)
 
 
 /***********************************/
-static void Select24to8MB(i)
-     int i;
+static void Select24to8MB(int i)
 {
   if (i<0 || i>=CONV24_MAX) return;
 
@@ -1126,8 +1115,7 @@ static void Select24to8MB(i)
 
 
 /***********************************/
-static void SelectWindowMB(i)
-     int i;
+static void SelectWindowMB(int i)
 {
   if (i<0 || i>=WMB_MAX) return;
   if (windowMB.dim[i]) return;
@@ -1157,8 +1145,7 @@ static void SelectWindowMB(i)
 
 
 /***********************************/
-static void SelectSizeMB(i)
-     int i;
+static void SelectSizeMB(int i)
 {
   int w,h;
 
@@ -1270,7 +1257,7 @@ static void SelectSizeMB(i)
 
 
 /***********************************/
-static void DoPrint()
+static void DoPrint(void)
 {
   /* pops open appropriate dialog boxes, issues print command */
 
@@ -1307,8 +1294,7 @@ static void DoPrint()
 
 
 /***********************************/
-static void debugEvent(e)
-     XEvent *e;
+static void debugEvent(XEvent *e)
 {
   switch (e->type) {
   case ButtonPress:
@@ -1382,8 +1368,7 @@ static void debugEvent(e)
   }
 }
 
-static const char *win2name(win)
-    Window win;
+static const char *win2name(Window win)
 {
   static char foo[16];
 
@@ -1404,9 +1389,7 @@ static const char *win2name(win)
 
 
 /***********************************/
-static void handleButtonEvent(event, donep, retvalp)
-    XEvent *event;
-    int    *donep, *retvalp;
+static void handleButtonEvent(XEvent *event, int *donep, int *retvalp)
 {
   XButtonEvent *but_event;
   int i,x,y, done, retval, shift;
@@ -1673,9 +1656,7 @@ static void handleButtonEvent(event, donep, retvalp)
 
 
 /***********************************/
-static void handleKeyEvent(event, donep, retvalp)
-    XEvent *event;
-    int    *donep, *retvalp;
+static void handleKeyEvent(XEvent *event, int *donep, int *retvalp)
 {
   /* handles KeyPress and KeyRelease events, called from HandleEvent */
 
@@ -2110,8 +2091,7 @@ static void handleKeyEvent(event, donep, retvalp)
 
 
 /***********************************/
-static void zoomCurs(mask)
-     u_int mask;
+static void zoomCurs(u_int mask)
 {
   int zc;
   zc = ((mask & ControlMask) && !(mask & ShiftMask) && !(mask & Mod1Mask));
@@ -2124,7 +2104,7 @@ static void zoomCurs(mask)
 
 
 /***********************************/
-static void textViewCmd()
+static void textViewCmd(void)
 {
   int   i;
   char *name;
@@ -2146,7 +2126,7 @@ static void textViewCmd()
 
 
 /***********************************/
-static void setSizeCmd()
+static void setSizeCmd(void)
 {
   /* open 'set size' prompt window, get a string, parse it, and try to
      set the window size accordingly */
@@ -2282,8 +2262,7 @@ static void setSizeCmd()
 
 
 /***********************************/
-void NewCutBuffer(str)
-     char const *str;
+void NewCutBuffer(const char *str)
 {
   /* called whenever contents of CUT_BUFFER0 and PRIMARY selection should
      be changed.  Only works for strings.  Copies the data, so the string
@@ -2300,8 +2279,7 @@ void NewCutBuffer(str)
 }
 
 /***********************************/
-void DrawWindow(x,y,w,h)
-     int x,y,w,h;
+void DrawWindow(int x, int y, int w, int h)
 {
   if (x+w < eWIDE) w++;  /* add one for broken servers (?) */
   if (y+h < eHIGH) h++;
@@ -2314,8 +2292,7 @@ void DrawWindow(x,y,w,h)
 
 
 /***********************************/
-void WResize(w, h)
-    int w, h;
+void WResize(int w, int h)
 {
   XWindowAttributes xwa;
 
@@ -2350,7 +2327,7 @@ void WResize(w, h)
 
 
 /***********************************/
-static void WMaximize()
+static void WMaximize(void)
 {
   if (useroot) WResize((int) dispWIDE, (int) dispHIGH);
   else {
@@ -2367,7 +2344,7 @@ static void WMaximize()
 
 
 /***********************************/
-void WRotate()
+void WRotate(void)
 {
   /* rotate the window and redraw the contents  */
 
@@ -2402,8 +2379,7 @@ void WRotate()
 
 
 /***********************************/
-void WCrop(w,h,dx,dy)
-     int w,h,dx,dy;
+void WCrop(int w, int h, int dx, int dy)
 {
   int ex, ey;
   XWindowAttributes xwa;
@@ -2434,7 +2410,7 @@ void WCrop(w,h,dx,dy)
 
 
 /***********************************/
-void WUnCrop()
+void WUnCrop(void)
 {
   int w,h;
   XWindowAttributes xwa;
@@ -2477,8 +2453,7 @@ void WUnCrop()
 
 
 /***********************************/
-void GetWindowPos(xwa)
-    XWindowAttributes *xwa;
+void GetWindowPos(XWindowAttributes *xwa)
 {
   Window child;
 
@@ -2494,8 +2469,7 @@ void GetWindowPos(xwa)
 
 
 /***********************************/
-void SetWindowPos(xwa)
-    XWindowAttributes *xwa;
+void SetWindowPos(XWindowAttributes *xwa)
 {
   /* sets window x,y,w,h values */
   XWindowChanges xwc;
@@ -2597,8 +2571,7 @@ void SetWindowPos(xwa)
 
 
 /***********************************/
-static void CropKey(dx,dy,grow,crop)
-     int dx,dy,grow,crop;
+static void CropKey(int dx, int dy, int grow, int crop)
 {
   int ocx, ocy;
 
@@ -2629,8 +2602,7 @@ static void CropKey(dx,dy,grow,crop)
 
 
 /***********************************/
-static void TrackPicValues(mx,my)
-     int mx,my;
+static void TrackPicValues(int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry,ox,oy,x,y, orgx,orgy;
@@ -2764,10 +2736,7 @@ static void TrackPicValues(mx,my)
 
 
 /***********************************/
-static Bool IsConfig(dpy, ev, arg)
-     Display *dpy;
-     XEvent  *ev;
-     char    *arg;
+static Bool IsConfig(Display *dpy, XEvent *ev, char *arg)
 {
   XConfigureEvent *cev;
 
@@ -2782,7 +2751,7 @@ static Bool IsConfig(dpy, ev, arg)
 }
 
 /***********************************/
-static int CheckForConfig()
+static int CheckForConfig(void)
 {
   XEvent ev;
   char   foo;
@@ -2798,7 +2767,7 @@ static int CheckForConfig()
 
 
 /************************************************************************/
-void SetEpicMode()
+void SetEpicMode(void)
 {
   if (epicMode == EM_RAW) {
     dispMB.dim[DMB_RAW]    = 1;
@@ -2821,9 +2790,7 @@ void SetEpicMode()
 
 
 /************************************************************************/
-int xvErrorHandler(disp, err)
-     Display *disp;
-     XErrorEvent *err;
+int xvErrorHandler(Display *disp, XErrorEvent *err)
 {
   char buf[128];
 
@@ -2932,7 +2899,7 @@ static void onInterrupt(int i)
 
 
 /***********************************/
-static void Paint()
+static void Paint(void)
 {
   Window  rW,cW;
   int     rx,ry, x,y, px,py, px1,py1, state;
@@ -3087,8 +3054,7 @@ static void Paint()
 
 
 /***********************/
-static void paintPixel(x,y)
-     int x,y;
+static void paintPixel(int x, int y)
 {
   /* paints pixel x,y (pic coords) into pic in editColor (PIC8) or clearR,G,B
      (PIC24) and does appropriate screen feedback. */
@@ -3120,8 +3086,7 @@ static void paintPixel(x,y)
 
 
 /***********************************/
-static void paintLine(x,y,x1,y1)
-  int x,y,x1,y1;
+static void paintLine(int x, int y, int x1, int y1)
 {
   int t,dx,dy,d,dd;
 
@@ -3170,8 +3135,7 @@ static void paintLine(x,y,x1,y1)
 static int pntxlcol = 0;  /* index into xorMasks */
 
 /***********************************/
-static void paintXLine(x,y,x1,y1,newcol)
-  int x,y,x1,y1,newcol;
+static void paintXLine(int x, int y, int x1, int y1, int newcol)
 {
   /* draws a xor'd line on image from x,y to x1,y1 (pic coords) */
   int ex,ey, ex1,ey1,  tx,ty,tx1,ty1;
@@ -3199,7 +3163,7 @@ static void paintXLine(x,y,x1,y1,newcol)
 
 
 /***********************************/
-static void BlurPaint()
+static void BlurPaint(void)
 {
   Window  rW,cW;
   int     rx,ry,ox,oy,x,y, px,py, done1, dragging;
@@ -3288,8 +3252,7 @@ static void BlurPaint()
 
 
 /***********************/
-static int highbit(ul)
-     unsigned long ul;
+static int highbit(long unsigned int ul)
 {
   /* returns position of highest set bit in 'ul' as an integer (0-31),
      or -1 if none */
@@ -3303,8 +3266,7 @@ static int highbit(ul)
 
 
 /***********************/
-static unsigned long RGBToXColor(r,g,b)
-     int r,g,b;
+static unsigned long RGBToXColor(int r, int g, int b)
 {
   /* converts arbitrary rgb values (0-255) into an appropriate X color value,
      suitable for XSetForeground().  Works for ncols==0, all visual types,
@@ -3385,8 +3347,7 @@ static unsigned long RGBToXColor(r,g,b)
 
 
 /***********************/
-static void blurPixel(x,y)
-     int x,y;
+static void blurPixel(int x, int y)
 {
   /* blurs pixel x,y (pic coords) into pic in editColor (PIC8) or clearR,G,B
      (PIC24) and does appropriate screen feedback.  Does a 3x3 average
@@ -3455,7 +3416,7 @@ static void blurPixel(x,y)
 
 
 /***********************/
-static void annotatePic()
+static void annotatePic(void)
 {
   int                i, w,h, len;
   byte              *cimg;

@@ -121,7 +121,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 
 
 /*******************************************/
-void CreatePNGW()
+void CreatePNGW(void)
 {
   pngW = CreateWindow("xv png", "XVPNG", NULL,
                       PWIDE, PHIGH, infofg, infobg, FALSE);
@@ -171,8 +171,7 @@ void CreatePNGW()
 
 
 /*******************************************/
-void PNGDialog(vis)
-     int vis;
+void PNGDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(pngW, pbut[P_BOK].x + (int) pbut[P_BOK].w/2,
@@ -185,8 +184,7 @@ void PNGDialog(vis)
 
 
 /*******************************************/
-int PNGCheckEvent(xev)
-     XEvent *xev;
+int PNGCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -258,9 +256,7 @@ int PNGCheckEvent(xev)
 
 
 /*******************************************/
-void PNGSaveParams(fname, col)
-     char *fname;
-     int col;
+void PNGSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -268,8 +264,7 @@ void PNGSaveParams(fname, col)
 
 
 /*******************************************/
-static void drawPD(x, y, w, h)
-     int x, y, w, h;
+static void drawPD(int x, int y, int w, int h)
 {
   const char *title   = "Save PNG file...";
 
@@ -324,8 +319,7 @@ static void drawPD(x, y, w, h)
 
 
 /*******************************************/
-static void clickPD(x,y)
-     int x,y;
+static void clickPD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -373,8 +367,7 @@ static void clickPD(x,y)
 
 
 /*******************************************/
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
   switch (cmd) {
     case P_BOK:
@@ -403,7 +396,7 @@ static void doCmd(cmd)
 
 
 /*******************************************/
-static void writePNG()
+static void writePNG(void)
 {
   FILE       *fp;
   int         w, h, nc, rv, ptype, pfree;
@@ -428,12 +421,7 @@ static void writePNG()
 
 
 /*******************************************/
-int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w, h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols;
+int WritePNG(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols)
      /* FIXME?  what's diff between picComments and WriteGIF's comment arg? */
 {
   png_struct *png_ptr;
@@ -708,7 +696,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
 
 /* GRR FIXME:  add .Xdefaults option to omit writing gamma (size, cumulative errors when editing)--alternatively, modify save box to include "omit" checkbox */
   png_set_gAMA(png_ptr,info_ptr,1.0/gDial.val);
-/* doesn't seem to be a way to set valid directly anymore, unnecessary maybe.. 
+/* doesn't seem to be a way to set valid directly anymore, unnecessary maybe..
   info_ptr->valid |= PNG_INFO_gAMA; */
 
 /* might need to be png_write_info_before_PLTE() ... */
@@ -762,7 +750,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
       key = savecmnt;
       png_get_text(png_ptr,info_ptr,&tp,&mt); /* to get 'max_text' */
       tp = text;
-      nt = 0;      
+      nt = 0;
 
       comment = strchr(key, ':');
 
@@ -874,7 +862,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
 
   if (text) {
     free(text);
-    /* must do this or png_destroy_write_struct() 0.97+ will free text again: 
+    /* must do this or png_destroy_write_struct() 0.97+ will free text again:
     info_ptr->text = (png_textp)NULL; */
     if (savecmnt)
     {
@@ -890,9 +878,7 @@ int WritePNG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols)
 
 
 /*******************************************/
-int LoadPNG(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadPNG(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -1174,9 +1160,7 @@ int LoadPNG(fname, pinfo)
 
 /*******************************************/
 static void
-png_xv_error(png_ptr, message)
-     png_structp png_ptr;
-     png_const_charp message;
+png_xv_error(png_structp png_ptr, png_const_charp message)
 {
   SetISTR(ISTR_WARNING,"%s:  libpng error: %s", fbasename, message);
 
@@ -1186,9 +1170,7 @@ png_xv_error(png_ptr, message)
 
 /*******************************************/
 static void
-png_xv_warning(png_ptr, message)
-     png_structp png_ptr;
-     png_const_charp message;
+png_xv_warning(png_structp png_ptr, png_const_charp message)
 {
   if (!png_ptr)
     return;
@@ -1199,7 +1181,7 @@ png_xv_warning(png_ptr, message)
 
 /*******************************************/
 void
-VersionInfoPNG()	/* GRR 19980605 */
+VersionInfoPNG(void)	/* GRR 19980605 */
 {
   fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
     PNG_LIBPNG_VER_STRING, png_libpng_ver);

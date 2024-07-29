@@ -124,10 +124,7 @@ static char **xrm_fonts;
 
 static struct context *context;	/* current context */
 
-struct ml_text *ml_draw_text(ctx, string, len)
-    struct context *ctx;
-    char *string;
-    int len;
+struct ml_text *ml_draw_text(struct context *ctx, char *string, int len)
 {
     unsigned char *str = (unsigned char *) string;
     unsigned char *estr = str + len;
@@ -381,8 +378,7 @@ struct ml_text *ml_draw_text(ctx, string, len)
     return &context->text;
 }
 
-static unsigned char *escape_sequence(str)
-    unsigned char *str;
+static unsigned char *escape_sequence(unsigned char *str)
 {
     unsigned char *p;
     switch(*str){
@@ -405,8 +401,7 @@ static unsigned char *escape_sequence(str)
 
 }
 
-static unsigned char *designator_sequence(str)
-    unsigned char *str;
+static unsigned char *designator_sequence(unsigned char *str)
 {
     unsigned char *p = str;
     int noc, bpc, n_g, shortened;
@@ -455,8 +450,7 @@ static unsigned char *designator_sequence(str)
     return p;
 }
 
-static void locking_shift(c)
-    unsigned CHAR c;
+static void locking_shift(unsigned int c)
 {
     switch((unsigned char) c){
     case CODE_SI:	context->gl = &context->g[0]; break;
@@ -474,8 +468,7 @@ static void locking_shift(c)
     }
 }
 
-static void single_shift(c)
-    unsigned CHAR c;
+static void single_shift(unsigned int c)
 {
     switch((unsigned char) c){
     case CODE_SS2:	context->ss = &context->g[2]; break;
@@ -484,8 +477,7 @@ static void single_shift(c)
 }
 
 
-static void put_unknown_char(chr)
-    unsigned CHAR chr;
+static void put_unknown_char(unsigned int chr)
 {
     unsigned char c = chr;
 
@@ -504,8 +496,7 @@ static void put_unknown_char(chr)
     }
 }
 
-struct context *ml_create_context(s)
-    Screen *s;
+struct context *ml_create_context(Screen *s)
 {
     context = (struct context *) malloc(sizeof *context);
 
@@ -531,9 +522,7 @@ struct context *ml_create_context(s)
 }
 
 
-int ml_set_charsets(ctx, sys)
-    struct context *ctx;
-    struct coding_system *sys;
+int ml_set_charsets(struct context *ctx, struct coding_system *sys)
 {
     int retval = 0;
     int i;
@@ -600,9 +589,7 @@ int ml_set_charsets(ctx, sys)
     return retval;
 }
 
-static struct charset *search_charset(bpc, noc, des)
-    int bpc, noc;
-    int des;
+static struct charset *search_charset(int bpc, int noc, int des)
 {
     struct charset *cset;
     for(cset = charset; cset->bpc != 0; cset++){
@@ -677,10 +664,8 @@ static struct charset *search_charset(bpc, noc, des)
     return NULL;
 }
 
-static void pack_string(cs, str, len)
-    struct charset *cs;
-    unsigned char *str;
-    int len;	/* number of chars(not bytes) */
+static void pack_string(struct charset *cs, unsigned char *str, int len)
+            	/* number of chars(not bytes) */
 {
     struct ml_text *mt = &context->text;
     struct ml_line *lp;
@@ -784,8 +769,7 @@ static void pack_string(cs, str, len)
 	lp->descent = cs->fs->descent;
 }
 
-void get_monofont_size(wide, high)
-    int *wide, *high;
+void get_monofont_size(int *wide, int *high)
 {
     if (ascii == NULL) {
 	fputs("ml_draw_text: call ml_set_charsets, first.\n", stderr);
@@ -795,13 +779,13 @@ void get_monofont_size(wide, high)
     *high = ascii->fs->ascent + ascii->fs->descent;
 }
 
-static void init_xrm()
+static void init_xrm(void)
 {
     init_xrm_fonts();
     init_xrm_tab();
 }
 
-static void init_xrm_fonts()
+static void init_xrm_fonts(void)
 {
     char *p, *fns = XGetDefault(theDisp, "xv", "fontSet");
     int n;
@@ -849,7 +833,7 @@ static void init_xrm_fonts()
 	xrm_fonts[n] = "";
 }
 
-static void init_xrm_tab()
+static void init_xrm_tab(void)
 {
     char *ts = XGetDefault(theDisp, "xv", "tabWidth");
     unsigned short tab;
@@ -886,9 +870,7 @@ static char *strdup(str)
 }
 #endif
 
-char *lookup_registry(d, b7)
-    struct design d;
-    int *b7;
+char *lookup_registry(struct design d, int *b7)
 {
     int i;
     for (i = 0; i < NR_CHARSETS; i++) {
@@ -901,9 +883,7 @@ char *lookup_registry(d, b7)
     return NULL;
 }
 
-struct design lookup_design(registry, b7)
-    char *registry;
-    int b7;
+struct design lookup_design(char *registry, int b7)
 {
     struct design d;
     int i;
@@ -922,9 +902,7 @@ struct design lookup_design(registry, b7)
     return d;
 }
 
-char *sjis_to_jis(orig, len, newlen)
-    char *orig;
-    int len, *newlen;
+char *sjis_to_jis(char *orig, int len, int *newlen)
 {
     unsigned char *new;
     unsigned char *p, *q, *endp;

@@ -71,13 +71,7 @@ static void drawCB     PARM((CBUTT *, int));
 
 
 /**********************************************/
-void BTCreate(bp,win,x,y,w,h,str,fg,bg,hi,lo)
-    BUTT         *bp;
-    Window        win;
-    int           x,y;
-    unsigned int  w,h;
-    const char   *str;
-    unsigned long fg,bg,hi,lo;
+void BTCreate(BUTT *bp, Window win, int x, int y, unsigned int w, unsigned int h, const char *str, long unsigned int fg, long unsigned int bg, long unsigned int hi, long unsigned int lo)
 {
   bp->win = win;
   bp->x = x;  bp->y = y;  bp->w = w;  bp->h = h;
@@ -99,9 +93,7 @@ void BTCreate(bp,win,x,y,w,h,str,fg,bg,hi,lo)
 
 
 /**********************************************/
-void BTMove(bp, x, y)
-    BUTT *bp;
-    int   x,y;
+void BTMove(BUTT *bp, int x, int y)
 {
   bp->x = x;
   bp->y = y;
@@ -110,9 +102,7 @@ void BTMove(bp, x, y)
 
 /**********************************************/
 
-void BTSetActive(bp, act)
-    BUTT *bp;
-    int   act;
+void BTSetActive(BUTT *bp, int act)
 {
   if (bp->active != act) {
     bp->active = act;
@@ -123,8 +113,7 @@ void BTSetActive(bp, act)
 
 
 /**********************************************/
-void BTRedraw(bp)
-    BUTT *bp;
+void BTRedraw(BUTT *bp)
 {
   int          x,y,r,x1,y1;
   unsigned int w,h;
@@ -239,8 +228,7 @@ void BTRedraw(bp)
 
 
 /**********************************************/
-int BTTrack(bp)
-BUTT *bp;
+int BTTrack(BUTT *bp)
 {
   /* called when we've gotten a click inside 'bp'.  returns 1 if button
      was still selected lit when mouse was released. */
@@ -287,12 +275,7 @@ BUTT *bp;
 
 
 /***********************************************/
-RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
-      RBUTT        *rblist;
-      Window        win;
-      int           x,y;
-      const char   *str;
-      unsigned long fg,bg,hi,lo;
+RBUTT *RBCreate(RBUTT *rblist, Window win, int x, int y, const char *str, long unsigned int fg, long unsigned int bg, long unsigned int hi, long unsigned int lo)
 {
   /* mallocs an RBUTT, fills in the fields, and appends it to rblist
      if rblist is NULL, this is the first rb in the list.  It will
@@ -443,9 +426,7 @@ RBUTT *RBCreate(rblist, win, x,y,str, fg, bg, hi, lo)
 
 
 /***********************************************/
-void RBRedraw(rblist, num)
-RBUTT *rblist;
-int    num;
+void RBRedraw(RBUTT *rblist, int num)
 {
   /* redraws the 'num-th' RB in the list.  if num < 0, redraws entire list */
 
@@ -471,9 +452,7 @@ int    num;
 
 
 /***********************************************/
-static void drawRB(rb, lit)
-     RBUTT *rb;
-     int   lit;
+static void drawRB(RBUTT *rb, int lit)
 {
   /* draws the rb being pointed at */
 
@@ -499,9 +478,7 @@ static void drawRB(rb, lit)
 
 
 /***********************************************/
-void RBSelect(rblist, n)
-RBUTT *rblist;
-int    n;
+void RBSelect(RBUTT *rblist, int n)
 {
   RBUTT *rbold, *rb;
   int    i;
@@ -530,8 +507,7 @@ int    n;
 
 
 /***********************************************/
-int RBWhich(rblist)
-     RBUTT *rblist;
+int RBWhich(RBUTT *rblist)
 {
   int i;
 
@@ -547,8 +523,7 @@ int RBWhich(rblist)
 
 
 /***********************************************/
-int RBCount(rblist)
-     RBUTT *rblist;
+int RBCount(RBUTT *rblist)
 {
   int i;
 
@@ -561,9 +536,7 @@ int RBCount(rblist)
 
 
 /***********************************************/
-void RBSetActive(rblist, n, act)
-     RBUTT *rblist;
-     int n,act;
+void RBSetActive(RBUTT *rblist, int n, int act)
 {
   RBUTT *rb;
   int    i;
@@ -582,9 +555,7 @@ void RBSetActive(rblist, n, act)
 
 
 /***********************************************/
-int RBClick(rblist, mx, my)
-RBUTT *rblist;
-int    mx,my;
+int RBClick(RBUTT *rblist, int mx, int my)
 {
   int i;
 
@@ -606,9 +577,7 @@ int    mx,my;
 
 
 /***********************************************/
-int RBTrack(rblist, n)
-     RBUTT *rblist;
-     int    n;
+int RBTrack(RBUTT *rblist, int n)
 {
   RBUTT       *rb;
   Window       rW, cW;
@@ -668,12 +637,7 @@ int RBTrack(rblist, n)
 #define XVCBSIZE 16
 
 /***********************************************/
-void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
-    CBUTT        *cb;
-    Window        win;
-    int           x,y;
-    const char   *str;
-    unsigned long fg,bg,hi,lo;
+void CBCreate(CBUTT *cb, Window win, int x, int y, const char *str, long unsigned int fg, long unsigned int bg, long unsigned int hi, long unsigned int lo)
 {
   /* fill in the fields of the structure */
   cb->win      = win;
@@ -700,9 +664,7 @@ void CBCreate(cb, win, x,y, str, fg, bg, hi, lo)
 }
 
 
-void CBMove(cb, x, y)
-    CBUTT *cb;
-    int    x, y;
+void CBMove(CBUTT *cb, int x, int y)
 {
   cb->x = x;
   cb->y = y;
@@ -711,8 +673,7 @@ void CBMove(cb, x, y)
 
 
 /***********************************************/
-void CBRedraw(cb)
-CBUTT *cb;
+void CBRedraw(CBUTT *cb)
 {
   /* draws the cb being pointed at */
 
@@ -742,9 +703,7 @@ CBUTT *cb;
 
 
 /**********************************************/
-void CBSetActive(cb,act)
-CBUTT        *cb;
-int           act;
+void CBSetActive(CBUTT *cb, int act)
 {
   if (cb->active != act) {
     cb->active = act;
@@ -754,9 +713,7 @@ int           act;
 
 
 /***********************************************/
-int CBClick(cb, mx, my)
-CBUTT *cb;
-int    mx,my;
+int CBClick(CBUTT *cb, int mx, int my)
 {
   if (PTINRECT(mx, my, cb->x, cb->y, XVCBSIZE,XVCBSIZE)) return 1;
   return 0;
@@ -764,8 +721,7 @@ int    mx,my;
 
 
 /***********************************************/
-int CBTrack(cb)
-CBUTT *cb;
+int CBTrack(CBUTT *cb)
 {
   Window       rW, cW;
   int          x, y, rx, ry, lit;
@@ -811,9 +767,7 @@ CBUTT *cb;
 
 
 /***********************************************/
-static void drawCB(cb, lit)
-CBUTT *cb;
-int lit;
+static void drawCB(CBUTT *cb, int lit)
 {
   /* draws highlighting */
   if (lit) {
@@ -846,15 +800,7 @@ int lit;
 
 
 /***********************************************/
-void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
-    MBUTT        *mb;
-    Window        win;
-    int           x,y;
-    unsigned int  w,h;
-    const char   *title;
-    const char  **list;
-    int           nlist;
-    unsigned long fg,bg,hi,lo;
+void MBCreate(MBUTT *mb, Window win, int x, int y, unsigned int w, unsigned int h, const char *title, const char **list, int nlist, long unsigned int fg, long unsigned int bg, long unsigned int hi, long unsigned int lo)
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
@@ -908,10 +854,7 @@ void MBCreate(mb, win, x, y, w, h, title, list, nlist, fg, bg, hi, lo)
 }
 
 
-void MBChange(mb, x, y, w, h)
-    MBUTT        *mb;
-    int           x, y;
-    unsigned int  w, h;
+void MBChange(MBUTT *mb, int x, int y, unsigned int w, unsigned int h)
 {
   mb->x = x;
   mb->y = y;
@@ -922,8 +865,7 @@ void MBChange(mb, x, y, w, h)
 
 
 /***********************************************/
-void MBRedraw(mb)
-    MBUTT *mb;
+void MBRedraw(MBUTT *mb)
 {
   /* draws a menu button in it's normal state.  (When it's actively being
      used (to select an item), all drawing is handled in MBTrack) */
@@ -1002,9 +944,7 @@ void MBRedraw(mb)
 
 
 /**********************************************/
-void MBSetActive(mb,act)
-    MBUTT *mb;
-    int    act;
+void MBSetActive(MBUTT *mb, int act)
 {
   if (mb->active != act) {
     mb->active = act;
@@ -1014,8 +954,7 @@ void MBSetActive(mb,act)
 
 
 /**********************************************/
-int MBWhich(mb)
-    MBUTT *mb;
+int MBWhich(MBUTT *mb)
 {
   /* returns index of first checked selection, or '-1' if nothing selected */
 
@@ -1031,9 +970,7 @@ int MBWhich(mb)
 
 
 /**********************************************/
-void MBSelect(mb, n)
-    MBUTT *mb;
-    int    n;
+void MBSelect(MBUTT *mb, int n)
 {
   /* makes entry #n the selected entry (ie, the only one with a check mark)
      Does all redrawing.  Does nothing if entry #n already selected.
@@ -1054,9 +991,7 @@ void MBSelect(mb, n)
 
 
 /***********************************************/
-int MBClick(mb, mx, my)
-MBUTT *mb;
-int    mx,my;
+int MBClick(MBUTT *mb, int mx, int my)
 {
   if (PTINRECT(mx, my, mb->x, mb->y, mb->w, mb->h)) return 1;
   return 0;
@@ -1064,8 +999,7 @@ int    mx,my;
 
 
 /***********************************************/
-int MBTrack(mb)
-    MBUTT *mb;
+int MBTrack(MBUTT *mb)
 {
   Window       rW, cW, win;
   int          i, x, y, rx, ry, extratop, hascheck;

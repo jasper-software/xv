@@ -121,9 +121,7 @@ int LoadPBM(fname, pinfo, fd)
      PICINFO *pinfo;
      int      fd;
 #else
-int LoadPBM(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadPBM(char *fname, PICINFO *pinfo)
 #endif /* HAVE_MGCSFX */
 /*******************************************/
 {
@@ -226,10 +224,7 @@ int LoadPBM(fname, pinfo)
 
 
 /*******************************************/
-static int loadpbm(fp, pinfo, raw)
-     FILE    *fp;
-     PICINFO *pinfo;
-     int      raw;
+static int loadpbm(FILE *fp, PICINFO *pinfo, int raw)
 {
   byte *pic8;
   byte *pix;
@@ -298,10 +293,7 @@ static int loadpbm(fp, pinfo, raw)
 
 
 /*******************************************/
-static int loadpgm(fp, pinfo, raw, maxv)
-     FILE    *fp;
-     PICINFO *pinfo;
-     int      raw, maxv;
+static int loadpgm(FILE *fp, PICINFO *pinfo, int raw, int maxv)
 {
   byte *pix, *pic8;
   int   i,j,bitshift,w,h,npixels, holdmaxv;
@@ -382,10 +374,7 @@ static int loadpgm(fp, pinfo, raw, maxv)
 
 
 /*******************************************/
-static int loadppm(fp, pinfo, raw, maxv)
-     FILE    *fp;
-     PICINFO *pinfo;
-     int      raw, maxv;
+static int loadppm(FILE *fp, PICINFO *pinfo, int raw, int maxv)
 {
   byte *pix, *pic24, scale[256];
   int   i,j,bitshift, w, h, npixels, bufsize, holdmaxv;
@@ -474,10 +463,7 @@ static int loadppm(fp, pinfo, raw, maxv)
 
 
 /*******************************************/
-static int loadpam(fp, pinfo, raw, maxv)	/* unofficial RGBA extension */
-     FILE    *fp;
-     PICINFO *pinfo;
-     int      raw, maxv;
+static int loadpam(FILE *fp, PICINFO *pinfo, int raw, int maxv)	/* unofficial RGBA extension */
 {
   byte *p, *pix, *pic24, *linebuf, scale[256], bgR, bgG, bgB, r, g, b, a;
   int   i, j, w, h, npixels, bufsize, linebufsize, holdmaxv;
@@ -592,9 +578,7 @@ static int loadpam(fp, pinfo, raw, maxv)	/* unofficial RGBA extension */
 
 
 /*******************************************/
-static int getint(fp, pinfo)
-     FILE *fp;
-     PICINFO *pinfo;
+static int getint(FILE *fp, PICINFO *pinfo)
 {
   int c, i, firstchar;
 
@@ -662,8 +646,7 @@ static int getint(fp, pinfo)
 
 
 /*******************************************/
-static int getshort(fp)
-     FILE    *fp;
+static int getshort(FILE *fp)
 {
   /* used in RAW mode to read 16-bit values */
 
@@ -693,9 +676,7 @@ static int getshort(fp)
 
 
 /*******************************************/
-static int getbit(fp, pinfo)
-     FILE *fp;
-     PICINFO *pinfo;
+static int getbit(FILE *fp, PICINFO *pinfo)
 {
   int c;
 
@@ -747,8 +728,7 @@ static int getbit(fp, pinfo)
 
 
 /*******************************************/
-static int pbmError(fname, st)
-     const char *fname, *st;
+static int pbmError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -759,13 +739,7 @@ static int pbmError(fname, st)
 
 
 /*******************************************/
-int WritePBM(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,raw,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle, raw;
-     char *comment;
+int WritePBM(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle, int raw, char *comment)
 {
   /* writes a PBM/PGM/PPM file to the already open stream
      if (raw), writes as RAW bytes, otherwise writes as ASCII

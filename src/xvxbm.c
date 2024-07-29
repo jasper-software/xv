@@ -31,9 +31,7 @@ static int xbmError PARM((const char *, const char *));
 
 
 /*******************************************/
-int LoadXBM(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadXBM(char *fname, PICINFO *pinfo)
 {
   /* returns '1' on success */
 
@@ -154,8 +152,7 @@ int LoadXBM(fname, pinfo)
 
 
 /*******************************************/
-static int xbmError(fname, st)
-     const char *fname, *st;
+static int xbmError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -163,12 +160,7 @@ static int xbmError(fname, st)
 
 
 /*******************************************/
-int WriteXBM(fp, pic, w, h, rmap, gmap, bmap, fname)
-     FILE *fp;
-     byte *pic;
-     int   w,h;
-     byte *rmap, *gmap, *bmap;
-     char *fname;
+int WriteXBM(FILE *fp, byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, char *fname)
 {
   /* pic is expected to be an array of w*h bytes, each of which is either
      '0' or '1'.

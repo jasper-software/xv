@@ -184,7 +184,7 @@ static int  selectCodeset         PARM((TVINFO *));
 #endif
 #ifdef TV_MULTILINGUAL
 static void setCodingSpec   PARM((TVINFO *, struct coding_spec *));
-static void createCsWins    PARM((char *));
+static void createCsWins    PARM((const char *));
 static void openCsWin       PARM((TVINFO *));
 static void closeCsWin      PARM((TVINFO *));
 #endif
@@ -196,8 +196,7 @@ etc.
  */
 
 /***************************************************************/
-void CreateTextWins(geom, cmtgeom)
-     const char *geom, *cmtgeom;
+void CreateTextWins(const char *geom, const char *cmtgeom)
 {
   int                   i, defwide, defhigh, cmthigh;
   XSetWindowAttributes  xswa;
@@ -373,8 +372,7 @@ void CreateTextWins(geom, cmtgeom)
 
 
 /***************************************************************/
-int TextView(fname)
-     const char *fname;
+int TextView(const char *fname)
 {
   /* given a filename, attempts to read in the file and open a textview win */
 
@@ -461,9 +459,7 @@ int TextView(fname)
 
 
 /***************************************************************/
-void OpenTextView(text, len, title, freeonclose)
-     const char *text, *title;
-     int   len, freeonclose;
+void OpenTextView(const char *text, int len, const char *title, int freeonclose)
 {
   /* opens up a textview window */
 
@@ -504,7 +500,7 @@ void OpenTextView(text, len, title, freeonclose)
 
 
 /***************************************************************/
-void OpenCommentText()
+void OpenCommentText(void)
 {
   /* opens up the reserved 'comment' textview window */
 
@@ -520,7 +516,7 @@ void OpenCommentText()
 
 
 /***************************************************************/
-void CloseCommentText()
+void CloseCommentText(void)
 {
   /* closes the reserved 'comment' textview window */
 
@@ -530,7 +526,7 @@ void CloseCommentText()
 
 
 /***************************************************************/
-void ChangeCommentText()
+void ChangeCommentText(void)
 {
   /* called when 'picComments' changes */
 
@@ -562,7 +558,7 @@ void ChangeCommentText()
 
 
 /***************************************************************/
-void HideTextWindows()
+void HideTextWindows(void)
 {
   int i;
 
@@ -577,7 +573,7 @@ void HideTextWindows()
 
 
 /***************************************************************/
-void UnHideTextWindows()
+void UnHideTextWindows(void)
 {
   int i;
 
@@ -592,7 +588,7 @@ void UnHideTextWindows()
 
 
 /***************************************************************/
-void RaiseTextWindows()
+void RaiseTextWindows(void)
 {
   int i;
 
@@ -605,8 +601,7 @@ void RaiseTextWindows()
 
 
 /***************************************************************/
-void SetTextCursor(c)
-     Cursor c;
+void SetTextCursor(Cursor c)
 {
   int i;
 
@@ -617,7 +612,7 @@ void SetTextCursor(c)
 
 
 /***************************************************************/
-void KillTextWindows()
+void KillTextWindows(void)
 {
   int i;
 
@@ -628,9 +623,7 @@ void KillTextWindows()
 
 
 /***************************************************************/
-int TextCheckEvent(xev, retP, doneP)
-     XEvent *xev;
-     int *retP, *doneP;
+int TextCheckEvent(XEvent *xev, int *retP, int *doneP)
 {
   int i;
 
@@ -647,8 +640,7 @@ int TextCheckEvent(xev, retP, doneP)
 
 
 /***************************************************************/
-int TextDelWin(win)
-     Window win;
+int TextDelWin(Window win)
 {
   /* got a delete window request.  see if the window is a textview window,
      and close accordingly.  Return 1 if event was eaten */
@@ -678,8 +670,7 @@ int TextDelWin(win)
 
 
 /***************************************************************/
-static void closeText(tv)
-     TVINFO *tv;
+static void closeText(TVINFO *tv)
 {
   /* closes specified textview window */
 
@@ -706,9 +697,7 @@ static void closeText(tv)
 
 
 /***************************************************************/
-static int tvChkEvent(tv, xev)
-     TVINFO *tv;
-     XEvent *xev;
+static int tvChkEvent(TVINFO *tv, XEvent *xev)
 {
   /* checks event to see if it's a text-window related thing.  If it
      is, it eats the event and returns '1', otherwise '0'. */
@@ -856,9 +845,7 @@ static int tvChkEvent(tv, xev)
 
 
 /***************************************************************/
-static void resizeText(tv,w,h)
-     TVINFO *tv;
-     int     w,h;
+static void resizeText(TVINFO *tv, int w, int h)
 {
   int        i, maxw, maxh;
   XSizeHints hints;
@@ -917,8 +904,7 @@ static void resizeText(tv,w,h)
 
 
 /***************************************************************/
-static void computeScrlVals(tv)
-     TVINFO *tv;
+static void computeScrlVals(TVINFO *tv)
 {
   int hmax, hpag, vmax, vpag;
 
@@ -945,9 +931,7 @@ static void computeScrlVals(tv)
 
 
 /***************************************************************/
-static void doCmd(tv, cmd)
-     TVINFO *tv;
-     int     cmd;
+static void doCmd(TVINFO *tv, int cmd)
 {
   switch (cmd) {
   case TV_ASCII:   doHexAsciiCmd(tv, 0);  break;
@@ -985,8 +969,7 @@ static void doCmd(tv, cmd)
 
 
 /***************************************************************/
-static void drawTextView(tv)
-     TVINFO *tv;
+static void drawTextView(TVINFO *tv)
 {
   /* redraw the outer window */
 
@@ -1022,8 +1005,7 @@ static void drawTextView(tv)
 
 
 /***************************************************************/
-static void drawNumLines(tv)
-     TVINFO *tv;
+static void drawNumLines(TVINFO *tv)
 {
   int x, y, w, nl;
   char tmpstr[128];
@@ -1061,8 +1043,7 @@ static void drawNumLines(tv)
 
 
 /***************************************************************/
-static void eraseNumLines(tv)
-     TVINFO *tv;
+static void eraseNumLines(TVINFO *tv)
 {
   int x, y, w, nl;
   char tmpstr[64];
@@ -1082,9 +1063,7 @@ static void eraseNumLines(tv)
 
 
 /***************************************************************/
-static void drawTextW(delta, sptr)
-     int   delta;
-     SCRL *sptr;
+static void drawTextW(int delta, SCRL *sptr)
 {
   int     i, j, lnum, hpos, vpos, cpos, lwide;
 #ifndef TV_MULTILINGUAL
@@ -1432,9 +1411,7 @@ static void drawTextW(delta, sptr)
 
 
 /***************************************************************/
-static void clickText(tv, x,y)
-     TVINFO *tv;
-     int     x,y;
+static void clickText(TVINFO *tv, int x, int y)
 {
   int   i;
   BUTT *bp;
@@ -1460,9 +1437,7 @@ static void clickText(tv, x,y)
 
 
 /***************************************************************/
-static void keyText(tv, kevt)
-     TVINFO    *tv;
-     XKeyEvent *kevt;
+static void keyText(TVINFO *tv, XKeyEvent *kevt)
 {
   char buf[128];
   KeySym ks;
@@ -1519,9 +1494,7 @@ static void keyText(tv, kevt)
 
 
 /***************************************************/
-static void textKey(tv, key)
-     TVINFO *tv;
-     int     key;
+static void textKey(TVINFO *tv, int key)
 {
   if (!tv->textlen) return;
 
@@ -1542,9 +1515,7 @@ static void textKey(tv, key)
 
 
 /***************************************************/
-static void doHexAsciiCmd(tv, hexval)
-     TVINFO *tv;
-     int hexval;
+static void doHexAsciiCmd(TVINFO *tv, int hexval)
 {
   int i, oldvscrl, pos;
 
@@ -1593,8 +1564,7 @@ static void doHexAsciiCmd(tv, hexval)
 
 
 /***************************************************/
-static void computeText(tv)
-     TVINFO *tv;
+static void computeText(TVINFO *tv)
 {
   /* compute # of lines and linestarts array for given text */
 
@@ -1699,8 +1669,7 @@ static void computeText(tv)
 
 /***************************************************/
 #ifdef TV_L10N
-static int selectCodeset(tv)
-     TVINFO *tv;
+static int selectCodeset(TVINFO *tv)
 {
   const byte *sp;
   int i, len;
@@ -1760,9 +1729,7 @@ static int selectCodeset(tv)
 #endif	/* TV_L10N */
 
 #ifdef TV_MULTILINGUAL
-static void setCodingSpec(tv, cs)
-    TVINFO *tv;
-    struct coding_spec *cs;
+static void setCodingSpec(TVINFO *tv, struct coding_spec *cs)
 {
   if (xvbcmp((char *) &tv->ccs, (char *) cs, sizeof *cs) == 0)
     return;
@@ -1798,7 +1765,7 @@ static void setCodingSpec(tv, cs)
 static char license[10240];
 
 /***************************************************************/
-void ShowLicense()
+void ShowLicense(void)
 {
   license[0] = '\0';
 
@@ -1987,7 +1954,7 @@ void ShowLicense()
 static char keyhelp[10240];
 
 /***************************************************************/
-void ShowKeyHelp()
+void ShowKeyHelp(void)
 {
   keyhelp[0] = '\0';
 
@@ -2254,8 +2221,7 @@ static char *(*cvtrtab[])PARM((char *, int, int *)) = {
 };
 
 
-static void createCsWins(geom)
-    const char *geom;
+static void createCsWins(const char *geom)
 {
     XSetWindowAttributes xswa;
     int i, j;
@@ -2368,8 +2334,7 @@ static void createCsWins(geom)
     }
 }
 
-static void openCsWin(tv)
-    TVINFO *tv;
+static void openCsWin(TVINFO *tv)
 {
     CSINFO *cs = tv->cs;
     if (cs->up)
@@ -2381,8 +2346,7 @@ static void openCsWin(tv)
     csReflect(cs);
 }
 
-static void closeCsWin(tv)
-    TVINFO *tv;
+static void closeCsWin(TVINFO *tv)
 {
     CSINFO *cs = tv->cs;
     if (!cs->up)
@@ -2391,8 +2355,7 @@ static void closeCsWin(tv)
     XUnmapWindow(theDisp, cs->win);
 }
 
-int CharsetCheckEvent(xev)
-    XEvent *xev;
+int CharsetCheckEvent(XEvent *xev)
 {
     int i;
     CSINFO *cs;
@@ -2408,9 +2371,7 @@ int CharsetCheckEvent(xev)
     return 0;
 }
 
-static int csCheckEvent(cs, xev)
-    CSINFO *cs;
-    XEvent *xev;
+static int csCheckEvent(CSINFO *cs, XEvent *xev)
 {
     RBUTT **rbp;
     CBUTT *cbp;
@@ -2537,8 +2498,7 @@ static int csCheckEvent(cs, xev)
     return 0;
 }
 
-static void csReflect(cs)
-    CSINFO *cs;
+static void csReflect(CSINFO *cs)
 {
     int i;
 
@@ -2585,8 +2545,7 @@ static void csReflect(cs)
 	csListRedraw(&cs->ls[i]);
 }
 
-static void csRedraw(cs)
-    CSINFO *cs;
+static void csRedraw(CSINFO *cs)
 {
     int i;
 
@@ -2622,8 +2581,7 @@ static void csRedraw(cs)
 	RBRedraw(cs->rbt[i], -1);
 }
 
-static void csListRedraw(ls)
-    LIST *ls;
+static void csListRedraw(LIST *ls)
 {
     int i;
     for (i = 0; i < TV_ML_NLISTS; i++) {
@@ -2632,9 +2590,7 @@ static void csListRedraw(ls)
     }
 }
 
-static void csLsRedraw(delta, sptr)
-    int delta;
-    SCRL *sptr;
+static void csLsRedraw(int delta, SCRL *sptr)
 {
     int i, j;
     for (i = 0; i < MAXTVWIN; i++) {
@@ -2647,13 +2603,12 @@ static void csLsRedraw(delta, sptr)
     }
 }
 
-int CharsetDelWin(win)
-    Window win;
+int CharsetDelWin(Window win)
 {
     CSINFO *cs;
     int i;
 
-    for (cs = csinfo, i = 0; i < TV_NCSS; cs++, i++) {
+    for (cs = csinfo, i = 0; i < MAXTVWIN; cs++, i++) {
 	if (cs->win == win) {
 	    if (cs->up) {
 		XUnmapWindow(theDisp, cs->win);
@@ -2666,7 +2621,7 @@ int CharsetDelWin(win)
 }
 
 static int reg_comp PARM((const void *, const void *));
-static void create_registry_list()
+static void create_registry_list(void)
 {
     struct design d;
     char *names, *p;
@@ -2702,8 +2657,7 @@ static void create_registry_list()
     regs[i++] = "unused";
     regs[i++] = NULL;
 }
-static int reg_comp(dst, src)
-    const void *dst, *src;
+static int reg_comp(const void *dst, const void *src)
 {
     return strcmp(*(char **) dst, *(char **) src);
 }

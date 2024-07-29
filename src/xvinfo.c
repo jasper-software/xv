@@ -43,8 +43,7 @@ static void redrawString  PARM((int));
 
 
 /***************************************************/
-void CreateInfo(geom)
-     const char *geom;
+void CreateInfo(const char *geom)
 {
   infoW = CreateWindow("xv info", "XVinfo", geom, INFOWIDE, INFOHIGH,
 		       infofg, infobg, False);
@@ -60,8 +59,7 @@ void CreateInfo(geom)
 
 
 /***************************************************/
-void InfoBox(vis)
-     int vis;
+void InfoBox(int vis)
 {
   if (vis) XMapRaised(theDisp, infoW);
   else     XUnmapWindow(theDisp, infoW);
@@ -71,9 +69,7 @@ void InfoBox(vis)
 
 
 /***************************************************/
-Pixmap ScalePixmap(src_pixmap, src_width, src_height)
-Pixmap src_pixmap;
-int src_width, src_height;
+Pixmap ScalePixmap(Pixmap src_pixmap, int src_width, int src_height)
 {
   int dest_width = src_width * dpiMult;
   int dest_height = src_height * dpiMult;
@@ -117,8 +113,7 @@ int src_width, src_height;
 }
 
 /***************************************************/
-void RedrawInfo(x,y,w,h)
-     int x,y,w,h;
+void RedrawInfo(int x, int y, int w, int h)
 {
   int  i;
   Pixmap bigPix;
@@ -180,7 +175,7 @@ void RedrawInfo(x,y,w,h)
 
 
 /***************************************************/
-static void drawStrings()
+static void drawStrings(void)
 {
   int i;
   for (i=0; i<7; i++)     drawFieldName(i);  /* draw the field titles */
@@ -190,8 +185,7 @@ static void drawStrings()
 
 
 /***************************************************/
-static void drawFieldName(fnum)
-     int fnum;
+static void drawFieldName(int fnum)
 {
   static const char *fname[7] = { "Filename:", "Format:", "Resolution:",
 	"Cropping:", "Expansion:", "Selection:", "Colors:" };
@@ -208,8 +202,7 @@ static void drawFieldName(fnum)
 
 
 /***************************************************/
-static void redrawString(st)
-     int st;
+static void redrawString(int st)
 {
   /* erase area of string, and draw it with new contents */
 
@@ -245,8 +238,7 @@ static void redrawString(st)
 
 
 /***************************************************/
-void SetInfoMode(mode)
-     int mode;
+void SetInfoMode(int mode)
 {
   int y1, y2;
 
@@ -334,8 +326,7 @@ va_dcl
 
 
 /***************************************************/
-char *GetISTR(stnum)
-int stnum;
+char *GetISTR(int stnum)
 {
   /* returns pointer to ISTR string */
   if (stnum < 0 || stnum>=NISTR) return(NULL);

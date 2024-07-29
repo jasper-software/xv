@@ -64,9 +64,7 @@ extern int lowresfax;
 extern int highresfax;
 
 int
-LoadG3 ( fname, pinfo )
-    char* fname;
-    PICINFO * pinfo;
+LoadG3 (char *fname, PICINFO *pinfo)
 {
     FILE *fp;
     int rows, last_allocated_row, cols, row, col, i;
@@ -175,10 +173,7 @@ LoadG3 ( fname, pinfo )
 }
 
 static int
-addtohash(hash, te, n, a, b)
-	tableentry* hash[];
-	tableentry* te;
-	int n, a, b;
+addtohash(tableentry **hash, tableentry *te, int n, int a, int b)
 {
 	unsigned int pos;
 
@@ -195,10 +190,7 @@ addtohash(hash, te, n, a, b)
 }
 
 static tableentry*
-hashfind(hash, length, code, a, b)
-    tableentry* hash[];
-    int length, code;
-    int a, b;
+hashfind(tableentry **hash, int length, int code, int a, int b)
 {
     unsigned int pos;
     tableentry* te;
@@ -215,10 +207,7 @@ hashfind(hash, length, code, a, b)
 }
 
 static int
-getfaxrow( inf, row, bitrow )
-    FILE* inf;
-    int row;
-    byte* bitrow;
+getfaxrow(FILE *inf, int row, byte *bitrow)
 {
 	int col;
 	byte* bP;
@@ -318,9 +307,8 @@ getfaxrow( inf, row, bitrow )
 }
 
 static void
-skiptoeol( file )
-    FILE* file;
-    {
+skiptoeol(FILE *file)
+{
     while ( rawzeros < 11 )
 	(void) rawgetbit( file );
     for ( ; ; )
@@ -331,9 +319,8 @@ skiptoeol( file )
     }
 
 static int
-rawgetbit( file )
-    FILE* file;
-    {
+rawgetbit(FILE *file)
+{
     int b;
 
     if ( ( shbit & 0xff ) == 0 )

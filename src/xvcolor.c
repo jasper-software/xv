@@ -47,9 +47,7 @@ typedef struct thing {
 
 
 /***********************************/
-void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
-     byte *pic, *rmap, *gmap, *bmap, *order, *trans;
-     int   pwide, phigh, *pnumcols;
+void SortColormap(byte *pic, int pwide, int phigh, int *pnumcols, byte *rmap, byte *gmap, byte *bmap, byte *order, byte *trans)
 {
   /* operates on 8-bit images.  sorts the colormap into 'best' order
    * 'order' is the 'best' order to allocate the colors.  'trans' is a
@@ -183,8 +181,7 @@ void SortColormap(pic, pwide, phigh, pnumcols, rmap,gmap,bmap, order, trans)
 
 
 /***********************************/
-void ColorCompress8(trans)
-     byte *trans;
+void ColorCompress8(byte *trans)
 {
   /* modify pic,cpic,epic to reflect new (compressed) colormap */
 
@@ -205,7 +202,7 @@ void ColorCompress8(trans)
 
 
 /***********************************/
-void AllocColors()
+void AllocColors(void)
 {
   int i;
 
@@ -270,7 +267,7 @@ void AllocColors()
 
 
 /********************************/
-void FreeColors()
+void FreeColors(void)
 {
   int i;
 
@@ -301,7 +298,7 @@ void FreeColors()
 
 
 /***********************************/
-static void allocROColors()
+static void allocROColors(void)
 {
   int      i, j, c, unique, p2alloc;
   Colormap cmap;
@@ -519,7 +516,7 @@ static void allocROColors()
 
 
 /***********************************/
-static void allocRWColors()
+static void allocRWColors(void)
 {
   int      i,j,c, failed[256];
   Colormap cmap;
@@ -685,8 +682,7 @@ static void allocRWColors()
 /* 24/32-bit TrueColor display color 'allocation' code */
 /*******************************************************/
 
-static int highbit(ul)
-     unsigned long ul;
+static int highbit(long unsigned int ul)
 {
   /* returns position of highest set bit in 'ul' as an integer (0-31),
    or -1 if none */
@@ -698,10 +694,7 @@ static int highbit(ul)
 }
 
 
-Status xvAllocColor(dp, cm, cdef)
-     Display *dp;
-     Colormap cm;
-     XColor *cdef;
+Status xvAllocColor(Display *dp, Colormap cm, XColor *cdef)
 {
   if (theVisual->class == TrueColor || theVisual->class == DirectColor) {
     unsigned long r, g, b, rmask, gmask, bmask, origr, origg, origb;
@@ -790,12 +783,7 @@ Status xvAllocColor(dp, cm, cdef)
 }
 
 
-void xvFreeColors(dp, cm, pixels, npixels, planes)
-     Display *dp;
-     Colormap cm;
-     unsigned long *pixels;
-     int npixels;
-     unsigned long planes;
+void xvFreeColors(Display *dp, Colormap cm, long unsigned int *pixels, int npixels, long unsigned int planes)
 {
   if (theVisual->class != TrueColor && theVisual->class != DirectColor)
     XFreeColors(dp, cm, pixels, npixels, planes);
@@ -806,8 +794,7 @@ void xvFreeColors(dp, cm, pixels, npixels, planes)
 
 
 /********************************/
-void ApplyEditColor(regroup)
-int regroup;
+void ApplyEditColor(int regroup)
 {
   int i, j;
 
@@ -883,7 +870,7 @@ int regroup;
 
 
 /**************************************/
-static void putECfirst()
+static void putECfirst(void)
 {
   /* called after all colors have been freed up, but before reallocating.
      moves color #editColor to first in 'colAllocOrder' list, so that it
@@ -916,7 +903,7 @@ static void putECfirst()
 #define CDIST(x,y,z)  ((x)*(x) + (y)*(y) + (z)*(z))
 
 /***************************************************************/
-int MakeStdCmaps()
+int MakeStdCmaps(void)
 {
   /* produces many things:
    *   stdr,stdg,stdb[256] - a 256-entry, desired 3/3/2 colormap
@@ -1287,7 +1274,7 @@ int MakeStdCmaps()
 
 
 /***************************************************************/
-void MakeBrowCmap()
+void MakeBrowCmap(void)
 {
   /* This function should only be called once, at the start of the program.
    *
@@ -1402,9 +1389,7 @@ void MakeBrowCmap()
 
 
 /************************************/
-static void diverseOrder(rmap,gmap,bmap,maplen,order)
-     byte *rmap, *gmap, *bmap, *order;
-     int   maplen;
+static void diverseOrder(byte *rmap, byte *gmap, byte *bmap, int maplen, byte *order)
 {
   /* takes a colormap (maxlen 256) and produces an order array that
      contains the most-diverse order for allocating these colors */
@@ -1444,7 +1429,7 @@ static void diverseOrder(rmap,gmap,bmap,maplen,order)
 
 
 /***************************************************************/
-static void freeStdCmaps()
+static void freeStdCmaps(void)
 {
   int i;
 
@@ -1460,8 +1445,7 @@ static void freeStdCmaps()
 
 
 /***************************************************************/
-void ChangeCmapMode(cmode, genepic, freeKludge)
-     int cmode, genepic, freeKludge;
+void ChangeCmapMode(int cmode, int genepic, int freeKludge)
 {
   /* note:  MAY BE CALLED before there is an image or anything */
 

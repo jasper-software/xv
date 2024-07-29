@@ -74,7 +74,7 @@ extern XtAppContext context;
 #endif
 
 /***********************************/
-int Grab()
+int Grab(void)
 {
   /* does UI part of Grab command.  returns '1' if a new image was grabbed,
      0 if cancelled */
@@ -401,8 +401,7 @@ int Grab()
 
 
 /***********************************/
-int LoadGrab(pinfo)
-     PICINFO *pinfo;
+int LoadGrab(PICINFO *pinfo)
 {
   /* loads up (into XV structures) last image successfully grabbed.
      returns '0' on failure, '1' on success */
@@ -440,8 +439,7 @@ int LoadGrab(pinfo)
 
 
 /***********************************/
-static void flashrect(x,y,w,h,show)
-     int x,y,w,h,show;
+static void flashrect(int x, int y, int w, int h, int show)
 {
   static int isvis  = 0;
   static int maskno = 0;
@@ -466,7 +464,7 @@ static void flashrect(x,y,w,h,show)
 
 
 /***********************************/
-static void startflash()
+static void startflash(void)
 {
   /* set up for drawing a flashing rectangle */
   XSetFunction(theDisp, rootGC, GXinvert);
@@ -475,7 +473,7 @@ static void startflash()
 
 
 /***********************************/
-static void endflash()
+static void endflash(void)
 {
   XSetFunction(theDisp, rootGC, GXcopy);
   XSetSubwindowMode(theDisp, rootGC, ClipByChildren);
@@ -485,7 +483,7 @@ static void endflash()
 
 
 /***********************************/
-static void ungrabX()
+static void ungrabX(void)
 {
   XUngrabServer(theDisp);
   XUngrabButton(theDisp, (u_int) AnyButton, 0, rootW);
@@ -493,8 +491,7 @@ static void ungrabX()
 
 
 /**************************************/
-static int lowbitnum(ul)
-     unsigned long ul;
+static int lowbitnum(long unsigned int ul)
 {
   /* returns position of lowest set bit in 'ul' as an integer (0-31),
    or -1 if none */
@@ -513,9 +510,7 @@ static int lowbitnum(ul)
 
 #define lowbit(x) ((x) & (~(x) + 1))
 
-static int getxcolors(win_info, colors)
-     XWindowAttributes *win_info;
-     XColor **colors;
+static int getxcolors(XWindowAttributes *win_info, XColor **colors)
 {
   int i, ncolors;
 
@@ -573,9 +568,7 @@ static int getxcolors(win_info, colors)
 
 
 /*******************************************/
-static void printWinTree(win,tab)
-     Window win;
-     int    tab;
+static void printWinTree(Window win, int tab)
 {
   u_int             i, nchildren;
   Window            root, parent, *children, chwin;
@@ -616,8 +609,7 @@ static void printWinTree(win,tab)
 
 
 /***********************************/
-static void errSpace(n)
-     int n;
+static void errSpace(int n)
 {
   for ( ; n>0; n--) putc(' ', stderr);
 }
@@ -626,8 +618,7 @@ static void errSpace(n)
 
 
 /***********************************/
-static int grabRootRegion(x, y, w, h)
-     int    x, y, w, h;
+static int grabRootRegion(int x, int y, int w, int h)
 {
   /* attempts to grab the specified rectangle of the root window
      returns '1' on success */
@@ -719,11 +710,7 @@ static int grabRootRegion(x, y, w, h)
 
 
 /***********************************/
-static int grabWinImage(win, parentVid, parentCmap, toplevel)
-     Window win;
-     VisualID           parentVid;
-     Colormap           parentCmap;
-     int                toplevel;
+static int grabWinImage(Window win, VisualID parentVid, Colormap parentCmap, int toplevel)
 {
   /* grabs area of window (and its children) that intersects
    * grab region (root coords: gXOFF,gYOFF,gWIDE,gHIGH), and stuffs
@@ -873,12 +860,9 @@ static int grabWinImage(win, parentVid, parentCmap, toplevel)
 
 
 /**************************************/
-static int convertImageAndStuff(image, colors, ncolors, xwap, gx,gy,gw,gh)
-     XImage *image;
-     XColor *colors;
-     int     ncolors;
-     XWindowAttributes *xwap;
-     int     gx,gy,gw,gh;      /* position within grabPic (guaranteed OK) */
+static int convertImageAndStuff(XImage *image, XColor *colors, int ncolors, XWindowAttributes *xwap,
+	int gx, int gy, int gw, int gh)
+	/* position within grabPic (guaranteed OK) */
 {
   /* attempts to convert the image from whatever weird-ass format it might
      be in into a 24-bit RGB image, and stuff it into grabPic
@@ -1132,8 +1116,7 @@ static int convertImageAndStuff(image, colors, ncolors, xwap, gx,gy,gw,gh)
 
 
 /***********************************/
-static int RectIntersect(ax,ay,aw,ah, bx,by,bw,bh)
-     int ax,ay,aw,ah, bx,by,bw,bh;
+static int RectIntersect(int ax, int ay, int aw, int ah, int bx, int by, int bw, int bh)
 {
   /* returns 0 if rectangles A and B do not intersect
      returns 1 if A partially intersects B
@@ -1158,9 +1141,7 @@ static int RectIntersect(ax,ay,aw,ah, bx,by,bw,bh)
 /** stuff needed to make new xvgrab work in 3.10a. **/
 
 /********************************************/
-static int CountColors24(pic, pwide, phigh, x, y, w, h)
-     byte *pic;
-     int   pwide, phigh, x,y,w,h;
+static int CountColors24(byte *pic, int pwide, int phigh, int x, int y, int w, int h)
 {
   /* counts the # of unique colors in a selected rect of a PIC24
      returns '0-256' or >256 */
@@ -1203,9 +1184,7 @@ static int CountColors24(pic, pwide, phigh, x, y, w, h)
 
 
 /****************************/
-static int Trivial24to8(pic24, w,h, pic8, rmap,gmap,bmap, maxcol)
-     byte *pic24, *pic8, *rmap, *gmap, *bmap;
-     int   w,h,maxcol;
+static int Trivial24to8(byte *pic24, int w, int h, byte *pic8, byte *rmap, byte *gmap, byte *bmap, int maxcol)
 {
   /* scans picture until it finds more than 'maxcol' different colors.  If it
      finds more than 'maxcol' colors, it returns '0'.  If it DOESN'T, it does

@@ -23,9 +23,7 @@ static int  WriteTIFF       PARM((FILE *, byte *, int, int, int,
 
 
 /*********************************************/
-static void setupColormap(tif, rmap, gmap, bmap)
-     TIFF *tif;
-     byte *rmap, *gmap, *bmap;
+static void setupColormap(TIFF *tif, byte *rmap, byte *gmap, byte *bmap)
 {
   short red[256], green[256], blue[256];
   int i;
@@ -44,14 +42,8 @@ static void setupColormap(tif, rmap, gmap, bmap)
 
 /*******************************************/
 /* Returns '0' if successful. */
-static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
-		     fname,comp,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h,comp;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *fname, *comment;
+static int WriteTIFF(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+		     char *fname, int comp, char *comment)
 {
   TIFF *tif;
   byte *pix;
@@ -235,7 +227,7 @@ static RBUTT *compRB;
 
 
 /***************************************************/
-void CreateTIFFW()
+void CreateTIFFW(void)
 {
   int x, y;
 
@@ -272,8 +264,7 @@ void CreateTIFFW()
 
 
 /***************************************************/
-void TIFFDialog(vis)
-int vis;
+void TIFFDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(tiffW, tbut[T_BOK].x + (int) tbut[T_BOK].w/2,
@@ -285,8 +276,7 @@ int vis;
 
 
 /***************************************************/
-int TIFFCheckEvent(xev)
-XEvent *xev;
+int TIFFCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -352,9 +342,7 @@ XEvent *xev;
 
 
 /***************************************************/
-void TIFFSaveParams(fname, col)
-char *fname;
-int col;
+void TIFFSaveParams(char *fname, int col)
 {
   int cur;
   cur = RBWhich(compRB);
@@ -379,8 +367,7 @@ int col;
 
 
 /***************************************************/
-static void drawTD(x,y,w,h)
-int x,y,w,h;
+static void drawTD(int x, int y, int w, int h)
 {
   const char *title  = "Save TIFF file...";
   int  i;
@@ -404,8 +391,7 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void clickTD(x,y)
-int x,y;
+static void clickTD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -432,8 +418,7 @@ int x,y;
 
 
 /***************************************************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
   switch (cmd) {
   case T_BOK: {
@@ -458,7 +443,7 @@ int cmd;
 
 
 /*******************************************/
-static void writeTIFF()
+static void writeTIFF(void)
 {
   FILE *fp;
   int   w, h, nc, rv, comp, ptype, pfree;

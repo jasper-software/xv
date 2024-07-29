@@ -49,9 +49,7 @@ static void fixBGR         PARM((unsigned char *, int, int));
 
 
 /*******************************************/
-int LoadSunRas(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadSunRas(char *fname, PICINFO *pinfo)
 {
   FILE	*fp;
   unsigned int	 linesize,lsize,csize,isize,i,w,h,d,npixels,nbytes;
@@ -276,10 +274,7 @@ int LoadSunRas(fname, pinfo)
 
 
 /*****************************/
-static int rle_read (ptr, size, nitems, fp, init)
-byte *ptr;
-int size, nitems,init;
-FILE *fp;
+static int rle_read (byte *ptr, int size, int nitems, FILE *fp, int init)
 {
   static int count, ch;
   int readbytes, c, read;
@@ -317,8 +312,7 @@ FILE *fp;
 
 
 /*****************************/
-static int sunRasError(fname, st)
-     const char *fname, *st;
+static int sunRasError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -326,9 +320,7 @@ static int sunRasError(fname, st)
 
 
 /************************************************/
-static void sunRas1to8 (dest, src, len)
-byte *dest, *src;
-int len;
+static void sunRas1to8 (byte *dest, byte *src, int len)
 {
   int i, b;
   int c = 0;
@@ -344,9 +336,7 @@ int len;
 
 
 
-static void sunRas8to1 (dest, src, len, flip)
-byte *dest, *src;
-int len, flip;
+static void sunRas8to1 (byte *dest, byte *src, int len, int flip)
 {
   int i, b;
   int c;
@@ -370,12 +360,7 @@ int len, flip;
 
 
 /*******************************************/
-int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle, userle;
+int WriteSunRas(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle, int userle)
 {
   /* writes a sun rasterfile to the already open stream
      writes either 24-bit, 8-bit or 1-bit
@@ -532,9 +517,7 @@ int WriteSunRas(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,userle)
 
 /* reads a 4-byte int in Sun byteorder
    returns 0 for success, EOF for failure */
-static int read_sun_long (l, fp)
-     int *l;
-     FILE *fp;
+static int read_sun_long (int *l, FILE *fp)
 {
   int c0, c1, c2, c3;
 
@@ -557,9 +540,7 @@ static int read_sun_long (l, fp)
 /* write a long word in sun byte-order
    returns 0 for success, EOF for failure
  */
-static int write_sun_long (l, fp)
-int l;
-FILE *fp;
+static int write_sun_long (int l, FILE *fp)
 {
     char c;
 
@@ -578,9 +559,7 @@ FILE *fp;
 
 
 /* kr3 - fix up BGR order SUN 24-bit rasters to be RGB order */
-static void fixBGR(img,w,h)
-unsigned char *img;
-int w,h;
+static void fixBGR(unsigned char *img, int w, int h)
 {
   int i,npixels;
   unsigned char tmp;

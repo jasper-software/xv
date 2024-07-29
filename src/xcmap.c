@@ -76,9 +76,7 @@ static void TrackMouse       PARM((int,int));
 static void DrawPixValue     PARM((int,int));
 
 /*******************************************/
-int main(argc, argv)
-     int   argc;
-     char *argv[];
+int main(int argc, char **argv)
 /*******************************************/
 {
   int        i;
@@ -185,8 +183,7 @@ int main(argc, argv)
 
 
 /************************************************/
-static void HandleEvent(event)
-     XEvent *event;
+static void HandleEvent(XEvent *event)
 {
   switch (event->type) {
   case Expose: {
@@ -242,7 +239,7 @@ static void HandleEvent(event)
 
 
 /***********************************/
-static void Syntax()
+static void Syntax(void)
 {
   printf("Usage: %s filename [=geom | -geometry geom] [ [-display] disp]\n",
 	 cmd);
@@ -251,8 +248,7 @@ static void Syntax()
 
 
 /***********************************/
-static void FatalError(identifier)
-     const char *identifier;
+static void FatalError(const char *identifier)
 {
   fprintf(stderr, "%s: %s\n", cmd, identifier);
   exit(-1);
@@ -260,16 +256,14 @@ static void FatalError(identifier)
 
 
 /***********************************/
-static void Quit()
+static void Quit(void)
 {
   exit(0);
 }
 
 
 /***********************************/
-static void CreateMainWindow(name,geom,argc,argv)
-     char *name,*geom,**argv;
-     int   argc;
+static void CreateMainWindow(char *name, char *geom, int argc, char **argv)
 {
   XSetWindowAttributes xswa;
   unsigned long xswamask;
@@ -333,8 +327,7 @@ static void CreateMainWindow(name,geom,argc,argv)
 
 
 /***********************************/
-static void DrawWindow(x,y,w,h)
-     int x,y,w,h;
+static void DrawWindow(int x, int y, int w, int h)
 {
   int i,j,x1,y1,x2,y2;
 
@@ -353,8 +346,7 @@ static void DrawWindow(x,y,w,h)
 
 
 /***********************************/
-static void Resize(w,h)
-     int w,h;
+static void Resize(int w, int h)
 {
   cWIDE = (w + nxcells - 1) / nxcells;
   cHIGH = (h + nycells - 1) / nycells;
@@ -363,8 +355,7 @@ static void Resize(w,h)
 
 
 /***********************************/
-static void TrackMouse(mx,my)
-     int mx,my;
+static void TrackMouse(int mx, int my)
 {
   /* called when there's a button press in the window.  draws the pixel
      value, and loops until button is released */
@@ -387,8 +378,7 @@ static void TrackMouse(mx,my)
 
 
 /***********************************/
-static void DrawPixValue(x,y)
-     int x,y;
+static void DrawPixValue(int x, int y)
 {
   static unsigned long pix, lastpix;
   static int           pvaly;

@@ -107,9 +107,7 @@ static byte       *dataptr;
 
 
 /*****************************/
-int LoadGIF(fname, pinfo)
-     char *fname;
-     PICINFO *pinfo;
+int LoadGIF(char *fname, PICINFO *pinfo)
 /*****************************/
 {
   /* returns '1' if successful */
@@ -535,8 +533,7 @@ int LoadGIF(fname, pinfo)
 
 
 /********************************************/
-static int readImage(pinfo)
-     PICINFO *pinfo;
+static int readImage(PICINFO *pinfo)
 {
   register byte ch, ch1, *ptr1, *picptr;
   int           i, npixels, maxpixels;
@@ -793,7 +790,7 @@ static int readImage(pinfo)
  * bring the desired code to the bottom, then mask it off and return it.
  */
 
-static int readCode()
+static int readCode(void)
 {
   int RawCode, ByteOffset;
 
@@ -811,8 +808,7 @@ static int readCode()
 
 
 /***************************/
-static void doInterlace(Index)
-     int Index;
+static void doInterlace(int Index)
 {
   static byte *ptr = NULL;
   static int   oldYC = -1;
@@ -866,9 +862,7 @@ static void doInterlace(Index)
 
 
 /*****************************/
-static int gifError(pinfo, st)
-     PICINFO    *pinfo;
-     const char *st;
+static int gifError(PICINFO *pinfo, const char *st)
 {
   gifWarning(st);
 
@@ -888,8 +882,7 @@ static int gifError(pinfo, st)
 
 
 /*****************************/
-static void gifWarning(st)
-     const char *st;
+static void gifWarning(const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", bname, st);
 }

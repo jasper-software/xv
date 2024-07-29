@@ -1192,7 +1192,7 @@ int JP2KCheckEvent(register XEvent *xev) {
 }
 
 /*******************************************/
-void VersionInfoJP2K() /* GRR 20070304 */
+void VersionInfoJP2K(void) /* GRR 20070304 */
 {
 	fprintf(stderr, "   Compiled with libjasper %s; using libjasper %s.\n",
 			JAS_VERSION, jas_getversion());

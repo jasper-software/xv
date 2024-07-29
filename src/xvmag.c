@@ -91,9 +91,7 @@ static char *mag_msgs[] = {
 
 
 /* The main routine to load a MAG file. */
-int LoadMAG(fname, pinfo)
-    char *fname;
-    PICINFO *pinfo;
+int LoadMAG(char *fname, PICINFO *pinfo)
 {
     struct mag mag;
     int e;
@@ -134,9 +132,7 @@ int LoadMAG(fname, pinfo)
     return 1;
 }
 
-static void mag_open_file(mi, fname)
-    struct mag *mi;
-    char *fname;
+static void mag_open_file(struct mag *mi, char *fname)
 {
     if((mi->fp = fopen(fname, "rb")) == NULL)
 	mag_file_error(mi, MAG_OPEN);
@@ -145,8 +141,7 @@ static void mag_open_file(mi, fname)
     fseek(mi->fp, (size_t) 0, SEEK_SET);
 }
 
-static void mag_read_check_data(mi)
-    struct mag *mi;
+static void mag_read_check_data(struct mag *mi)
 {
     char buffer[8];
 
@@ -156,9 +151,7 @@ static void mag_read_check_data(mi)
 	mag_error(mi, MAG_FORMAT);
 }
 
-static void mag_read_comment(mi, p)
-    struct mag *mi;
-    char **p;
+static void mag_read_comment(struct mag *mi, char **p)
 {
     int max = -1, i = 0;
     int c;
@@ -187,8 +180,7 @@ static void mag_read_comment(mi, p)
     }
 }
 
-static void mag_read_header(mi)
-    struct mag *mi;
+static void mag_read_header(struct mag *mi)
 {
     byte buf[32];
 
@@ -234,9 +226,7 @@ static void mag_read_header(mi)
     if(DEBUG) mag_show_struct(mi);
 }
 
-static void mag_read_palette(mi, r, g, b)
-    struct mag *mi;
-    byte *r, *g, *b;
+static void mag_read_palette(struct mag *mi, byte *r, byte *g, byte *b)
 {
     int num_palettes;
     byte *buf;
@@ -262,8 +252,7 @@ static void mag_read_palette(mi, r, g, b)
     free(buf);
 }
 
-static void mag_read_flags(mi)
-     struct mag *mi;
+static void mag_read_flags(struct mag *mi)
 {
     mi->a = mag_malloc((size_t) mi->a_size, "mag_read_flags#1");
     mi->b = mag_malloc((size_t) mi->b_size, "mag_read_flags#2");
@@ -275,8 +264,7 @@ static void mag_read_flags(mi)
 	mag_file_warning(mi, MAG_CORRUPT);
 }
 
-static void mag_read_pixel_data(mi)
-    struct mag *mi;
+static void mag_read_pixel_data(struct mag *mi)
 {
     mi->p = mag_malloc((size_t) mi->p_size, "mag_read_pixel_data");
 
@@ -286,9 +274,7 @@ static void mag_read_pixel_data(mi)
 }
 
 /* MAG expanding routine */
-static void mag_expand_body(mi, pic0)
-    struct mag *mi;
-    byte **pic0;
+static void mag_expand_body(struct mag *mi, byte **pic0)
 {
     int ai, bi, fi, pi;
     int px, py, x, y;
@@ -383,14 +369,8 @@ static void mag_expand_body(mi, pic0)
 
 
 /* The main routine to write a MAG file. */
-int WriteMAG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
-	      comment)
-    FILE *fp;
-    byte *pic;
-    int ptype, w, h;
-    byte *rmap, *gmap, *bmap;
-    int numcols, colorstyle;
-    char *comment;
+int WriteMAG(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+	      char *comment)
 {
     byte rtemp[256], gtemp[256], btemp[256];
     struct mag mag;
@@ -448,9 +428,7 @@ int WriteMAG(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
 }
 
 /* MAG compressing routine */
-static void mag_compress_data(mi, pic0)
-    struct mag *mi;
-    byte *pic0;
+static void mag_compress_data(struct mag *mi, byte *pic0)
 {
     int ai, bi, pi, i;
     int bmax, pmax;
@@ -571,16 +549,13 @@ static void mag_compress_data(mi, pic0)
     free(flag0);
 }
 
-static void mag_write_check_data(mi)
-    struct mag *mi;
+static void mag_write_check_data(struct mag *mi)
 {
     if(fwrite(mag_id, (size_t) 8, (size_t) 1, mi->fp) != 1)
 	mag_file_error(mi, MAG_WRITE);
 }
 
-static void mag_write_comment(mi, comment)
-    struct mag *mi;
-    char *comment;
+static void mag_write_comment(struct mag *mi, char *comment)
 {
     char *p;
     int i;
@@ -618,11 +593,7 @@ static void mag_write_comment(mi, comment)
 	mag_file_error(mi, MAG_WRITE);
 }
 
-static void mag_write_palette(mi, num, r, g, b, grey)
-    struct mag *mi;
-    int num;
-    byte *r, *g, *b;
-    int grey;
+static void mag_write_palette(struct mag *mi, int num, byte *r, byte *g, byte *b, int grey)
 {
     int i, left;
     char buf[3];
@@ -656,8 +627,7 @@ static void mag_write_palette(mi, num, r, g, b, grey)
     }
 }
 
-static void mag_write_flags(mi)
-    struct mag *mi;
+static void mag_write_flags(struct mag *mi)
 {
     int i;
 
@@ -674,8 +644,7 @@ static void mag_write_flags(mi)
     }
 }
 
-static void mag_write_pixel_data(mi)
-    struct mag *mi;
+static void mag_write_pixel_data(struct mag *mi)
 {
     int i;
 
@@ -686,8 +655,7 @@ static void mag_write_pixel_data(mi)
     }
 }
 
-static void mag_write_header(mi)
-    struct mag *mi;
+static void mag_write_header(struct mag *mi)
 {
     byte buf[32];
 
@@ -716,9 +684,7 @@ static void mag_write_header(mi)
 	mag_file_error(mi, MAG_WRITE);
 }
 
-static void mag_set_double_word(n, p)
-    long n;
-    byte *p;
+static void mag_set_double_word(long int n, byte *p)
 {
     p[0] = n % 256;	/* ugly...anything wrong with shift/mask operations? */
     p[1] = n / 256 % 256;		/* (n >> 8) & 0xff */
@@ -735,8 +701,7 @@ static void mag_set_double_word(n, p)
  * mag_cleanup_pinfo:
  *	cleans up a PICINFO structure.
  */
-static void mag_init_info(mi)
-    struct mag *mi;
+static void mag_init_info(struct mag *mi)
 {
     mi->fp = NULL;
     mi->fsize = 0;
@@ -751,9 +716,7 @@ static void mag_init_info(mi)
     mi->p = NULL;
 }
 
-static void mag_cleanup_mag_info(mi, writing)
-    struct mag *mi;
-    int writing;
+static void mag_cleanup_mag_info(struct mag *mi, int writing)
 {
     if(mi->fp && !writing)
 	fclose(mi->fp);
@@ -765,8 +728,7 @@ static void mag_cleanup_mag_info(mi, writing)
 	free(mi->p);
 }
 
-static void mag_cleanup_pinfo(pinfo)
-    PICINFO *pinfo;
+static void mag_cleanup_pinfo(PICINFO *pinfo)
 {
     if(pinfo->comment){
 	free(pinfo->comment);
@@ -789,25 +751,20 @@ static void mag_cleanup_pinfo(pinfo)
  * mag_file_warning:
  *	shows an file warning message.
  */
-static void mag_memory_error(scm, fn)
-    char *scm, *fn;
+static void mag_memory_error(char *scm, char *fn)
 {
     char buf[128];
     sprintf(buf, "%s: can't allocate memory. (%s)", scm, fn);
     FatalError(buf);
 }
 
-static void mag_error(mi, mn)
-    struct mag *mi;
-    int mn;
+static void mag_error(struct mag *mi, int mn)
 {
     SetISTR(ISTR_WARNING, "%s", mag_msgs[mn]);
     longjmp(mi->jmp, 1);
 }
 
-static void mag_file_error(mi, mn)
-    struct mag *mi;
-    int mn;
+static void mag_file_error(struct mag *mi, int mn)
 {
     if(feof(mi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", mag_msgs[mn]);
@@ -816,9 +773,7 @@ static void mag_file_error(mi, mn)
     longjmp(mi->jmp, 1);
 }
 
-static void mag_file_warning(mi, mn)
-    struct mag *mi;
-    int mn;
+static void mag_file_warning(struct mag *mi, int mn)
 {
     if(feof(mi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", mag_msgs[mn]);
@@ -826,8 +781,7 @@ static void mag_file_warning(mi, mn)
 	SetISTR(ISTR_WARNING, "%s (%s)", mag_msgs[mn], ERRSTR(errno));
 }
 
-static void mag_show_struct (mi)
-    struct mag *mi;
+static void mag_show_struct (struct mag *mi)
 {
     fprintf(stderr, "  256 colors: %s\n", mi->m_256 ? "true" : "false");
     fprintf(stderr, "  8 colors: %s\n", mi->m_8 ? "true" : "false");
@@ -843,9 +797,7 @@ static void mag_show_struct (mi)
 }
 
 /* Memory related routines. */
-static void *mag_malloc(n, fn)
-    size_t n;
-    char *fn;
+static void *mag_malloc(size_t n, char *fn)
 {
     void *r = (void *) malloc(n);
     if(r == NULL)
@@ -853,10 +805,7 @@ static void *mag_malloc(n, fn)
     return r;
 }
 
-static void *mag_realloc(p, n, fn)
-    void *p;
-    size_t n;
-    char *fn;
+static void *mag_realloc(void *p, size_t n, char *fn)
 {
     void *r = (p == NULL) ? (void *) malloc(n) : (void *) realloc(p, n);
     if(r == NULL)

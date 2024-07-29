@@ -635,7 +635,7 @@ static RBUTT *resnRB;
 
 
 /***************************************************/
-void CreatePCDW()
+void CreatePCDW(void)
 {
   int y;
 
@@ -673,8 +673,7 @@ void CreatePCDW()
 
 
 /***************************************************/
-void PCDDialog(vis)
-int vis;
+void PCDDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(pcdW, tbut[T_BOK].x + tbut[T_BOK].w/2,
@@ -686,8 +685,7 @@ int vis;
 
 
 /***************************************************/
-int PCDCheckEvent(xev)
-XEvent *xev;
+int PCDCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -793,8 +791,7 @@ drawTD(int x, int y, int w, int h)
 
 
 /***************************************************/
-static void clickTD(x,y)
-int x,y;
+static void clickTD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -825,8 +822,7 @@ int x,y;
 
 
 /***************************************************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
   leaveitup=0;
   goforit=0;
@@ -843,7 +839,7 @@ int cmd;
 
 
 /*******************************************/
-static void PCDSetParams()
+static void PCDSetParams(void)
 {
   switch (RBWhich(resnRB)) {
   case 0: size = 0;      break;

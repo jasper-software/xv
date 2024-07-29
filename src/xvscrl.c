@@ -52,14 +52,8 @@ static void drawThumb   PARM((SCRL *));
 
 
 /***************************************************/
-void SCCreate(sp, parent, x, y, vert, len, minv, maxv, curv, page,
-	          fg, bg, hi, lo, func)
-    SCRL         *sp;
-    Window        parent;
-    int           x,y,vert,len,minv,maxv,curv,page;
-    unsigned long fg,bg,hi,lo;
-
-    void          (*func)PARM((int, SCRL *));
+void SCCreate(SCRL *sp, Window parent, int x, int y, int vert, int len, int minv, int maxv, int curv, int page,
+	          unsigned long fg, unsigned long bg, unsigned long hi, unsigned long lo, void (*func)(int, SCRL *))
 {
 
 
@@ -118,9 +112,7 @@ void SCCreate(sp, parent, x, y, vert, len, minv, maxv, curv, page,
 
 
 /***************************************************/
-void SCChange(sp, x, y, vert, len, minv, maxv, curv, page)
-    SCRL         *sp;
-    int           x,y,vert,len,minv,maxv,curv,page;
+void SCChange(SCRL *sp, int x, int y, int vert, int len, int minv, int maxv, int curv, int page)
 {
   sp->vert = vert;
   sp->len  = len;
@@ -147,9 +139,7 @@ void SCChange(sp, x, y, vert, len, minv, maxv, curv, page)
 
 
 /***************************************************/
-void SCSetRange(sp, minv, maxv, curv, page)
-     SCRL *sp;
-     int   minv, maxv, curv, page;
+void SCSetRange(SCRL *sp, int minv, int maxv, int curv, int page)
 {
   if (maxv<minv) maxv=minv;
   sp->min = minv;    sp->max = maxv;    sp->page = page;
@@ -168,9 +158,7 @@ void SCSetRange(sp, minv, maxv, curv, page)
 
 
 /***************************************************/
-int SCSetVal(sp, curv)
-SCRL *sp;
-int   curv;
+int SCSetVal(SCRL *sp, int curv)
 {
   /* returns '0' if no redraw was done */
   int oldval;
@@ -197,8 +185,7 @@ int   curv;
 
 
 /***************************************************/
-void SCRedraw(sp)
-SCRL *sp;
+void SCRedraw(SCRL *sp)
 {
   XSetForeground(theDisp, theGC, sp->fg);
   XSetBackground(theDisp, theGC, sp->bg);
@@ -227,9 +214,7 @@ SCRL *sp;
 
 
 /***************************************************/
-static void drawArrow(sp,arr)
-SCRL *sp;
-int arr;
+static void drawArrow(SCRL *sp, int arr)
 {
   Pixmap butpix;
 
@@ -288,8 +273,7 @@ int arr;
 
 
 /***************************************************/
-static void drawThumb(sp)
-SCRL *sp;
+static void drawThumb(SCRL *sp)
 {
   if (sp->vert) {
     /* clear out thumb area with background color */
@@ -347,9 +331,7 @@ SCRL *sp;
 
 
 /***************************************************/
-static int whereInScrl(sp,x,y)
-SCRL *sp;
-int x,y;
+static int whereInScrl(SCRL *sp, int x, int y)
 {
   int v;
 
@@ -379,9 +361,7 @@ int x,y;
 
 
 /***************************************************/
-void SCTrack(sp,mx,my)
-SCRL *sp;
-int mx,my;
+void SCTrack(SCRL *sp, int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry, x,y, ipos, pos, lit, tx, ty, tyoff, txoff, ty1, tx1;

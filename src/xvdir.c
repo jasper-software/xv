@@ -181,22 +181,21 @@ static int  dopipe;
 
 
 /***************************************************/
-static int DirHigh()
+static int DirHigh(void)
 {
   return dir_h;
 }
 
 
 /***************************************************/
-static int DirWide()
+static int DirWide(void)
 {
   return dList.w + 113*dpiMult;
 }
 
 
 /***************************************************/
-static int roomForLines(height)
-    int height;
+static int roomForLines(int height)
 {
   int num;
 
@@ -211,8 +210,7 @@ static int roomForLines(height)
 
 
 /***************************************************/
-void ResizeDirW(w, h)
-    int w, h;
+void ResizeDirW(int w, int h)
 {
   int nlines;
 
@@ -226,21 +224,21 @@ void ResizeDirW(w, h)
 
 
 /***************************************************/
-static int DNamWide()
+static int DNamWide(void)
 {
   return DirWide() - 100*dpiMult;
 }
 
 
 /***************************************************/
-static int DNamY()
+static int DNamY(void)
 {
   return DirHigh() - (10*dpiMult + 2*dpiMult + LINEHIGH + 5*dpiMult);
 }
 
 
 /***************************************************/
-void CreateDirW()
+void CreateDirW(void)
 {
   int nlines;
 
@@ -326,8 +324,7 @@ void CreateDirW()
 
 
 /***************************************************/
-void DirBox(mode)
-    int mode;
+void DirBox(int mode)
 {
   static int firstclose = 1;
 
@@ -406,8 +403,7 @@ void DirBox(mode)
 
 
 /***************************************************/
-static void arrangeElements(savemode)
-    int savemode;
+static void arrangeElements(int savemode)
 {
   int i, nbts, ngaps, szdiff, top, gap;
 
@@ -466,8 +462,7 @@ static void arrangeElements(savemode)
 
 
 /***************************************************/
-void RedrawDirW(x, y, w, h)
-     int x, y, w, h;
+void RedrawDirW(int x, int y, int w, int h)
 {
   int        i, ypos, txtw;
   char       foo[30];
@@ -545,9 +540,7 @@ void RedrawDirW(x, y, w, h)
 
 
 /***************************************************/
-int ClickDirW(x, y, button)
-    int x, y;
-    int button;
+int ClickDirW(int x, int y, int button)
 {
   BUTT  *bp;
   int    bnum,i,maxbut,v;
@@ -741,9 +734,7 @@ int ClickDirW(x, y, button)
 }
 
 /***************************************************/
-int DoubleClickDirW(x, y, button)
-    int x, y;
-    int button;
+int DoubleClickDirW(int x, int y, int button)
 {
   /* handle double-clicks inside the filename box */
   if (button == 1 &&
@@ -758,8 +749,7 @@ int DoubleClickDirW(x, y, button)
 }
 
 
-static int posOfCoordinate(clkx)
-    int clkx;
+static int posOfCoordinate(int clkx)
 {
   int dx, pos;
 
@@ -779,8 +769,7 @@ static int posOfCoordinate(clkx)
 
 
 /***************************************************/
-static void moveInsertionPoint(clkx)
-    int clkx;
+static void moveInsertionPoint(int clkx)
 {
   curPos = posOfCoordinate(clkx);
   selPos=selLen = 0;
@@ -790,7 +779,7 @@ static void moveInsertionPoint(clkx)
 
 
 /***************************************************/
-static void unselect()
+static void unselect(void)
 {
   selPos=selLen = 0;
   ReleaseSelection(XA_PRIMARY);
@@ -798,7 +787,7 @@ static void unselect()
 
 
 /***************************************************/
-static void removeSelectedRange()
+static void removeSelectedRange(void)
 {
   if (selLen > 0) {
     int len;
@@ -812,8 +801,7 @@ static void removeSelectedRange()
 
 
 /***************************************************/
-static void pasteIntoBox(text)
-    const char *text;
+static void pasteIntoBox(const char *text)
 {
   int len, cleanlen;
   int tpos, cpos;
@@ -859,8 +847,7 @@ static void pasteIntoBox(text)
 
 
 /***************************************************/
-void SelectDir(n)
-    int n;
+void SelectDir(int n)
 {
   /* called when entry #n in the dir list was selected/double-clicked */
 
@@ -883,8 +870,7 @@ void SelectDir(n)
 
 
 /***************************************************/
-static void changedDirMB(sel)
-    int sel;
+static void changedDirMB(int sel)
 {
   if (sel != 0) {   /* changed directories */
     char tmppath[MAXPATHLEN+1], *trunc_point;
@@ -937,9 +923,7 @@ static void changedDirMB(sel)
 
 
 /***************************************************/
-static void RedrawDList(delta, sptr)
-    int   delta;
-    SCRL *sptr;
+static void RedrawDList(int delta, SCRL *sptr)
 {
   XV_UNUSED(sptr);
   LSRedraw(&dList,delta);
@@ -947,7 +931,7 @@ static void RedrawDList(delta, sptr)
 
 
 /***************************************************/
-static void loadCWD()
+static void loadCWD(void)
 {
   /* loads up current-working-directory into load/save list */
 
@@ -957,7 +941,7 @@ static void loadCWD()
 
 
 /***************************************************/
-void LoadCurrentDirectory()
+void LoadCurrentDirectory(void)
 {
   /* rescans current load/save directory */
 
@@ -1025,7 +1009,7 @@ void LoadCurrentDirectory()
 #endif
 
     dirs[i] = dbeg;
-    dbeg = dend+1;
+    dbeg = ((dend == NULL)? NULL: (dend+1));
   }
   ndirs = i-1;
 
@@ -1138,8 +1122,7 @@ void LoadCurrentDirectory()
 
 
 /***************************************************/
-void GetDirPath(buf)
-    char *buf;
+void GetDirPath(char *buf)
 {
   /* returns current 'dirW' path.  buf should be MAXPATHLEN long */
 
@@ -1158,8 +1141,7 @@ static int cd_able(str)
 
 
 /***************************************************/
-static int dnamcmp(p1, p2)
-    const void *p1, *p2;
+static int dnamcmp(const void *p1, const void *p2)
 {
   char **s1, **s2;
 
@@ -1185,7 +1167,7 @@ static int dnamcmp(p1, p2)
 
 
 /***************************************************/
-static int updatePrimarySelection()
+static int updatePrimarySelection(void)
 {
   if (selLen > 0)
     if (SetPrimaryText(dirW, &filename[selPos], selLen) == 0) {
@@ -1198,7 +1180,7 @@ static int updatePrimarySelection()
 
 
 /***************************************************/
-static int updateClipboardSelection()
+static int updateClipboardSelection(void)
 {
   if (selLen > 0)
     if (SetClipboardText(dirW, &filename[selPos], selLen) == 0) {
@@ -1211,7 +1193,7 @@ static int updateClipboardSelection()
 
 
 /***************************************************/
-void SelectAllDirW()
+void SelectAllDirW(void)
 {
   selPos = 0;
   selLen = strlen(filename);
@@ -1221,7 +1203,7 @@ void SelectAllDirW()
 
 
 /***************************************************/
-void InactivateDirW()
+void InactivateDirW(void)
 {
   /* FIXME: it would be nice to have two selection colors:
    * one for selected and PRIMARY and one for just selected
@@ -1231,7 +1213,7 @@ void InactivateDirW()
 
 
 /***************************************************/
-void CutDirW()
+void CutDirW(void)
 {
   updateClipboardSelection();
 
@@ -1243,14 +1225,14 @@ void CutDirW()
 
 
 /***************************************************/
-void CopyDirW()
+void CopyDirW(void)
 {
   updateClipboardSelection();
 }
 
 
 /***************************************************/
-void PasteDirW()
+void PasteDirW(void)
 {
   char *text = GetClipboardText();
 
@@ -1262,7 +1244,7 @@ void PasteDirW()
 
 
 /***************************************************/
-void ClearDirW()
+void ClearDirW(void)
 {
   removeSelectedRange();
 
@@ -1272,8 +1254,7 @@ void ClearDirW()
 
 
 /***************************************************/
-int DirKey(c)
-    int c;
+int DirKey(int c)
 {
   /* got keypress in dirW.  stick on end of filename */
   int len;
@@ -1395,7 +1376,7 @@ int DirKey(c)
 
 
 /***************************************************/
-static int autoComplete()
+static int autoComplete(void)
 {
   /* called to 'auto complete' a filename being entered.  If the name that
      has been entered so far is anything but a simple filename (ie, has
@@ -1457,7 +1438,7 @@ static int autoComplete()
 
 
 /***************************************************/
-static void scrollToFileName()
+static void scrollToFileName(void)
 {
   int i, hi, lo, pos, cmp;
 
@@ -1489,7 +1470,7 @@ static void scrollToFileName()
 
 
 /***************************************************/
-void RedrawDNamW()
+void RedrawDNamW(void)
 {
   int cpos, i;
   int xoff;
@@ -1549,7 +1530,7 @@ void RedrawDNamW()
 
 
 /***************************************************/
-int DoSave()
+int DoSave(void)
 {
   FILE *fp;
   byte *thepic, *rp, *gp, *bp;
@@ -1822,8 +1803,7 @@ int DoSave()
 
 
 /***************************************************/
-void SetDirFName(st)
-    const char *st;
+void SetDirFName(const char *st)
 {
   strncpy(deffname, st, (size_t) MAXFNLEN-1);
   deffname[MAXFNLEN-1] = '\0';
@@ -1832,8 +1812,7 @@ void SetDirFName(st)
 
 
 /***************************************************/
-static void setFName(st)
-    const char *st;
+static void setFName(const char *st)
 {
   /* Prevent an ASan failure. */
   /* Why is this code being called with filename == st??? */
@@ -1850,7 +1829,7 @@ static void setFName(st)
 
 
 /***************************************************/
-static void showFName()
+static void showFName(void)
 {
   int len;
 
@@ -1893,14 +1872,14 @@ static void showFName()
 
 
 /***************************************************/
-char *GetDirFName()
+char *GetDirFName(void)
 {
   return (filename);
 }
 
 
 /***************************************************/
-char *GetDirFullName()
+char *GetDirFullName(void)
 {
   static char globname[MAXFNLEN+100];   /* the +100 is for ~ expansion */
   static char fullname[MAXPATHLEN+2];
@@ -1919,8 +1898,7 @@ char *GetDirFullName()
 
 
 /***************************************************/
-void SetDirSaveMode(group, bnum)
-    int group, bnum;
+void SetDirSaveMode(int group, int bnum)
 {
   if (group == F_COLORS) {
     if (picType == PIC24) {   /* disable REDUCED COLOR */
@@ -1990,7 +1968,7 @@ void SetDirSaveMode(group, bnum)
 
 
 /***************************************/
-static void changeSuffix()
+static void changeSuffix(void)
 {
   /* see if there's a common suffix at the end of the filename.
      if there is, remember what case it was (all caps or all lower), lop
@@ -2149,7 +2127,7 @@ static void changeSuffix()
 
 
 /***************************************************/
-int DirCheckCD()
+int DirCheckCD(void)
 {
   /* checks if the current filename is a directory.  If so,
      cd's there, resets the filename to 'deffname', and returns '1'
@@ -2166,7 +2144,7 @@ int DirCheckCD()
 
 
 /***************************************************/
-static int FNameCdable()
+static int FNameCdable(void)
 {
   /* returns '1' if filename is a directory, and goes there */
 
@@ -2236,8 +2214,7 @@ static int FNameCdable()
 
 
 /**************************************************************************/
-int Globify(fname)
-    char *fname;
+int Globify(char *fname)
 {
   /* expands ~s in file names.  Returns the name inplace 'name'.
      returns 0 if okay, 1 if error occurred (user name not found) */
@@ -2283,8 +2260,7 @@ int Globify(fname)
 
 
 /***************************************/
-FILE *OpenOutFile(filename)
-    const char *filename;
+FILE *OpenOutFile(const char *filename)
 {
   /* opens file for output.  does various error handling bits.  Returns
      an open file pointer if success, NULL if failure */
@@ -2354,11 +2330,7 @@ FILE *OpenOutFile(filename)
 
 
 /***************************************/
-int CloseOutFileWhy(fp, filename, failed, why)
-    FILE       *fp;
-    const char *filename;
-    int         failed;
-    const char *why;
+int CloseOutFileWhy(FILE *fp, const char *filename, int failed, const char *why)
 {
   char buf[64];
 
@@ -2449,10 +2421,7 @@ static byte rBW[2], gBW[2], bBW[2];
 static byte gray[256];
 
 /***************************************/
-static byte *handleBWandReduced(pic, ptype, pw, ph, color, nc, rpp, gpp, bpp)
-     byte  *pic;
-     int    ptype, pw, ph, color, *nc;
-     byte **rpp, **gpp, **bpp;
+static byte *handleBWandReduced(byte *pic, int ptype, int pw, int ph, int color, int *nc, byte **rpp, byte **gpp, byte **bpp)
 {
   /* given 'color mode' (F_FULLCOLOR, etc.), we may have to dither
      and/or use different colormaps.  Returns 'nc', rpp, gpp, bpp (the
@@ -2549,8 +2518,7 @@ static byte *handleBWandReduced(pic, ptype, pw, ph, color, nc, rpp, gpp, bpp)
 
 
 /***************************************/
-static byte *handleNormSel(pptype, pwide, phigh, pfree)
-    int *pptype, *pwide, *phigh, *pfree;
+static byte *handleNormSel(int *pptype, int *pwide, int *phigh, int *pfree)
 {
   /* called to return a pointer to a 'pic', its type, its width & height,
    * and whether or not it should be freed when we're done with it.  The 'pic'
@@ -2612,9 +2580,7 @@ static byte *handleNormSel(pptype, pwide, phigh, pfree)
 
 
 /***************************************/
-byte *GenSavePic(ptypeP, wP, hP, freeP, ncP, rmapP, gmapP, bmapP)
-    int   *ptypeP, *wP, *hP, *freeP, *ncP;
-    byte **rmapP, **gmapP, **bmapP;
+byte *GenSavePic(int *ptypeP, int *wP, int *hP, int *freeP, int *ncP, byte **rmapP, byte **gmapP, byte **bmapP)
 {
   /* handles the whole ugly mess of the various save options.
    * returns an image, of type 'ptypeP', size 'wP,hP'.
@@ -2655,8 +2621,7 @@ byte *GenSavePic(ptypeP, wP, hP, freeP, ncP, rmapP, gmapP, bmapP)
 
 
 /***************************************/
-void GetSaveSize(wP, hP)
-    int *wP, *hP;
+void GetSaveSize(int *wP, int *hP)
 {
   /* returns the size (in pixels) of the save image.  Takes 'normal size'
      and 'save selection' checkboxes into account */
@@ -2702,7 +2667,7 @@ static time_t lastchgtime;
 
 
 /****************************/
-void InitPoll()
+void InitPoll(void)
 {
   /* called whenever a file is initially loaded.  stat's the file and puts
      the results in origStat */
@@ -2724,8 +2689,7 @@ void InitPoll()
 
 
 /****************************/
-int CheckPoll(del)
-    int del;
+int CheckPoll(int del)
 {
   /* returns '1' if the file has been modified, and either
       A) the file has stabilized (st = lastStat), or
@@ -2771,8 +2735,7 @@ int CheckPoll(del)
 
 
 /***************************************************************/
-void DIRDeletedFile(name)
-    char *name;
+void DIRDeletedFile(char *name)
 {
   /* called when file 'name' has been deleted.  If any of the browsers
      were showing the directory that the file was in, does a rescan() */
@@ -2788,8 +2751,7 @@ void DIRDeletedFile(name)
 
 
 /***************************************************************/
-void DIRCreatedFile(name)
-    char *name;
+void DIRCreatedFile(char *name)
 {
   DIRDeletedFile(name);
 }
@@ -2797,9 +2759,7 @@ void DIRCreatedFile(name)
 
 #ifdef HAVE_PIC2
 /**** Stuff for PIC2Dialog box ****/
-FILE *pic2_OpenOutFile(filename, append)
-    char *filename;
-    int *append;
+FILE *pic2_OpenOutFile(char *filename, int *append)
 {
     /* opens file for output.  does various error handling bits.  Returns
        an open file pointer if success, NULL if failure */
@@ -2883,8 +2843,7 @@ FILE *pic2_OpenOutFile(filename, append)
 
 
 /***************************************/
-void pic2_KillNullFile(fp)
-    FILE *fp;
+void pic2_KillNullFile(FILE *fp)
 {
     fseek(fp, (size_t) 0, SEEK_END);
     if (ftell(fp) > 0) {

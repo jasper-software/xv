@@ -55,8 +55,7 @@ static CBUTT FlosslessCB;
 
 static void drawWEBPD PARM((int x, int y, int w, int h));
 
-static void drawWEBPD(x, y, w, h)
-     int x, y, w, h;
+static void drawWEBPD(int x, int y, int w, int h)
 {
   const char *title   = "Save WEBP file...";
 
@@ -97,7 +96,7 @@ static void drawWEBPD(x, y, w, h)
 
 static void writeWEBP PARM((void));
 
-static void writeWEBP()
+static void writeWEBP(void)
 {
   FILE       *fp;
   int         w, h, nc, rv, ptype, pfree;
@@ -124,8 +123,7 @@ static void writeWEBP()
 
 static void doCmd PARM((int cmd));
 
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
   switch (cmd) {
     case P_BOK:
@@ -156,8 +154,7 @@ static void doCmd(cmd)
 
 static void clickWEBPD PARM((int x, int y));
 
-static void clickWEBPD(x,y)
-     int x,y;
+static void clickWEBPD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -189,7 +186,7 @@ static void clickWEBPD(x,y)
 }
 
 /*******************************************/
-void CreateWEBPW()
+void CreateWEBPW(void)
 {
   webpW = CreateWindow("xv webp", "XVWEBP", NULL,
                       WEBPWIDE, WEBPHIGH, infofg, infobg, 0);
@@ -215,8 +212,7 @@ void CreateWEBPW()
 
 
 /*******************************************/
-void WEBPDialog(vis)
-     int vis;
+void WEBPDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(webpW, pbut[P_BOK].x + (int) pbut[P_BOK].w/2,
@@ -229,8 +225,7 @@ void WEBPDialog(vis)
 
 
 /*******************************************/
-int WEBPCheckEvent(xev)
-     XEvent *xev;
+int WEBPCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -305,9 +300,7 @@ int WEBPCheckEvent(xev)
  *
  * Takes a file name and the color type.
  */
-void WEBPSaveParams(fname, col)
-     char *fname;
-     int col;
+void WEBPSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -354,12 +347,7 @@ void WEBPSaveParams(fname, col)
  * - @tanabi on GITHUB
  */
 int
-WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
+WriteWEBP(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
   uint8_t*  webp_in = NULL;
   uint8_t*  webp_out = NULL;
@@ -449,7 +437,7 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
  * Output version information to stderr
  */
 void
-VersionInfoWEBP()
+VersionInfoWEBP(void)
 {
   int decoder_version;
   int encoder_version;
@@ -477,9 +465,7 @@ VersionInfoWEBP()
  * Returns 1 on success, 0 on failure
  *
  */
-int LoadWEBP(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadWEBP(char *fname, PICINFO *pinfo)
 {
   FILE                  *fp;
   int                   filesize;

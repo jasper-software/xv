@@ -59,9 +59,7 @@ static const char *bname;
 
 
 /*******************************************/
-int LoadIFF(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadIFF(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -473,9 +471,7 @@ int LoadIFF(fname, pinfo)
 
 
 /*******************************************/
-static void decomprle(sptr, dptr, slen, dlen)
-     byte *sptr, *dptr;
-     register long slen, dlen;
+static void decomprle(byte *sptr, byte *dptr, register long int slen, register long int dlen)
 {
   register byte codeByte, dataByte;
 
@@ -516,8 +512,7 @@ static void decomprle(sptr, dptr, slen, dlen)
 
 
 /*******************************************/
-static unsigned int iff_getword(ptr)
-     byte *ptr;
+static unsigned int iff_getword(byte *ptr)
 {
   register unsigned int v;
 
@@ -529,8 +524,7 @@ static unsigned int iff_getword(ptr)
 
 
 /*******************************************/
-static unsigned long iff_getlong(ptr)
-     byte *ptr;
+static unsigned long iff_getlong(byte *ptr)
 {
   register unsigned long l;
 
@@ -544,8 +538,7 @@ static unsigned long iff_getlong(ptr)
 
 
 /*******************************************/
-static int iffError(fname, st)
-     const char *fname, *st;
+static int iffError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
