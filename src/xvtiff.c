@@ -15,7 +15,7 @@
 #ifdef HAVE_TIFF
 
 #include "tiffio.h"     /* has to be after xv.h, as it needs varargs/stdarg */
-#include <stdint.h>
+
 
 /* Portions fall under the following copyright:
  *
