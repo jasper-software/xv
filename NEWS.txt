@@ -6,11 +6,46 @@
 5.0.1 (2024-05-14)
 ==================
 
+* Applied patches from other xv forks.
+    Add contributed xv.xpm and xv.desktop.
+    BMP updates for WIN_95, 98, and NT.
+    xv was not really exiting with 0 for a valid call "xv -help".
+    sprintf() to snprintf() safety fix.
+    Add XrandR support.
+    Add webp support for browsing and saving.
+    Add support for reading G3 facsimile image files.
+    Eliminate flicker in the image window.
+    Add TRUE and FALSE defines in case these don't get defined elsewhere.
+    Change C++ style comments to C style.
+    Allow main and save/load window resizes.
+    Add README.debian.
+    Fix dashes and formatting on manual pages.
+    Minor tweak to 'nopos' parameter.
+    24-bit autocrop bug partial fix (applied to all four places).
 * Increased some buffers to fix compile warnings and sanitizer warnings.
 * Fixed unused variable warnings with XV_UNUSED macro or by removing the variables.
 * Updated prototypes in xv.h to fix warnings about declarations without prototypes.
 * Added a -c option to the build script to do a clean build.
 * Added .gitignore
+* Fixes for G3, tiff, and wbmp processing.
+* Fixed memory leak of tv->lines in computeText() in xvtext.c.
+* Fixed possible overwrite in add_filelist_to_namelist() in xv.c.
+* Added overprint.ps sample PS image.
+* Switched order of calloc() args to fix compile warning in xvbrowse.c.
+* Fixed crash on long file names in xv.c.
+* Added Add a test image with a long file name in data/images.
+* Rebuilt with clang and fixed compile warnings.
+* Added HiDPI support.
+    New options -dpimult # to set the scale factor,
+    -hidpi to set a scale factor of 2,
+    +hidpi to set a scale factor of 1.
+    Most dialogs scale based on the dpi multiplier.
+    xv automatically defaults to -hidpi for displays with more than 144 dpi.
+* Fixed error from negative shift in xvpic.c.
+* Fixed crash on NULL monofsetinfo in xv.c.
+* Fixed bad pointer reference in last interation of LoadCurrentDirectory in xvdir.c.
+* Fixed loop limit in CharsetDelWin to avoid accessing csinfo out of bounds if there are no text windows in xvtext.c.
+* Convert function definitions to use prototypes as required by C23.
 
 5.0.0 (2024-02-06)
 ==================
