@@ -394,7 +394,7 @@ int TextView(const char *fname)
      the uncompressed version */
 
   filetype = ReadFileType(filename);
-  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2) || (filetype == RFT_XZ)) {
 #ifndef VMS
     if (!UncompressFile(filename, rfname, filetype)) return FALSE;
 #else

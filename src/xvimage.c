@@ -3259,7 +3259,7 @@ static int ReadImageFile1(char *name, PICINFO *pinfo)
 
   ftype = ReadFileType(name);
 
-  if ((ftype == RFT_COMPRESS) || (ftype == RFT_BZIP2)) {  /* handle .Z,gz,bz2 */
+  if ((ftype == RFT_COMPRESS) || (ftype == RFT_BZIP2) || (ftype == RFT_XZ)) {  /* handle .Z,gz,bz2 */
 #ifdef VMS
     basefname[0] = '\0';
     strcpy(basefname, name);     /* remove trailing .Z */

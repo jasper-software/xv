@@ -2366,6 +2366,10 @@ static int openPic(int filenum)
     if (strlen(basefname)>4 && strcmp(basefname+strlen(basefname)-4,".bz2")==0)
       basefname[strlen(basefname)-4]='\0';
 #endif
+#ifdef XZ
+    if (strlen(basefname)>3 && strcmp(basefname+strlen(basefname)-3,".xz")==0)
+      basefname[strlen(basefname)-3]='\0';
+#endif
   }
 
 
@@ -2499,7 +2503,7 @@ static int openPic(int filenum)
 #endif
 
   /* if it's a compressed file, uncompress it: */
-  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2) || (filetype == RFT_XZ)) {
     char tmpname[128];
 
     if (
@@ -3197,6 +3201,12 @@ int ReadFileType(char *fname)
   else if (magicno[0]==0x42 && magicno[1]==0x5a)              rv = RFT_BZIP2;
 #endif
 
+#ifdef XZ
+  else if (magicno[0]==0xfd &&
+           magicno[1]=='7' && magicno[2]=='z' &&
+           magicno[3]=='X' && magicno[4]=='Z')                rv = RFT_XZ;
+#endif
+
   else if (magicno[0]==0x0a && magicno[1] <= 5)               rv = RFT_PCX;
 
   else if (strncmp((char *) magicno,   "FORM", (size_t) 4)==0 &&
@@ -3430,6 +3440,45 @@ int ReadPicFile(char *fname, int ftype, PICINFO *pinfo, int quick)
   return rv;
 }
 
+/********************************/
+char *QuoteFileName(char *safe_name, const char *orig_name, int max_len)
+{
+  /* Returns a quoted version of orig_name safe for use in command lines. */
+  /* The return value is safe_name to simplify use in sprintf calls. */
+  /* safe_name should be at least 3 * length(orig_name) + 4 */
+  /* Use XV_MAXQUOTEDPATHLEN */
+
+  int i, len;
+
+  if (max_len < 10) {
+    fprintf(stderr, "Error quoting file name\n");
+    Quit(1);
+    return NULL;
+  }
+
+  len = 0;
+  safe_name[ len++ ] = XV_SINGLE_QUOTE;
+  i = 0;
+  while (orig_name[i] != '\0' && len + 4 < max_len) {
+    if (orig_name[i] == XV_SINGLE_QUOTE) {
+      if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+      while (orig_name[i] == XV_SINGLE_QUOTE && len + 4 < max_len) {
+        if (len < max_len) safe_name[ len++ ] = '\\';
+        if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+        i++;
+      }
+      if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+    } else {
+      if (len < max_len) safe_name[ len++ ] = orig_name[ i ];
+      i++;
+    }
+  }
+
+  safe_name[ len++ ] = XV_SINGLE_QUOTE;
+  safe_name[ len ] = '\0';
+
+  return safe_name;
+}
 
 /********************************/
 int UncompressFile(char *name, char *uncompname, int filetype)
@@ -3437,7 +3486,8 @@ int UncompressFile(char *name, char *uncompname, int filetype)
   /* returns '1' on success, with name of uncompressed file in uncompname
      returns '0' on failure */
 
-  char namez[128], *fname, buf[512];
+  char namez[128], *fname, buf[ 512 + 2 * XV_MAXQUOTEDPATHLEN ];
+  char quoted_name[ XV_MAXQUOTEDPATHLEN ], quoted_uncompname[ XV_MAXQUOTEDPATHLEN ];
 #ifndef USE_MKSTEMP
   int tmpfd;
 #endif
@@ -3490,14 +3540,25 @@ int UncompressFile(char *name, char *uncompname, int filetype)
    * single quotes) before calling system().  Maybe one of the
    * exec() variants would be better...
    */
+  /* QuoteFileName handles single quotes.
+   * It also adds the outer quotes for flexibility for more efficient quoting or other operating systems.
+   */
 #ifndef VMS
   if (filetype == RFT_COMPRESS)
-    sprintf(buf,"%s -c '%s' > '%s'", UNCOMPRESS, fname, uncompname);
+    sprintf(buf,"%s -c %s > %s", UNCOMPRESS, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
 # ifdef BUNZIP2
   else if (filetype == RFT_BZIP2)
-    sprintf(buf,"%s -c '%s' > '%s'", BUNZIP2, fname, uncompname);
+    sprintf(buf,"%s -c %s > %s", BUNZIP2, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
+# endif
+# ifdef XZ
+  else if (filetype == RFT_XZ)
+    sprintf(buf,"%s -c %s > %s", XZ, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
 # endif
 #else /* it IS VMS */
+  /* QuoteFileName currently doesn't know the quote rules for VMS */
+  /* VMS uses double quotes around the file name. */
+  /* Use two double quotes for an embedded double quote. */
+  /* It might depend if the CLI is DCL or a shell. */
 # ifdef GUNZIP
   sprintf(buf,"%s '%s' '%s'", UNCOMPRESS, fname, uncompname);
 # else

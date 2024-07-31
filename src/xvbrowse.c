@@ -1424,7 +1424,7 @@ static void changedNumLit(BROWINFO *br, int sel, int nostr)
 /***************************************************************/
 static void setSelInfoStr(BROWINFO *br, int sel)
 {
-  /* sets the '# files selected' string in the brow window appropriately */
+  /* sets the '# files selected' string in the browser window appropriately */
 
   /* criteria:
    *    if no files are lit, display ''
@@ -2547,7 +2547,7 @@ static void keyIconWin(BROWINFO *br, XKeyEvent *kevt)
 	  /* try to open this file */
 	  snprintf(foo, sizeof(buf), "%s%s", br->path, br->bfList[i].name);
 #ifdef AUTO_EXPAND
-	Dirtovd(foo);
+	  Dirtovd(foo);
 #endif
 	  for (j=0; j<numnames && strcmp(namelist[j],foo); j++);
 	  if (j<numnames) {
@@ -3026,7 +3026,7 @@ static void scanDir(BROWINFO *br)
 #endif
 
     dirnames[i] = dbeg;
-    dbeg = dend+1;
+    dbeg = ((dend==NULL)? NULL: (dend+1));
   }
   br->ndirs = i-1;
 
@@ -3275,6 +3275,7 @@ static void scanFile(BROWINFO *br, BFIL *bf, char *name)
     case RFT_PDSVICAR: bf->ftype = BF_PDS;      break;
     case RFT_COMPRESS: bf->ftype = BF_COMPRESS; break;
     case RFT_BZIP2:    bf->ftype = BF_BZIP2;    break;
+    case RFT_XZ:       bf->ftype = BF_COMPRESS; break;
     case RFT_PS:       bf->ftype = BF_PS;       break;
     case RFT_IFF:      bf->ftype = BF_IFF;      break;
     case RFT_TARGA:    bf->ftype = BF_TGA;      break;
@@ -3691,7 +3692,7 @@ static void genIcon(BROWINFO *br, BFIL *bf)
 
   filetype = ReadFileType(bf->name);
 
-  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2) || (filetype == RFT_XZ)) {
 #if (defined(VMS) && !defined(GUNZIP))
     /* VMS decompress doesn't like the file to have a trailing .Z in fname
        however, GUnZip is OK with it, which we are calling UnCompress */
@@ -5863,9 +5864,7 @@ static void cp_fifo(struct stat *st, int exists)
 
 /*********************************/
 #ifdef AUTO_EXPAND
-static int stat2bf(uistmode, path)
-     u_int uistmode;
-     char *path;
+static int stat2bf(u_int uistmode, char *path)
 #else
 static int stat2bf(u_int uistmode)
 #endif

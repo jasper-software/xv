@@ -42,6 +42,21 @@
 
 
 /***************************************************************************
+ * XZ'd file support
+ *
+ * if you have the uncompression utility 'xz', XV can use it to automatically
+ * 'unzip' any xz'd files.  To enable this feature, change 'undef' to 'define'
+ * in the following line (if not already done).  Use 'which xz' or
+ * 'which xz' to find if you have xz, and where it lives.
+ */
+#define USE_XZ
+
+#ifdef USE_XZ
+#  define XZ "xz -dq"  /* should this include the full path? */
+#endif
+
+
+/***************************************************************************
  * compress'd file support
  *
  * if you have GUNZIP defined above, just ignore this, as 'gunzip' can

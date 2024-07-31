@@ -379,6 +379,8 @@
 #  define MAXPATHLEN 256
 #endif
 
+#define XV_MAXQUOTEDPATHLEN	(3 * MAXPATHLEN + 10)
+#define XV_SINGLE_QUOTE		'\''
 
 #ifdef SVR4
 #  define random lrand48
@@ -737,10 +739,11 @@
 #define RFT_PCD      23
 #define RFT_HIPS     24
 #define RFT_BZIP2    25
-#define RFT_JPC      26
-#define RFT_JP2      27
-#define RFT_G3       28
-#define RFT_WEBP     29
+#define RFT_XZ       26
+#define RFT_JPC      27
+#define RFT_JP2      28
+#define RFT_G3       29
+#define RFT_WEBP     30
 #define JP_EXT_RFT   (RFT_WEBP)
 #define RFT_MAG      (JP_EXT_RFT + 1)
 #define RFT_MAKI     (JP_EXT_RFT + 2)
@@ -1583,6 +1586,7 @@ WHERE int           mgcsfxUp;      /* is mgcsfxW mapped, or what? */
 void  SendSelection        PARM((Atom, Window, Atom, Atom, Time, char const *));
 int   ReadFileType         PARM((char *));
 int   ReadPicFile          PARM((char *, int, PICINFO *, int));
+char *QuoteFileName        PARM((char *, const char *, int));
 int   UncompressFile       PARM((char *, char *, int));
 void  KillPageFiles        PARM((char *, int));
 #ifdef MACBINARY
