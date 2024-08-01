@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.12)
 # The major, minor, and micro version numbers of the project.
 set(XV_VERSION_MAJOR 5)
 set(XV_VERSION_MINOR 2)
-set(XV_VERSION_PATCH 2)
+set(XV_VERSION_PATCH 3)
 set(XV_VERSION_DATE "20240801")
 
 # Generate the project version.

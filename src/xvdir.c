@@ -1552,7 +1552,7 @@ int DoSave(void)
       Mkvdir(path);
       if ((i = Isvdir(fullname)) & 01) {
 	  char buf[128];
-	  sprintf(buf,
+	  snprintf(buf, sizeof(buf),
 		  "Sorry, you can't save file in the virtual directory, '%s'",
 		  path);
 	  ErrPopUp(buf, "\nBummer!");

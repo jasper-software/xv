@@ -4408,7 +4408,7 @@ static void doRenameCmd(BROWINFO *br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't rename file in the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't rename file in the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -4503,7 +4503,7 @@ static void doMkdirCmd(BROWINFO *br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't mkdir in the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't mkdir in the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -4631,7 +4631,7 @@ static void doDeleteCmd(BROWINFO *br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't delete file at the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't delete file at the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -5129,7 +5129,7 @@ static void dragFiles(BROWINFO *srcBr, BROWINFO *dstBr, char *srcpath, char *dst
 
 #ifdef AUTO_EXPAND
   if (Isvdir(dstp)) {
-    sprintf(buf,"Sorry, you can't %s to the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't %s to the virtual directory, '%s'",
 	    cpymode ? "copy" : "move", dstp);
     ErrPopUp(buf, "\nBummer!");
     SetCursors(-1);

@@ -357,7 +357,7 @@ static int vd_Mkvdir(char *dir)
 	    }
 
 	if (!S_ISDIR(st.st_mode)) {
-	    char origdir[MAXPATHLEN+1], buf[XV_MAXQUOTEDPATHLEN+10], buf1[100];
+	    char origdir[ MAXPATHLEN + 1 ], buf[ XV_MAXQUOTEDPATHLEN + 20 ], buf1[ 100 ];
 	    char quoted_dir[ XV_MAXQUOTEDPATHLEN ];
 
 	    if (vdcount >= VD_VDTABLESIZE) {
@@ -370,7 +370,7 @@ static int vd_Mkvdir(char *dir)
 
 	    xv_getwd(origdir, MAXPATHLEN+1);
 
-	    sprintf(tmp, "%s%s", vdroot, dir2);
+	    snprintf(tmp, sizeof(tmp), "%s%s", vdroot, dir2);
 	    if (vd_recursive_mkdir(tmp) || chdir(tmp)) {
 		SetISTR(ISTR_INFO, "fail to make virtual directory.");
 		Warning();
@@ -510,9 +510,9 @@ static int vd_Movevdir(char *src, char *dst)
 
     for (i = 0; i < vdcount; i++)
 	if (!strncmp(src, vdtable[i], strlen(src))) {
-	    sprintf(tmps, "%s%s", vdroot, vdtable[i]);
-	    sprintf(tmp, "%s%s", dst, vdtable[i]+strlen(src));
-	    sprintf(tmpd, "%s%s", vdroot, tmp);
+	    snprintf(tmps, sizeof(tmps), "%s%s", vdroot, vdtable[i]);
+	    snprintf(tmp,  sizeof(tmp),  "%s%s", dst, vdtable[i]+strlen(src));
+	    snprintf(tmpd, sizeof(tmpd), "%s%s", vdroot, tmp);
 
 	    if (vd_Movevdir(tmps, tmpd))
 		return 1;
@@ -910,7 +910,7 @@ static int vd_UncompressFile(char *name, char *uncompname, int filetype)
     /* returns '1' on success, with name of uncompressed file in uncompname
        returns '0' on failure */
 
-    char namez[128], *fname, buf[512], tmp[HEADERSIZE];
+    char namez[128], *fname, buf[ XV_MAXQUOTEDPATHLEN + 20 ], tmp[HEADERSIZE];
     char quoted_name[ XV_MAXQUOTEDPATHLEN ];
     int n, tmpfd;
     FILE *pfp, *tfp;
