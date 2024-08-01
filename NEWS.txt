@@ -3,7 +3,7 @@
 
 * Made some improvements to WEBP support.
 
-5.0.1 (2024-07-31)
+5.0.1 (2024-08-01)
 ==================
 
 * Applied patches from other xv forks.
@@ -48,6 +48,7 @@
 * Convert function definitions to use prototypes as required by C23.
 * Add support for xz compressed files.
 * Fixed opening archives and compressed files with special characters in their name.
+* Fixed opening compressed archives.
 
 5.0.0 (2024-02-06)
 ==================

@@ -22,7 +22,7 @@ static int   vd_recursive_rmdir		PARM((char *));
 static void  vd_optimize_path		PARM((char *));
 static int   vd_ftype			PARM((char *));
 static int   vd_compp			PARM((char *, char *));
-static int   vd_UncompressFile		PARM((char *, char *));
+static int   vd_UncompressFile		PARM((char *, char *, int));
 static int   vd_tarc			PARM((char *));
 static u_int vd_tar_sumchk		PARM((char *));
 
@@ -41,6 +41,7 @@ extern XtAppContext context;
 
 /* archive extraction commands */
 /* The %s should not be quoted because QuoteFileName() handles quoting */
+/* The maximum VD type must be less than RFT_COMPRESS to avoid conflicts */
 
 static char *ext_command[] = {
 /* KEEP 0 */
@@ -289,7 +290,7 @@ int Mkvdir(char *dir)
     int mask;
 
     mask = block_signal(SIGHUP);
-    block_signal(SIGCHLD);
+    /* block_signal(SIGCHLD); */ /* breaks calls to system() */
 
     strcpy(dir1, dir);
     vd_optimize_path(dir1);
@@ -318,7 +319,7 @@ int Mkvdir(char *dir)
 MKVDIR_END:
 
     unblock_signal(SIGHUP, mask);
-    unblock_signal(SIGCHLD, mask);
+    /* unblock_signal(SIGCHLD, mask); */
 
     return rv;
 }
@@ -340,7 +341,7 @@ static int vd_Mkvdir(char *dir)
 	SetCursors(-1);
 	return ftype;
     }
-    if (ftype == RFT_COMPRESS) {
+    if (ftype == RFT_COMPRESS || ftype == RFT_BZIP2 || ftype == RFT_XZ) {
 	if (!(ftype = vd_compp(dir1, tmp))) {
 	    SetCursors(-1);
 	    return ftype;
@@ -660,12 +661,15 @@ int Isarchive(char *path)
 {
     int ftype;
 
-    if ((ftype = vd_ftype(path)) < 0)
+    if ((ftype = vd_ftype(path)) < 0) {
 	return 0;
+    }
 
-    if (ftype == RFT_COMPRESS)
-	if (!(ftype = vd_compp(path, NULL)))
+    if (ftype == RFT_COMPRESS || ftype == RFT_BZIP2 || ftype == RFT_XZ) {
+	if (!(ftype = vd_compp(path, NULL))) {
 	    return 0;
+	}
+    }
 
     return ftype;
 }
@@ -832,6 +836,16 @@ static int vd_ftype(char *fname)
     else if (magicno[0]==0x1f && magicno[1]==0x1e) rv = RFT_COMPRESS;/* pack */
 #endif
 
+#ifdef BUNZIP2
+    else if (magicno[0]==0x42 && magicno[1]==0x5a) rv = RFT_BZIP2;
+#endif
+
+#ifdef XZ
+  else if (magicno[0]==0xfd &&
+           magicno[1]=='7' && magicno[2]=='z' &&
+           magicno[3]=='X' && magicno[4]=='Z') rv = RFT_XZ;
+#endif
+
     return rv;
 }
 
@@ -864,7 +878,7 @@ static int vd_compp(char *path, char *newpath)
     if (UncompressFile(basename, uncompname)) {
 #else
     if (newpath == NULL)
-	r = vd_UncompressFile(basename, uncompname);
+	r = vd_UncompressFile(basename, uncompname, comptype);
     else
 	r = UncompressFile(basename, uncompname, comptype);
     if (r) {
@@ -888,15 +902,16 @@ static int   stderr_on			PARM((void));
 static int   stderr_off			PARM((void));
 static FILE  *popen_nul			PARM((char *, char *));
 
-static int vd_UncompressFile(char *name, char *uncompname)
+static int vd_UncompressFile(char *name, char *uncompname, int filetype)
 {
-    /* Yap, I`m nearly same as original `UncompnameFile' function, but,
+    /* Yap, I`m nearly same as original `UncompressFile' function, but,
        1) I extract `name' file ONLY first 512 byte.
        2) I'm called only from UNIX and UNIX like OS, *NOT* VMS */
     /* returns '1' on success, with name of uncompressed file in uncompname
        returns '0' on failure */
 
     char namez[128], *fname, buf[512], tmp[HEADERSIZE];
+    char quoted_name[ XV_MAXQUOTEDPATHLEN ];
     int n, tmpfd;
     FILE *pfp, *tfp;
 
@@ -939,7 +954,20 @@ static int vd_UncompressFile(char *name, char *uncompname)
    * Maybe one of the exec() variants would be better...
    * (and why can't this be merged with the similar code in xv.c?)
    */
-    sprintf(buf,"%s -c %s", UNCOMPRESS, fname);
+    buf[0] = '\0';
+    QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN);
+    if (filetype == RFT_COMPRESS)
+      sprintf(buf,"%s -c %s", UNCOMPRESS, quoted_name);
+#ifdef BUNZIP2
+    else if (filetype == RFT_BZIP2)
+      sprintf(buf,"%s -c %s", BUNZIP2, quoted_name);
+#endif
+#ifdef XZ
+    else if (filetype == RFT_XZ)
+      sprintf(buf,"%s -c %s", XZ, quoted_name);
+#endif
+    else
+      return 0;
     SetISTR(ISTR_INFO, "Uncompressing Header '%s'...", BaseName(fname));
     if ((pfp = popen_nul(buf, "r")) == NULL) {
 	SetISTR(ISTR_INFO, "Cannot extract for archive '%s'.",

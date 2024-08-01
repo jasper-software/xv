@@ -3543,6 +3543,7 @@ int UncompressFile(char *name, char *uncompname, int filetype)
   /* QuoteFileName handles single quotes.
    * It also adds the outer quotes for flexibility for more efficient quoting or other operating systems.
    */
+  buf[0] = '\0';
 #ifndef VMS
   if (filetype == RFT_COMPRESS)
     sprintf(buf,"%s -c %s > %s", UNCOMPRESS, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
