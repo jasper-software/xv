@@ -41,6 +41,8 @@ static int    pixmaps_built=0;   /* true if pixmaps created already */
 #define DNPAGE 3
 #define THUMB  4
 
+#define THUMB_SIZE 19
+
 #define SCRLWAIT 80   /* milliseconds to wait between scrolls */
 
 /* local functions */
@@ -50,14 +52,8 @@ static void drawThumb   PARM((SCRL *));
 
 
 /***************************************************/
-void SCCreate(sp, parent, x, y, vert, len, minv, maxv, curv, page,
-	          fg, bg, hi, lo, func)
-SCRL         *sp;
-Window        parent;
-int           x,y,vert,len,minv,maxv,curv,page;
-unsigned long fg,bg,hi,lo;
-
-void          (*func)PARM((int, SCRL *));
+void SCCreate(SCRL *sp, Window parent, int x, int y, int vert, int len, int minv, int maxv, int curv, int page,
+	          unsigned long fg, unsigned long bg, unsigned long hi, unsigned long lo, void (*func)(int, SCRL *))
 {
 
 
@@ -87,7 +83,7 @@ void          (*func)PARM((int, SCRL *));
   sp->hi   = hi;
   sp->lo   = lo;
   sp->uplit = sp->dnlit = 0;
-  sp->tsize  =  19;
+  sp->tsize  =  THUMB_SIZE;
 
   if (vert) {
     sp->win = XCreateSimpleWindow(theDisp,parent,x,y,
@@ -105,8 +101,8 @@ void          (*func)PARM((int, SCRL *));
 
   if (!sp->win) FatalError("can't create scrollbar window");
 
-  sp->tmin   =  sp->tsize+1;
-  sp->tmax   =  len - (sp->tsize+1) - sp->tsize;
+  sp->tmin   = sp->tsize+1;
+  sp->tmax   = len - (sp->tsize+1) - sp->tsize;
 
   sp->drawobj = func;
 
@@ -116,34 +112,38 @@ void          (*func)PARM((int, SCRL *));
 
 
 /***************************************************/
-void SCChange(sp, x, y, vert, len, minv, maxv, curv, page)
-SCRL         *sp;
-int           x,y,vert,len,minv,maxv,curv,page;
+void SCChange(SCRL *sp, int x, int y, int vert, int len, int minv, int maxv, int curv, int page)
 {
   sp->vert = vert;
   sp->len  = len;
   sp->uplit = sp->dnlit = 0;
 
-  if (vert) XMoveResizeWindow(theDisp, sp->win, x,y,
+  if (vert) {
+    XMoveResizeWindow(theDisp, sp->win, x,y,
 			      (u_int) sp->tsize,(u_int) len);
-  else      XMoveResizeWindow(theDisp, sp->win, x,y,
+    sp->w = sp->tsize;
+    sp->h = len;
+  }
+  else {
+    XMoveResizeWindow(theDisp, sp->win, x,y,
 			      (u_int) len, (u_int) sp->tsize);
+    sp->w = len;
+    sp->h = sp->tsize;
+  }
 
-  sp->tmin   =  sp->tsize+1;
-  sp->tmax   =  len - (sp->tsize+1) - sp->tsize;
+  sp->tmin = sp->tsize+1;
+  sp->tmax = len - (sp->tsize+1) - sp->tsize;
 
   SCSetRange(sp, minv, maxv, curv, page);
 }
 
 
 /***************************************************/
-void SCSetRange(sp, minv, maxv, curv, page)
-     SCRL *sp;
-     int   minv, maxv, curv, page;
+void SCSetRange(SCRL *sp, int minv, int maxv, int curv, int page)
 {
   if (maxv<minv) maxv=minv;
   sp->min = minv;    sp->max = maxv;    sp->page = page;
-  sp->active =  (minv < maxv);
+  sp->active = (minv < maxv);
 
   /* adjust scroll bar background */
   if (sp->active) {
@@ -158,9 +158,7 @@ void SCSetRange(sp, minv, maxv, curv, page)
 
 
 /***************************************************/
-int SCSetVal(sp, curv)
-SCRL *sp;
-int   curv;
+int SCSetVal(SCRL *sp, int curv)
 {
   /* returns '0' if no redraw was done */
   int oldval;
@@ -187,8 +185,7 @@ int   curv;
 
 
 /***************************************************/
-void SCRedraw(sp)
-SCRL *sp;
+void SCRedraw(SCRL *sp)
 {
   XSetForeground(theDisp, theGC, sp->fg);
   XSetBackground(theDisp, theGC, sp->bg);
@@ -217,9 +214,7 @@ SCRL *sp;
 
 
 /***************************************************/
-static void drawArrow(sp,arr)
-SCRL *sp;
-int arr;
+static void drawArrow(SCRL *sp, int arr)
 {
   Pixmap butpix;
 
@@ -278,8 +273,7 @@ int arr;
 
 
 /***************************************************/
-static void drawThumb(sp)
-SCRL *sp;
+static void drawThumb(SCRL *sp)
 {
   if (sp->vert) {
     /* clear out thumb area with background color */
@@ -337,9 +331,7 @@ SCRL *sp;
 
 
 /***************************************************/
-static int whereInScrl(sp,x,y)
-SCRL *sp;
-int x,y;
+static int whereInScrl(SCRL *sp, int x, int y)
 {
   int v;
 
@@ -369,9 +361,7 @@ int x,y;
 
 
 /***************************************************/
-void SCTrack(sp,mx,my)
-SCRL *sp;
-int mx,my;
+void SCTrack(SCRL *sp, int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry, x,y, ipos, pos, lit, tx, ty, tyoff, txoff, ty1, tx1;

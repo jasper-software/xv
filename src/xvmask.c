@@ -9,8 +9,6 @@
 #include "xv.h"
 
 /* Flmask */
-void cpcode 		PARM ((char *, unsigned char *, int));
-void MaskCr 		PARM ((void));
 static void FLmask 	PARM ((void));
 static void Q0mask 	PARM ((void));
 static void WINmask 	PARM ((void));
@@ -51,8 +49,7 @@ void printUTime 		PARM ((char *));
 
 /************************/
 void
-DoMask (anum)
-     int anum;
+DoMask (int anum)
 {
     switch (anum)
     {
@@ -76,7 +73,7 @@ DoMask (anum)
       Flmask:  FLMASK.
 ******************************/
 static void
-FLmask ()
+FLmask (void)
 {
     byte *pic24, *tmpPic;
     char *str;
@@ -106,7 +103,7 @@ FLmask ()
       Flmask:  BitReverse.
 ******************************/
 static void
-BitReverse ()
+BitReverse (void)
 {
     byte *pic24, *tmpPic;
     char *str;
@@ -136,7 +133,7 @@ BitReverse ()
       Flmask:  ColReverse.
 ******************************/
 static void
-ColReverse ()
+ColReverse (void)
 {
     byte *pic24, *tmpPic;
     char *str;
@@ -166,7 +163,7 @@ ColReverse ()
       Flmask:  Q0 MASK.
 ******************************/
 static void
-Q0mask ()
+Q0mask (void)
 {
     int pixX, pixY, err;
     static const char *labels[] = {"\nOk", "\033Cancel"};
@@ -221,7 +218,7 @@ Q0mask ()
       Flmask:  RGBchange.
 ******************************/
 static void
-RGBchange ()
+RGBchange (void)
 {
     byte *pic24, *tmpPic;
     char *str;
@@ -250,7 +247,7 @@ RGBchange ()
       Flmask:  WINmask.
 ******************************/
 static void
-WINmask ()
+WINmask (void)
 {
     byte *pic24, *tmpPic;
     char *str;
@@ -280,7 +277,7 @@ WINmask ()
 ******************************/
 static
 void
-MEKOmask ()
+MEKOmask (void)
 {
     static const char *labels[] = {"\nForward", "\nBackward"};
     char txt[256];
@@ -309,9 +306,7 @@ MEKOmask ()
 
 /************************/
 static void
-doMEKOmask (pic24, w, h, results, selx, sely, selw, selh, flag)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh, flag;
+doMEKOmask (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int flag)
 {
     register byte *dst, *src;
     register int i;
@@ -319,6 +314,8 @@ doMEKOmask (pic24, w, h, results, selx, sely, selw, selh, flag)
     MKT *mt;
 
     printUTime ("start of MEKOmask.");
+
+    XV_UNUSED(h);
 
     xmax = selw / 16;
     ymax = selh / 16;
@@ -377,7 +374,7 @@ move16bit (byte * dest, byte * src, int w)
       Flmask:  CP MASK.
 ******************************/
 static void
-CPmask ()
+CPmask (void)
 {
     static const char *labels[] = {"\nOk", "\033Cancel"};
     char buf[64];
@@ -433,10 +430,7 @@ CPmask ()
 
 /************************/
 static void
-doCPmask (pic24, w, h, results, selx, sely, selw, selh, key)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh;
-     char *key;
+doCPmask (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, char *key)
 {
     register byte *dst, *src;
     register int i;
@@ -445,6 +439,7 @@ doCPmask (pic24, w, h, results, selx, sely, selw, selh, key)
 
     printUTime ("start of CPmask.");
 
+    XV_UNUSED(h);
     xmax = selw / 8;
     ymax = selh / 8;
 
@@ -508,15 +503,15 @@ moveCP (byte * dest, byte * src, int w, int cp_flag)
 
 /************************/
 static void
-doFLmask (pic24, w, h, results, selx, sely, selw, selh)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh;
+doFLmask (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
     register byte *dst, *src;
     register int i;
     register int *ar, xmax, ymax;
 
     printUTime ("start of FLMASK.");
+
+    XV_UNUSED(h);
 
     xmax = selw / 8;
     ymax = selh / 8;
@@ -621,15 +616,15 @@ move8bit (byte * dest, byte * src, int w)
 
 /************************/
 static void
-doColReverse (pic24, w, h, results, selx, sely, selw, selh, bit_flag)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh, bit_flag;
+doColReverse (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int bit_flag)
 {
     register byte *p24;
     register byte *rp;
     register int x, y;
 
     printUTime ("start of Reverse.");
+
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + selh; y++)
     {
@@ -659,19 +654,16 @@ doColReverse (pic24, w, h, results, selx, sely, selw, selh, bit_flag)
 
 /************************/
 static void
-doQ0mask (pic24, w, h, results, selx, sely, selw, selh, pixX, pixY)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh, pixX, pixY;
+doQ0mask (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int pixX, int pixY)
 {
     register byte *p24;
-    register int bperlin;
     byte *rp;
     int x, y;
     int skip, y0, x0;
 
     printUTime ("start of Q0mask.");
 
-    bperlin = w * 3;
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + ((selh / pixY) * pixY); y++)
     {
@@ -697,15 +689,15 @@ doQ0mask (pic24, w, h, results, selx, sely, selw, selh, pixX, pixY)
 
 /************************/
 static void
-doWINmask (pic24, w, h, results, selx, sely, selw, selh)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh;
+doWINmask (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
     register byte *p24;
     register byte *rp;
     register int x, y;
 
     printUTime ("start of WIN mask.");
+
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + selh; y++)
     {
@@ -749,15 +741,15 @@ wincp (int src, int dst, byte * p24, byte * rp)
 
 /************************/
 static void
-doRGBchange (pic24, w, h, results, selx, sely, selw, selh)
-     byte *pic24, *results;
-     int w, h, selx, sely, selw, selh;
+doRGBchange (byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
     register byte *p24;
     register byte *rp;
     register int x, y;
 
     printUTime ("start of RGB change.");
+
+    XV_UNUSED(h);
 
     for (y = sely; y < sely + selh; y++)
     {
@@ -783,7 +775,7 @@ doRGBchange (pic24, w, h, results, selx, sely, selw, selh)
       Flmask:  MaskCrop.
 ******************************/
 void
-MaskCr ()
+MaskCr (void)
 {
     byte *pic24, *tmpPic;
     char str[] = "Doing AutoMaskCrop...";
@@ -816,9 +808,7 @@ MaskCr ()
 
 /************************/
 static void
-doMaskCr (pic24, w, h, selx, sely, selw, selh)
-     byte *pic24;
-     int w, h, selx, sely, selw, selh;
+doMaskCr (byte *pic24, int w, int h, int selx, int sely, int selw, int selh)
 {
     register byte *p24, *p24u;
     register int x, y;
@@ -827,6 +817,8 @@ doMaskCr (pic24, w, h, selx, sely, selw, selh)
     int xp1, xp2, yp1, yp2;
 
     printUTime ("start of MaskCrop.");
+
+    XV_UNUSED(h);
 
     edgeX = (double *) malloc (sizeof (edge) * selw);
     edgeY = (double *) malloc (sizeof (edge) * selh);

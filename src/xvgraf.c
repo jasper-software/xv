@@ -28,10 +28,10 @@
 #include "bits/gf1_gamma"
 
 
-#define GHIGH 147
-#define GBHIGH 23
-#define GBWIDE 30
-#define GWIDE (128 + 3 + 4 + GBWIDE)
+#define GHIGH (147 * dpiMult)
+#define GBHIGH (23 * dpiMult)
+#define GBWIDE (30 * dpiMult)
+#define GWIDE ((128 + 3 + 4) * dpiMult + GBWIDE)
 
 #define PW gf1_addh_width
 #define PH gf1_addh_height
@@ -47,12 +47,7 @@ static void drawHandPos PARM((GRAF *, int));
 
 
 /***************************************************/
-void CreateGraf(gp, parent, x, y, fg, bg, title)
-     GRAF *gp;
-     Window parent;
-     int x,y;
-     unsigned long fg,bg;
-     const char *title;
+void CreateGraf(GRAF *gp, Window parent, int x, int y, long unsigned int fg, long unsigned int bg, const char *title)
 {
   /* NOTE:  CreateGraf does not initialize hands[], nhands, or spline,
      as these could be initialized by X resources (or whatever),
@@ -61,6 +56,7 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
      InitGraf() sets those fields of a GRAF to likely enough values */
 
   int i;
+  char tstr[32];
 
   if (!pixmaps_built) {
     gfbpix[GFB_ADDH]   = MakePix1(parent, gf1_addh_bits, PW, PH);
@@ -71,7 +67,7 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
     gfbpix[GFB_GAMMA]  = MakePix1(parent, gf1_gamma_bits,
 				  gf1_gamma_width, gf1_gamma_height);
 
-    for (i=0; i<N_GFB && gfbpix[i] != (Pixmap) NULL; i++);
+    for (i=0; i<N_GFB && gfbpix[i] != (Pixmap) None; i++);
     if (i<N_GFB) FatalError("can't create graph pixmaps");
 
     pixmaps_built = 1;
@@ -83,17 +79,19 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
   gp->entergamma = 0;
   gp->drawobj = NULL;
 
-  sprintf(gp->gvstr, "%.5g", gp->gamma);
+  sprintf(tstr, "%.5g", gp->gamma);
+  strncpy(gp->gvstr, tstr, GVMAX+1);
+  gp->gvstr[GVMAX] = '\0';
 
-  gp->win = XCreateSimpleWindow(theDisp, parent, x,y, GWIDE, GHIGH, 1, fg,bg);
+  gp->win = XCreateSimpleWindow(theDisp, parent, x,y, GWIDE, GHIGH, 1 * dpiMult, fg,bg);
   if (!gp->win) FatalError("can't create graph (main) window");
 
-  gp->gwin = XCreateSimpleWindow(theDisp, gp->win, 2, GHIGH-132,
-				 128, 128, 1, fg,bg);
+  gp->gwin = XCreateSimpleWindow(theDisp, gp->win, 2 * dpiMult, GHIGH - 132 * dpiMult,
+				 128 * dpiMult, 128 * dpiMult, 1 * dpiMult, fg,bg);
   if (!gp->gwin) FatalError("can't create graph (sub) window");
 
   for (i=0; i<N_GFB; i++) {
-    BTCreate(&gp->butts[i], gp->win, GWIDE-GBWIDE-2, 1+i * (GBHIGH + 1),
+    BTCreate(&gp->butts[i], gp->win, GWIDE - GBWIDE - 2 * dpiMult, 1 * dpiMult + i * (GBHIGH + 1 * dpiMult),
 	     GBWIDE, GBHIGH, (char *) NULL, fg, bg, hicol, locol);
     gp->butts[i].pix = gfbpix[i];
     gp->butts[i].pw = PW;
@@ -120,24 +118,21 @@ void CreateGraf(gp, parent, x, y, fg, bg, title)
 
 
 /***************************************************/
-void InitGraf(gp)
-GRAF *gp;
+void InitGraf(GRAF *gp)
 {
   gp->nhands = 4;
   gp->spline = 1;
-  gp->hands[0].x =   0;  gp->hands[0].y =   0;
-  gp->hands[1].x =  64;  gp->hands[1].y =  64;
-  gp->hands[2].x = 192;  gp->hands[2].y = 192;
-  gp->hands[3].x = 255;  gp->hands[3].y = 255;
+  gp->hands[0].x =   0;            gp->hands[0].y =   0;
+  gp->hands[1].x =  64 * dpiMult;  gp->hands[1].y =  64 * dpiMult;
+  gp->hands[2].x = 192 * dpiMult;  gp->hands[2].y = 192 * dpiMult;
+  gp->hands[3].x = 255 * dpiMult;  gp->hands[3].y = 255 * dpiMult;
 
   gp->gammamode = 0;     gp->gamma = 1.0;
 }
 
 
 /***************************************************/
-void RedrawGraf(gp, gwin)
-GRAF *gp;
-int gwin;
+void RedrawGraf(GRAF *gp, int gwin)
 {
   int i;
 
@@ -146,12 +141,12 @@ int gwin;
 
   if (gwin) drawGraf(gp,0);
   else {
-    Draw3dRect(gp->win, 0,0, GWIDE-1, GHIGH-1, R3D_OUT, 1, hicol, locol,
+    Draw3dRect(gp->win, 0,0, GWIDE - 1 * dpiMult, GHIGH - 1 * dpiMult, R3D_OUT, 1 * dpiMult, hicol, locol,
 	       gp->bg);
 
     XSetForeground(theDisp, theGC, gp->fg);
     XSetBackground(theDisp, theGC, gp->bg);
-    DrawString(gp->win, 2, 1+ASCENT, gp->str);
+    DrawString(gp->win, 2 * dpiMult, 1 * dpiMult + ASCENT, gp->str);
 
     for (i=0; i<N_GFB; i++) BTRedraw(&gp->butts[i]);
   }
@@ -159,9 +154,7 @@ int gwin;
 
 
 /***************************************************/
-static void drawGraf(gp,erase)
-GRAF *gp;
-int   erase;
+static void drawGraf(GRAF *gp, int erase)
 {
   int i,x,y;
   XPoint  pts[129], *pt;
@@ -175,16 +168,16 @@ int   erase;
     XSetBackground(theDisp, theGC, gp->bg);
 
     XClearWindow(theDisp,gp->gwin);
-    DrawString(gp->gwin, 10, 30+ASCENT,         str1);
-    DrawString(gp->gwin, 10, 30+ASCENT+CHIGH+3, str2);
+    DrawString(gp->gwin, 10 * dpiMult, 30 * dpiMult + ASCENT,                       str1);
+    DrawString(gp->gwin, 10 * dpiMult, 30 * dpiMult + ASCENT + CHIGH + 3 * dpiMult, str2);
 
-    x = 10 + StringWidth(str2) + 8;
-    y = 30 + ASCENT + CHIGH + 3;
+    x = 10 * dpiMult + StringWidth(str2) + 8 * dpiMult;
+    y = 30 * dpiMult + ASCENT + CHIGH + 3 * dpiMult;
     i = StringWidth(gp->gvstr);
     if (gp->entergamma < 0 && strlen(gp->gvstr)) {
       /* show string highlited */
-      XFillRectangle(theDisp, gp->gwin, theGC, x-1, y-ASCENT-1,
-		     (u_int) i+2, (u_int) CHIGH+2);
+      XFillRectangle(theDisp, gp->gwin, theGC, x - 1 * dpiMult, y - ASCENT - 1 * dpiMult,
+		     (u_int) i + 2 * dpiMult, (u_int) CHIGH + 2 * dpiMult);
       XSetForeground(theDisp, theGC, gp->bg);
     }
     else
@@ -199,7 +192,7 @@ int   erase;
         else XSetForeground(theDisp, theGC, gp->fg);
 
   for (i=0, pt=pts; i<256; i+=2,pt++) {
-    pt->x = i/2;  pt->y = 127 - (gp->func[i]/2);
+    pt->x = (i * dpiMult)/2;  pt->y = 127 * dpiMult - ((gp->func[i] * dpiMult)/2);
     if (i==0) i = -1;   /* kludge to get sequence 0,1,3,5, ... 253,255 */
   }
   XDrawLines(theDisp, gp->gwin, theGC, pts, 129, CoordModeOrigin);
@@ -212,20 +205,20 @@ int   erase;
   XSetForeground(theDisp, theGC, gp->bg);
 
   for (i=0; i<gp->nhands; i++) {   /* clear inside rectangles */
-    x = gp->hands[i].x/2;  y = 127 - gp->hands[i].y/2;
-    XFillRectangle(theDisp, gp->gwin, theGC, x-2, y-2, 5,5);
+    x = gp->hands[i].x/2;  y = 127 * dpiMult - gp->hands[i].y/2;
+    XFillRectangle(theDisp, gp->gwin, theGC, x - 2 * dpiMult, y - 2 * dpiMult, 5 * dpiMult, 5 * dpiMult);
   }
 
   XSetForeground(theDisp,theGC,gp->fg);
 
   for (i=0; i<gp->nhands; i++) {  /* draw center dots */
-    x = gp->hands[i].x/2;  y = 127 - gp->hands[i].y/2;
+    x = gp->hands[i].x/2;  y = 127 * dpiMult - gp->hands[i].y/2;
     XDrawPoint(theDisp, gp->gwin, theGC, x, y);
   }
 
   for (i=0; i<gp->nhands; i++) {   /* draw rectangles */
-    x = gp->hands[i].x/2;  y = 127 - gp->hands[i].y/2;
-    XDrawRectangle(theDisp, gp->gwin, theGC, x-3, y-3, 6,6);
+    x = gp->hands[i].x/2;  y = 127 * dpiMult - gp->hands[i].y/2;
+    XDrawRectangle(theDisp, gp->gwin, theGC, x - 3 * dpiMult, y - 3 * dpiMult, 6 * dpiMult, 6 * dpiMult);
   }
 
 }
@@ -233,10 +226,7 @@ int   erase;
 
 
 /***************************************************/
-int ClickGraf(gp,child,mx,my)
-GRAF *gp;
-Window child;
-int mx,my;
+int ClickGraf(GRAF *gp, Window child, int mx, int my)
 {
   /* returns '1' if GrafFunc was changed, '0' otherwise */
 
@@ -246,6 +236,8 @@ int mx,my;
   Window       rW, cW;
   int          x, y, rx, ry, firsttime=1;
   unsigned int mask;
+
+  XV_UNUSED(child);
 
   rv = 0;
 
@@ -326,7 +318,7 @@ int mx,my;
 		    (gp->nhands - lpos) * sizeof(XPoint));
 
 	    x = gp->hands[lpos-1].x + lgap/2;
-	    y = gp->func[x];
+	    y = gp->func[x/dpiMult] * dpiMult;
 	    gp->hands[lpos].x = x;
 	    gp->hands[lpos].y = y;
 	    gp->nhands++;
@@ -385,14 +377,14 @@ int mx,my;
 
 
     else if (cW == gp->gwin) {  /* clicked in graph */
-      int h, vertonly, offx, offy;
+      int h, vertonly;
 
       XTranslateCoordinates(theDisp, gp->win, gp->gwin,mx,my,&mx,&my,&cW);
 
       /* see if x,y is within any of the handles */
       for (h=0; h<gp->nhands; h++) {
-	if (PTINRECT(mx*2,(127-my)*2,
-		     gp->hands[h].x-5,gp->hands[h].y-5,11,11)) break;
+	if (PTINRECT(mx*2,(127 * dpiMult - my)*2,
+		     gp->hands[h].x - 5 * dpiMult, gp->hands[h].y - 5 * dpiMult, 11 * dpiMult, 11 * dpiMult)) break;
       }
 
       if (h==gp->nhands) {     /* not found.  wait 'til mouseup */
@@ -402,7 +394,7 @@ int mx,my;
       }
 
       else {  /* track handle */
-	int origx, origy, orighx, orighy, dx, dy, olddx, olddy, grab;
+	int origx, origy, orighx, orighy, dx, dy, grab;
 
 	drawHandPos(gp, h);
 
@@ -417,12 +409,8 @@ int mx,my;
 	orighx = gp->hands[h].x;  orighy = gp->hands[h].y;
 
 	gp->gammamode = 0;
-	offx = gp->hands[h].x - origx;
-	offy = gp->hands[h].y - origy;
 
 	vertonly = (h==0 || h==(gp->nhands-1));
-
-	olddx = 0;  olddy = 0;
 
 	while (XQueryPointer(theDisp,rootW,&rW,&cW,&rx,&ry,&x,&y,&mask)) {
 	  int newx, newy;
@@ -438,18 +426,21 @@ int mx,my;
 	     orighx + dx, orighy + dy */
 
 	  if (!vertonly) { /* keep this handle between its neighbors */
-	    if (dx+orighx <= gp->hands[h-1].x) dx=(gp->hands[h-1].x+1)-orighx;
-	    if (dx+orighx >= gp->hands[h+1].x) dx=(gp->hands[h+1].x-1)-orighx;
+	    if (dx+orighx <= gp->hands[h-1].x) dx=(gp->hands[h-1].x + 1) - orighx;
+	    if (dx+orighx >= gp->hands[h+1].x) dx=(gp->hands[h+1].x - 1) - orighx;
 	  }
 
 	  newx = dx + orighx;  newy = dy + orighy;
-	  RANGE(newy, 0, 255);
+	  RANGE(newy, 0, 255 * dpiMult);
 
 	  if (newx != gp->hands[h].x || newy != gp->hands[h].y) {
 	    /* this handle has moved... */
+	    /*   this should match the end of drawGraf() that drew the handle */
+	    int xc, yc;
 	    XSetForeground(theDisp, theGC, gp->bg);
+	    xc = gp->hands[h].x/2; yc = 127 * dpiMult - gp->hands[h].y/2;
 	    XFillRectangle(theDisp, gp->gwin, theGC,
-		     (gp->hands[h].x/2)-3, ((255-gp->hands[h].y)/2)-3, 7,7);
+		     xc - 3 * dpiMult - 1, yc - 3 * dpiMult - 1, 6 * dpiMult + 2, 6 * dpiMult + 2);
 
 	    gp->hands[h].x = newx;  gp->hands[h].y = newy;
 	    drawGraf(gp,1);           /* erase old trace */
@@ -457,7 +448,6 @@ int mx,my;
 	    drawGraf(gp,0);
 	    drawHandPos(gp, h);
 	    rv = 1;
-	    olddx = dx;  olddy = dy;
 
 	    if (gp->drawobj) (gp->drawobj)();
 	  }
@@ -465,7 +455,7 @@ int mx,my;
 
 	drawHandPos(gp, -1);
 	XWarpPointer(theDisp, None, gp->gwin, 0,0,0,0,
-		     gp->hands[h].x/2, (255-gp->hands[h].y)/2);
+		     gp->hands[h].x/2, (255*dpiMult - gp->hands[h].y)/2);
 	if (grab) XUngrabPointer(theDisp, (Time) CurrentTime);
       }
     }
@@ -475,9 +465,7 @@ int mx,my;
 }
 
 
-static void drawHandPos(gp, hnum)
-     GRAF *gp;
-     int   hnum;
+static void drawHandPos(GRAF *gp, int hnum)
 {
   int w;
   const char *tstr = "888,888";
@@ -487,12 +475,12 @@ static void drawHandPos(gp, hnum)
   XSetFont(theDisp, theGC, monofont);
   w = XTextWidth(monofinfo, tstr, (int) strlen(tstr));
 
-  if (hnum >= 0) sprintf(dummystr,"%3d,%3d",gp->hands[hnum].x,gp->hands[hnum].y);
+  if (hnum >= 0) sprintf(dummystr,"%3d,%3d", gp->hands[hnum].x/dpiMult, gp->hands[hnum].y/dpiMult);
             else sprintf(dummystr,"       ");
 
   XSetForeground(theDisp, theGC, gp->fg);
   XSetBackground(theDisp, theGC, gp->bg);
-  XDrawImageString(theDisp, gp->win, theGC, 130-w, 1+ASCENT,
+  XDrawImageString(theDisp, gp->win, theGC, 130 * dpiMult - w, 1 * dpiMult + ASCENT,
 		   dummystr, (int) strlen(dummystr));
 
   XSetFont(theDisp, theGC, mfont);
@@ -500,9 +488,7 @@ static void drawHandPos(gp, hnum)
 
 
 /***************************************************/
-int GrafKey(gp,str)
-GRAF *gp;
-char *str;
+int GrafKey(GRAF *gp, char *str)
 {
   int len, ok;
 
@@ -596,9 +582,7 @@ char *str;
 
 
 /*********************/
-void GenerateGrafFunc(gp,redraw)
-GRAF *gp;
-int redraw;
+void GenerateGrafFunc(GRAF *gp, int redraw)
 {
   /* generate new gp->func data (ie, handles have moved, or line/spline
      setting has changed) and redraw the entire graph area */
@@ -608,15 +592,15 @@ int redraw;
   /* do sanity check.  (x-coords must be sorted (strictly increasing)) */
 
   for (i=0; i<gp->nhands; i++) {
-    RANGE(gp->hands[i].x, 0, 255);
-    RANGE(gp->hands[i].y, 0, 255);
+    RANGE(gp->hands[i].x, 0, 255 * dpiMult);
+    RANGE(gp->hands[i].y, 0, 255 * dpiMult);
   }
 
-  gp->hands[0].x = 0;  gp->hands[gp->nhands-1].x = 255;
+  gp->hands[0].x = 0;  gp->hands[gp->nhands-1].x = 255 * dpiMult;
   for (i=1; i<gp->nhands-1; i++) {
     if (gp->hands[i].x < i)  gp->hands[i].x = i;
-    if (gp->hands[i].x > 256-gp->nhands+i)
-        gp->hands[i].x = 256-gp->nhands+i;
+    if (gp->hands[i].x > 256 * dpiMult - gp->nhands + i)
+        gp->hands[i].x = 256 * dpiMult - gp->nhands + i;
 
     if (gp->hands[i].x <= gp->hands[i-1].x)
       gp->hands[i].x = gp->hands[i-1].x + 1;
@@ -650,7 +634,7 @@ int redraw;
 
 
     for (i=0; i<gp->nhands; i++) {
-      gp->hands[i].y = gp->func[gp->hands[i].x];
+      gp->hands[i].y = gp->func[gp->hands[i].x / dpiMult] * dpiMult;
     }
   }
 
@@ -665,8 +649,8 @@ int redraw;
 	for (j=x1,k=0; j<=x2; j++,k++) {  /* x2 <= 255 */
 	  yd = ((double) k * (y2 - y1)) / (x2 - x1);
 	  y = y1 + (int) floor(yd + 0.5);
-	  RANGE(y,0,255);
-	  gp->func[j] = y;
+	  RANGE(y,0,255*dpiMult);
+	  gp->func[j/dpiMult] = y/dpiMult;
 	}
       }
     }
@@ -677,7 +661,7 @@ int redraw;
     double yd;
 
     for (i=0; i<gp->nhands; i++) {
-      x[i] = gp->hands[i].x;  y[i] = gp->hands[i].y;
+      x[i] = gp->hands[i].x / dpiMult;  y[i] = gp->hands[i].y / dpiMult;
     }
 
     InitSpline(x, y, gp->nhands, yf);
@@ -699,9 +683,7 @@ int redraw;
 
 
 /*********************/
-void Graf2Str(gp, str)
-GRAF_STATE *gp;
-char *str;
+void Graf2Str(GRAF_STATE *gp, char *str)
 {
   /* generates strings of the form: "S 3 : 0,0 : 63,63 : 255,255",
      (meaning SPLINE, 3 points, and the 3 sets of handle coordinates)
@@ -712,7 +694,7 @@ char *str;
      able to hold it... */
 
   int i;
-  char cstr[16];
+  char cstr[64];
 
   if (gp->gammamode) {
     sprintf(str,"G %g", gp->gamma);
@@ -720,7 +702,7 @@ char *str;
   else {
     sprintf(str, "%c %d", gp->spline ? 'S' : 'L', gp->nhands);
     for (i=0; i<gp->nhands; i++) {
-      sprintf(cstr," : %d,%d", gp->hands[i].x, gp->hands[i].y);
+      sprintf(cstr," : %d,%d", (gp->hands[i].x / dpiMult), (gp->hands[i].y / dpiMult));
       strcat(str, cstr);
     }
   }
@@ -728,9 +710,7 @@ char *str;
 
 
 /*********************/
-int Str2Graf(gp, str)
-     GRAF_STATE *gp;
-     const char *str;
+int Str2Graf(GRAF_STATE *gp, const char *str)
 {
   /* parses strings of the form: "S 3 : 0,0 : 63,63 : 255,255",
      (meaning SPLINE, 3 points, and the 3 sets of handle coordinates)
@@ -759,8 +739,11 @@ int Str2Graf(gp, str)
   if (*tstr == 'G' || *tstr == 'g') {
     if (sscanf(tstr+1, "%lf", &(gp->gamma)) == 1 &&
 	gp->gamma >= -1000.0 && gp->gamma <= 1000.0) {
+      char tstr2[32];
       gp->gammamode = 1;
-      sprintf(gp->gvstr, "%.5g", gp->gamma);
+      sprintf(tstr2, "%.5g", gp->gamma);
+      strncpy(gp->gvstr, tstr2, GVMAX+1);
+      gp->gvstr[GVMAX] = '\0';
       return 0;
     }
     else return 1;
@@ -785,8 +768,8 @@ int Str2Graf(gp, str)
     while (*sp && *sp != ':') {*dp = *sp;  dp++;  sp++; }
     *dp++ = '\0';
     if (sscanf(tstr1,"%d,%d",&x, &y) != 2) return 1;
-    if (x < 0 || x > 255 ||
-	y < 0 || y > 255) return 1;  /* out of range */
+    if (x < 0 || x > 255 * dpiMult ||
+	y < 0 || y > 255 * dpiMult) return 1;  /* out of range */
     coords[i].x = x;  coords[i].y = y;
   }
 
@@ -804,9 +787,7 @@ int Str2Graf(gp, str)
 
 
 /*********************/
-void GetGrafState(gp, gsp)
-GRAF *gp;
-GRAF_STATE *gsp;
+void GetGrafState(GRAF *gp, GRAF_STATE *gsp)
 {
   int i;
 
@@ -824,9 +805,7 @@ GRAF_STATE *gsp;
 
 
 /*********************/
-int SetGrafState(gp, gsp)
-GRAF *gp;
-GRAF_STATE *gsp;
+int SetGrafState(GRAF *gp, GRAF_STATE *gsp)
 {
 #define IFSET(a,b) if ((a) != (b)) { a = b;  rv++; }
   int i;
@@ -864,9 +843,7 @@ GRAF_STATE *gsp;
 
 
 /*********************/
-void InitSpline(x,y,n,y2)
-     int *x, *y, n;
-     double *y2;
+void InitSpline(int *x, int *y, int n, double *y2)
 {
   /* given arrays of data points x[0..n-1] and y[0..n-1], computes the
      values of the second derivative at each of the data points
@@ -895,9 +872,7 @@ void InitSpline(x,y,n,y2)
 
 
 /*********************/
-double EvalSpline(xa,ya,y2a,n,x)
-double y2a[],x;
-int n,xa[],ya[];
+double EvalSpline(int *xa, int *ya, double *y2a, int n, double x)
 {
   int klo,khi,k;
   double h,b,a;

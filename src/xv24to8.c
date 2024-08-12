@@ -50,7 +50,7 @@ static int    ppm_quant   PARM((byte *,int,int, byte*, byte*,byte*,byte*,int));
 static int    slow_quant  PARM((byte*, int,int, byte*, byte*,byte*,byte*,int));
 
 /****************************/
-void Init24to8()
+void Init24to8(void)
 {
   /* doesn't do anything anymore... */
 }
@@ -58,10 +58,7 @@ void Init24to8()
 
 
 /****************************/
-byte *Conv24to8(pic24,w,h,nc,rm,gm,bm)
-     byte *pic24;
-     byte *rm, *gm, *bm;
-     int   w,h,nc;
+byte *Conv24to8(byte *pic24, int w, int h, int nc, byte *rm, byte *gm, byte *bm)
 {
   /* returns pointer to new 8-bit-per-pixel image (w*h) if successful, or
      NULL if unsuccessful */
@@ -108,9 +105,7 @@ byte *Conv24to8(pic24,w,h,nc,rm,gm,bm)
 
 
 /***************************************************************/
-byte *Conv8to24(pic8, w, h, rmap,gmap,bmap)
-     byte *pic8, *rmap, *gmap, *bmap;
-     int   w, h;
+byte *Conv8to24(byte *pic8, int w, int h, byte *rmap, byte *gmap, byte *bmap)
 {
   /* converts an w*h 8-bit image (with colormap rmap,gmap,bmap) into a
    * 24-bit image.  Note, 'pic8' could be NULL
@@ -137,9 +132,7 @@ byte *Conv8to24(pic8, w, h, rmap,gmap,bmap)
 
 
 /****************************/
-static int quick_check(pic24, w,h, pic8, rmap,gmap,bmap, maxcol)
-     byte *pic24, *pic8, *rmap, *gmap, *bmap;
-     int   w,h,maxcol;
+static int quick_check(byte *pic24, int w, int h, byte *pic8, byte *rmap, byte *gmap, byte *bmap, int maxcol)
 {
   /* scans picture until it finds more than 'maxcol' different colors.  If it
      finds more than 'maxcol' colors, it returns '0'.  If it DOESN'T, it does
@@ -218,9 +211,7 @@ static int quick_check(pic24, w,h, pic8, rmap,gmap,bmap, maxcol)
 
 
 /************************************/
-static int quick_quant(p24,w,h, p8, rmap,gmap,bmap, nc)
-     byte *p24, *p8, *rmap, *gmap, *bmap;
-     int   w,h,nc;
+static int quick_quant(byte *p24, int w, int h, byte *p8, byte *rmap, byte *gmap, byte *bmap, int nc)
 {
   XV_UNUSED(nc);
   /* called after 'pic8' has been alloced, pWIDE,pHIGH set up, mono/1-bit
@@ -446,9 +437,7 @@ static void        ppm_freechash    PARM((chash_table));
 
 
 /****************************************************************************/
-static int ppm_quant(pic24, cols, rows, pic8, rmap, gmap, bmap, newcolors)
-     byte *pic24, *pic8, *rmap, *gmap, *bmap;
-     int  cols, rows, newcolors;
+static int ppm_quant(byte *pic24, int cols, int rows, byte *pic8, byte *rmap, byte *gmap, byte *bmap, int newcolors)
 {
   pixel**           pixels;
   register pixel*   pP;
@@ -625,10 +614,7 @@ static int ppm_quant(pic24, cols, rows, pic8, rmap, gmap, bmap, newcolors)
 
 
 /****************************************************************************/
-static chist_vec mediancut( chv, colors, sum, maxval, newcolors )
-     chist_vec chv;
-     int colors, sum, newcolors;
-     int maxval;
+static chist_vec mediancut(chist_vec chv, int colors, int sum, int maxval, int newcolors)
 {
   chist_vec colormap;
   box_vector bv;
@@ -789,32 +775,28 @@ static chist_vec mediancut( chv, colors, sum, maxval, newcolors )
 
 
 /**********************************/
-static int redcompare(p1, p2)
-     const void *p1, *p2;
+static int redcompare(const void *p1, const void *p2)
 {
   return (int) PPM_GETR( ((chist_vec)p1)->color ) -
          (int) PPM_GETR( ((chist_vec)p2)->color );
 }
 
 /**********************************/
-static int greencompare(p1, p2)
-     const void *p1, *p2;
+static int greencompare(const void *p1, const void *p2)
 {
   return (int) PPM_GETG( ((chist_vec)p1)->color ) -
          (int) PPM_GETG( ((chist_vec)p2)->color );
 }
 
 /**********************************/
-static int bluecompare(p1, p2)
-     const void *p1, *p2;
+static int bluecompare(const void *p1, const void *p2)
 {
   return (int) PPM_GETB( ((chist_vec)p1)->color ) -
          (int) PPM_GETB( ((chist_vec)p2)->color );
 }
 
 /**********************************/
-static int sumcompare(p1, p2)
-     const void *p1, *p2;
+static int sumcompare(const void *p1, const void *p2)
 {
   return ((box_vector) p2)->sum - ((box_vector) p1)->sum;
 }
@@ -823,10 +805,7 @@ static int sumcompare(p1, p2)
 
 /****************************************************************************/
 static chist_vec
-  ppm_computechist(pixels, cols, rows, maxcolors, colorsP)
-     pixel** pixels;
-     int cols, rows, maxcolors;
-     int* colorsP;
+  ppm_computechist(pixel **pixels, int cols, int rows, int maxcolors, int *colorsP)
 {
   chash_table cht;
   chist_vec chv;
@@ -841,11 +820,8 @@ static chist_vec
 
 
 /****************************************************************************/
-static chash_table ppm_computechash(pixels, cols, rows,
-					    maxcolors, colorsP )
-     pixel** pixels;
-     int cols, rows, maxcolors;
-     int* colorsP;
+static chash_table ppm_computechash(pixel** pixels, int cols, int rows,
+					    int maxcolors, int* colorsP )
 {
   chash_table cht;
   register pixel* pP;
@@ -885,7 +861,7 @@ static chash_table ppm_computechash(pixels, cols, rows,
 
 
 /****************************************************************************/
-static chash_table ppm_allocchash()
+static chash_table ppm_allocchash(void)
 {
   chash_table cht;
   int i;
@@ -901,9 +877,7 @@ static chash_table ppm_allocchash()
 
 
 /****************************************************************************/
-static chist_vec ppm_chashtochist( cht, maxcolors )
-     chash_table cht;
-     int maxcolors;
+static chist_vec ppm_chashtochist(chash_table cht, int maxcolors)
 {
   chist_vec chv;
   chist_list chl;
@@ -929,16 +903,14 @@ static chist_vec ppm_chashtochist( cht, maxcolors )
 
 
 /****************************************************************************/
-static void ppm_freechist( chv )
-     chist_vec chv;
+static void ppm_freechist(chist_vec chv)
 {
   free( (char*) chv );
 }
 
 
 /****************************************************************************/
-static void ppm_freechash( cht )
-     chash_table cht;
+static void ppm_freechash(chash_table cht)
 {
   int i;
   chist_list chl, chlnext;
@@ -1036,9 +1008,7 @@ static void   init_error_limit PARM((void));
 
 
 /* Master control for slow quantizer. */
-static int slow_quant(pic24, w, h, pic8, rm,gm,bm, descols)
-     byte *pic24, *pic8, *rm, *gm, *bm;
-     int   w, h, descols;
+static int slow_quant(byte *pic24, int w, int h, byte *pic8, byte *rm, byte *gm, byte *bm, int descols)
 {
   size_t fs_arraysize = (w + 2) * (3 * sizeof(FSERROR));
 
@@ -1085,9 +1055,7 @@ static int slow_quant(pic24, w, h, pic8, rm,gm,bm, descols)
 }
 
 
-static void slow_fill_histogram (pic24, numpixels)
-     register byte *pic24;
-     register int   numpixels;
+static void slow_fill_histogram (register byte *pic24, register int numpixels)
 {
   register histptr histp;
   register hist2d * histogram = sl_histogram;
@@ -1107,9 +1075,7 @@ static void slow_fill_histogram (pic24, numpixels)
 }
 
 
-static boxptr find_biggest_color_pop (boxlist, numboxes)
-     boxptr boxlist;
-     int numboxes;
+static boxptr find_biggest_color_pop (boxptr boxlist, int numboxes)
 {
   register boxptr boxp;
   register int i;
@@ -1126,9 +1092,7 @@ static boxptr find_biggest_color_pop (boxlist, numboxes)
 }
 
 
-static boxptr find_biggest_volume (boxlist, numboxes)
-     boxptr boxlist;
-     int numboxes;
+static boxptr find_biggest_volume (boxptr boxlist, int numboxes)
 {
   register boxptr boxp;
   register int i;
@@ -1145,8 +1109,7 @@ static boxptr find_biggest_volume (boxlist, numboxes)
 }
 
 
-static void update_box (boxp)
-     boxptr boxp;
+static void update_box (boxptr boxp)
 {
   hist2d * histogram = sl_histogram;
   histptr histp;
@@ -1244,9 +1207,7 @@ static void update_box (boxp)
 }
 
 
-static int median_cut (boxlist, numboxes, desired_colors)
-     boxptr boxlist;
-     int numboxes, desired_colors;
+static int median_cut (boxptr boxlist, int numboxes, int desired_colors)
 {
   int n,lb;
   int c0,c1,c2,cmax;
@@ -1301,9 +1262,7 @@ static int median_cut (boxlist, numboxes, desired_colors)
 }
 
 
-static void compute_color (boxp, icolor)
-     boxptr boxp;
-     int icolor;
+static void compute_color (boxptr boxp, int icolor)
 {
   /* Current algorithm: mean weighted by pixels (not colors) */
   /* Note it is important to get the rounding correct! */
@@ -1340,8 +1299,7 @@ static void compute_color (boxp, icolor)
 }
 
 
-static void slow_select_colors (descolors)
-     int descolors;
+static void slow_select_colors (int descolors)
 /* Master routine for color selection */
 {
   box boxlist[MAXNUMCOLORS];
@@ -1381,9 +1339,7 @@ static void slow_select_colors (descolors)
 #define BOX_C2_SHIFT  (C2_SHIFT + BOX_C2_LOG)
 
 
-static int find_nearby_colors (minc0, minc1, minc2, colorlist)
-     int minc0, minc1, minc2;
-     JSAMPLE colorlist[];
+static int find_nearby_colors (int minc0, int minc1, int minc2, JSAMPLE *colorlist)
 {
   int numcolors = sl_num_colors;
   int maxc0, maxc1, maxc2;
@@ -1484,11 +1440,8 @@ static int find_nearby_colors (minc0, minc1, minc2, colorlist)
 }
 
 
-static void find_best_colors (minc0, minc1, minc2, numcolors,
-			      colorlist, bestcolor)
-     int minc0, minc1, minc2, numcolors;
-     JSAMPLE colorlist[];
-     JSAMPLE bestcolor[];
+static void find_best_colors (int minc0, int minc1, int minc2, int numcolors,
+			      JSAMPLE colorlist[], JSAMPLE bestcolor[])
 {
   int ic0, ic1, ic2;
   int i, icolor;
@@ -1555,8 +1508,7 @@ static void find_best_colors (minc0, minc1, minc2, numcolors,
 }
 
 
-static void fill_inverse_cmap (c0, c1, c2)
-     int c0, c1, c2;
+static void fill_inverse_cmap (int c0, int c1, int c2)
 {
   hist2d * histogram = sl_histogram;
   int minc0, minc1, minc2;	/* lower left corner of update box */
@@ -1599,9 +1551,7 @@ static void fill_inverse_cmap (c0, c1, c2)
 }
 
 
-static void slow_map_pixels (pic24, width, height, pic8)
-     byte *pic24, *pic8;
-     int   width, height;
+static void slow_map_pixels (byte *pic24, int width, int height, byte *pic8)
 {
   register LOCFSERROR cur0, cur1, cur2;	/* current error or pixel value */
   LOCFSERROR belowerr0, belowerr1, belowerr2; /* error for pixel below cur */
@@ -1724,7 +1674,7 @@ static void slow_map_pixels (pic24, width, height, pic8)
 }
 
 
-static void init_error_limit ()
+static void init_error_limit (void)
 /* Allocate and fill in the error_limiter table */
 /* Note this should be done only once. */
 {

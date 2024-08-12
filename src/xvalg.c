@@ -66,8 +66,7 @@ static byte origrmap[256], origgmap[256], origbmap[256];
 
 
 /***************************/
-void printUTime(str)
-     const char *str;
+void printUTime(const char *str)
 {
   XV_UNUSED(str);
 #ifdef TIMING_TEST
@@ -82,7 +81,7 @@ void printUTime(str)
 
 
 /************************************************************/
-void AlgInit()
+void AlgInit(void)
 {
   /* called whenver an image file is loaded.  disposes of origPic
      if neccessary, and points it to null */
@@ -96,8 +95,7 @@ void AlgInit()
 
 
 /************************/
-void DoAlg(anum)
-     int anum;
+void DoAlg(int anum)
 {
   /* called with a value from the algMB button.  Executes the specified
      algorithm */
@@ -124,7 +122,7 @@ void DoAlg(anum)
 
 
 /************************/
-static void NoAlg()
+static void NoAlg(void)
 {
   int i;
 
@@ -153,7 +151,7 @@ static void NoAlg()
 
 
 /************************/
-static void Blur()
+static void Blur(void)
 {
   /* runs a n*n convolution mask (all 1's) over 'pic',
      producing a 24-bit version.  Then calls 24to8 to generate a new 8-bit
@@ -200,7 +198,7 @@ static void Blur()
 
 
 /************************/
-static void Sharpen()
+static void Sharpen(void)
 {
   /* runs an edge-enhancment algorithm */
 
@@ -242,7 +240,7 @@ static void Sharpen()
 
 
 /************************/
-static void EdgeDetect()
+static void EdgeDetect(void)
 {
   byte *pic24, *p24, *tmpPic, *tlp;
   const char *str;
@@ -287,7 +285,7 @@ static void EdgeDetect()
 
 
 /************************/
-static void TinFoil()
+static void TinFoil(void)
 {
   byte *pic24, *tmpPic, *tp, *tlp;
   const char *str;
@@ -330,7 +328,7 @@ static void TinFoil()
 
 
 /************************/
-static void OilPaint()
+static void OilPaint(void)
 {
   byte *pic24, *tmpPic;
   int   sx,sy,sw,sh;
@@ -354,7 +352,7 @@ static void OilPaint()
 
 
 /************************/
-static void Blend()
+static void Blend(void)
 {
   byte *pic24, *tmpPic;
   int   sx,sy,sw,sh;
@@ -375,8 +373,7 @@ static void Blend()
 
 
 /************************/
-static void FineRotate(clr)
-     int clr;
+static void FineRotate(int clr)
 {
   byte              *pic24, *tmpPic;
   int                i,sx,sy,sw,sh;
@@ -411,7 +408,7 @@ static void FineRotate(clr)
 
 
 /************************/
-static void Pixelize()
+static void Pixelize(void)
 {
   byte              *pic24, *tmpPic;
   int                i,sx,sy,sw,sh, pixX,pixY,err;
@@ -458,7 +455,7 @@ static void Pixelize()
 
 
 /************************/
-static void Spread()
+static void Spread(void)
 {
   byte              *pic24, *tmpPic;
   int                i,sx,sy,sw,sh, pixX,pixY,err;
@@ -508,7 +505,7 @@ static void Spread()
 
 
 /************************/
-static void MedianFilter()
+static void MedianFilter(void)
 {
   /* runs median filter algorithm (for n*n rect centered around each pixel,
      replace with median value */
@@ -552,9 +549,7 @@ static void MedianFilter()
 
 
 /************************/
-static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
-     byte *pic24, *results;
-     int   w,h, selx,sely,selw,selh, n;
+static void doBlurConvolv(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int n)
 {
   XV_UNUSED(h);
   /* convolves with an n*n array, consisting of only 1's.
@@ -621,9 +616,7 @@ static void doBlurConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
 
 
 /************************/
-static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
-     byte *pic24, *results;
-     int   w,h, selx,sely,selw,selh, n;
+static void doSharpConvolv(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int n)
 {
   XV_UNUSED(h);
   byte  *p24;
@@ -715,9 +708,7 @@ static void doSharpConvolv(pic24, w, h, results, selx,sely,selw,selh, n)
 
 
 /************************/
-static void doEdgeConvolv(pic24, w, h, results, selx,sely,selw,selh)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh;
+static void doEdgeConvolv(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
   XV_UNUSED(h);
 
@@ -811,9 +802,7 @@ static void doEdgeConvolv(pic24, w, h, results, selx,sely,selw,selh)
 
 
 /************************/
-static void doAngleConvolv(pic24, w, h, results, selx,sely,selw,selh)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh;
+static void doAngleConvolv(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
   XV_UNUSED(h);
 
@@ -897,9 +886,7 @@ static void doAngleConvolv(pic24, w, h, results, selx,sely,selw,selh)
 
 
 /************************/
-static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh, n;
+static void doOilPaint(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int n)
 {
   XV_UNUSED(h);
 
@@ -985,9 +972,7 @@ static void doOilPaint(pic24, w, h, results, selx,sely,selw,selh, n)
 
 
 /************************/
-static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh;
+static void doBlend(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh)
 {
   XV_UNUSED(h);
   /* 'blends' a rectangular region out of existence.  computes the average
@@ -1097,10 +1082,7 @@ static void doBlend(pic24, w, h, results, selx,sely,selw,selh)
 
 
 /************************/
-static void doRotate(pic24, w, h, results, selx,sely,selw,selh, rotval, clear)
-     byte  *pic24, *results;
-     int    w, h, selx,sely,selw,selh,clear;
-     double rotval;
+static void doRotate(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, double rotval, int clear)
 {
   /* rotates a rectangular region (selx,sely,selw,selh) of an image (pic24,w,h)
      by the amount specified in degrees (rotval), and stores the result in
@@ -1278,8 +1260,7 @@ if (0)	{
 
 
 /***********************************************/
-static void add2bb(x1, y1, x2, y2, x,y)
-     int *x1, *y1, *x2, *y2, x,y;
+static void add2bb(int *x1, int *y1, int *x2, int *y2, int x, int y)
 {
   if (x < *x1) *x1 = x;
   if (x > *x2) *x2 = x;
@@ -1289,9 +1270,7 @@ static void add2bb(x1, y1, x2, y2, x,y)
 
 
 /***********************************************/
-static void rotXfer(x,y, rx,ry, cx,cy, rad)
-     int x,y;
-     double *rx, *ry, cx, cy, rad;
+static void rotXfer(int x, int y, double *rx, double *ry, double cx, double cy, double rad)
 {
   /* take point x,y, rotate it 'rad' radians around cx,cy, return rx,ry */
   double d, xf, yf, ang;
@@ -1321,9 +1300,7 @@ static void rotXfer(x,y, rx,ry, cx,cy, rad)
 
 
 /************************/
-static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh, pixX,pixY;
+static void doPixel(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int pixX, int pixY)
 {
   XV_UNUSED(h);
   /* runs 'pixelization' algorithm.  replaces each pixX-by-pixY region
@@ -1387,9 +1364,7 @@ static void doPixel(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 
 
 /************************/
-static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
-     byte *pic24, *results;
-     int   w, h, selx,sely,selw,selh, pixX,pixY;
+static void doSpread(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int pixX, int pixY)
 {
   XV_UNUSED(h);
   XV_UNUSED(pic24);
@@ -1461,9 +1436,7 @@ static void doSpread(pic24, w, h, results, selx,sely,selw,selh, pixX, pixY)
 
 
 /************************/
-static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
-     byte *pic24, *results;
-     int   w,h, selx,sely,selw,selh, n;
+static void doMedianFilter(byte *pic24, int w, int h, byte *results, int selx, int sely, int selw, int selh, int n)
 {
   XV_UNUSED(h);
   /* runs the median filter algorithm
@@ -1472,7 +1445,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
      'n' must be odd */
 
   byte *p24;
-  //int   rsum,gsum,bsum;
+  /* int   rsum,gsum,bsum; */
   byte          *rp;
   int            x,y,x1,y1,count,n2,nsq,c2;
   int           *rtab, *gtab, *btab;
@@ -1495,7 +1468,7 @@ static void doMedianFilter(pic24, w, h, results, selx,sely,selw,selh, n)
 
     for (x=selx; x<selx+selw; x++) {
 
-      //rsum = gsum = bsum = 0;
+      /* rsum = gsum = bsum = 0; */
       count = 0;
 
       for (y1=y-n2; y1<=y+n2; y1++) {
@@ -1574,8 +1547,7 @@ static void intsort(a, n)
 
 
 /***********************************************/
-int start24bitAlg(pic24, tmpPic)
-     byte **pic24, **tmpPic;
+int start24bitAlg(byte **pic24, byte **tmpPic)
 {
   /* generates a 24-bit version of 'pic', if neccessary, and also mallocs
    * a pWIDE*pHIGH*3 24-bit output pic.
@@ -1607,8 +1579,7 @@ int start24bitAlg(pic24, tmpPic)
 
 
 /***********************************************/
-void end24bitAlg(pic24, outPic)
-     byte *pic24, *outPic;
+void end24bitAlg(byte *pic24, byte *outPic)
 {
   /* given pic24, and outPic, which has the new 24-bit image, installs it */
 
@@ -1636,7 +1607,7 @@ void end24bitAlg(pic24, outPic)
 
 
 /************************/
-void saveOrigPic()
+void saveOrigPic(void)
 {
   /* saves original picture into origPic, if it hasn't already been done.
      This allows us to undo algorithms...

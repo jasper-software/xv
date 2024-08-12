@@ -1755,7 +1755,7 @@ void CreateMGCSFXW()
 
 
   mgcsfxW = CreateWindow("xv mgcsfx", "XVmgcsfx", NULL,
-			 MSWIDE, MSHIGH, infofg, infobg, 0);
+			 MSWIDE, MSHIGH, infofg, infobg, FALSE);
   if (!mgcsfxW) FatalError("can't create mgcsfx window!");
 
   XSelectInput(theDisp, mgcsfxW,

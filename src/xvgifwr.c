@@ -46,7 +46,7 @@ static long CountDown;
 static int  Interlace;
 
 static void putword     PARM((int, FILE *));
-static void compress    PARM((int, FILE *, byte *, int));
+static void xv_compress PARM((int, FILE *, byte *, int));
 static void output      PARM((int));
 static void cl_block    PARM((void));
 static void cl_hash     PARM((count_int));
@@ -59,14 +59,8 @@ static byte pc2nc[256];
 
 
 /*************************************************************/
-int WriteGIF(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
-	     comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *comment;
+int WriteGIF(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+	     char *comment)
 {
   int   RWidth, RHeight;
   int   LeftOfs, TopOfs;
@@ -203,7 +197,7 @@ int WriteGIF(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
             else fputc(0x00, fp);
 
   fputc(InitCodeSize, fp);
-  compress(InitCodeSize+1, fp, pic8, w*h);
+  xv_compress(InitCodeSize+1, fp, pic8, w*h);
 
   fputc(0,fp);                      /* Write out a Zero-length packet (EOF) */
   fputc(';',fp);                    /* Write GIF file terminator */
@@ -218,9 +212,7 @@ int WriteGIF(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
 
 
 /******************************/
-static void putword(w, fp)
-int w;
-FILE *fp;
+static void putword(int w, FILE *fp)
 {
   /* writes a 16-bit integer in GIF order (LSB first) */
   fputc(w & 0xff, fp);
@@ -264,7 +256,7 @@ static  unsigned short codetab [HSIZE];
 static int hsize = HSIZE;            /* for dynamic table sizing */
 
 /*
- * To save much memory, we overlay the table used by compress() with those
+ * To save much memory, we overlay the table used by xv_compress() with those
  * used by decompress().  The tab_prefix table is the same size and type
  * as the codetab.  The tab_suffix table needs 2**BITS characters.  We
  * get this from the beginning of htab.  The output stack uses the rest
@@ -311,11 +303,7 @@ static int EOFCode;
 
 
 /********************************************************/
-static void compress(init_bits, outfile, data, len)
-int   init_bits;
-FILE *outfile;
-byte *data;
-int   len;
+static void xv_compress(int init_bits, FILE *outfile, byte *data, int len)
 {
   register long fcode;
   register int i = 0;
@@ -445,8 +433,7 @@ unsigned long masks[] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F,
                                   0x01FF, 0x03FF, 0x07FF, 0x0FFF,
                                   0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
 
-static void output(code)
-int code;
+static void output(int code)
 {
   cur_accum &= masks[cur_bits];
 
@@ -504,7 +491,7 @@ int code;
 
 
 /********************************/
-static void cl_block ()             /* table clear for block compress */
+static void cl_block (void)             /* table clear for block compress */
 {
   /* Clear out the hash table */
 
@@ -517,8 +504,7 @@ static void cl_block ()             /* table clear for block compress */
 
 
 /********************************/
-static void cl_hash(hsize)          /* reset code table */
-register count_int hsize;
+static void cl_hash(register count_int hsize)          /* reset code table */
 {
   register count_int *htab_p = htab+hsize;
   register long i;
@@ -564,7 +550,7 @@ static int a_count;
 /*
  * Set up the 'byte output' routine
  */
-static void char_init()
+static void char_init(void)
 {
 	a_count = 0;
 }
@@ -578,8 +564,7 @@ static char accum[ 256 ];
  * Add a character to the end of the current packet, and if it is 254
  * characters, flush the packet to disk.
  */
-static void char_out(c)
-int c;
+static void char_out(int c)
 {
   accum[ a_count++ ] = c;
   if( a_count >= 254 )
@@ -589,7 +574,7 @@ int c;
 /*
  * Flush the packet to disk, and reset the accumulator
  */
-static void flush_char()
+static void flush_char(void)
 {
   if( a_count > 0 ) {
     fputc(a_count, g_outfile );

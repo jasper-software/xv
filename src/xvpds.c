@@ -170,9 +170,7 @@ static int LoadPDSPalette     PARM((char *, PICINFO *));
 /* The method of termination is unpredictable.  A pox on VMS.   */
 /* Sometimes we even get mixtures of CR's and LF's.  Sigh.      */
 
-static int getpdsrec(f,buff)
-     FILE *f;
-     char *buff;
+static int getpdsrec(FILE *f, char *buff)
 {
   static char *bp;
   static int count;
@@ -248,9 +246,7 @@ static int getpdsrec(f,buff)
  */
 
 /*******************************************/
-int LoadPDS(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadPDS(char *fname, PICINFO *pinfo)
 {
   /* returns '1' on success, '0' on failure */
 
@@ -265,7 +261,7 @@ int LoadPDS(fname, pinfo)
   char	*tmp;
   const char   *ftypstr;
   unsigned long filesize;
-  char  sampletype[64];
+  char  sampletype[64+1];
 
   pinfo->type = PIC8;
   isfixed = TRUE;
@@ -890,15 +886,13 @@ int LoadPDS(fname, pinfo)
  */
 
 /*******************************************/
-static int Convert16BitImage(fname, pinfo, swab)
-     char *fname;
-     PICINFO *pinfo;
-     int swab;
+static int Convert16BitImage(char *fname, PICINFO *pinfo, int swab)
 {
   unsigned short *pShort;
   long i, j, k, l, n, *hist, nTot;
   size_t m;
   byte *lut, *pPix8;
+  byte *oldpic;
   FILE *fp;
   char  name[1024], *c;
 
@@ -999,10 +993,12 @@ static int Convert16BitImage(fname, pinfo, swab)
 
   /* convert the 16-bit image to 8-bit */
   lut[0] = 0;
-  free(pShort = (unsigned short *)pinfo->pic);
+  oldpic = pinfo->pic;
+  pShort = (unsigned short *)oldpic;
   pinfo->pic = pPix8;
   while(--n >= 0)
     *pPix8++ = lut[*pShort++];
+  free(oldpic);
   free(lut);
   return 1;
 }
@@ -1012,9 +1008,7 @@ static int Convert16BitImage(fname, pinfo, swab)
  */
 
 /*******************************************/
-static int LoadPDSPalette(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+static int LoadPDSPalette(char *fname, PICINFO *pinfo)
 {
   FILE    *fp;
   char    name[1024], buf[256], *c;

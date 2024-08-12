@@ -51,9 +51,7 @@ static void putint32 PARM((int, FILE *));
 
 
 /*******************************************/
-int LoadPM(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadPM(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -252,14 +250,8 @@ int LoadPM(fname, pinfo)
 
 
 /*******************************************/
-int WritePM(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
-	    comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *comment;
+int WritePM(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+	    char *comment)
 {
   /* writes a PM file to the already open stream
      'colorstyle' single-handedly determines the type of PM pic written
@@ -358,8 +350,7 @@ int WritePM(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
 
 
 /*****************************/
-static int pmError(fname, st)
-     const char *fname, *st;
+static int pmError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   if (thePic.pm_image != NULL) free(thePic.pm_image);
@@ -368,8 +359,7 @@ static int pmError(fname, st)
 
 
 /*****************************/
-static int flip4(i)
-     int i;
+static int flip4(int i)
 {
   /* flips low-order 4 bytes around in integer */
 
@@ -391,8 +381,7 @@ static int flip4(i)
 
 
 
-static int getint32(fp)
-     FILE *fp;
+static int getint32(FILE *fp)
 {
   int i;
 
@@ -406,9 +395,7 @@ static int getint32(fp)
 
 
 
-static void putint32(i, fp)
-     int   i;
-     FILE *fp;
+static void putint32(int i, FILE *fp)
 {
   putc( ((i>>24) & 0xff), fp);
   putc( ((i>>16) & 0xff), fp);

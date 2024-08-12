@@ -277,6 +277,7 @@ static void pic2_show_pic2_info        PARM((struct pic2_info*));
 static char *pic2_strncpy              PARM((char*,char*,size_t));
 static void *pic2_malloc               PARM((size_t,char*));
 static void *pic2_new                  PARM((size_t,char*));
+static void pic2_xvbzero               PARM((char *, size_t));
 
 static int WritePIC2                   PARM((FILE*,byte*,int,int,int,
 					     byte*,byte*,byte*,int,int,char*,
@@ -326,10 +327,7 @@ extern XtAppContext context;
 #endif
 
 /* The main routine to load a PIC2 file. */
-int LoadPIC2(fname, pinfo, quick)
-char *fname;
-PICINFO *pinfo;
-int quick;
+int LoadPIC2(char *fname, PICINFO *pinfo, int quick)
 {
     int e, i, block;
     struct pic2_info pic2;
@@ -465,9 +463,7 @@ int quick;
 /*
  * This function opens the file, and set its size.
  */
-static void pic2_open_file(pi, fname)
-    struct pic2_info *pi;
-    char *fname;
+static void pic2_open_file(struct pic2_info *pi, char *fname)
 {
     if ((pi->fp = fopen(fname, "rb")) == NULL)
 	pic2_file_error(pi, PIC2_OPEN);
@@ -485,8 +481,7 @@ static void pic2_open_file(pi, fname)
  * pic2_read_block_header2:
  *	reads the rest of block header.
  */
-static void pic2_read_header(pi)
-struct pic2_info *pi;
+static void pic2_read_header(struct pic2_info *pi)
 {
     long s_comment;
 
@@ -538,15 +533,13 @@ struct pic2_info *pi;
     pi->next_pos = pic2_tell_file(pi);
 }
 
-static void pic2_read_block_header1(pi)
-struct pic2_info *pi;
+static void pic2_read_block_header1(struct pic2_info *pi)
 {
     pic2_read_file(pi, pi->block->id, 4);
     pi->block->size = pic2_read_long(pi);
 }
 
-static void pic2_read_block_header2(pi)
-struct pic2_info *pi;
+static void pic2_read_block_header2(struct pic2_info *pi)
 {
     pi->block->flag = pic2_read_short(pi);
     pi->block->x_wid = pic2_read_short(pi);
@@ -560,9 +553,7 @@ struct pic2_info *pi;
 /*
  * These functions are arithmetic pic2 format extractor.
  */
-static short pic2_arith_decode_bit(pi, c)
-struct pic2_info *pi;
-int c;
+static short pic2_arith_decode_bit(struct pic2_info *pi, int c)
 {
     unsigned short pp;
 
@@ -591,9 +582,7 @@ int c;
     }
 }
 
-static short pic2_arith_decode_nn(pi, c)
-struct pic2_info *pi;
-int c;
+static short pic2_arith_decode_nn(struct pic2_info *pi, int c)
 {
     int n;
 
@@ -686,10 +675,7 @@ int c;
     return (n);
 }
 
-static void pic2_arith_expand_chain(pi, x, y, cc)
-struct pic2_info *pi;
-int x, y;
-pixel cc;
+static void pic2_arith_expand_chain(struct pic2_info *pi, int x, int y, pixel cc)
 {
     static const unsigned short c_tab[] = {
 	80 + 6 * 5,	/* -5 */
@@ -701,6 +687,8 @@ pixel cc;
 	80 + 6 * 0,	/* 1  */
     };
     unsigned short b;
+
+    XV_UNUSED(y);
 
     b = c_tab[pi->flag_now[x] + 5];
     if (!pic2_arith_decode_bit(pi, b++)) {
@@ -723,9 +711,7 @@ pixel cc;
     }
 }
 
-static short pic2_arith_get_number(pi, c, bef)
-struct pic2_info *pi;
-int c, bef;
+static short pic2_arith_get_number(struct pic2_info *pi, int c, int bef)
 {
     unsigned short n;
     byte maxcol;
@@ -742,7 +728,7 @@ int c, bef;
 	    n = bef - n / 2;
     } else {
 	if ((int) n > (bef * 2))
-	    n = n;
+	    /* n = n */;
 	else if (n & 1)
 	    n = n / 2 + bef + 1;
 	else
@@ -751,9 +737,7 @@ int c, bef;
     return (n);
 }
 
-static pixel pic2_arith_read_color(pi, x)
-struct pic2_info *pi;
-int x;
+static pixel pic2_arith_read_color(struct pic2_info *pi, int x)
 {
     pixel c1, c2, cc;
     unsigned short i, j, k, m;
@@ -817,9 +801,7 @@ int x;
     return (cc);
 }
 
-static int pic2_arith_expand_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_arith_expand_line(struct pic2_info *pi, pixel **line)
 {
     int ymax;
     int x, xw;
@@ -877,8 +859,7 @@ pixel **line;
     return (pi->ynow - 1);
 }
 
-static int pic2_arith_loader_init(pi)
-struct pic2_info *pi;
+static int pic2_arith_loader_init(struct pic2_info *pi)
 {
     unsigned short p2b[256];
     int i, xw;
@@ -933,8 +914,7 @@ struct pic2_info *pi;
 /*
  * These functions are fast pic2 compression extractor.
  */
-static int pic2_fast_read_length(pi)
-struct pic2_info *pi;
+static int pic2_fast_read_length(struct pic2_info *pi)
 {
     int a;
 
@@ -947,10 +927,7 @@ struct pic2_info *pi;
     return (pic2_read_bits(pi, a) + (1 << a) - 1);
 }
 
-static void pic2_fast_expand_chain(pi, x, cc)
-struct pic2_info *pi;
-int x;
-pixel cc;
+static void pic2_fast_expand_chain(struct pic2_info *pi, int x, pixel cc)
 {
     if (pic2_read_bits(pi, 1) != 0) {
 	if (pic2_read_bits(pi, 1) != 0) {		/* down */
@@ -976,9 +953,7 @@ pixel cc;
     }
 }
 
-static pixel pic2_fast_read_color(pi, bc)
-struct pic2_info *pi;
-pixel bc;
+static pixel pic2_fast_read_color(struct pic2_info *pi, pixel bc)
 {
     pixel cc;
     unsigned short j, k, m;
@@ -1004,9 +979,7 @@ pixel bc;
     return (cc);
 }
 
-static int pic2_fast_expand_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_fast_expand_line(struct pic2_info *pi, pixel **line)
 {
     int ymax;
     int x, xw;
@@ -1072,8 +1045,7 @@ pixel **line;
     return (pi->ynow - 1);
 }
 
-static int pic2_fast_loader_init(pi)
-struct pic2_info *pi;
+static int pic2_fast_loader_init(struct pic2_info *pi)
 {
     int xw;
 
@@ -1106,9 +1078,7 @@ struct pic2_info *pi;
 /*
  * These functions are beta pic2 format extractor.
  */
-static int pic2_beta_expand_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_beta_expand_line(struct pic2_info *pi, pixel **line)
 {
     int i, xw, ymax;
     byte a, b, c, *p;
@@ -1175,8 +1145,7 @@ pixel **line;
     return (pi->ynow - 1);
 }
 
-static int pic2_beta_loader_init(pi)
-struct pic2_info *pi;
+static int pic2_beta_loader_init(struct pic2_info *pi)
 {
     pi->ynow = 0;
     pi->next_line = pic2_beta_expand_line;
@@ -1187,17 +1156,19 @@ struct pic2_info *pi;
 /*
  * Make a picture from the expanded data.
  */
-static void pic2_make_xvpic(pi, xp, rp, gp, bp)
-struct pic2_info *pi;
-byte **xp, *rp, *gp, *bp;
+static void pic2_make_xvpic(struct pic2_info *pi, byte **xp, byte *rp, byte *gp, byte *bp)
 {
     int line, i;
     pixel *linep, opaque;
     short colbits;
     byte colmask;
 
+    XV_UNUSED(rp);
+    XV_UNUSED(gp);
+    XV_UNUSED(bp);
+
     if (*xp == NULL)
-	*xp = pic2_new((size_t) pi->x_max * pi->y_max * 3, "pic2_make_xvpic");   // GRR POSSIBLE OVERFLOW / FIXME
+	*xp = pic2_new((size_t) pi->x_max * pi->y_max * 3, "pic2_make_xvpic");   /* GRR POSSIBLE OVERFLOW / FIXME */
 
     if (pi->block->flag & 1)
 	opaque = pi->block->opaque;
@@ -1241,10 +1212,7 @@ byte **xp, *rp, *gp, *bp;
 /*
  * This function splits a multiblock PIC2 file into several pages.
  */
-static void pic2_make_pagefile(pi, pagebname, pnum)
-struct pic2_info *pi;
-char *pagebname;
-int pnum;
+static void pic2_make_pagefile(struct pic2_info *pi, char *pagebname, int pnum)
 {
     struct pic2_info pic2;
     FILE *fp;
@@ -1283,23 +1251,15 @@ int pnum;
 }
 
 /* The main routine to save a PIC2 file. */
-static int WritePIC2(fp, pic0, ptype, w, h, rmap, gmap, bmap, numcols,
-		     colorstyle, fname, type, depth, x_offset, y_offset,
-		     append, comment)
-FILE *fp;
-byte *pic0;
-int ptype, w, h;
-byte *rmap, *gmap, *bmap;
-int numcols, colorstyle;
-char *fname;
-int type, depth;
-int x_offset, y_offset;
-int append;
-char *comment;
+static int WritePIC2(FILE *fp, byte *pic0, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols,
+		     int colorstyle, char *fname, int type, int depth, int x_offset, int y_offset,
+		     int append, char *comment)
 {
     struct pic2_info pic2;
     char creator[256], title[256], saver[256];
     int e;
+
+    XV_UNUSED(numcols);
 
     if (DEBUG)
 	fputs("WritePIC2:\n", stderr);
@@ -1347,14 +1307,8 @@ char *comment;
 /*
  * This function initializes pic2_info.
  */
-static void pic2_setup_pic2_info(pi, name, fname, title, saver, no, depth,
-			      x_aspect, y_aspect, x_max, y_max, comment)
-struct pic2_info *pi;
-char *name, *fname, *title, *saver;
-int no, depth;
-int x_aspect, y_aspect;
-int x_max, y_max;
-char *comment;
+static void pic2_setup_pic2_info(struct pic2_info *pi, char *name, char *fname, char *title, char *saver, int no, int depth,
+			      int x_aspect, int y_aspect, int x_max, int y_max, char *comment)
 {
     char basename[256], *suffix;
 
@@ -1411,8 +1365,7 @@ char *comment;
 /*
  * This function appends to existing pic2 file.
  */
-static void pic2_append(pi)
-struct pic2_info *pi;
+static void pic2_append(struct pic2_info *pi)
 {
     int block;
 
@@ -1433,8 +1386,7 @@ struct pic2_info *pi;
  * pic2_write_block_header:
  *	write the block header.
  */
-static void pic2_write_header1(pi)
-struct pic2_info *pi;
+static void pic2_write_header1(struct pic2_info *pi)
 {
     char *comment;
 
@@ -1464,8 +1416,7 @@ struct pic2_info *pi;
     pi->header->size = pi->next_pos;
 }
 
-static void pic2_write_header2(pi)
-struct pic2_info *pi;
+static void pic2_write_header2(struct pic2_info *pi)
 {
     pic2_seek_file(pi, pi->next_pos, SEEK_SET);
 
@@ -1505,8 +1456,7 @@ struct pic2_info *pi;
     pic2_write_long(pi, pi->header->reserve1);
 }
 
-static void pic2_write_block_header(pi)
-struct pic2_info *pi;
+static void pic2_write_block_header(struct pic2_info *pi)
 {
     pic2_write_file(pi, pi->block->id, 4);
     pic2_write_long(pi, pi->block->size);
@@ -1524,8 +1474,7 @@ struct pic2_info *pi;
  */
 #define	pic2_arith_write_one_bit(pi)	(pi->bs.bits++)
 
-static void pic2_arith_write_zero_bit(pi)
-struct pic2_info *pi;
+static void pic2_arith_write_zero_bit(struct pic2_info *pi)
 {
     if (pi->bs.zero)
 	pic2_write_bits(pi, 0, 1);
@@ -1537,8 +1486,7 @@ struct pic2_info *pi;
     pi->bs.zero = 1;
 }
 
-static void pic2_arith_flush_bit_buf(pi)
-struct pic2_info *pi;
+static void pic2_arith_flush_bit_buf(struct pic2_info *pi)
 {
     int	i;
 
@@ -1553,8 +1501,7 @@ struct pic2_info *pi;
     pic2_flush_bits(pi);
 }
 
-static void pic2_arith_carry_bit(pi)
-struct pic2_info *pi;
+static void pic2_arith_carry_bit(struct pic2_info *pi)
 {
     pic2_write_bits(pi, 1, 1);
 
@@ -1567,9 +1514,7 @@ struct pic2_info *pi;
     }
 }
 
-static void pic2_arith_encode_bit(pi, n, c)
-struct pic2_info *pi;
-int n, c;
+static void pic2_arith_encode_bit(struct pic2_info *pi, int n, int c)
 {
     int	pp;
     long *c_sum, *c_0_sum;
@@ -1613,9 +1558,7 @@ int n, c;
     }
 }
 
-static void pic2_arith_encode_nbyte(pi, n, c, max)
-struct pic2_info *pi;
-int n, c, max;
+static void pic2_arith_encode_nbyte(struct pic2_info *pi, int n, int c, int max)
 {
     short i;
 
@@ -1626,9 +1569,7 @@ int n, c, max;
 	pic2_arith_encode_bit(pi, 1, c + n);
 }
 
-static void pic2_arith_encode_nn(pi, n, c)
-struct pic2_info *pi;
-int n, c;
+static void pic2_arith_encode_nn(struct pic2_info *pi, int n, int c)
 {
     if (n < 1) {
 	pic2_arith_encode_bit(pi, 1, c);
@@ -1721,9 +1662,7 @@ int n, c;
     }
 }
 
-static void pic2_arith_press_chain(pi, x)
-struct pic2_info *pi;
-int x;
+static void pic2_arith_press_chain(struct pic2_info *pi, int x)
 {
     int b, d;
     pixel c;
@@ -1760,9 +1699,7 @@ int x;
     pic2_arith_encode_nbyte(pi, d, 80 + 6 * b, 5);
 }
 
-static void pic2_arith_put_number(pi, xn, xa, xb)
-struct pic2_info *pi;
-int xn, xa, xb;
+static void pic2_arith_put_number(struct pic2_info *pi, int xn, int xa, int xb)
 {
     short n;
     byte maxcol;
@@ -1787,9 +1724,7 @@ int xn, xa, xb;
     pic2_arith_encode_nn(pi, n, xn);
 }
 
-static void pic2_arith_write_color(pi, x)
-struct pic2_info *pi;
-int x;
+static void pic2_arith_write_color(struct pic2_info *pi, int x)
 {
     pixel c1, c2, cc;
     short g0, r0, b0, r, g, b;
@@ -1863,8 +1798,7 @@ int x;
     }
 }
 
-static void pic2_arith_press_line2(pi)
-struct pic2_info *pi;
+static void pic2_arith_press_line2(struct pic2_info *pi)
 {
     int x, xw, ymax;
     pixel cc;
@@ -1912,9 +1846,16 @@ struct pic2_info *pi;
     }
 }
 
-static int pic2_arith_press_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+/* unchecked xvbzero for accessing negative indices in flag2 buffers */
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((no_sanitize("address")))
+#endif
+static void pic2_xvbzero(char *s, size_t len)
+{
+    for ( ; len>0; len--) *s++ = 0;
+}
+
+static int pic2_arith_press_line(struct pic2_info *pi, pixel **line)
 {
     int i, xw, ymax;
     long *c_sum, *c_0_sum;
@@ -1926,7 +1867,7 @@ pixel **line;
 
     pic2_handle_para(pi, 0);
 
-    xvbzero((char *) pi->flag2_next2 - 4,
+    pic2_xvbzero((char *) pi->flag2_next2 - 4,
 	    (8 + xw) * sizeof(pi->flag2_next2[0]));
 
     if (pi->ynow == 0) {			/* first line */
@@ -1967,9 +1908,9 @@ pixel **line;
 	xvbzero((char *) pi->cache, 8 * 8 * 8 * sizeof(pi->cache[0]));
 	xvbzero((char *) pi->cache_pos, 8 * 8 * 8 * sizeof(pi->cache_pos[0]));
 
-	xvbzero((char *) pi->flag2_next - 4,
+	pic2_xvbzero((char *) pi->flag2_next - 4,
 		(8 + xw) * sizeof(pi->flag2_next[0]));
-	xvbzero((char *) pi->flag2_next2 - 4,
+	pic2_xvbzero((char *) pi->flag2_next2 - 4,
 		(8 + xw) * sizeof(pi->flag2_next2[0]));
 
 	pi->vram_next[-1] = cc;
@@ -2015,9 +1956,7 @@ pixel **line;
     }
 }
 
-static int pic2_arith_saver_init(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_arith_saver_init(struct pic2_info *pi, pixel **line)
 {
     pi->ynow = 0;
 
@@ -2045,9 +1984,7 @@ pixel **line;
 /*
  * These functions are fast pic2 format compressor.
  */
-static void pic2_fast_write_length(pi, n)
-struct pic2_info *pi;
-int n;
+static void pic2_fast_write_length(struct pic2_info *pi, int n)
 {
     int	a, b;
     static const unsigned short len_data[8][2] = {
@@ -2077,9 +2014,7 @@ int n;
     }
 }
 
-static void pic2_fast_press_chain(pi, x)
-struct pic2_info *pi;
-int x;
+static void pic2_fast_press_chain(struct pic2_info *pi, int x)
 {
     int ymax;
     pixel cc;
@@ -2111,9 +2046,7 @@ int x;
 	pic2_write_bits(pi, 0, 1);
 }
 
-static void pic2_fast_press_chain2(pi, x)
-struct pic2_info *pi;
-int x;
+static void pic2_fast_press_chain2(struct pic2_info *pi, int x)
 {
     int ymax;
     pixel cc;
@@ -2147,8 +2080,7 @@ int x;
 	chain_buff[pi->cc++] = 0;
 }
 
-static void pic2_fast_flush_chain(pi)
-struct pic2_info *pi;
+static void pic2_fast_flush_chain(struct pic2_info *pi)
 {
     int i;
     char *chain_buf;
@@ -2179,9 +2111,7 @@ struct pic2_info *pi;
     pi->cc = 0;
 }
 
-static void pic2_fast_write_color(pi, x)
-struct pic2_info *pi;
-int x;
+static void pic2_fast_write_color(struct pic2_info *pi, int x)
 {
     pixel cc, bc;
     unsigned short j, k, m;
@@ -2216,8 +2146,7 @@ int x;
     }
 }
 
-static void pic2_fast_press_line2(pi)
-struct pic2_info *pi;
+static void pic2_fast_press_line2(struct pic2_info *pi)
 {
     int x, xw;
     pixel cc;
@@ -2255,9 +2184,7 @@ struct pic2_info *pi;
 	}
 }
 
-static int pic2_fast_press_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_fast_press_line(struct pic2_info *pi, pixel **line)
 {
     int xw, ymax;
 
@@ -2314,9 +2241,7 @@ pixel **line;
     }
 }
 
-static int pic2_fast_saver_init(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_fast_saver_init(struct pic2_info *pi, pixel **line)
 {
     pi->ynow = 0;
 
@@ -2341,9 +2266,7 @@ pixel **line;
 /*
  * These functions are beta pic2 format compressor.
  */
-static int pic2_beta_press_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_beta_press_line(struct pic2_info *pi, pixel **line)
 {
     int i, xw, ymax;
     byte *p;
@@ -2400,9 +2323,7 @@ pixel **line;
     return (pi->ynow);
 }
 
-static int pic2_beta_saver_init(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_beta_saver_init(struct pic2_info *pi, pixel **line)
 {
     pi->ynow = 0;
 
@@ -2415,19 +2336,14 @@ pixel **line;
 /*
  * This function saves compressed data.
  */
-static void pic2_write_data(pi, data, ptype, x_offset, y_offset, w, h,
-			    rmap, gmap, bmap, type, depth)
-struct pic2_info *pi;
-byte *data;
-int ptype;
-int x_offset, y_offset;
-int w, h;
-byte *rmap, *gmap, *bmap;
-int type, depth;
+static void pic2_write_data(struct pic2_info *pi, byte *data, int ptype, int x_offset, int y_offset, int w, int h,
+			    byte *rmap, byte *gmap, byte *bmap, int type, int depth)
 {
     int i, line;
     pixel *linep;
     short colbits;
+
+    XV_UNUSED(depth);
 
     colbits = pi->header->depth / 3;
 
@@ -2469,9 +2385,7 @@ int type, depth;
 /*
  * This function compresses/extracts one line buffer.
  */
-static int pic2_next_line(pi, line)
-struct pic2_info *pi;
-pixel **line;
+static int pic2_next_line(struct pic2_info *pi, pixel **line)
 {
     int res;
 
@@ -2500,8 +2414,7 @@ pixel **line;
  * pic2_find_block:
  *	finds the first image block and moves the file pointer there.
  */
-static int pic2_next_block(pi)
-struct pic2_info *pi;
+static int pic2_next_block(struct pic2_info *pi)
 {
     int i;
 
@@ -2546,8 +2459,7 @@ struct pic2_info *pi;
     return (1);
 }
 
-static int pic2_find_block(pi)
-struct pic2_info *pi;
+static int pic2_find_block(struct pic2_info *pi)
 {
     if (pi->mode != PIC2_READ_MODE)
 	return (-1);
@@ -2563,8 +2475,7 @@ struct pic2_info *pi;
  * pic2_save_block:
  *	initializes saver information.
  */
-static int pic2_load_block(pi)
-struct pic2_info *pi;
+static int pic2_load_block(struct pic2_info *pi)
 {
     int i;
 
@@ -2579,12 +2490,7 @@ struct pic2_info *pi;
     return (form_tab[i].loader_init(pi));
 }
 
-static int pic2_save_block(pi, line, x, y, xw, yw, id, opaque)
-struct pic2_info *pi;
-pixel **line;
-int x, y, xw, yw;
-char *id;
-pixel opaque;
+static int pic2_save_block(struct pic2_info *pi, pixel **line, int x, int y, int xw, int yw, char *id, pixel opaque)
 {
     int i;
 
@@ -2692,8 +2598,7 @@ byte *r, *g, *b;
  * pic2_exchange_rg:
  *      exchanges red and green values.
  */
-static byte pic2_convert_color_bits(c, from, to)
-int c, from, to;
+static byte pic2_convert_color_bits(int c, int from, int to)
 {
     if (from == to)
 	return ((byte) c);
@@ -2703,8 +2608,7 @@ int c, from, to;
 	return (pic2_reduce_color_bits(c, from, to));
 }
 
-static byte pic2_pad_color_bits(c, from, to)
-int c, from, to;
+static byte pic2_pad_color_bits(int c, int from, int to)
 {
     byte p = 0;
 
@@ -2715,15 +2619,12 @@ int c, from, to;
     return (p);
 }
 
-static byte pic2_reduce_color_bits(c, from, to)
-int c, from, to;
+static byte pic2_reduce_color_bits(int c, int from, int to)
 {
     return ((byte) (c >> (from - to)));
 }
 
-static pixel pic2_exchange_rg(p, colbits)
-pixel p;
-int colbits;
+static pixel pic2_exchange_rg(pixel p, int colbits)
 {
     pixel rmask, gmask, bmask;
 
@@ -2740,9 +2641,7 @@ int colbits;
 /*
  * This function handles work memory buffer.
  */
-static void pic2_handle_para(pi, mode)
-struct pic2_info *pi;
-int mode;
+static void pic2_handle_para(struct pic2_info *pi, int mode)
 {
     static pixel *vram_prev, *vram_now, *vram_next;
     static short *flag_now, *flag_next;
@@ -2787,8 +2686,7 @@ int mode;
  * pic2_free_buffer:
  *	free work memory buffer.
  */
-static int pic2_alloc_buffer(pi)
-struct pic2_info *pi;
+static int pic2_alloc_buffer(struct pic2_info *pi)
 {
     int wid;
     byte *p;
@@ -2798,7 +2696,7 @@ struct pic2_info *pi;
 
     wid = pi->block->x_wid;
 
-    p = pi->buf = (byte *) pic2_new((wid + 8) * sizeof(pixel) * 3   // GRR POSSIBLE OVERFLOW / FIXME
+    p = pi->buf = (byte *) pic2_new((wid + 8) * sizeof(pixel) * 3   /* GRR POSSIBLE OVERFLOW / FIXME */
 				    + sizeof(pi->cache[0]) * 8 * 8 * 8
 				    + sizeof(pi->cache_pos[0]) * 8 * 8 * 8
 				    + sizeof(pi->mulu_tab[0]) * 16384
@@ -2830,8 +2728,7 @@ struct pic2_info *pi;
     return (0);
 }
 
-static void pic2_free_buffer(pi)
-struct pic2_info *pi;
+static void pic2_free_buffer(struct pic2_info *pi)
 {
     free(pi->buf);
     pi->buf = NULL;
@@ -2844,10 +2741,7 @@ struct pic2_info *pi;
  * pic2_tell_file:
  *	tells the location of the file pointer.
  */
-static long pic2_seek_file(pi, offset, whence)
-struct pic2_info *pi;
-long offset;
-int whence;
+static long pic2_seek_file(struct pic2_info *pi, long int offset, int whence)
 {
     long n;
 
@@ -2858,8 +2752,7 @@ int whence;
     return (n);
 }
 
-static long pic2_tell_file(pi)
-struct pic2_info *pi;
+static long pic2_tell_file(struct pic2_info *pi)
 {
     return (ftell(pi->fp));
 }
@@ -2883,18 +2776,14 @@ struct pic2_info *pi;
  * pic2_write_char:
  *	writes byte data to the file.
  */
-static int pic2_read_file(pi, buf, size)
-struct pic2_info *pi;
-void *buf;
-size_t size;
+static int pic2_read_file(struct pic2_info *pi, void *buf, size_t size)
 {
     if (fread(buf, (size_t) 1, size, pi->fp) < size)
 	pic2_file_error(pi, PIC2_CORRUPT);
     return (0);
 }
 
-static long pic2_read_long(pi)
-struct pic2_info *pi;
+static long pic2_read_long(struct pic2_info *pi)
 {
     byte buf[4];
 
@@ -2903,8 +2792,7 @@ struct pic2_info *pi;
     return (pic2_cextolong(buf));
 }
 
-static short pic2_read_short(pi)
-struct pic2_info *pi;
+static short pic2_read_short(struct pic2_info *pi)
 {
     byte buf[2];
 
@@ -2913,8 +2801,7 @@ struct pic2_info *pi;
     return (pic2_cextoshort(buf));
 }
 
-static char pic2_read_char(pi)
-struct pic2_info *pi;
+static char pic2_read_char(struct pic2_info *pi)
 {
     int c;
 
@@ -2923,19 +2810,14 @@ struct pic2_info *pi;
     return ((char) c);
 }
 
-static int pic2_write_file(pi, buf, size)
-struct pic2_info *pi;
-void *buf;
-size_t size;
+static int pic2_write_file(struct pic2_info *pi, void *buf, size_t size)
 {
     if (fwrite(buf, (size_t) 1, size, pi->fp) < size)
 	pic2_error(pi, PIC2_WRITE);
     return (0);
 }
 
-static int pic2_write_long(pi, n)
-struct pic2_info *pi;
-long n;
+static int pic2_write_long(struct pic2_info *pi, long int n)
 {
     byte buf[4];
 
@@ -2945,9 +2827,7 @@ long n;
     return (0);
 }
 
-static int pic2_write_short(pi, n)
-struct pic2_info *pi;
-int n;
+static int pic2_write_short(struct pic2_info *pi, int n)
 {
     byte buf[2];
 
@@ -2957,9 +2837,7 @@ int n;
     return (0);
 }
 
-static int pic2_write_char(pi, c)
-struct pic2_info *pi;
-int c;
+static int pic2_write_char(struct pic2_info *pi, int c)
 {
     if (fputc(c, pi->fp) == EOF)
 	pic2_error(pi, PIC2_WRITE);
@@ -2975,9 +2853,7 @@ int c;
  * pic2_flush_bits:
  *	flushes bit buffer to the file.
  */
-static unsigned long pic2_read_bits(pi, bits)
-struct pic2_info *pi;
-int bits;
+static unsigned long pic2_read_bits(struct pic2_info *pi, int bits)
 {
     unsigned long r = 0;
 
@@ -2999,10 +2875,7 @@ int bits;
     return r;
 }
 
-static void pic2_write_bits(pi, dat, bits)
-struct pic2_info *pi;
-unsigned long dat;
-int bits;
+static void pic2_write_bits(struct pic2_info *pi, long unsigned int dat, int bits)
 {
     unsigned long dat_mask = 1 << (bits - 1);
 
@@ -3024,8 +2897,7 @@ int bits;
     }
 }
 
-static void pic2_flush_bits(pi)
-struct pic2_info *pi;
+static void pic2_flush_bits(struct pic2_info *pi)
 {
     if (pi->bs.rest < 8) {
 	pi->bs.cur <<= 8 - pi->bs.rest;
@@ -3045,17 +2917,14 @@ struct pic2_info *pi;
  * pic2_cleanup_pinfo:
  *	cleans up a PICINFO structure.
  */
-static void pic2_init_info(pi)
-struct pic2_info *pi;
+static void pic2_init_info(struct pic2_info *pi)
 {
     xvbzero((char *) pi, sizeof(struct pic2_info));
     pi->header = pic2_new(sizeof(struct pic2_header), "pic2_init_info#1");
     pi->block = pic2_new(sizeof(struct pic2_block), "pic2_init_info#2");
 }
 
-static void pic2_cleanup_pic2_info(pi, writing)
-struct pic2_info *pi;
-int writing;
+static void pic2_cleanup_pic2_info(struct pic2_info *pi, int writing)
 {
     if (!writing && pi->fp)
 	fclose(pi->fp);
@@ -3069,8 +2938,7 @@ int writing;
     pi->comment = NULL;
 }
 
-static void pic2_cleanup_pinfo(pinfo)
-PICINFO *pinfo;
+static void pic2_cleanup_pinfo(PICINFO *pinfo)
 {
     if (pinfo->pic){
 	free(pinfo->pic);
@@ -3091,25 +2959,20 @@ PICINFO *pinfo;
  * pic2_file_error:
  *	shows a file error message and jumps to the entry for errors.
  */
-static void pic2_memory_error(scm, fn)
-char *scm, *fn;
+static void pic2_memory_error(char *scm, char *fn)
 {
     char buf[128];
     sprintf(buf, "%s: can't allocate memory. (%s)", scm, fn);
     FatalError(buf);
 }
 
-static void pic2_error(pi, mn)
-struct pic2_info *pi;
-int mn;
+static void pic2_error(struct pic2_info *pi, int mn)
 {
     SetISTR(ISTR_WARNING, "%s", pic2_msgs[mn]);
     longjmp(pi->jmp, 1);
 }
 
-static void pic2_file_error(pi, mn)
-    struct pic2_info *pi;
-    int mn;
+static void pic2_file_error(struct pic2_info *pi, int mn)
 {
     if (feof(pi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", pic2_msgs[mn]);
@@ -3118,8 +2981,7 @@ static void pic2_file_error(pi, mn)
     longjmp(pi->jmp, 1);
 }
 
-static void pic2_show_pic2_info(pi)
-    struct pic2_info *pi;
+static void pic2_show_pic2_info(struct pic2_info *pi)
 {
     fprintf(stderr, "file size: %ld.\n", pi->fsize);
     fprintf(stderr, "full image size: %dx%d\n", pi->x_max, pi->y_max);
@@ -3149,9 +3011,7 @@ static void pic2_show_pic2_info(pi)
  * This function is similar to strncpy.
  * But this pads with whitespace after the null character.
  */
-static char *pic2_strncpy(dest, src, n)
-char *dest, *src;
-size_t n;
+static char *pic2_strncpy(char *dest, char *src, size_t n)
 {
     char *r;
 
@@ -3167,9 +3027,7 @@ size_t n;
 /*
  * These functions create a memory block.
  */
-static void *pic2_malloc(size, fn)
-size_t size;
-char *fn;
+static void *pic2_malloc(size_t size, char *fn)
 {
     void *p;
 
@@ -3179,9 +3037,7 @@ char *fn;
     return (p);
 }
 
-static void *pic2_new(size, fn)
-size_t size;
-char *fn;
+static void *pic2_new(size_t size, char *fn)
 {
     void *p;
 
@@ -3195,12 +3051,12 @@ char *fn;
 
 /**** Stuff for PIC2Dialog box ****/
 
-#define TWIDE    320
-#define THIGH	 178
+#define TWIDE    (320*dpiMult)
+#define THIGH	 (178*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int,int,int,int));
 static void clickTD   PARM((int,int));
@@ -3221,9 +3077,9 @@ static RBUTT *depthRB;
 
 
 /***************************************************/
-void CreatePIC2W()
+void CreatePIC2W(void)
 {
-    int	     y;
+    int x, y;
 
     pic2W = CreateWindow("xv pic2", "XVpic2", NULL,
 			TWIDE, THIGH, infofg, infobg, 0);
@@ -3233,37 +3089,41 @@ void CreatePIC2W()
     XSelectInput(theDisp, pic2W,
 		 ExposureMask | ButtonPressMask | KeyPressMask);
 
-    BTCreate(&tbut[T_BOK], pic2W, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
+    BTCreate(&tbut[T_BOK], pic2W, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	     "Ok", infofg, infobg, hicol, locol);
 
-    BTCreate(&tbut[T_BCANC], pic2W, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
+    BTCreate(&tbut[T_BCANC], pic2W, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	     "Cancel", infofg, infobg, hicol, locol);
 
-    y = 55;
-    typeRB = RBCreate(NULL, pic2W, 36, y,          "P2SS",
+    x = 36*dpiMult;
+    y = 55*dpiMult;
+    typeRB = RBCreate(NULL, pic2W, x, y,           "P2SS",
 		      infofg, infobg,hicol,locol);
-    RBCreate(typeRB, pic2W, 36, y+18,              "P2SF",
+    RBCreate(typeRB, pic2W, x, y + 18*dpiMult,     "P2SF",
 	     infofg, infobg,hicol,locol);
-    RBCreate(typeRB, pic2W, 36, y+36,              "P2BM",
+    RBCreate(typeRB, pic2W, x, y + 36*dpiMult,     "P2BM",
 	     infofg, infobg, hicol, locol);
-    RBCreate(typeRB, pic2W, 36, y+54,              "P2BI",
+    RBCreate(typeRB, pic2W, x, y + 54*dpiMult,     "P2BI",
 	     infofg, infobg, hicol, locol);
 
-    depthRB = RBCreate(NULL, pic2W, TWIDE/2-16, y, "  3bit",
+    x = TWIDE/2 - 16*dpiMult;
+    depthRB = RBCreate(NULL, pic2W, x, y,          "  3bit",
 		       infofg, infobg,hicol,locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+18,     "  6bit",
+    RBCreate(depthRB, pic2W, x, y + 18*dpiMult,    "  6bit",
 	     infofg, infobg,hicol,locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+36,     "  9bit",
+    RBCreate(depthRB, pic2W, x, y + 36*dpiMult,    "  9bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/2-16, y+54,     "12bit",
+    RBCreate(depthRB, pic2W, x, y + 54*dpiMult,    "12bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y,      "15bit",
+
+    x = TWIDE/4*3 - 16*dpiMult;
+    RBCreate(depthRB, pic2W, x, y,                 "15bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+18,   "18bit",
+    RBCreate(depthRB, pic2W, x, y + 18*dpiMult,    "18bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+36,   "21bit",
+    RBCreate(depthRB, pic2W, x, y + 36*dpiMult,    "21bit",
 	     infofg, infobg, hicol, locol);
-    RBCreate(depthRB, pic2W, TWIDE/4*3-16, y+54,   "24bit",
+    RBCreate(depthRB, pic2W, x, y + 54*dpiMult,    "24bit",
 	     infofg, infobg, hicol, locol);
 
     XMapSubwindows(theDisp, pic2W);
@@ -3271,8 +3131,7 @@ void CreatePIC2W()
 
 
 /***************************************************/
-void PIC2Dialog(vis)
-int vis;
+void PIC2Dialog(int vis)
 {
     if (vis) {
 	CenterMapWindow(pic2W, tbut[T_BOK].x + tbut[T_BOK].w/2,
@@ -3284,8 +3143,7 @@ int vis;
 
 
 /***************************************************/
-int PIC2CheckEvent(xev)
-XEvent *xev;
+int PIC2CheckEvent(XEvent *xev)
 {
     /* check event to see if it's for one of our subwindows.  If it is,
        deal accordingly and return '1'.  Otherwise, return '0'. */
@@ -3350,9 +3208,7 @@ XEvent *xev;
 
 
 /***************************************************/
-int PIC2SaveParams(fname, col)
-char *fname;
-int col;
+int PIC2SaveParams(char *fname, int col)
 {
     filename = fname;
     colorType = col;
@@ -3453,8 +3309,7 @@ int col;
 
 
 /***************************************************/
-static void drawTD(x,y,w,h)
-int x,y,w,h;
+static void drawTD(int x, int y, int w, int h)
 {
     char *title  = "Save PIC2 file...";
     int  i;
@@ -3469,18 +3324,17 @@ int x,y,w,h;
     for (i = 0; i < T_NBUTTS; i++)
 	BTRedraw(&tbut[i]);
 
-    ULineString(pic2W, typeRB->x-16, typeRB->y-3-DESCENT,   "FormatType");
-    ULineString(pic2W, depthRB->x-16, depthRB->y-3-DESCENT, "ColorDepth");
+    ULineString(pic2W, typeRB->x  - 16*dpiMult, typeRB->y  - 3*dpiMult - DESCENT, "FormatType");
+    ULineString(pic2W, depthRB->x - 16*dpiMult, depthRB->y - 3*dpiMult - DESCENT, "ColorDepth");
     RBRedraw(typeRB, -1);
     RBRedraw(depthRB, -1);
 
-    DrawString(pic2W, 20, 29, title);
+    DrawString(pic2W, 20*dpiMult, 29*dpiMult, title);
 
     XSetClipMask(theDisp, theGC, None);
 }
 
-static void clickTD(x,y)
-int x,y;
+static void clickTD(int x, int y)
 {
     int i;
     BUTT *bp;
@@ -3515,8 +3369,7 @@ int x,y;
 
 
 /***************************************************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
     switch (cmd) {
     case T_BOK: {
@@ -3573,7 +3426,7 @@ int cmd;
 
 
 /*******************************************/
-static void writePIC2()
+static void writePIC2(void)
 {
     int   w, h, nc, rv, type, depth, ptype, pfree;
     byte *inpix, *rmap, *gmap, *bmap;

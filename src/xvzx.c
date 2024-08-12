@@ -24,21 +24,22 @@
 
 #define TRUNCSTR "File appears to be truncated."
 
+static int PointZX PARM((byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int x, int y));
+static void CellZX PARM((byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int cx, int cy, byte *zxfile));
+
 static int zxError PARM((const char *, const char *));
 
 static const char *bname;
 
 /*******************************************/
-int LoadZX(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadZX(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   /* returns '1' on success */
 
   FILE  *fp;
   unsigned int    c, c1;
-  int   x,y, trunc;
+  int   x,y;
   byte  *zxfile;
 
   bname = BaseName(fname);
@@ -62,7 +63,7 @@ int LoadZX(fname, pinfo)
 
   /* Load it in en bloc */
   memset(zxfile, 0, 7040);
-  if (fread(zxfile, 1, 7040, fp) < 7040) trunc = 1;
+  if (fread(zxfile, 1, 7040, fp) < 7040) { /* trunc = 1 */; }
 
   /* Transform to 8-bit */
 
@@ -152,8 +153,7 @@ int LoadZX(fname, pinfo)
 
 
 /*******************************************/
-static int zxError(fname, st)
-     const char *fname, *st;
+static int zxError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;
@@ -177,11 +177,7 @@ byte ZXheader[128] =
 
 /* Get the Spectrum colour/bright byte (0-15) from a pixel */
 
-static int PointZX(pic, w, h, rmap, gmap, bmap, x, y)
-	byte *pic;
-	int w,h;
-	byte *rmap, *gmap, *bmap;
-	int x,y;
+static int PointZX(byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int x, int y)
 {
 	int index, r, g, b, zxc;
 
@@ -214,12 +210,7 @@ static int PointZX(pic, w, h, rmap, gmap, bmap, x, y)
 
 /* Work out what colours should be used in a cell */
 
-static void CellZX(pic, w, h, rmap, gmap, bmap, cx, cy, zxfile)
-        byte *pic;
-        int w,h;
-        byte *rmap, *gmap, *bmap;
-        int cx,cy;
-	byte *zxfile;
+static void CellZX(byte *pic, int w, int h, byte *rmap, byte *gmap, byte *bmap, int cx, int cy, byte *zxfile)
 {
 	byte counts[16];	/* Count of no. of colours */
 	int offset, ink, paper, n, m, x, y, x0, y0, di, dp;
@@ -297,18 +288,16 @@ static void CellZX(pic, w, h, rmap, gmap, bmap, cx, cy, zxfile)
 
 
 /*******************************************/
-int WriteZX(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *comment;
+int WriteZX(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle, char *comment)
 {
 	int rv, x, y;
 	byte *zxfile;
 	byte *pic8;
 	byte  rtemp[256],gtemp[256],btemp[256];
+
+	XV_UNUSED(numcols);
+	XV_UNUSED(colorstyle);
+	XV_UNUSED(comment);
 
 	/* To simplify matters, reduce 24-bit to 8-bit. Since the Spectrum
            screen is 3.5-bit anyway, it doesn't make much difference */

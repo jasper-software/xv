@@ -1,0 +1,29 @@
+%!PS-Adobe-3.0
+%%Creator: William
+%%Title: test overprint
+%%DocumentProcessColors: Cyan Magenta Yellow
+%%BoundingBox: 0 0 144 144
+%%EndComments
+%%EndProlog
+%%Page: 1 1
+
+statusdict /setpage known {statusdict begin 144 144 1 setpage end} if
+
+0 setlinecap
+1 setlinewidth
+0 setlinejoin
+10 setmiterlimit
+[ ] 0 setdash
+
+false setoverprint
+1 0 0 0 setcmykcolor
+newpath 0 0 moveto 0 72 rlineto 72 0 rlineto 0 -72 rlineto closepath fill
+
+0 1 0 0 setcmykcolor
+newpath 36 36 moveto 0 72 rlineto 72 0 rlineto 0 -72 rlineto closepath fill
+
+true setoverprint
+0 0 1 0 setcmykcolor
+newpath 72 72 moveto 0 72 rlineto 72 0 rlineto 0 -72 rlineto closepath fill
+
+showpage

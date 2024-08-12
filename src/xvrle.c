@@ -33,9 +33,7 @@ static int  rleError PARM((const char *, const char *));
 
 
 /*******************************************/
-int LoadRLE(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadRLE(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   FILE  *fp;
@@ -160,7 +158,7 @@ int LoadRLE(fname, pinfo)
 
   if (ferror(fp) || feof(fp)) {
     fclose(fp);
-    if (pinfo->comment) free(pinfo->comment);  pinfo->comment = (char *) NULL;
+    if (pinfo->comment) { free(pinfo->comment); } pinfo->comment = (char *) NULL;
     return rleError(bname, "EOF reached in RLE header.\n");
   }
 
@@ -191,7 +189,7 @@ int LoadRLE(fname, pinfo)
 
   if (errstr) {
     fclose(fp);
-    if (pinfo->comment) free(pinfo->comment);  pinfo->comment = (char *) NULL;
+    if (pinfo->comment) { free(pinfo->comment); } pinfo->comment = (char *) NULL;
     return rleError(bname, errstr);
   }
 
@@ -201,7 +199,7 @@ int LoadRLE(fname, pinfo)
                else img = (byte *) calloc((size_t) w * h * 3, (size_t) 1);
   if (!img) {
     fclose(fp);
-    if (pinfo->comment) free(pinfo->comment);  pinfo->comment = (char *) NULL;
+    if (pinfo->comment) { free(pinfo->comment); } pinfo->comment = (char *) NULL;
     return rleError(bname, "unable to allocate image data.\n");
   }
 
@@ -289,14 +287,13 @@ int LoadRLE(fname, pinfo)
 
 
 /*******************************************/
-static void read_rle(fp, img, w, h, ncolors, ncmap)
-     FILE *fp;
-     byte *img;
-     int   w, h, ncolors, ncmap;
+static void read_rle(FILE *fp, byte *img, int w, int h, int ncolors, int ncmap)
 {
   int posx, posy, plane, bperpix, i, pixval, skipcalls;
   int opcode, operand, done, c, c1;
   byte *ip;
+
+  XV_UNUSED(ncmap);
 
   posx = posy = plane = done = skipcalls = 0;
   if (ncolors == 1) bperpix = 1;
@@ -373,8 +370,7 @@ static void read_rle(fp, img, w, h, ncolors, ncmap)
 
 
 /*******************************************/
-static int rleError(fname,st)
-     const char *fname, *st;
+static int rleError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

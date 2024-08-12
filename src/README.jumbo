@@ -370,7 +370,8 @@ not finished (and/or even started ;-) ):
    unknown tags (or truncated/corrupted images)
  - fix for minor .Z inefficiency in xv.c ("FIXME")
  - fix for filename entry-field mouse/cursor deficiencies
-   (positioning fixed 20070104 by Ross Combs; would like select/cut/paste, too)
+   (positioning fixed 20070104 by Ross Combs; would like
+   select/cut/copy/paste, too)
  - fix for .ppm.gz "disk leak" [can't reproduce...already fixed?]
    (maybe occurs only if filesystem is already nearly full?  bad .gz?)
 
@@ -378,6 +379,11 @@ not finished (and/or even started ;-) ):
  - support for tiled background image (with transparent foreground image)
  - MNG/JNG support
  - SVG support
+
+ - tooltips for buttons with icons
+ - fix meta/alt/mod1 confusion in event handling and docs
+ - fix strange non-ICCCM positioning which causes windows to drift
+   when operations are performed and other strangeness
 
 
 ChangeLog

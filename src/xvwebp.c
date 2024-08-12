@@ -34,14 +34,273 @@
 static char *filename;
 static int   colorType;
 
+/*** Stuff for WEBP Dialog box ***/
+#define WEBPWIDE (288*dpiMult)
+#define WEBPHIGH (185*dpiMult)
+
+#define QUALITY   70     /* default quality */
+
+#define DWIDE    (86*dpiMult)
+#define DHIGH    (104*dpiMult)
+
+#define P_BOK    0
+#define P_BCANC  1
+#define P_NBUTTS 2
+
+#define BUTTH    (24*dpiMult)
+
+static DIAL  qDial;
+static BUTT  pbut[P_NBUTTS];
+static CBUTT FlosslessCB;
+
+static void drawWEBPD PARM((int x, int y, int w, int h));
+
+static void drawWEBPD(int x, int y, int w, int h)
+{
+  const char *title   = "Save WEBP file...";
+
+  char ctitle1[20];
+  const char *ctitle2 = "Quality value determines";
+  const char *ctitle3 = "compression rate: higher";
+  const char *ctitle4 = "quality = bigger file.";
+
+  int i;
+  int dx, dy;
+  XRectangle xr;
+
+  xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
+  XSetClipRectangles(theDisp, theGC, 0,0, &xr, 1, Unsorted);
+
+  XSetForeground(theDisp, theGC, infofg);
+  XSetBackground(theDisp, theGC, infobg);
+
+  for (i=0; i<P_NBUTTS; i++) BTRedraw(&pbut[i]);
+
+  DrawString(webpW, 15*dpiMult, 6*dpiMult + ASCENT, title);
+
+  dx = 110*dpiMult;
+  dy = 6*dpiMult + qDial.y + ASCENT*dpiMult;
+
+  sprintf(ctitle1, "Default = %d", QUALITY);
+  DrawString(webpW,      dx,  dy,            ctitle1);
+  DrawString(webpW,      dx,  dy+LINEHIGH,   ctitle2);
+  DrawString(webpW,      dx,  dy+2*LINEHIGH, ctitle3);
+  DrawString(webpW,      dx,  dy+3*LINEHIGH, ctitle4);
+
+  CBRedraw(&FlosslessCB);
+
+  XSetClipMask(theDisp, theGC, None);
+}
+
+/*******************************************/
+
+static void writeWEBP PARM((void));
+
+static void writeWEBP(void)
+{
+  FILE       *fp;
+  int         w, h, nc, rv, ptype, pfree;
+  byte       *inpix, *rmap, *gmap, *bmap;
+  int         unused_numcols;
+
+  fp = OpenOutFile(filename);
+  if (!fp) return;
+
+  WaitCursor();
+  inpix = GenSavePic(&ptype, &w, &h, &pfree, &nc, &rmap, &gmap, &bmap);
+
+  unused_numcols = 0;
+  rv = WriteWEBP(fp, inpix, ptype, w, h, rmap, gmap, bmap, unused_numcols, colorType);
+
+  SetCursors(-1);
+
+  if (CloseOutFile(fp, filename, rv) == 0) DirBox(0);
+
+  if (pfree) free(inpix);
+}
+
+/*******************************************/
+
+static void doCmd PARM((int cmd));
+
+static void doCmd(int cmd)
+{
+  switch (cmd) {
+    case P_BOK:
+      {
+        char *fullname;
+
+        writeWEBP();
+        WEBPDialog(0);
+
+        fullname = GetDirFullName();
+        if (!ISPIPE(fullname[0])) {
+          XVCreatedFile(fullname);
+          StickInCtrlList(0);
+        }
+      }
+      break;
+
+    case P_BCANC:
+      WEBPDialog(0);
+      break;
+
+    default:
+      break;
+  }
+}
+
+/*******************************************/
+
+static void clickWEBPD PARM((int x, int y));
+
+static void clickWEBPD(int x, int y)
+{
+  int i;
+  BUTT *bp;
+
+  /* check BUTTs */
+
+  for (i=0; i<P_NBUTTS; i++) {
+    bp = &pbut[i];
+    if (PTINRECT(x, y, bp->x, bp->y, bp->w, bp->h)) break;
+  }
+
+  if (i<P_NBUTTS) {  /* found one */
+    if (BTTrack(bp)) doCmd(i);
+  }
+
+  /* check CBUTTs */
+
+  else if (CBClick(&FlosslessCB,x,y)) {
+    int oldval = FlosslessCB.val;
+
+    CBTrack(&FlosslessCB);
+
+    if (oldval != FlosslessCB.val)
+    {
+      DSetActive(&qDial, !FlosslessCB.val);
+      DRedraw(&qDial); /* necessary? */
+    }
+  }
+}
+
+/*******************************************/
+void CreateWEBPW(void)
+{
+  webpW = CreateWindow("xv webp", "XVWEBP", NULL,
+                      WEBPWIDE, WEBPHIGH, infofg, infobg, 0);
+  if (!webpW) FatalError("can't create WEBP window!");
+
+  XSelectInput(theDisp, webpW, ExposureMask | ButtonPressMask | KeyPressMask);
+
+  DCreate(&qDial, webpW,  12*dpiMult, 25*dpiMult, DWIDE, DHIGH, 0.0,
+          100.0, QUALITY, 1.0, 3.0,
+          infofg, infobg, hicol, locol, "Quality", NULL);
+
+  CBCreate(&FlosslessCB,   webpW, 110*dpiMult, 6*dpiMult + qDial.y + ASCENT + 4*LINEHIGH, "Lossless",
+           infofg, infobg, hicol, locol);
+  FlosslessCB.val = 0;
+
+  BTCreate(&pbut[P_BOK], webpW, WEBPWIDE - 180*dpiMult - 1*dpiMult, WEBPHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
+          "Ok", infofg, infobg, hicol, locol);
+  BTCreate(&pbut[P_BCANC], webpW, WEBPWIDE - 90*dpiMult - 1*dpiMult, WEBPHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
+          "Cancel", infofg, infobg, hicol, locol);
+
+  XMapSubwindows(theDisp, webpW);
+}
+
+
+/*******************************************/
+void WEBPDialog(int vis)
+{
+  if (vis) {
+    CenterMapWindow(webpW, pbut[P_BOK].x + (int) pbut[P_BOK].w/2,
+                          pbut[P_BOK].y + (int) pbut[P_BOK].h/2,
+                    WEBPWIDE, WEBPHIGH);
+  }
+  else XUnmapWindow(theDisp, webpW);
+  webpUp = vis;
+}
+
+
+/*******************************************/
+int WEBPCheckEvent(XEvent *xev)
+{
+  /* check event to see if it's for one of our subwindows.  If it is,
+     deal accordingly, and return '1'.  Otherwise, return '0' */
+
+  int rv;
+  rv = 1;
+
+  if (!webpUp) return 0;
+  if (xev->type == Expose) {
+    int x,y,w,h;
+    XExposeEvent *e = (XExposeEvent *) xev;
+    x = e->x; y = e->y; w = e->width; h = e->height;
+
+    /* throw away excess expose events for 'dumb' windows */
+    if (e->count > 0 && (e->window == qDial.win)) {}
+
+    else if (e->window == webpW)       drawWEBPD(x, y, w, h);
+    else if (e->window == qDial.win)   DRedraw(&qDial);
+    else rv = 0;
+  }
+
+  else if (xev->type == ButtonPress) {
+    XButtonEvent *e = (XButtonEvent *) xev;
+    int x,y;
+    x = e->x;  y = e->y;
+
+    if (e->button == Button1) {
+      if      (e->window == webpW)      clickWEBPD(x,y);
+      else if (e->window == qDial.win)  DTrack(&qDial, x, y);
+      else rv = 0;
+    }  /* button1 */
+    else rv = 0;
+  }  /* button press */
+
+  else if (xev->type == KeyPress) {
+    XKeyEvent *e = (XKeyEvent *) xev;
+    char buf[128];  KeySym ks;
+    int stlen;
+
+    stlen = XLookupString(e,buf,128,&ks,(XComposeStatus *) NULL);
+    buf[stlen] = '\0';
+
+    RemapKeyCheck(ks, buf, &stlen);
+
+    if (e->window == webpW) {
+      if (stlen) {
+        if (buf[0] == '\r' || buf[0] == '\n') { /* enter */
+          FakeButtonPress(&pbut[P_BOK]);
+        }
+        else if (buf[0] == '\033') {            /* ESC */
+          FakeButtonPress(&pbut[P_BCANC]);
+        }
+      }
+    }
+    else rv = 0;
+  }
+  else rv = 0;
+
+  if (rv==0 && (xev->type == ButtonPress || xev->type == KeyPress)) {
+    XBell(theDisp, 50);
+    rv = 1;   /* eat it */
+  }
+
+  return rv;
+}
+
+
+/*******************************************/
+
 /*
  * This is how xv hands off save parameters to us.
  *
  * Takes a file name and the color type.
  */
-void WEBPSaveParams(fname, col)
-     char *fname;
-     int col;
+void WEBPSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -88,12 +347,7 @@ void WEBPSaveParams(fname, col)
  * - @tanabi on GITHUB
  */
 int
-WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
+WriteWEBP(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
   uint8_t*  webp_in = NULL;
   uint8_t*  webp_out = NULL;
@@ -102,6 +356,8 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   int       linesize = w*3;
   int       i = 0;
   int       final_size = 0;
+
+  XV_UNUSED(numcols);
 
   /*
    * First, we have to prepare our data in such a fashion that we can
@@ -113,7 +369,7 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
    */
   if (ptype == PIC24) {
     if (colorstyle == F_GREYSCALE) {
-        // Convert the pic to greyscale
+        /* Convert the pic to greyscale */
         webp_in = (uint8_t*)malloc(linesize*h);
         free_me = 1;
 
@@ -181,7 +437,7 @@ WriteWEBP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
  * Output version information to stderr
  */
 void
-VersionInfoWEBP()
+VersionInfoWEBP(void)
 {
   int decoder_version;
   int encoder_version;
@@ -209,9 +465,7 @@ VersionInfoWEBP()
  * Returns 1 on success, 0 on failure
  *
  */
-int LoadWEBP(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadWEBP(char *fname, PICINFO *pinfo)
 {
   FILE                  *fp;
   int                   filesize;
@@ -394,6 +648,5 @@ int LoadWEBP(fname, pinfo)
   WebPFree(rgba);
   return 1;
 }
-
 
 #endif

@@ -19,6 +19,7 @@
 
 #define XV_CAST(type, expr) ((type)(expr))
 #define XV_UNUSED(variable) ((void)(variable))
+#define XV_UNUSED_RETURN(expr) ((void)(expr))
 
 /* xv 3.10a:				19941229 */
 /* PNG patch 1.2d:			19960731 */
@@ -251,6 +252,11 @@
 #include <X11/Xatom.h>
 #include <X11/Xmd.h>
 
+#ifdef HAVE_XRR
+#include <X11/Xproto.h>
+#include <X11/extensions/Xrandr.h>
+#endif
+
 #ifdef TV_L10N
 #  include <X11/Xlocale.h>
 #endif
@@ -373,6 +379,8 @@
 #  define MAXPATHLEN 256
 #endif
 
+#define XV_MAXQUOTEDPATHLEN	(3 * MAXPATHLEN + 10)
+#define XV_SINGLE_QUOTE		'\''
 
 #ifdef SVR4
 #  define random lrand48
@@ -440,6 +448,7 @@
 /* END OF CONFIGURATION INFO */
 /*****************************/
 
+#define DBLCLICKTIME 400           /* double-click speed in milliseconds */
 
 #ifdef DOJPEG
 #  define HAVE_JPEG
@@ -463,6 +472,14 @@
 
 #ifdef DOG3
 #  define HAVE_G3
+#endif
+
+#ifndef TRUE
+#  define TRUE 1
+#endif
+
+#ifndef FALSE
+#  define FALSE 0
 #endif
 
 #ifdef DOWEBP
@@ -673,7 +690,8 @@
 #define F_FITS      (10 + F_TIFF)
 #define F_PM        (11 + F_TIFF)
 #define F_ZX        (12 + F_TIFF)   /* [JCE] */
-#define F_WBMP      (13 + F_TIFF)
+#define F_G3        (13 + F_TIFF)   /* [JCE] */
+#define F_WBMP      (14 + F_TIFF)
 #define F_WEBP      (F_WEBPINC + F_WBMP)
 #define JP_EXT_F    (F_WEBP)
 #define F_MAG       (JP_EXT_F + F_MAGINC)
@@ -721,10 +739,11 @@
 #define RFT_PCD      23
 #define RFT_HIPS     24
 #define RFT_BZIP2    25
-#define RFT_JPC      26
-#define RFT_JP2      27
-#define RFT_G3       28
-#define RFT_WEBP     29
+#define RFT_XZ       26
+#define RFT_JPC      27
+#define RFT_JP2      28
+#define RFT_G3       29
+#define RFT_WEBP     30
 #define JP_EXT_RFT   (RFT_WEBP)
 #define RFT_MAG      (JP_EXT_RFT + 1)
 #define RFT_MAKI     (JP_EXT_RFT + 2)
@@ -1127,7 +1146,7 @@ typedef struct { byte *pic;                  /* image data */
 #define GFB_RESET  4
 #define GFB_GAMMA  5
 
-#define GVMAX 8
+#define GVMAX 16
 
 typedef struct {  Window win;               /* window ID */
 		  Window gwin;              /* graph subwindow */
@@ -1191,6 +1210,7 @@ WHERE int           theScreen;
 WHERE unsigned int  ncells, dispDEEP; /* root color sizes */
 WHERE unsigned int  dispWIDE, dispHIGH; /* screen sizes */
 WHERE unsigned int  vrWIDE, vrHIGH, maxWIDE, maxHIGH; /* virtual root and max image sizes */
+WHERE int dpiMult;  /* multiplier for hidpi displays */
 WHERE Colormap      theCmap, LocalCmap;
 WHERE Window        spec_window, rootW, mainW, vrootW;
 WHERE GC            theGC;
@@ -1282,6 +1302,9 @@ WHERE int            nomgcsfx;  /* True if we don't want to use MgcSfx */
 
 #define FSTRMAX 12   /* Number of function keys to support. */
 WHERE char          *fkeycmds[FSTRMAX]; /* command to run when F# is pressed */
+WHERE int            forcegeom; /* always pretend geometry is user-specified
+				   (breaks ICCCM but some wm would require
+				   manual placement otherwise) */
 
 /* Std Cmap stuff */
 WHERE byte           stdr[256], stdg[256], stdb[256];  /* std 3/3/2 cmap */
@@ -1314,7 +1337,7 @@ WHERE XImage        *theImage;     /* X version of epic */
 
 WHERE int           ncols;         /* max # of (different) colors to alloc */
 
-WHERE char          dummystr[128]; /* dummy string used for error messages */
+WHERE char          dummystr[256]; /* dummy string used for error messages */
 WHERE char          initdir[MAXPATHLEN];   /* cwd when xv was started */
 WHERE char          searchdir[MAXPATHLEN]; /* '-dir' option */
 WHERE char          fullfname[MAXPATHLEN]; /* full name of current file */
@@ -1335,6 +1358,7 @@ WHERE int           bwidth,        /* border width of created windows */
                     viewonly,      /* if true, ignore any user input */
                     noFreeCols,    /* don't free colors when loading new pic */
                     autoquit,      /* quit in '-root' or when click on win */
+                    nopos,         /* if true, don't set PPosition, USPosition hints */
                     xerrcode,      /* errorcode of last X error */
                     grabDelay,     /* # of seconds to sleep at start of Grab */
                     startGrab;     /* start immediate grab ? */
@@ -1468,6 +1492,12 @@ WHERE Window        pngW;
 WHERE int           pngUp;        /* is pngW mapped, or what? */
 #endif
 
+#ifdef HAVE_WEBP
+/* stuff used for 'webp' box */
+WHERE Window        webpW;
+WHERE int           webpUp;       /* is webpW mapped, or what? */
+#endif
+
 #ifdef ENABLE_FIXPIX_SMOOTH
 WHERE int           do_fixpix_smooth;  /* GRR 19980607: runtime FS dithering */
 #endif
@@ -1553,13 +1583,15 @@ WHERE int           mgcsfxUp;      /* is mgcsfxW mapped, or what? */
 /* function declarations for externally-callable functions */
 
 /****************************** XV.C ****************************/
+void  SendSelection        PARM((Atom, Window, Atom, Atom, Time, char const *));
 int   ReadFileType         PARM((char *));
 int   ReadPicFile          PARM((char *, int, PICINFO *, int));
+char *QuoteFileName        PARM((char *, const char *, int));
 int   UncompressFile       PARM((char *, char *, int));
 void  KillPageFiles        PARM((char *, int));
-#ifdef MACBINARY          
+#ifdef MACBINARY
 int   RemoveMacbinary      PARM((char *, char *));
-#endif                    
+#endif
 
 void NewPicGetColors       PARM((int, int));
 void FixAspect             PARM((int, int *, int *));
@@ -1589,7 +1621,7 @@ void DoAlg                 PARM((int));
 
 
 /*************************** XVBROWSE.C ************************/
-void CreateBrowse          PARM((const char *, const char *, const char *,
+void CreateBrowse          PARM((const char *, int, const char *, const char *,
 				 const char *, const char *));
 void OpenBrowse            PARM((void));
 void HideBrowseWindows     PARM((void));
@@ -1608,6 +1640,7 @@ void BRCreatedFile         PARM((char *));
 void BTCreate              PARM((BUTT *, Window, int, int, u_int, u_int,
 				 const char *, u_long, u_long, u_long, u_long));
 
+void BTMove                PARM((BUTT *, int, int));
 void BTSetActive           PARM((BUTT *, int));
 void BTRedraw              PARM((BUTT *));
 int  BTTrack               PARM((BUTT *));
@@ -1628,6 +1661,7 @@ int    RBTrack             PARM((RBUTT *, int));
 void   CBCreate            PARM((CBUTT *, Window, int, int, const char *,
 				 u_long, u_long, u_long, u_long));
 
+void   CBMove              PARM((CBUTT *, int, int));
 void   CBRedraw            PARM((CBUTT *));
 void   CBSetActive         PARM((CBUTT *, int));
 int    CBClick             PARM((CBUTT *,int,int));
@@ -1637,6 +1671,9 @@ int    CBTrack             PARM((CBUTT *));
 void   MBCreate            PARM((MBUTT *, Window, int, int, u_int, u_int,
 				 const char *, const char **, int,
 				 u_long, u_long, u_long, u_long));
+
+void   MBChange            PARM((MBUTT *, int, int, unsigned int,
+				 unsigned int));
 
 void   MBRedraw            PARM((MBUTT *));
 void   MBSetActive         PARM((MBUTT *, int));
@@ -1662,10 +1699,12 @@ void   ChangeCmapMode      PARM((int, int, int));
 
 /************************** XVCPMASK.C **************************/
 CPS   *calcCPmask          PARM((char *, int));
+void   cpcode 	           PARM((char *, unsigned char *, int));
 
 
 /**************************** XVCTRL.C **************************/
 void   CreateCtrl          PARM((const char *));
+void   ResizeCtrl          PARM((int, int));
 void   SetButtPix          PARM((BUTT *, Pixmap, int, int));
 Pixmap MakePix1            PARM((Window, byte *, int, int));
 
@@ -1680,6 +1719,7 @@ void LSCreate              PARM((LIST *, Window, int, int, int, int, int,
 				 char **, int, u_long, u_long, u_long, u_long,
 				 void (*)(int, SCRL *), int, int));
 
+void LSResize              PARM((LIST *lp, int w, int h, int nlines));
 void LSRedraw              PARM((LIST *, int));
 int  LSClick               PARM((LIST *, XButtonEvent *));
 void LSChangeData          PARM((LIST *, char **, int));
@@ -1740,10 +1780,13 @@ int  DTrack                PARM((DIAL *, int, int));
 
 
 /**************************** XVDIR.C ***************************/
-void CreateDirW            PARM((char *));
+void CreateDirW            PARM((void));
+void ResizeDirW            PARM((int, int));
 void DirBox                PARM((int));
-void RedrawDirW            PARM((int,int,int,int));
-int  ClickDirW             PARM((int, int));
+void RedrawDirW            PARM((int, int, int, int));
+int  ClickDirW             PARM((int, int, int));
+int  DoubleClickDirW       PARM((int, int, int));
+void PasteIntoBox          PARM((char const *));
 void LoadCurrentDirectory  PARM((void));
 void GetDirPath            PARM((char *));
 int  DirCheckCD            PARM((void));
@@ -1751,6 +1794,12 @@ void RedrawDDirW           PARM((void));
 void RedrawDNamW           PARM((void));
 void SelectDir             PARM((int));
 void TrackDDirW            PARM((int,int));
+void SelectAllDirW         PARM((void));
+void CutDirW               PARM((void));
+void CopyDirW              PARM((void));
+void PasteDirW             PARM((void));
+void ClearDirW             PARM((void));
+void InactivateDirW        PARM((void));
 int  DirKey                PARM((int));
 int  DoSave                PARM((void));
 void SetDirFName           PARM((const char *));
@@ -1779,7 +1828,7 @@ int  OpenOutFileDesc       PARM((char *));
 int  EventLoop             PARM((void));
 int  HandleEvent           PARM((XEvent *, int *));
 
-void NewCutBuffer          PARM((char *));
+void NewCutBuffer          PARM((char const *));
 void DrawWindow            PARM((int,int,int,int));
 void WResize               PARM((int, int));
 void WRotate               PARM((void));
@@ -1879,6 +1928,7 @@ void  InfoBox              PARM((int));
 void  RedrawInfo           PARM((int, int, int, int));
 void  SetInfoMode          PARM((int));
 char *GetISTR              PARM((int));
+Pixmap ScalePixmap         PARM((Pixmap src_pixmap, int src_width, int src_height));
 
 #if defined(__STDC__) && !defined(NOSTDHDRS)
 void  SetISTR(int, ...);
@@ -1894,6 +1944,9 @@ void MaskCr                PARM((void));
 
 /*************************** XVMISC.C ***************************/
 void StoreDeleteWindowProp PARM((Window));
+Window CreateFlexWindow    PARM((const char *, const char *, const char *,
+				int, int, unsigned long, unsigned long,
+				int, int, int));
 Window CreateWindow        PARM((const char *, const char *, const char *,
 				 int, int, u_long, u_long, int));
 void DrawString            PARM((Window, int, int, const char *));
@@ -1937,6 +1990,10 @@ void Timer                 PARM((int));
 
 
 /*************************** XVPOPUP.C ***************************/
+void  SetMinSizeWindow     PARM((Window win, int w, int h));
+void  SetMaxSizeWindow     PARM((Window win, int w, int h));
+void  SetSizeIncWindow     PARM((Window win, int dx, int dy));
+void  CenterMapFlexWindow  PARM((Window, int, int, int, int, int));
 void  CenterMapWindow      PARM((Window, int, int, int, int));
 int   PopUp                PARM((const char *, const char **, int));
 void  ErrPopUp             PARM((const char *, const char *));
@@ -2040,6 +2097,10 @@ int LoadFITS               PARM((char *, PICINFO *, int));
 int WriteFITS              PARM((FILE *, byte *, int, int, int, byte *,
 				 byte *, byte *, int, int, char *));
 
+/**************************** XVG3.C ****************************/
+int LoadG3                 PARM((char *, PICINFO *));
+
+
 /**************************** XVGIF.C ***************************/
 int LoadGIF                PARM((char *, PICINFO *));
 
@@ -2140,6 +2201,7 @@ void  CreatePIC2W          PARM((void));
 void  PIC2Dialog           PARM((int));
 int   PIC2CheckEvent       PARM((XEvent *));
 int   PIC2SetParamOptions  PARM((char *));
+int   PIC2SaveParams       PARM((char *, int));
 
 /**************************** XVPM.C ****************************/
 int LoadPM                 PARM((char *, PICINFO *));
@@ -2164,6 +2226,14 @@ int   LoadPS               PARM((char *, PICINFO *, int));
 
 /**************************** XVRLE.C ***************************/
 int LoadRLE                PARM((char *, PICINFO *));
+
+/**************************** XVSELECT.C ***************************/
+char *GetClipboardText     PARM((void));
+char *GetPrimaryText       PARM((void));
+int SetClipboardText       PARM((Window, char const *, int));
+int SetPrimaryText         PARM((Window, char const *, int));
+char const *TextOfSelection PARM((Atom));
+int ReleaseSelection       PARM((Atom));
 
 /**************************** XVSUNRAS.C ***************************/
 int LoadSunRas             PARM((char *, PICINFO *));
@@ -2190,9 +2260,12 @@ int WriteWBMP              PARM((FILE *, byte *, int, int, int, byte *,
 
 /**************************** XVWEBP.C ***************************/
 int  LoadWEBP              PARM((char *, PICINFO *));
+void CreateWEBPW           PARM((void));
+void WEBPDialog            PARM((int));
+int  WEBPCheckEvent        PARM((XEvent *));
 int WriteWEBP              PARM((FILE *, byte *, int, int, int, byte *,
 				                 byte *, byte *, int, int));
-
+void WEBPSaveParams        PARM((char *, int));
 void VersionInfoWEBP       PARM((void));
 
 

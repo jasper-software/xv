@@ -58,9 +58,7 @@ static void    hash_destroy  PARM((void));
 
 
 /**************************************/
-int LoadXPM(fname, pinfo)
-     char *fname;
-     PICINFO *pinfo;
+int LoadXPM(char *fname, PICINFO *pinfo)
 {
   /* returns '1' on success */
 
@@ -357,8 +355,7 @@ int LoadXPM(fname, pinfo)
 
 
 /***************************************/
-static int XpmLoadError(fname, st)
-     const char *fname, *st;
+static int XpmLoadError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING, "%s:  %s", fname, st);
   return 0;
@@ -366,8 +363,7 @@ static int XpmLoadError(fname, st)
 
 
 /***************************************/
-static int XpmGetc(f)
-     FILE *f;
+static int XpmGetc(FILE *f)
 {
   int	c, d, lastc;
 
@@ -410,8 +406,7 @@ static int XpmGetc(f)
 
 
 /***************************************/
-static int hash(token)
-     char *token;
+static int hash(char *token)
 {
   int i, sum;
 
@@ -424,8 +419,7 @@ static int hash(token)
 
 
 /***************************************/
-static int hash_init(hsize)
-     int hsize;
+static int hash_init(int hsize)
 {
   /*
    * hash_init() - This function takes an arg, but doesn't do anything with
@@ -435,6 +429,8 @@ static int hash_init(hsize)
    */
 
   int i;
+
+  XV_UNUSED(hsize);
 
   hash_len = 257;
 
@@ -452,8 +448,7 @@ static int hash_init(hsize)
 
 
 /***************************************/
-static int hash_insert(entry)
-     hentry *entry;
+static int hash_insert(hentry *entry)
 {
   int     key;
   hentry *tmp;
@@ -478,8 +473,7 @@ static int hash_insert(entry)
 
 
 /***************************************/
-static hentry *hash_search(token)
-     char *token;
+static hentry *hash_search(char *token)
 {
   int     key;
   hentry *tmp;
@@ -496,7 +490,7 @@ static hentry *hash_search(token)
 
 
 /***************************************/
-static void hash_destroy()
+static void hash_destroy(void)
 {
   int     i;
   hentry *tmp;
@@ -516,15 +510,14 @@ static void hash_destroy()
 
 
 /**************************************************************************/
-int WriteXPM(fp, pic, ptype, w, h, rp, gp, bp, nc, col, name, comments)
-     FILE *fp;			/* File to write to */
-     byte *pic;			/* Image data */
-     int ptype;			/* PIC8 or PIC24 */
-     int w, h;			/* width, & height */
-     byte *rp, *gp, *bp;	/* Colormap pointers */
-     int nc, col;		/* number of colors, & colorstyle */
-     char *name;		/* name of file (/image) */
-     char *comments;		/* image comments (not currently used */
+int WriteXPM(FILE *fp /* File to write to */,
+		byte *pic /* Image data */,
+		int ptype /* PIC8 or PIC24 */,
+		int w, int h /* width, & height */,
+		byte *rp, byte *gp, byte *bp, /* Colormap pointers */
+		int nc, int col, /* number of colors, & colorstyle */
+		char *name /* name of file (/image) */,
+		char *comments /* image comments (not currently used) */ )
 {
   /* Note here, that tokenchars is assumed to contain 64 valid token */
   /* characters.  It's hardcoded to assume this for benefit of generating */
@@ -544,6 +537,8 @@ int WriteXPM(fp, pic, ptype, w, h, rp, gp, bp, nc, col, name, comments)
   long	li;		/* for() loop index */
   int	numcol;
 #endif
+
+  XV_UNUSED(comments);
 
   if (DEBUG) {
     if (ptype == PIC8)

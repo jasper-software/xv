@@ -44,9 +44,7 @@ static int  pcxError       PARM((const char *, const char *));
 
 
 /*******************************************/
-int LoadPCX(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadPCX(char *fname, PICINFO *pinfo)
 /*******************************************/
 {
   FILE  *fp;
@@ -211,11 +209,7 @@ int LoadPCX(fname, pinfo)
 
 
 /*****************************/
-static int pcxLoadImage8(fname, fp, pinfo, hdr)
-     const char *fname;
-     FILE    *fp;
-     PICINFO *pinfo;
-     byte    *hdr;
+static int pcxLoadImage8(const char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
 {
   /* load an image with at most 8 bits per pixel */
 
@@ -248,11 +242,7 @@ static int pcxLoadImage8(fname, fp, pinfo, hdr)
 
 
 /*****************************/
-static int pcxLoadImage24(fname, fp, pinfo, hdr)
-     const char *fname;
-     FILE *fp;
-     PICINFO *pinfo;
-     byte *hdr;
+static int pcxLoadImage24(const char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
 {
   byte *pix, *pic24, scale[256];
   int   c, i, j, w, h, maxv, cnt, planes, bperlin, nbytes, count;
@@ -330,10 +320,7 @@ static int pcxLoadImage24(fname, fp, pinfo, hdr)
 
 
 /*****************************/
-static void pcxLoadRaster(fp, image, depth, hdr, w,h)
-     FILE    *fp;
-     byte    *image, *hdr;
-     int      depth,w,h;
+static void pcxLoadRaster(FILE *fp, byte *image, int depth, byte *hdr, int w, int h)
 {
   /* supported:  8 bits per pixel, 1 plane; or 1 bit per pixel, 1-8 planes */
 
@@ -392,8 +379,7 @@ static void pcxLoadRaster(fp, image, depth, hdr, w,h)
 
 
 /*******************************************/
-static int pcxError(fname,st)
-     const char *fname, *st;
+static int pcxError(const char *fname, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
   return 0;

@@ -3,7 +3,11 @@
  *
  * callable functions:
  *
- *   CenterMapWindow(win,x,y)  -  maps and centers a window around the mouse
+ *   SetMinSizeWindow(win,w,h) -  set minimum allowed size
+ *   SetMaxSizeWindow(win,w,h) -  set maximum allowed size
+ *   SetSizeIncWindow(win,dx,dy) -  set resize increment stepping
+ *   CenterMapFlexWindow(win,x,y,keep) -  maps and centers a window around the mouse
+ *   CenterMapWindow(win,x,y) -  maps and centers a window around the mouse
  *   PopUp(str,...)        -  maps, sets up popW
  *   ErrPopUp(str,str)     -  maps, sets up popW
  *   GetStrPopUp(...)      -  opens a 1-line, editable text popup window
@@ -22,13 +26,13 @@
 #define OMIT_ICON_BITS
 #include "bits/icon"   /* icon_bits[] not used, but icon_width/height are */
 
-#define PUWIDE 480
-#define PUHIGH 170
+#define PUWIDE (480*dpiMult)
+#define PUHIGH (170*dpiMult)
 
-#define PAD_PUWIDE 480
-#define PAD_PUHIGH 215
+#define PAD_PUWIDE (480*dpiMult)
+#define PAD_PUHIGH (215*dpiMult)
 
-#define BUTTH   24
+#define BUTTH   (24*dpiMult)
 
 static int  doPopUp       PARM((const char *, const char **, int, int, const char *));
 static void attachPUD     PARM((void));
@@ -60,8 +64,8 @@ static void build1PadList PARM((const char *, const char **, const char **, int 
 /* local variables */
 static Window      popW;
 static int         nbts, selected, popUp=0, firsttime=1;
-static int         puwide = PUWIDE;
-static int         puhigh = PUHIGH;
+static int         puwide = 0 /* PUWIDE */;
+static int         puhigh = 0 /* PUHIGH */;
 static BUTT       *bts;
 static const char *text;
 static char        accel[8];
@@ -135,11 +139,51 @@ extern XtAppContext context;
 #endif
 
 /***************************************************/
-void CenterMapWindow(win, dx, dy, w, h)
-     Window win;
-     int    dx, dy, w, h;
+void SetMinSizeWindow(Window win, int w, int h)
 {
   XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.min_width  = w;
+  hints.min_height = h;
+  hints.flags |= PMinSize;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void SetMaxSizeWindow(Window win, int w, int h)
+{
+  XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.max_width  = w;
+  hints.max_height = h;
+  hints.flags |= PMaxSize;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void SetSizeIncWindow(Window win, int dx, int dy)
+{
+  XSizeHints hints;
+
+  if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
+  hints.base_width  = 0;
+  hints.base_height = 0;
+  hints.flags |= PBaseSize;
+  hints.width_inc  = dx;
+  hints.height_inc = dy;
+  hints.flags |= PResizeInc;
+  XSetNormalHints(theDisp, win, &hints);
+}
+
+
+/***************************************************/
+void CenterMapFlexWindow(Window win, int dx, int dy, int w, int h, int keepsize)
+{
+  XSizeHints   hints;
   Window       rW,cW;
   int          rx,ry,x,y,wx,wy;
   unsigned int mask;
@@ -158,7 +202,7 @@ void CenterMapWindow(win, dx, dy, w, h)
     if (wy + h > dispHIGH) wy = dispHIGH - h;
   }
 
-
+#if 0
   if (winCtrPosKludge) {
     wx -= (p_offx + ch_offx);
     wy -= (p_offy + ch_offy);
@@ -167,35 +211,42 @@ void CenterMapWindow(win, dx, dy, w, h)
     wx -= (ch_offx);
     wy -= (ch_offy);
   }
+#endif
+
+  /* do this first so the WM can override us */
+  XMoveWindow(theDisp, win, wx, wy);
 
   if (!XGetNormalHints(theDisp, win, &hints)) hints.flags = 0;
-  hints.width  = hints.min_width  = hints.max_width  = w;
-  hints.height = hints.min_height = hints.max_height = h;
   hints.x = wx;  hints.y = wy;
-  hints.flags  |= (USSize | PMinSize | PMaxSize | USPosition);
+  hints.width = w;
+  hints.height = h;
+  hints.flags |= PPosition | PSize;
+  if (keepsize) {
+    hints.min_width  = hints.max_width  = w;
+    hints.min_height = hints.max_height = h;
+    hints.flags |= PMinSize | PMaxSize;
+  }
   XSetNormalHints(theDisp, win, &hints);
 
-  XMoveWindow(theDisp, win, wx, wy);
   XMapRaised(theDisp, win);
 }
 
 
+void CenterMapWindow(Window win, int dx, int dy, int w, int h)
+{
+  CenterMapFlexWindow(win, dx, dy, w, h, TRUE);
+}
+
+
 /***************************************************/
-int PopUp(txt, labels, n)
-     const char *txt;
-     const char *labels[];
-     int         n;
+int PopUp(const char *txt, const char **labels, int n)
 {
   return doPopUp(txt, labels, n, ISPOPUP, "xv confirm");
 }
 
 
 /***************************************************/
-static int doPopUp(txt, labels, n, poptyp, wname)
-     const char *txt;
-     const char *labels[];
-     int         n, poptyp;
-     const char *wname;
+static int doPopUp(const char *txt, const char **labels, int n, int poptyp, const char *wname)
 {
   int    i;
   XEvent event;
@@ -211,30 +262,30 @@ static int doPopUp(txt, labels, n, poptyp, wname)
   else if (poptyp == ISPAD) {
 
     if (!padHaveDooDads) {
-      DCreate(&padWDial, popW, 16,      puhigh-16-100-1,75,100,
+      DCreate(&padWDial, popW, 16*dpiMult,      puhigh - 16*dpiMult - 100*dpiMult - 1*dpiMult, 75*dpiMult, 100*dpiMult,
 	      1.0, 2048.0, (double)pWIDE, 1.0, 10.0,
 	      infofg, infobg, hicol, locol, "Width", NULL);
-      DCreate(&padHDial, popW, 16+1+75, puhigh-16-100-1,75,100,
+      DCreate(&padHDial, popW, (16 + 1 + 75)*dpiMult, puhigh - 16*dpiMult - 100*dpiMult - 1*dpiMult, 75*dpiMult, 100*dpiMult,
 	      1.0, 2048.0, (double)pHIGH, 1.0, 10.0,
 	      infofg, infobg, hicol, locol, "Height", NULL);
 
-      DCreate(&padODial, popW, 16+1+75+75+9, puhigh-16-100-1,75,100,
+      DCreate(&padODial, popW, (16+1+75+75+9)*dpiMult, puhigh - 16*dpiMult - 100*dpiMult - 1*dpiMult, 75*dpiMult, 100*dpiMult,
 	      0.0, 100.0, 100.0, 1.0, 10.0,
 	      infofg, infobg, hicol, locol, "Opaque", NULL);
 
-      MBCreate(&padMthdMB, popW, 100-2+44, 10, 140, 19, NULL,
+      MBCreate(&padMthdMB, popW, 100*dpiMult - 2*dpiMult + 44*dpiMult, 10*dpiMult, 140*dpiMult, 19*dpiMult, NULL,
 	       padMthdNames, padMthdLen, infofg, infobg, hicol, locol);
       padMthdMB.hascheck = 1;
       padMthdMB.flags[0] = 1;
 
-      MBCreate(&padDfltMB, popW, 250-2+44, 10, 140, 19, "Defaults",
+      MBCreate(&padDfltMB, popW, (250-2+44)*dpiMult, 10*dpiMult, 140*dpiMult, 19*dpiMult, "Defaults",
 	       padColNames, padColLen, infofg, infobg, hicol, locol);
 
-      BTCreate(&padDButt, popW, padHDial.x+padHDial.w-12, puhigh-140+6,
-	       13,13, "", infofg, infobg, hicol, locol);
+      BTCreate(&padDButt, popW, padHDial.x+padHDial.w - 12*dpiMult, puhigh - 140*dpiMult + 6*dpiMult,
+	       13*dpiMult, 13*dpiMult, "", infofg, infobg, hicol, locol);
 
-      BTCreate(&padOMButt, popW, padODial.x+padODial.w-12, puhigh-140+6,
-	       13,13, "", infofg, infobg, hicol, locol);
+      BTCreate(&padOMButt, popW, padODial.x+padODial.w - 12*dpiMult, puhigh - 140*dpiMult + 6*dpiMult,
+	       13*dpiMult, 13*dpiMult, "", infofg, infobg, hicol, locol);
 
       padHaveDooDads = 1;
     }
@@ -257,8 +308,8 @@ static int doPopUp(txt, labels, n, poptyp, wname)
   text = txt;
 
   for (i=0; i<n; i++) {
-    BTCreate(&bts[i], popW, puwide - (n-i) * (80 + 10), puhigh - 10 - BUTTH,
-	     80, BUTTH, labels[i]+1, infofg, infobg, hicol, locol);
+    BTCreate(&bts[i], popW, puwide - (n-i) * (80 + 10)*dpiMult, puhigh - 10*dpiMult - BUTTH,
+	     80*dpiMult, BUTTH, labels[i]+1, infofg, infobg, hicol, locol);
     accel[i] = labels[i][0];
   }
 
@@ -302,7 +353,7 @@ static int doPopUp(txt, labels, n, poptyp, wname)
   if (startGrab == 2)
     startGrab = 4;
   else {
-    CenterMapWindow(popW, 40 + bts[0].x, BUTTH/2 + bts[0].y, puwide, puhigh);
+    CenterMapWindow(popW, 40*dpiMult + bts[0].x, BUTTH/2 + bts[0].y, puwide, puhigh);
 
     /* MUST wait for VisibilityNotify event to come in, else we run the risk
        of UnMapping the window *before* the Map request completed.  This
@@ -331,9 +382,7 @@ static int doPopUp(txt, labels, n, poptyp, wname)
 
 
 /***************************************************/
-void ErrPopUp(txt, label)
-     const char *txt;
-     const char *label;
+void ErrPopUp(const char *txt, const char *label)
 {
   /* simplified interface to PopUp.  Takes a string and the label for the
      (one) button */
@@ -343,12 +392,7 @@ void ErrPopUp(txt, label)
 
 
 /***************************************************/
-int GetStrPopUp(txt, labels, n, buf, buflen, filstr, allow)
-     const char *txt;
-     const char *labels[];
-     char *buf;
-     const char *filstr;
-     int   n, buflen, allow;
+int GetStrPopUp(const char *txt, const char **labels, int n, char *buf, int buflen, const char *filstr, int allow)
 {
   /* pops up a window with a prompt string, a 1-line editable
      text thingy, and a row of buttons.  'txt' is the prompt
@@ -374,14 +418,14 @@ int GetStrPopUp(txt, labels, n, buf, buflen, filstr, allow)
   gsCurPos = strlen(gsBuf);
   gsStPos = gsEnPos = 0;
 
-  gsh = LINEHIGH+5;
-  gsx = 10 + icon_width + 20;
-  gsy = 10+(PUHIGH-30-BUTTH-gsh)/2;
+  gsh = LINEHIGH + 5*dpiMult;
+  gsx = 10*dpiMult + icon_width + 20*dpiMult;
+  gsy = 10*dpiMult + (PUHIGH - 30*dpiMult - BUTTH - gsh)/2;
 
   if (strlen(txt) > (size_t) 60)
-    gsy = PUHIGH - 10 - BUTTH - 10 - gsh - 20;
+    gsy = PUHIGH - 10*dpiMult - BUTTH - 10*dpiMult - gsh - 20*dpiMult;
 
-  gsw = PUWIDE - gsx - 10;
+  gsw = PUWIDE - gsx - 10*dpiMult;
 
   changedGSBuf();      /* careful!  popW doesn't exist yet! */
 
@@ -390,8 +434,7 @@ int GetStrPopUp(txt, labels, n, buf, buflen, filstr, allow)
 
 
 /***************************************************/
-int GrabPopUp(pHide, pDelay)
-     int *pHide, *pDelay;
+int GrabPopUp(int *pHide, int *pDelay)
 {
   /* pops up Grab options dialog box */
 
@@ -406,17 +449,17 @@ int GrabPopUp(pHide, pDelay)
   gsCurPos = strlen(gsBuf);
   gsStPos = gsEnPos = 0;
 
-  gsw = 32;
-  gsh = LINEHIGH+5;
-  gsx = 10 + StringWidth(DELAYSTR) + 5;
-  gsy = (PUHIGH-BUTTH-10-5-gsh);
+  gsw = 32*dpiMult;
+  gsh = LINEHIGH + 5*dpiMult;
+  gsx = 10*dpiMult + StringWidth(DELAYSTR) + 5*dpiMult;
+  gsy = (PUHIGH - BUTTH - 10*dpiMult - 5*dpiMult - gsh);
 
   changedGSBuf();      /* careful!  popW doesn't exist yet! */
 
   /* window value gets filled in in doPopUp() */
-  CBCreate(&ahideCB, (Window) NULL,
-	   PUWIDE-10-18-StringWidth(HIDESTR),
-	   gsy+2, HIDESTR, infofg, infobg, hicol, locol);
+  CBCreate(&ahideCB, (Window) None,
+	   PUWIDE - 10*dpiMult - 18*dpiMult - StringWidth(HIDESTR),
+	   gsy + 2*dpiMult, HIDESTR, infofg, infobg, hicol, locol);
   ahideCB.val = *pHide;
 
   sprintf(grabTxt, "Grab: after delay, Left button grabs a window, ");
@@ -435,9 +478,7 @@ int GrabPopUp(pHide, pDelay)
 
 
 /***************************************************/
-int PadPopUp(pMode, pStr, pWide,pHigh, pOpaque, pOmode)
-     int  *pMode, *pWide, *pHigh, *pOpaque, *pOmode;
-     char **pStr;
+int PadPopUp(int *pMode, char **pStr, int *pWide, int *pHigh, int *pOpaque, int *pOmode)
 {
   /* pops up 'Pad' options dialog box */
 
@@ -481,10 +522,10 @@ int PadPopUp(pMode, pStr, pWide,pHigh, pOpaque, pOmode)
   gsCurPos = strlen(gsBuf);
   gsStPos  = gsEnPos = 0;
 
-  gsw = PAD_PUWIDE - 20;
-  gsh = LINEHIGH+5;
-  gsx = 10;
-  gsy = 40;
+  gsw = PAD_PUWIDE - 20*dpiMult;
+  gsh = LINEHIGH + 5*dpiMult;
+  gsx = 10*dpiMult;
+  gsy = 40*dpiMult;
 
   changedGSBuf();      /* careful!  popW doesn't exist yet! */
 
@@ -532,7 +573,7 @@ int PadPopUp(pMode, pStr, pWide,pHigh, pOpaque, pOmode)
 
 
 /***************************************************/
-static void buildPadLists()
+static void buildPadLists(void)
 {
   /* generates padCol* and padBg* lists used in 'Defaults' MBUTT.  Grabs
      all the X resources values it can, and adds appropriate defaults */
@@ -551,11 +592,7 @@ static void buildPadLists()
 
 
 /***************************************************/
-static void build1PadList(typstr, vals, nams, lenp, dvals, dnams, dlen)
-     const char  *typstr;
-     const char **vals, **nams;
-     const char **dvals, **dnams;
-     int         *lenp, dlen;
+static void build1PadList(const char *typstr, const char **vals, const char **nams, int *lenp, const char **dvals, const char **dnams, int dlen)
 {
   int   i;
   char  resname[128];
@@ -614,7 +651,7 @@ static void build1PadList(typstr, vals, nams, lenp, dvals, dnams, dlen)
 
 
 /***************************************************/
-void ClosePopUp()
+void ClosePopUp(void)
 {
   /* closes popW:  if it's a pop-up, returns 'cancel'.  If it's an alert,
      simply closes it */
@@ -628,8 +665,7 @@ void ClosePopUp()
 
 
 /***************************************************/
-void OpenAlert(txt)
-     const char *txt;
+void OpenAlert(const char *txt)
 {
   /* pops up a window with txt displayed in it (*no buttons*).
      returns immediately.  window is closed by 'CloseAlert()'.
@@ -668,7 +704,7 @@ void OpenAlert(txt)
 
 
 /***************************************************/
-void CloseAlert()
+void CloseAlert(void)
 {
   popUp = 0;
   XUnmapWindow(theDisp, popW);
@@ -676,8 +712,7 @@ void CloseAlert()
 
 
 /***************************************************/
-int PUCheckEvent(xev)
-     XEvent *xev;
+int PUCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for us.  If so, return 1, otherwise 0 */
 
@@ -791,11 +826,7 @@ int PUCheckEvent(xev)
 #define TR_MAXLN 10
 
 /***************************************************/
-static void TextRect(win, txt, x, y, w, h, fg)
-     Window      win;
-     const char *txt;
-     int         x,y,w,h;
-     u_long      fg;
+static void TextRect(Window win, const char *txt, int x, int y, int w, int h, u_long fg)
 {
   /* draws semi-complex strings in a rectangle */
 
@@ -864,10 +895,10 @@ static void TextRect(win, txt, x, y, w, h, fg)
 
 
 /***************************************************/
-static void createPUD()
+static void createPUD(void)
 {
   popW = CreateWindow("xv confirm", "XVconfirm", "+0+0",
-		      PUWIDE, PUHIGH, infofg, infobg, 0);
+		      PUWIDE, PUHIGH, infofg, infobg, FALSE);
   if (!popW) FatalError("can't create popup window!");
 
   XSelectInput(theDisp, popW, ExposureMask | ButtonPressMask | KeyPressMask
@@ -881,7 +912,7 @@ static void createPUD()
 
 
 /***************************************************/
-static void attachPUD()
+static void attachPUD(void)
 {
   /* used to make PUD a transient window of something.  Doesn't
      do anything anymore, as I got tired of having window layering
@@ -893,8 +924,7 @@ static void attachPUD()
 
 
 /***************************************************/
-static void drawPUD(x,y,w,h)
-int x,y,w,h;
+static void drawPUD(int x, int y, int w, int h)
 {
   int  i,xt,yt;
   XRectangle xr;
@@ -906,13 +936,13 @@ int x,y,w,h;
   XSetBackground(theDisp, theGC, infobg);
 
   if (popUp == ISGRAB) {
-    xt = 10;  yt = 10;
-    TextRect(popW, text, xt, yt, puwide-10-xt, gsy-20, infofg);
+    xt = 10*dpiMult;  yt = 10*dpiMult;
+    TextRect(popW, text, xt, yt, puwide - 10*dpiMult - xt, gsy - 20*dpiMult, infofg);
     drawGSBuf();
 
     XSetForeground(theDisp, theGC, infofg);
-    DrawString(popW, 10,        gsy+ASCENT+4, DELAYSTR);
-    DrawString(popW, gsx+gsw+5, gsy+ASCENT+4, SECSTR);
+    DrawString(popW, 10*dpiMult,        gsy + ASCENT + 4*dpiMult, DELAYSTR);
+    DrawString(popW, gsx + gsw + 5*dpiMult, gsy + ASCENT + 4*dpiMult, SECSTR);
 
     CBRedraw(&ahideCB);
   }
@@ -921,7 +951,7 @@ int x,y,w,h;
     drawGSBuf();
 
     XSetForeground(theDisp, theGC, infofg);
-    DrawString(popW, 10+44,10+ASCENT+4,"Pad Method:");
+    DrawString(popW, (10+44)*dpiMult, 10*dpiMult + ASCENT + 4*dpiMult, "Pad Method:");
 
     MBRedraw(&padMthdMB);
     MBRedraw(&padDfltMB);
@@ -933,40 +963,40 @@ int x,y,w,h;
     XSetForeground(theDisp, theGC, infofg);
     drawPadOMStr();
 
-    XDrawRectangle(theDisp, popW, theGC, 10, puhigh-140, 16+2*74+84, 130);
-    Draw3dRect(popW, 10+1, puhigh-140+1, 16+2*74+84-2, 130-2,
+    XDrawRectangle(theDisp, popW, theGC, 10*dpiMult, puhigh - 140*dpiMult, (16+2*74+84)*dpiMult, 130*dpiMult);
+    Draw3dRect(popW, (10+1)*dpiMult, puhigh - 140*dpiMult + 1*dpiMult, (16+2*74+84-2)*dpiMult, (130-2)*dpiMult,
 	       R3D_IN,2,hicol,locol,infobg);
     XSetForeground(theDisp, theGC, infofg);
-    CenterString(popW, 16+1+75-13, puhigh-16-100-12, "New Image Size");
+    CenterString(popW, (16+1+75-13)*dpiMult, puhigh - 16*dpiMult - 100*dpiMult - 12*dpiMult, "New Image Size");
 
     if (ctrlColor) {
       XSetForeground(theDisp, theGC, locol);
-      XDrawLine(theDisp, popW, theGC, 16+1+75+75+5, puhigh-140 + 6+8,
-		16+1+75+75+5, puhigh-10-4);
+      XDrawLine(theDisp, popW, theGC, (16+1+75+75+5)*dpiMult, puhigh - 140*dpiMult + 6*dpiMult + 8*dpiMult,
+		(16+1+75+75+5)*dpiMult, puhigh - 10*dpiMult - 4*dpiMult);
     }
 
 
     XSetForeground(theDisp, theGC, infofg);
-    XDrawRectangle(theDisp, popW, theGC, 268, puhigh-140,
-		   (u_int) puwide - 10 - 268, 130-BUTTH-10);
-    Draw3dRect(popW, 268+1, puhigh-140+1, (u_int) puwide -10-268-2,
-	       130-2 - BUTTH-10, R3D_IN,2,hicol,locol,infobg);
+    XDrawRectangle(theDisp, popW, theGC, 268*dpiMult, puhigh - 140*dpiMult,
+		   (u_int) puwide - 10*dpiMult - 268*dpiMult, 130*dpiMult - BUTTH - 10*dpiMult);
+    Draw3dRect(popW, (268+1)*dpiMult, puhigh - 140*dpiMult + 1*dpiMult, (u_int) puwide - 10*dpiMult - 268*dpiMult - 2*dpiMult,
+	       130*dpiMult - 2*dpiMult - BUTTH - 10*dpiMult, R3D_IN,2,hicol,locol,infobg);
 
-    TextRect(popW,padInst,268+5, puhigh-140+3, puwide-10-268-10,
-	     130-6 - BUTTH-10, infofg);
+    TextRect(popW,padInst, (268+5)*dpiMult, puhigh - 140*dpiMult + 3*dpiMult, puwide - 10*dpiMult - 268*dpiMult - 10*dpiMult,
+	     130*dpiMult - 6*dpiMult - BUTTH - 10*dpiMult, infofg);
   }
 
   else {
     XCopyPlane(theDisp, iconPix, popW, theGC, 0,0, icon_width, icon_height,
-	       10,10+(puhigh-30-BUTTH-icon_height)/2, 1L);
+	       10*dpiMult, 10*dpiMult + (puhigh - 30*dpiMult - BUTTH - icon_height)/2, 1L);
 
-    xt = 10+icon_width+20;  yt = 10;
+    xt = 10*dpiMult + icon_width + 20*dpiMult;  yt = 10*dpiMult;
 
     if (popUp == ISGETSTR) {
-      TextRect(popW, text, xt, yt, puwide-10-xt, gsy-20, infofg);
+      TextRect(popW, text, xt, yt, puwide - 10*dpiMult - xt, gsy - 20*dpiMult, infofg);
       drawGSBuf();
     }
-    else TextRect(popW,text,xt,yt,puwide-10-xt,puhigh-10-BUTTH-20,infofg);
+    else TextRect(popW, text, xt, yt, puwide - 10*dpiMult - xt, puhigh - 10*dpiMult - BUTTH - 20*dpiMult, infofg);
   }
 
 
@@ -976,15 +1006,14 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawPadOMStr()
+static void drawPadOMStr(void)
 {
-  CenterString(popW, padODial.x + (padODial.w - 13)/2,
-	       puhigh-16-100-12, padOMStr[padOMode]);
+  CenterString(popW, padODial.x + (padODial.w - 13*dpiMult)/2,
+	       puhigh - 16*dpiMult - 100*dpiMult - 12*dpiMult, padOMStr[padOMode]);
 }
 
 /***************************************************/
-static void clickPUD(x,y)
-     int x,y;
+static void clickPUD(int x, int y)
 {
   int i;
   BUTT *bp = NULL;
@@ -1049,11 +1078,11 @@ static void clickPUD(x,y)
       gsStPos = gsEnPos = 0;
       changedGSBuf();
       if (ctrlColor)
-	XClearArea(theDisp, popW, gsx+3,gsy+3,
-		   (u_int)gsw-5, (u_int)gsh-5, False);
+	XClearArea(theDisp, popW, gsx + 3*dpiMult, gsy + 3*dpiMult,
+		   (u_int)gsw - 5*dpiMult, (u_int)gsh - 5*dpiMult, False);
       else
-	XClearArea(theDisp, popW, gsx+1,gsy+1,
-		   (u_int)gsw-1, (u_int)gsh-1, False);
+	XClearArea(theDisp, popW, gsx + 1*dpiMult, gsy + 1*dpiMult,
+		   (u_int)gsw - 1*dpiMult, (u_int)gsh - 1*dpiMult, False);
       drawGSBuf();
 
       BTSetActive(&bts[0], (int) strlen(gsBuf));
@@ -1063,8 +1092,8 @@ static void clickPUD(x,y)
       DSetActive (&padWDial,  (i!=PAD_LOAD));
       DSetActive (&padHDial,  (i!=PAD_LOAD));
 
-      XClearArea(theDisp, popW, 184+5, puhigh-140+3,
-		 (u_int) puwide-10-184-10, 130-6 - BUTTH-10, True);
+      XClearArea(theDisp, popW, (184+5)*dpiMult, puhigh - 140*dpiMult + 3*dpiMult,
+		 (u_int) puwide - 10*dpiMult - 184*dpiMult - 10*dpiMult, 130*dpiMult - 6*dpiMult - BUTTH - 10*dpiMult, True);
 
       padMode = i;
     }
@@ -1081,11 +1110,11 @@ static void clickPUD(x,y)
       gsStPos = gsEnPos = 0;
       changedGSBuf();
       if (ctrlColor)
-	XClearArea(theDisp, popW, gsx+3,gsy+3,
-		   (u_int)gsw-5, (u_int)gsh-5, False);
+	XClearArea(theDisp, popW, gsx + 3*dpiMult, gsy + 3*dpiMult,
+		   (u_int)gsw - 5*dpiMult, (u_int)gsh - 5*dpiMult, False);
       else
-	XClearArea(theDisp, popW, gsx+1,gsy+1,
-		   (u_int)gsw-1, (u_int)gsh-1, False);
+	XClearArea(theDisp, popW, gsx + 1*dpiMult, gsy + 1*dpiMult,
+		   (u_int)gsw - 1*dpiMult, (u_int)gsh - 1*dpiMult, False);
       drawGSBuf();
 
       BTSetActive(&bts[0], (int) strlen(gsBuf));
@@ -1096,16 +1125,14 @@ static void clickPUD(x,y)
 
 
 /***************************************************/
-static void doGetStrKey(c)
-     int c;
+static void doGetStrKey(int c)
 {
   if (doGSKey(c)) XBell(theDisp, 0);
 }
 
 
 /***************************************************/
-static int doGSKey(c)
-     int c;
+static int doGSKey(int c)
 {
   /* handle characters typed at GetStrPopUp window.  Button accel. keys
      have already been checked for elsewhere.  Practical upshot is that
@@ -1179,9 +1206,9 @@ static int doGSKey(c)
   changedGSBuf();      /* compute gsEnPos, gsStPos */
 
   if (ctrlColor)
-    XClearArea(theDisp, popW, gsx+3,gsy+3, (u_int)gsw-5, (u_int)gsh-5, False);
+    XClearArea(theDisp, popW, gsx + 3*dpiMult, gsy + 3*dpiMult, (u_int)gsw - 5*dpiMult, (u_int)gsh - 5*dpiMult, False);
   else
-    XClearArea(theDisp, popW, gsx+1,gsy+1, (u_int)gsw-1, (u_int)gsh-1, False);
+    XClearArea(theDisp, popW, gsx + 1*dpiMult, gsy + 1*dpiMult, (u_int)gsw - 1*dpiMult, (u_int)gsh - 1*dpiMult, False);
 
   drawGSBuf();
 
@@ -1204,7 +1231,7 @@ static int doGSKey(c)
 
 
 /***************************************************/
-static void changedGSBuf()
+static void changedGSBuf(void)
 {
   /* cursor position (or whatever) may have changed.  adjust displayed
      portion of gsBuf */
@@ -1221,13 +1248,13 @@ static void changedGSBuf()
 
   /* while substring is shorter than window, inc enPos */
 
-  while (XTextWidth(mfinfo, &gsBuf[gsStPos], gsEnPos-gsStPos) < (gsw-6)
+  while (XTextWidth(mfinfo, &gsBuf[gsStPos], gsEnPos-gsStPos) < (gsw - 6*dpiMult)
 	 && gsEnPos<len) { gsEnPos++; }
 
   /* while substring is longer than window, dec enpos, unless enpos==curpos,
      in which case, inc stpos */
 
-  while (XTextWidth(mfinfo, &gsBuf[gsStPos], gsEnPos-gsStPos) > (gsw-6)) {
+  while (XTextWidth(mfinfo, &gsBuf[gsStPos], gsEnPos-gsStPos) > (gsw - 6*dpiMult)) {
     if (gsEnPos != gsCurPos) gsEnPos--;
     else gsStPos++;
   }
@@ -1235,7 +1262,7 @@ static void changedGSBuf()
 
 
 /***************************************************/
-static void drawGSBuf()
+static void drawGSBuf(void)
 {
   /* draw edittext thingy in GetStrPopUp window */
 
@@ -1243,29 +1270,29 @@ static void drawGSBuf()
 
   XSetForeground(theDisp, theGC, infofg);
   XDrawRectangle(theDisp, popW, theGC, gsx, gsy, (u_int) gsw, (u_int) gsh);
-  Draw3dRect(popW, gsx+1, gsy+1, (u_int) gsw-2, (u_int) gsh-2,
+  Draw3dRect(popW, gsx + 1*dpiMult, gsy + 1*dpiMult, (u_int) gsw - 2*dpiMult, (u_int) gsh - 2*dpiMult,
 	     R3D_IN, 2, hicol,locol,infobg);
 
   XSetForeground(theDisp, theGC, infofg);
 
   if (gsStPos>0) {  /* draw a "there's more over here" doowah */
-    XDrawLine(theDisp, popW, theGC, gsx+1, gsy+1, gsx+1, gsy + gsh-1);
-    XDrawLine(theDisp, popW, theGC, gsx+2, gsy+1, gsx+2, gsy + gsh-1);
-    XDrawLine(theDisp, popW, theGC, gsx+3, gsy+1, gsx+3, gsy + gsh-1);
+    XDrawLine(theDisp, popW, theGC, gsx + 1*dpiMult, gsy + 1*dpiMult, gsx + 1*dpiMult, gsy + gsh - 1*dpiMult);
+    XDrawLine(theDisp, popW, theGC, gsx + 2*dpiMult, gsy + 1*dpiMult, gsx + 2*dpiMult, gsy + gsh - 1*dpiMult);
+    XDrawLine(theDisp, popW, theGC, gsx + 3*dpiMult, gsy + 1*dpiMult, gsx + 3*dpiMult, gsy + gsh - 1*dpiMult);
   }
 
   if ((size_t) gsEnPos < strlen(gsBuf)) {
     /* draw a "there's more over here" doowah */
-    XDrawLine(theDisp, popW, theGC, gsx+gsw-3, gsy+1, gsx+gsw-3, gsy+gsh-1);
-    XDrawLine(theDisp, popW, theGC, gsx+gsw-2, gsy+1, gsx+gsw-2, gsy+gsh-1);
-    XDrawLine(theDisp, popW, theGC, gsx+gsw-1, gsy+1, gsx+gsw-1, gsy+gsh-1);
+    XDrawLine(theDisp, popW, theGC, gsx + gsw - 3*dpiMult, gsy + 1*dpiMult, gsx + gsw - 3*dpiMult, gsy + gsh - 1*dpiMult);
+    XDrawLine(theDisp, popW, theGC, gsx + gsw - 2*dpiMult, gsy + 1*dpiMult, gsx + gsw - 2*dpiMult, gsy + gsh - 1*dpiMult);
+    XDrawLine(theDisp, popW, theGC, gsx + gsw - 1*dpiMult, gsy + 1*dpiMult, gsx + gsw - 1*dpiMult, gsy + gsh - 1*dpiMult);
   }
 
-  XDrawString(theDisp, popW, theGC, gsx+4, gsy+ASCENT+4,
+  XDrawString(theDisp, popW, theGC, gsx + 4*dpiMult, gsy + ASCENT + 4*dpiMult,
 	      gsBuf+gsStPos, gsEnPos-gsStPos);
 
   cpos = gsx+XTextWidth(mfinfo, &gsBuf[gsStPos], gsCurPos-gsStPos);
-  XDrawLine(theDisp,popW,theGC, 4+cpos, gsy+3,         4+cpos, gsy+2+CHIGH+1);
-  XDrawLine(theDisp,popW,theGC, 4+cpos, gsy+2+CHIGH+1, 6+cpos, gsy+2+CHIGH+3);
-  XDrawLine(theDisp,popW,theGC, 4+cpos, gsy+2+CHIGH+1, 2+cpos, gsy+2+CHIGH+3);
+  XDrawLine(theDisp,popW,theGC, 4*dpiMult + cpos, gsy + 3*dpiMult,                     4*dpiMult + cpos, gsy + 2*dpiMult + CHIGH + 1*dpiMult);
+  XDrawLine(theDisp,popW,theGC, 4*dpiMult + cpos, gsy + 2*dpiMult + CHIGH + 1*dpiMult, 6*dpiMult + cpos, gsy + 2*dpiMult + CHIGH + 3*dpiMult);
+  XDrawLine(theDisp,popW,theGC, 4*dpiMult + cpos, gsy + 2*dpiMult + CHIGH + 1*dpiMult, 2*dpiMult + cpos, gsy + 2*dpiMult + CHIGH + 3*dpiMult);
 }

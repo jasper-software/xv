@@ -23,9 +23,7 @@ static int  WriteTIFF       PARM((FILE *, byte *, int, int, int,
 
 
 /*********************************************/
-static void setupColormap(tif, rmap, gmap, bmap)
-     TIFF *tif;
-     byte *rmap, *gmap, *bmap;
+static void setupColormap(TIFF *tif, byte *rmap, byte *gmap, byte *bmap)
 {
   short red[256], green[256], blue[256];
   int i;
@@ -44,14 +42,8 @@ static void setupColormap(tif, rmap, gmap, bmap)
 
 /*******************************************/
 /* Returns '0' if successful. */
-static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
-		     fname,comp,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype,w,h,comp;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *fname, *comment;
+static int WriteTIFF(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+		     char *fname, int comp, char *comment)
 {
   TIFF *tif;
   byte *pix;
@@ -65,6 +57,7 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
   }
 
 #ifndef VMS
+  XV_UNUSED(fp);
   tif = TIFFOpen(fname, "w");
 #else
   tif = TIFFFdOpen(dup(fileno(fp)), fname, "w");
@@ -212,12 +205,12 @@ static int WriteTIFF(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,
 
 /**** Stuff for TIFFDialog box ****/
 
-#define TWIDE 280
-#define THIGH 160
+#define TWIDE (280*dpiMult)
+#define THIGH (160*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int, int, int, int));
 static void clickTD   PARM((int, int));
@@ -234,33 +227,35 @@ static RBUTT *compRB;
 
 
 /***************************************************/
-void CreateTIFFW()
+void CreateTIFFW(void)
 {
-  int	     y;
+  int x, y;
 
   tiffW = CreateWindow("xv tiff", "XVtiff", NULL,
-		       TWIDE, THIGH, infofg, infobg, 0);
+		       TWIDE, THIGH, infofg, infobg, FALSE);
   if (!tiffW) FatalError("can't create tiff window!");
 
   XSelectInput(theDisp, tiffW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  BTCreate(&tbut[T_BOK], tiffW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BOK], tiffW, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&tbut[T_BCANC], tiffW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
+  BTCreate(&tbut[T_BCANC], tiffW, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
-  y = 55;
-  compRB = RBCreate(NULL, tiffW, 36, y,   "None", infofg, infobg,hicol,locol);
-  RBCreate(compRB, tiffW, 36, y+18,       "LZW", infofg, infobg,hicol,locol);
-  RBCreate(compRB, tiffW, 36, y+36,       "PackBits", infofg, infobg,
+  x = 36*dpiMult;
+  y = 55*dpiMult;
+  compRB = RBCreate(NULL, tiffW, x, y,         "None", infofg, infobg,hicol,locol);
+  RBCreate(compRB, tiffW, x, y + 18*dpiMult,   "LZW", infofg, infobg,hicol,locol);
+  RBCreate(compRB, tiffW, x, y + 36*dpiMult,   "PackBits", infofg, infobg,
            hicol, locol);
-  RBCreate(compRB, tiffW, TWIDE/2, y,     "CCITT Group3", infofg, infobg,
+  x = TWIDE/2;
+  RBCreate(compRB, tiffW, x, y,                "CCITT Group3", infofg, infobg,
 	   hicol, locol);
-  RBCreate(compRB, tiffW, TWIDE/2, y+18,  "CCITT Group4", infofg, infobg,
+  RBCreate(compRB, tiffW, x, y + 18*dpiMult,   "CCITT Group4", infofg, infobg,
 	   hicol, locol);
   if (ALLOW_JPEG) {
-    RBCreate(compRB, tiffW, TWIDE/2, y+36,  "JPEG", infofg, infobg,
+    RBCreate(compRB, tiffW, x, y + 36*dpiMult, "JPEG", infofg, infobg,
 	     hicol, locol);
   }
 
@@ -269,8 +264,7 @@ void CreateTIFFW()
 
 
 /***************************************************/
-void TIFFDialog(vis)
-int vis;
+void TIFFDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(tiffW, tbut[T_BOK].x + (int) tbut[T_BOK].w/2,
@@ -282,8 +276,7 @@ int vis;
 
 
 /***************************************************/
-int TIFFCheckEvent(xev)
-XEvent *xev;
+int TIFFCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -349,9 +342,7 @@ XEvent *xev;
 
 
 /***************************************************/
-void TIFFSaveParams(fname, col)
-char *fname;
-int col;
+void TIFFSaveParams(char *fname, int col)
 {
   int cur;
   cur = RBWhich(compRB);
@@ -376,8 +367,7 @@ int col;
 
 
 /***************************************************/
-static void drawTD(x,y,w,h)
-int x,y,w,h;
+static void drawTD(int x, int y, int w, int h)
 {
   const char *title  = "Save TIFF file...";
   int  i;
@@ -391,18 +381,17 @@ int x,y,w,h;
 
   for (i=0; i<T_NBUTTS; i++) BTRedraw(&tbut[i]);
 
-  ULineString(tiffW, compRB->x-16, compRB->y-3-DESCENT, "Compression");
+  ULineString(tiffW, compRB->x - 16*dpiMult, compRB->y - 3*dpiMult - DESCENT, "Compression");
   RBRedraw(compRB, -1);
 
-  DrawString(tiffW, 20, 29, title);
+  DrawString(tiffW, 20*dpiMult, 29*dpiMult, title);
 
   XSetClipMask(theDisp, theGC, None);
 }
 
 
 /***************************************************/
-static void clickTD(x,y)
-int x,y;
+static void clickTD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -429,8 +418,7 @@ int x,y;
 
 
 /***************************************************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
   switch (cmd) {
   case T_BOK: {
@@ -455,7 +443,7 @@ int cmd;
 
 
 /*******************************************/
-static void writeTIFF()
+static void writeTIFF(void)
 {
   FILE *fp;
   int   w, h, nc, rv, comp, ptype, pfree;

@@ -1,0 +1,20 @@
+# staging area
+tmp*
+
+# temporary build files
+*-
+*.err
+*.log
+*.orig
+*.rej
+*.save
+
+#objects
+*.o
+
+# executables
+xv
+bggen
+vdcomp
+xcmap
+xvpictoppm

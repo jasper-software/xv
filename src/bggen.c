@@ -71,9 +71,7 @@ void   writePPM    PARM((byte *, int, int, int));
 
 
 /*************************************/
-int main(argc,argv)
-     int    argc;
-     char **argv;
+int main(int argc, char **argv)
 {
   byte *pic24, *rpic24, *pp, *sp;
   int   i,j,cnt,x,y;
@@ -318,7 +316,7 @@ static int distdebug;
 
 
 /*************************************/
-void usage()
+void usage(void)
 {
   fprintf(stderr,"usage:  bggen [-h high] [-w wide] [-b bits] [-g geom]\n");
   fprintf(stderr,"\t\t[-d disp] [-a] [-r rot] [-G rptgeom] \n");
@@ -328,9 +326,7 @@ void usage()
 
 
 /*************************************/
-void dorot(pic, w, h, rot)
-     byte *pic;
-     int   w, h, rot;
+void dorot(byte *pic, int w, int h, int rot)
 {
   byte   *pp;
   double maxd, mind, del, d, rat, crat, cval;
@@ -398,8 +394,7 @@ void dorot(pic, w, h, rot)
 
 
 
-double computeDist(x, y, cx, cy, rot)
-     int x,y,cx,cy,rot;
+double computeDist(int x, int y, int cx, int cy, int rot)
 {
   /* rot has to be in range 0-359 */
 
@@ -437,9 +432,7 @@ double computeDist(x, y, cx, cy, rot)
 
 
 /******************************/
-void writePPM(pic, w, h, doascii)
-     byte *pic;
-     int   w,h,doascii;
+void writePPM(byte *pic, int w, int h, int doascii)
 {
   /* dumps a pic24 in PPM format to stdout */
 

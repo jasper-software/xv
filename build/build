@@ -24,6 +24,20 @@ usage()
 	    Set the build directory to \$build_dir.
 	-i \$install_dir
 	    Set the install directory to \$install_dir.
+	-c
+	    Clean the build and install directories.
+	-r
+	    Build to make a release.
+	-d
+	    Build for debugging.
+	-s
+	    Strict build to treat warnings as errors.
+	-o \$configure_options
+	    Add \$configure_options to the cmake command line.
+	-f
+	    Fast build, don't install.
+	-p clang|gcc
+	    Set compiler
 	-v
 	    Enable verbose mode.
 	-h
@@ -34,15 +48,21 @@ usage()
 
 program_dir=$(dirname "$0") || exit 1
 top_dir="$program_dir/.."
+real_top_dir=$(realpath "$top_dir")
+if [ -n "$real_top_dir" ] && [ -d "$real_top_dir" ] ; then top_dir="$real_top_dir" ; fi
 
 verbose=0
 build_dir=
 install_dir=
 tmp_dir=
+install=1
 mode=release
 strict=0
+clean=0
+c_compiler=
+configure_options=()
 
-while getopts vb:i:t:drs opt; do
+while getopts vhcb:i:o:t:fp:drs opt; do
 	case $opt in
 	s)
 		strict=1;;
@@ -50,16 +70,26 @@ while getopts vb:i:t:drs opt; do
 		mode=release;;
 	d)
 		mode=debug;;
+	t)
+		tmp_dir="$OPTARG";;
 	b)
 		build_dir="$OPTARG";;
 	i)
 		install_dir="$OPTARG";;
+	o)
+		configure_options+=("$OPTARG");;
+	c)
+		clean=1;;
+	f)
+		install=0;;
+	p)
+		c_compiler="$OPTARG";;
 	v)
 		verbose=$((verbose + 1));;
 	h)
-		usage;;
+		usage "$@";;
 	\?)
-		usage;;
+		usage "$@";;
 	esac
 done
 shift $((OPTIND - 1))
@@ -74,9 +104,29 @@ if [ -z "$install_dir" ]; then
 	install_dir="$tmp_dir/install"
 fi
 
-cmake --version || panic "cannot run cmake"
+if [ "$clean" -ge 1 ]; then
+	echo "Cleaning..."
+	case "$build_dir" in
+	*tmp*/*build*)
+		rm -rf "$build_dir" || panic "Could not clean build dir ${build_dir}.";;
+	*)
+		panic "Not cleaning build dir ${build_dir}. Does not look match *tmp*build.";;
+	esac
+	case "$install_dir" in
+	*tmp*/*install*)
+		rm -rf "$install_dir" || panic "Could not clean install dir ${install_dir}.";;
+	*)
+		panic "Not cleaning install dir ${install_dir}. Does not look match *tmp*install.";;
+	esac
+fi
 
-configure_options=()
+case "$c_compiler" in
+gcc) configure_options+=(-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++) ;;
+clang) configure_options+=(-DCMAKE_C_COMPILER="$c_compiler" -DCMAKE_CXX_COMPILER="${c_compiler}++") ;;
+*) if [ -n "$c_compiler" ] ; then panic "Unknown compiler ${c_compiler}." ; fi
+esac
+
+cmake --version || panic "cannot run cmake"
 
 configure_options+=(-DCMAKE_INSTALL_PREFIX="$install_dir")
 
@@ -93,9 +143,17 @@ if [ "$strict" -ne 0 ]; then
 	configure_options+=(-DXV_STRICT=1)
 fi
 
+echo "Starting $mode build"
+echo "Top dir: $top_dir"
+echo "Build dir: $build_dir"
+echo "Install dir: $install_dir"
+echo "Options: ${configure_options[*]}"
+
 cmake "${configure_options[@]}" -H"$top_dir" -B"$build_dir" || \
   panic "configure failed"
 
 cmake --build "$build_dir" || panic "build failed"
 
-cmake --build "$build_dir" --target install || panic "install failed"
+if [ "$install" -ne 0 ]; then
+	cmake --build "$build_dir" --target install || panic "install failed"
+fi

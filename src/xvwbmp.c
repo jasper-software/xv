@@ -58,7 +58,7 @@ static const char *st_err;
 static int    fail	PARM((const char *, const char *));
 static int    read_mb	PARM((int *, int));
 static void   write_mb	PARM((uint32, FILE *));
-static int    read_ext	PARM((int, uint8));
+static int    read_ext	PARM((int, int));
 static void  *mymalloc	PARM((int));
 static void   myfree	PARM((void));
 static uint8 *render1	PARM((uint8 *, int, int));
@@ -67,9 +67,7 @@ static void **mymem = NULL;
 static int    mymems = 0;
 
 
-int LoadWBMP(fname, pinfo)
-     char *fname;
-     PICINFO *pinfo;
+int LoadWBMP(char *fname, PICINFO *pinfo)
 {
     int fd;
     int im_type;	/* image type (only type 0 supported) */
@@ -142,16 +140,18 @@ int LoadWBMP(fname, pinfo)
 }
 
 
-int WriteWBMP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
-     FILE *fp;
-     byte *pic;
-     int ptype, w, h;
-     byte *rmap, *gmap, *bmap;
-     int numcols, colorstyle;
+int WriteWBMP(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
     int count = 0;
     uint8 bit = 0;
     int i;
+
+    XV_UNUSED(ptype);
+    XV_UNUSED(rmap);
+    XV_UNUSED(gmap);
+    XV_UNUSED(bmap);
+    XV_UNUSED(numcols);
+    XV_UNUSED(colorstyle);
 
     write_mb(0, fp);	/* type : always 0 */
     putc(0, fp);	/* fixed header : always 0 for type 0 */
@@ -164,11 +164,12 @@ int WriteWBMP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
 	bit |= (((pic[i]&1)<<(7-(count++))));
 	if (count == 8) {
 	    putc(bit, fp);
+	    bit = 0;
 	    count = 0;
 	}
     }
 
-    if (!count) {
+    if (count > 0) {
 	putc(bit, fp);
     }
 
@@ -176,17 +177,14 @@ int WriteWBMP(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
 }
 
 
-static int fail(name, msg)
-     const char *name, *msg;
+static int fail(const char *name, const char *msg)
 {
     SetISTR(ISTR_WARNING, "%s : %s", name, msg);
     return 0;
 }
 
 
-static void write_mb(data, f)
-     uint32 data;
-     FILE *f;
+static void write_mb(uint32 data, FILE *f)
 {
     int i = 32;
     uint32 aux = data;
@@ -219,8 +217,7 @@ static void write_mb(data, f)
 }
 
 
-static int read_mb(dst, fd)
-     int *dst, fd;
+static int read_mb(int *dst, int fd)
 {
     int ac = 0;
     int ct = 0;
@@ -245,10 +242,12 @@ static int read_mb(dst, fd)
 }
 
 
-static int read_ext(fd, fixed)
-     int fd;
-     uint8 fixed;
+static int read_ext(int fd, int fixed)
 {
+    XV_UNUSED(fd);
+
+    fixed &= 0xFF; /* reduce to uint8 */
+
     if (!(fixed&0x7f)) {    /* no extensions */
 	return 1;
     }
@@ -286,17 +285,16 @@ static int read_ext(fd, fixed)
 }
 
 
-static void *mymalloc(numbytes)
-     int numbytes;
+static void *mymalloc(int numbytes)
 {
-    mymem = (void**)realloc(mymem, mymems+1);
+    mymem = (void**)realloc(mymem, (mymems+1)*sizeof(void *));
     if (!mymem)
 	FatalError("LoadWBMP: can't realloc buffer");
     return (mymem[mymems++] = malloc(numbytes));
 }
 
 
-static void myfree()
+static void myfree(void)
 {
     int i;
 
@@ -312,14 +310,14 @@ static void myfree()
 }
 
 
-static uint8 *render1(data, size, npixels)
-     uint8 *data;
-     int size, npixels;
+static uint8 *render1(uint8 *data, int size, int npixels)
 {
     byte * pic;
     int i;
     int cnt = 0;
     uint8 cb = *data;
+
+    XV_UNUSED(size);
 
     pic = calloc(npixels,1);   /* checked for overflow by caller */
     if (!pic) {
@@ -330,15 +328,22 @@ static uint8 *render1(data, size, npixels)
     /* expand bits into bytes */
     /* memset(pic, 0, npixels); */
 
-    for (i=0; i<npixels; i++) {
+    if (npixels > 0) {
+	i = 0;
+	for (;;) {
 
-	pic[i] = (cb>>7)&1;
+	    pic[i++] = (cb>>7)&1;
 
-	if ((++cnt)==8) {
-	    cb = *(++data);
-	    cnt = 0;
-	} else {
-	    cb <<=1;
+	    if (i >= npixels) {
+		break;
+	    }
+
+	    if ((++cnt)==8) {
+		cb = *(++data);
+		cnt = 0;
+	    } else {
+		cb <<=1;
+	    }
 	}
     }
     return pic;

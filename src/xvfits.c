@@ -54,10 +54,7 @@ static       void  flip      PARM((byte *, int, int));
 
 
 /*******************************************/
-int LoadFITS(fname, pinfo, quick)
-     char    *fname;
-     PICINFO *pinfo;
-     int      quick;
+int LoadFITS(char *fname, PICINFO *pinfo, int quick)
 /*******************************************/
 {
   /* returns '1' on success */
@@ -161,18 +158,14 @@ int LoadFITS(fname, pinfo, quick)
 
 
 /*******************************************/
-int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
-     FILE *fp;
-     byte *pic;
-     int   ptype, w,h;
-     byte *rmap, *gmap, *bmap;
-     int   numcols, colorstyle;
-     char *comment;
+int WriteFITS(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle, char *comment)
 {
   int   i, j, npixels, nend;
   byte *ptr;
   const char *error;
   byte  rgb[256];
+
+  XV_UNUSED(colorstyle);
 
   if (!fits_block) {
     fits_block = (char *) malloc((size_t) BLOCKSIZE);
@@ -214,11 +207,7 @@ int WriteFITS(fp,pic,ptype,w,h,rmap,gmap,bmap,numcols,colorstyle,comment)
 
 
 /************************************/
-static int splitfits(image, comment, nx, ny, nz, basename)
-     byte *image;
-     char *comment;
-     int   nx, ny, nz;
-     char *basename;
+static int splitfits(byte *image, char *comment, int nx, int ny, int nz, char *basename)
 {
   /*
    * Given a 3-dimensional FITS image, this splits it up into nz 2-d files.
@@ -302,10 +291,7 @@ static int splitfits(image, comment, nx, ny, nz, basename)
 
 
 /************************************/
-static const char *wrheader(fp, nx, ny, comment)
-     FILE *fp;
-     int nx, ny;
-     char *comment;
+static const char *wrheader(FILE *fp, int nx, int ny, char *comment)
 {
   /* Writes a minimalist FITS file header */
 
@@ -363,10 +349,7 @@ static const char *wrheader(fp, nx, ny, comment)
 
 
 /************************************/
-static const char *ftopen3d(fs, file, nx, ny, nz, bitpix)
-     FITS *fs;
-     char *file;
-     int  *nx, *ny, *nz, *bitpix;
+static const char *ftopen3d(FITS *fs, char *file, int *nx, int *ny, int *nz, int *bitpix)
 {
   /* open a 2 or 3-dimensional fits file.
    * Stores the dimensions of the file in nx, ny and nz, and updates the FITS
@@ -414,8 +397,7 @@ static const char *ftopen3d(fs, file, nx, ny, nz, bitpix)
 
 
 /************************************/
-static void ftclose(fs)
-     FITS *fs;
+static void ftclose(FITS *fs)
 {
   if (fs == NULL) return;
   if (fs->fp != NULL) fclose(fs->fp);
@@ -423,15 +405,14 @@ static void ftclose(fs)
 
 
 /************************************/
-static const char *rdheader(fs)
-     FITS *fs;
+static const char *rdheader(FITS *fs)
 {
   /* reads the fits header, and updates the FITS structure fs.
    * Returns NULL on success, or an error message otherwise.
    */
 
   int i, j, res, commlen, commsize;
-  char name[9];
+  char name[32];
   char *block=fits_block, *p;
   const char *error;
   long int val;         /* the value */
@@ -547,12 +528,7 @@ static const char *rdheader(fs)
 
 
 /************************************/
-static void wrcard(card, name, dtype, kvalue, svalue)
-     char *card;
-     const char *name;
-     DATTYPE dtype;   /* type of value */
-     int kvalue;
-     char *svalue;
+static void wrcard(char *card, const char *name, DATTYPE dtype /* type of value */, int kvalue, char *svalue)
 {
   /* write a header record into the 80 byte buffer card.
    * The keyword name is passed in name. The value type is in dtype; this
@@ -597,11 +573,7 @@ static void wrcard(card, name, dtype, kvalue, svalue)
 
 
 /************************************/
-static const char *rdcard(card, name, dtype, kvalue)
-     char *card;
-     const char *name;
-     DATTYPE dtype;   /* type of value */
-     long int *kvalue;
+static const char *rdcard(char *card, const char *name, DATTYPE dtype /* type of value */, long int *kvalue)
 {
   /* Read a header record, from the 80 byte buffer card.
    * the keyword name must match 'name'; and parse its value according to
@@ -659,10 +631,7 @@ static const char *rdcard(card, name, dtype, kvalue)
 
 
 /************************************/
-static int ftgdata(fs, buffer, nelem)
-     FITS *fs;
-     void *buffer;
-     int nelem;
+static int ftgdata(FITS *fs, void *buffer, int nelem)
 {
   /* reads nelem values into the buffer.
    * returns NULL for success or an error message.
@@ -713,10 +682,7 @@ static int ftgdata(fs, buffer, nelem)
 
 
 /************************************/
-static void ftfixdata(fs, buffer, nelem)
-     FITS *fs;
-     void *buffer;
-     int nelem;
+static void ftfixdata(FITS *fs, void *buffer, int nelem)
 {
   /* convert the raw data, as stored in the FITS file, to the format
    * appropiate for the data representation of the host computer.
@@ -819,10 +785,7 @@ static void ftfixdata(fs, buffer, nelem)
 
 
 /************************************/
-static int ftgbyte(fs, cbuff, nelem)
-     FITS *fs;
-     byte *cbuff;
-     int nelem;
+static int ftgbyte(FITS *fs, byte *cbuff, int nelem)
 {
   /* Reads a byte image from the FITS file fs. The image contains nelem pixels.
    * If bitpix = 8, then the image is loaded as stored in the file.
@@ -945,10 +908,7 @@ static int ftgbyte(fs, cbuff, nelem)
 
 
 /************************************/
-static void flip(buffer, nx, ny)
-     byte *buffer;
-     int nx;
-     int ny;
+static void flip(byte *buffer, int nx, int ny)
 {
   /* reverse order of lines in image */
 

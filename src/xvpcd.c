@@ -549,6 +549,8 @@ magnify(int mag,  /* power of 2 by which to magnify in place */
   int x,y,yi;
   byte *optr,*nptr,*uptr;  /* MUST be unsigned, else averaging fails */
 
+  XV_UNUSED(mh);
+
   while (mag > 1) {
 
     /* create every 2nd new row from 0 */
@@ -614,12 +616,12 @@ pcdError(const char *fname, const char *st)
 
 /**** Stuff for PCDDialog box ****/
 
-#define TWIDE 380
-#define THIGH 160
+#define TWIDE (380*dpiMult)
+#define THIGH (160*dpiMult)
 #define T_NBUTTS 2
 #define T_BOK    0
 #define T_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 static void drawTD    PARM((int, int, int, int));
 static void clickTD   PARM((int, int));
@@ -633,35 +635,35 @@ static RBUTT *resnRB;
 
 
 /***************************************************/
-void CreatePCDW()
+void CreatePCDW(void)
 {
-  int       y;
+  int y;
 
   pcdW = CreateWindow("xv pcd", "XVpcd", NULL,
-           TWIDE, THIGH, infofg, infobg, 0);
+                     TWIDE, THIGH, infofg, infobg, 0);
   if (!pcdW) FatalError("can't create pcd window!");
 
   XSelectInput(theDisp, pcdW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  BTCreate(&tbut[T_BOK], pcdW, TWIDE-140-1, THIGH-10-BUTTH-1, 60, BUTTH,
-     "Ok", infofg, infobg, hicol, locol);
+  BTCreate(&tbut[T_BOK], pcdW, TWIDE - 140*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
+          "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&tbut[T_BCANC], pcdW, TWIDE-70-1, THIGH-10-BUTTH-1, 60, BUTTH,
-     "Cancel", infofg, infobg, hicol, locol);
+  BTCreate(&tbut[T_BCANC], pcdW, TWIDE - 70*dpiMult - 1*dpiMult, THIGH - 10*dpiMult - BUTTH - 1*dpiMult, 60*dpiMult, BUTTH,
+          "Cancel", infofg, infobg, hicol, locol);
 
-  y = 55;
-  resnRB = RBCreate(NULL, pcdW, 36, y,   "192*128   Base/16",
+  y = 55*dpiMult;
+  resnRB = RBCreate(NULL, pcdW, 36*dpiMult, y,       "192*128   Base/16",
            infofg, infobg,hicol,locol);
-  RBCreate(resnRB, pcdW, 36, y+18,       "384*256   Base/4",
+  RBCreate(resnRB, pcdW, 36*dpiMult, y + 18*dpiMult, "384*256   Base/4",
            infofg, infobg,hicol,locol);
-  RBCreate(resnRB, pcdW, 36, y+36,       "768*512   Base",
+  RBCreate(resnRB, pcdW, 36*dpiMult, y + 36*dpiMult, "768*512   Base",
            infofg, infobg, hicol, locol);
-  RBCreate(resnRB, pcdW, TWIDE/2, y,     "1536*1024 4Base",
+  RBCreate(resnRB, pcdW, TWIDE/2, y,                 "1536*1024 4Base",
            infofg, infobg, hicol, locol);
-  RBCreate(resnRB, pcdW, TWIDE/2, y+18,  "3072*2048 16Base",
+  RBCreate(resnRB, pcdW, TWIDE/2, y + 18*dpiMult,    "3072*2048 16Base",
            infofg, infobg, hicol, locol);
 
-  CBCreate(&lutCB, pcdW, TWIDE/2, y+36,  "Linear LUT",
+  CBCreate(&lutCB, pcdW, TWIDE/2, y + 36*dpiMult,    "Linear LUT",
            infofg, infobg, hicol, locol);
 
   RBSelect(resnRB, 2);
@@ -671,12 +673,11 @@ void CreatePCDW()
 
 
 /***************************************************/
-void PCDDialog(vis)
-int vis;
+void PCDDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(pcdW, tbut[T_BOK].x + tbut[T_BOK].w/2,
-        tbut[T_BOK].y + tbut[T_BOK].h/2, TWIDE, THIGH);
+                   tbut[T_BOK].y + tbut[T_BOK].h/2, TWIDE, THIGH);
   }
   else     XUnmapWindow(theDisp, pcdW);
   pcdUp = vis;
@@ -684,8 +685,7 @@ int vis;
 
 
 /***************************************************/
-int PCDCheckEvent(xev)
-XEvent *xev;
+int PCDCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -729,12 +729,12 @@ XEvent *xev;
 
     if (e->window == pcdW) {
       if (stlen) {
-  if (buf[0] == '\r' || buf[0] == '\n') { /* enter */
-    FakeButtonPress(&tbut[T_BOK]);
-  }
-  else if (buf[0] == '\033') {            /* ESC */
-    FakeButtonPress(&tbut[T_BCANC]);
-  }
+        if (buf[0] == '\r' || buf[0] == '\n') { /* enter */
+          FakeButtonPress(&tbut[T_BOK]);
+        }
+        else if (buf[0] == '\033') {            /* ESC */
+          FakeButtonPress(&tbut[T_BCANC]);
+        }
       }
     }
     else rv = 0;
@@ -754,9 +754,7 @@ XEvent *xev;
 void
 PCDSetParamOptions(const char *fname)
 {
-  int cur;
-  cur = RBWhich(resnRB);
-
+  XV_UNUSED(fname);
   RBSetActive(resnRB,0,1);
   RBSetActive(resnRB,1,1);
   RBSetActive(resnRB,2,1);
@@ -782,19 +780,18 @@ drawTD(int x, int y, int w, int h)
 
   for (i=0; i<T_NBUTTS; i++) BTRedraw(&tbut[i]);
 
-  ULineString(pcdW, resnRB->x-16, resnRB->y-10-DESCENT, "Resolution");
+  ULineString(pcdW, resnRB->x - 16*dpiMult, resnRB->y - 10*dpiMult - DESCENT, "Resolution");
   RBRedraw(resnRB, -1);
   CBRedraw(&lutCB);
 
-  XDrawString(theDisp, pcdW, theGC, 20, 19, title, strlen(title));
+  XDrawString(theDisp, pcdW, theGC, 20*dpiMult, 19*dpiMult, title, strlen(title));
 
   XSetClipMask(theDisp, theGC, None);
 }
 
 
 /***************************************************/
-static void clickTD(x,y)
-int x,y;
+static void clickTD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -825,14 +822,14 @@ int x,y;
 
 
 /***************************************************/
-static void doCmd(cmd)
-int cmd;
+static void doCmd(int cmd)
 {
   leaveitup=0;
   goforit=0;
   switch (cmd) {
   case T_BOK:    PCDSetParams();
                 goforit=1;
+                /* fall through */
   case T_BCANC:  PCDDialog(0);
                 break;
 
@@ -842,7 +839,7 @@ int cmd;
 
 
 /*******************************************/
-static void PCDSetParams()
+static void PCDSetParams(void)
 {
   switch (RBWhich(resnRB)) {
   case 0: size = 0;      break;
@@ -928,7 +925,7 @@ gethufftable(void)
     return NULL;
   }
  */
-  if((hufftab = (int *)malloc(bufsize)) == NULL)
+  if((hufftab = (int *)malloc((bufsize < 2*sizeof(int))? 2*sizeof(int): bufsize)) == NULL)
     FatalError("couldn't malloc initial Huffman table");
   hufftab[0] = hufftab[1] = 0;
 
@@ -1161,8 +1158,9 @@ gethuffdata(  byte *luma,
 {
 static  byte  clip[3*256];
   int  *hufftable[3], *huffstart = NULL, *huffptr = NULL;
-  int  row, col, plane, i, result = 1;
+  int  row, plane, i, result = 1;
 #if TRACE
+  int  col;
   int  uflow = 0, oflow = 0;
 #endif
   byte  *pixelptr = NULL;
@@ -1211,17 +1209,22 @@ static  byte  clip[3*256];
   i = 0;
   while (is24() != 0xfffffe) {
     (void)get24();
-    if(++i == 1)
+    if(++i == 1) {
       trace((stderr,"gethuffdata: skipping for sync ..."));
+    }
   }
-  if(i != 0)
+  if(i != 0) {
     trace((stderr, " %d times\n", i));
+  }
 
   while(result) {
     if(is24() == 0xfffffe) {
       skip24();
       plane = get2();
-      row = get13(); col = 0;
+      row = get13();
+#if TRACE
+      col = 0;
+#endif
       skip1();
       if(row >= maxrownumber) {
         trace((stderr,

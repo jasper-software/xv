@@ -113,7 +113,9 @@ static byte screen_set[3][256];
  * to you at the moment and would appreciate any suggestions...
  */
 
-static void screen_init()
+static void screen_init PARM((void));
+
+static void screen_init(void)
 {
   static int init_flag; /* assume auto-init as 0 */
   Pixmap check_map;
@@ -236,8 +238,9 @@ typedef struct { byte    *colorset;
  * Only fs2_init() specifies the (maximum) number of components.
  */
 
-static FSBUF *fs2_init(width)
-int width;
+static FSBUF *fs2_init PARM((int width));
+
+static FSBUF *fs2_init(int width)
 {
   FSBUF *fs;
   FSERROR *p;
@@ -272,10 +275,9 @@ int width;
  *     Adapt this if necessary.
  */
 
-static int fs2_dither(fs, ptr, nc, num_rows, num_cols)
-FSBUF *fs;
-byte *ptr;
-int nc, num_rows, num_cols;
+static int fs2_dither PARM((FSBUF *fs, byte *ptr, int nc, int num_rows, int num_cols));
+
+static int fs2_dither(FSBUF *fs, byte *ptr, int nc, int num_rows, int num_cols)
 {
   int abs_nc, ci, row, col;
   LOCFSERROR delta, cur, belowerr, bpreverr;
@@ -325,8 +327,7 @@ int nc, num_rows, num_cols;
 
 
 /***********************************/
-void Resize(w,h)
-int w,h;
+void Resize(int w, int h)
 {
   RANGE(w,1,maxWIDE);  RANGE(h,1,maxHIGH);
 
@@ -349,7 +350,7 @@ int w,h;
 }
 
 /********************************************/
-void GenerateCpic()
+void GenerateCpic(void)
 {
   /* called when 'pic' has been modified (different contents, *not* different
      size, orientation, etc.  Rebuilds cpic. */
@@ -373,8 +374,7 @@ void GenerateCpic()
 
 
 /***********************************/
-void GenerateEpic(w,h)
-int w,h;
+void GenerateEpic(int w, int h)
 {
   int          cy,ex,ey,*cxarr, *cxarrp;
   byte        *clptr,*elptr,*epptr;
@@ -489,9 +489,7 @@ int w,h;
 
 
 /***********************************/
-void DoZoom(x,y,button)
-     int          x, y;
-     unsigned int button;
+void DoZoom(int x, int y, unsigned int button)
 {
   if      (button == Button1) do_zoom(x,y);
   else if (button == Button2) do_pan(x,y);
@@ -501,8 +499,7 @@ void DoZoom(x,y,button)
 
 
 /***********************************/
-static void do_zoom(mx,my)
-     int mx,my;
+static void do_zoom(int mx, int my)
 {
   int i;
   int rx,ry,rx2,ry2, orx, ory, orw, orh;
@@ -574,8 +571,7 @@ static void do_zoom(mx,my)
 
 
 /***********************************/
-static void compute_zoom_rect(x, y, px, py, pw, ph)
-     int x, y, *px, *py, *pw, *ph;
+static void compute_zoom_rect(int x, int y, int *px, int *py, int *pw, int *ph)
 {
   /* given a mouse pos (in epic coords), return x,y,w,h PIC coords for
      a 'zoom in by 2x' rectangle to be tracked.  The rectangle stays
@@ -594,7 +590,7 @@ static void compute_zoom_rect(x, y, px, py, pw, ph)
 
 
 /***********************************/
-static void do_unzoom()
+static void do_unzoom(void)
 {
   int x,y,w,h, x2,y2, ex,ey,ew,eh;
 
@@ -627,8 +623,7 @@ static void do_unzoom()
 
 
 /***********************************/
-static void do_pan(mx,my)
-     int mx,my;
+static void do_pan(int mx, int my)
 {
   int i, ox,oy,offx,offy, rw,rh, px, py, dx, dy,m;
   Window rW, cW;  unsigned int mask;  int rx, ry;
@@ -717,22 +712,19 @@ static void do_pan(mx,my)
 
 
 /***********************************/
-static void do_pan_calc(offx, offy, xp,yp)
-     int offx, offy, *xp, *yp;
+static void do_pan_calc(int offx, int offy, int *xp, int *yp)
 {
   /* given mouse coords (in xp,yp) and original offset, compute 'clipped'
      coords (returned in xp,yp) such that the 'pan window' remains entirely
      within the image boundaries */
 
-  int mx, my, eprx, epry, eprw, eprh, pprx, ppry, pprw, pprh;
+  int mx, my, eprx, epry, pprx, ppry, pprw, pprh;
 
   mx = *xp;  my = *yp;
 
   /* compute corners of pan rect in eWIDE,eHIGH coords */
   eprx = offx - mx;
   epry = offy - my;
-  eprw = eWIDE;
-  eprh = eHIGH;
 
   /* compute corners of pan rect in pWIDE,pHIGH coords */
   CoordE2P(eprx, epry, &pprx, &ppry);
@@ -754,7 +746,7 @@ static void do_pan_calc(offx, offy, xp,yp)
 
 
 /***********************************/
-void Crop()
+void Crop(void)
 {
   int x, y, w, h;
 
@@ -767,8 +759,7 @@ void Crop()
 
 
 /**********************************/
-static void crop1(x,y,w,h,zm)
-     int x,y,w,h,zm;
+static void crop1(int x, int y, int w, int h, int zm)
 {
   int   oldew,oldeh,oldcx,oldcy;
 
@@ -792,7 +783,7 @@ static void crop1(x,y,w,h,zm)
 
 
 /***********************************/
-void UnCrop()
+void UnCrop(void)
 {
   int w,h;
 
@@ -839,7 +830,7 @@ void UnCrop()
 
 
 /***********************************/
-void AutoCrop()
+void AutoCrop(void)
 {
   /* called when AutoCrop button is pressed */
   int oldcx, oldcy;
@@ -859,7 +850,7 @@ void AutoCrop()
 
 
 /***********************************/
-int DoAutoCrop()
+int DoAutoCrop(void)
 {
   /* returns '1' if any cropping was actually done. */
 
@@ -930,7 +921,7 @@ int DoAutoCrop()
 
 
 /***********************************/
-static int doAutoCrop24()
+static int doAutoCrop24(void)
 {
   /* returns '1' if any cropping was actually done */
 
@@ -963,12 +954,12 @@ static int doAutoCrop24()
     for (i=0, misses=0, cp1=cp; i<cWIDE && misses<maxmiss; i++, cp1+=3) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
       oldr=r; oldg=g; oldb=b;
     }
 
@@ -987,12 +978,12 @@ static int doAutoCrop24()
     for (i=0, misses=0, cp1=cp; i<cWIDE && misses<maxmiss; i++, cp1+=3) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cWIDE) { cp -= cWIDE*3;  cbot++; }
@@ -1013,12 +1004,12 @@ static int doAutoCrop24()
 	 i++, cp1 += (cWIDE * 3)) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cHIGH) { cp+=3; cleft++; }
@@ -1037,12 +1028,12 @@ static int doAutoCrop24()
 	 i++, cp1 += (cWIDE*3)) {
       r=cp1[0]-bgR;  g=cp1[1]-bgG;  b=cp1[2]-bgB;
       R=cp1[0]-oldr; G=cp1[1]-oldg; B=cp1[2]-oldb;
-      if (!inabsrange(r-g, EPSILON) ||
-	  !inabsrange(r-b, EPSILON) ||
-	  !inabsrange(b-g, EPSILON) ||
-	  !inabsrange(R-G, NEIGHBOR) ||
-	  !inabsrange(R-B, NEIGHBOR) ||
-	  !inabsrange(B-G, NEIGHBOR)) misses++;
+      if (!inabsrange(r, EPSILON) ||
+	  !inabsrange(g, EPSILON) ||
+	  !inabsrange(b, EPSILON) ||
+	  !inabsrange(R, NEIGHBOR) ||
+	  !inabsrange(G, NEIGHBOR) ||
+	  !inabsrange(B, NEIGHBOR)) misses++;
     }
 
     if (i==cHIGH) { cp-=3; cright++; }
@@ -1065,8 +1056,7 @@ static int doAutoCrop24()
 
 
 /*******************************/
-void DoCrop(x,y,w,h)
-     int x,y,w,h;
+void DoCrop(int x, int y, int w, int h)
 {
   /* given a cropping rectangle in PIC coordinates, it regens cpic
      and sticks likely values into eWIDE,eHIGH, assuming you wanted to
@@ -1157,8 +1147,7 @@ void DoCrop(x,y,w,h)
 
 
 /***********************************/
-void Rotate(dir)
-     int dir;
+void Rotate(int dir)
 {
   /* called when rotate CW and rotate CCW controls are clicked */
   /* dir=0: clockwise, else counter-clockwise */
@@ -1172,8 +1161,7 @@ void Rotate(dir)
 
 
 /***********************************/
-void DoRotate(dir)
-     int dir;
+void DoRotate(int dir)
 {
   int i;
 
@@ -1222,10 +1210,7 @@ void DoRotate(dir)
 
 
 /************************/
-void RotatePic(pic, ptype, wp, hp, dir)
-     byte *pic;
-     int  *wp, *hp;
-     int   ptype, dir;
+void RotatePic(byte *pic, int ptype, int *wp, int *hp, int dir)
 {
   /* rotates a w*h array of bytes 90 deg clockwise (dir=0)
      or counter-clockwise (dir != 0).  swaps w and h */
@@ -1286,8 +1271,7 @@ void RotatePic(pic, ptype, wp, hp, dir)
 
 
 /***********************************/
-void Flip(dir)
-     int dir;
+void Flip(int dir)
 {
   /* dir=0: flip horizontally, else vertically
    *
@@ -1318,10 +1302,7 @@ void Flip(dir)
 
 
 /************************/
-void FlipPic(pic, w, h, dir)
-     byte *pic;
-     int w, h;
-     int dir;
+void FlipPic(byte *pic, int w, int h, int dir)
 {
   /* flips a w*h array of bytes horizontally (dir=0) or vertically (dir!=0) */
 
@@ -1365,8 +1346,7 @@ void FlipPic(pic, w, h, dir)
 
 
 /************************/
-static void flipSel(dir)
-     int dir;
+static void flipSel(int dir)
 {
   /* flips selected area in 'pic', regens cpic and epic appropriately */
 
@@ -1418,7 +1398,7 @@ static void flipSel(dir)
 
 
 /************************/
-void InstallNewPic()
+void InstallNewPic(void)
 {
   /* given a new pic and colormap, (or new 24-bit pic) installs everything,
      regens cpic and epic, and redraws image */
@@ -1439,7 +1419,7 @@ void InstallNewPic()
 
 
 /***********************************/
-void DrawEpic()
+void DrawEpic(void)
 {
   /* given an 'epic', builds a new Ximage, and draws it.  Basically
      called whenever epic is changed, or whenever color allocation
@@ -1456,7 +1436,7 @@ void DrawEpic()
 
 
 /************************************/
-void KillOldPics()
+void KillOldPics(void)
 {
   /* throw away all previous images */
 
@@ -1474,10 +1454,7 @@ void KillOldPics()
 
 
 /************************/
-static void floydDitherize1(ximage,pic824,ptype, wide, high, rmap, gmap, bmap)
-     XImage *ximage;
-     byte   *pic824, *rmap, *gmap, *bmap;
-     int     ptype, wide, high;
+static void floydDitherize1(XImage *ximage, byte *pic824, int ptype, int wide, int high, byte *rmap, byte *gmap, byte *bmap)
 {
   /* does floyd-steinberg ditherizing algorithm.
    *
@@ -1602,10 +1579,8 @@ static void floydDitherize1(ximage,pic824,ptype, wide, high, rmap, gmap, bmap)
 
 
 /************************/
-byte *FSDither(inpic, intype, w, h, rmap, gmap, bmap,
-	      bval, wval)
-     byte *inpic, *rmap, *gmap, *bmap;
-     int   w,h, intype, bval, wval;
+byte *FSDither(byte *inpic, int intype, int w, int h, byte *rmap, byte *gmap, byte *bmap,
+	      int bval, int wval)
 {
   /* takes an input pic of size w*h, and type 'intype' (PIC8 or PIC24),
    *                (if PIC8, colormap specified by rmap,gmap,bmap)
@@ -1719,7 +1694,7 @@ byte *FSDither(inpic, intype, w, h, rmap, gmap, bmap,
 
 
 /***********************************/
-void CreateXImage()
+void CreateXImage(void)
 {
   xvDestroyImage(theImage);   theImage = NULL;
 
@@ -1743,10 +1718,7 @@ void CreateXImage()
 
 
 /***********************************/
-XImage *Pic8ToXImage(pic8, wide, high, xcolors, rmap, gmap, bmap)
-     byte          *pic8, *rmap, *gmap, *bmap;
-     unsigned int   wide, high;
-     unsigned long *xcolors;
+XImage *Pic8ToXImage(byte *pic8, unsigned int wide, unsigned int high, long unsigned int *xcolors, byte *rmap, byte *gmap, byte *bmap)
 {
   /*
    * this has to do the tricky bit of converting the data in 'pic8'
@@ -2110,9 +2082,7 @@ XImage *Pic8ToXImage(pic8, wide, high, xcolors, rmap, gmap, bmap)
 
 
 /***********************************/
-XImage *Pic24ToXImage(pic24, wide, high)
-     byte          *pic24;
-     unsigned int   wide, high;
+XImage *Pic24ToXImage(byte *pic24, unsigned int wide, unsigned int high)
 {
   /*
    * This has to do the none-too-simple bit of converting the data in 'pic24'
@@ -2666,8 +2636,7 @@ XImage *Pic24ToXImage(pic24, wide, high)
 
 
 /***********************************************************/
-void Set824Menus(mode)
-     int mode;
+void Set824Menus(int mode)
 {
   /* move checkmark */
   conv24MB.flags[CONV24_8BIT]  = (mode==PIC8);
@@ -2704,8 +2673,7 @@ void Set824Menus(mode)
 
 
 /***********************************************************/
-void Change824Mode(mode)
-     int mode;
+void Change824Mode(int mode)
 {
   if (mode == picType) return;   /* same mode, do nothing */
 
@@ -2753,7 +2721,7 @@ void Change824Mode(mode)
 
 
 /***********************************************************/
-void FreeEpic()
+void FreeEpic(void)
 {
   if (egampic && egampic != epic) free(egampic);
   if (epic && epic != cpic) free(epic);
@@ -2762,9 +2730,7 @@ void FreeEpic()
 
 
 /***********************************************************/
-void InvertPic24(pic24, w, h)
-     byte *pic24;
-     int   w,h;
+void InvertPic24(byte *pic24, int w, int h)
 {
   int i;
 
@@ -2793,9 +2759,7 @@ unsigned long ul;
 
 
 /***********************************************************/
-byte *XVGetSubImage(pic, ptype, w,h, sx,sy,sw,sh)
-     byte *pic;
-     int   ptype, w,h, sx,sy,sw,sh;
+byte *XVGetSubImage(byte *pic, int ptype, int w, int h, int sx, int sy, int sw, int sh)
 {
   /* mallocs and returns the selected subimage (sx,sy,sw,sh) of pic.
      selection is guaranteed to be within pic boundaries.
@@ -2836,9 +2800,7 @@ static char *holdcomment = (char *) NULL;
 static char *holdfname   = (char *) NULL;
 
 /***********************************/
-int DoPad(mode, str, wide, high, opaque, omode)
-     int   mode, wide, high, opaque, omode;
-     char *str;
+int DoPad(int mode, char *str, int wide, int high, int opaque, int omode)
 {
   /* parses/verifies user-entered string.  If valid, does the thing, and
      installs the new pic and all that...  Returns '0' on failure */
@@ -2882,9 +2844,7 @@ int DoPad(mode, str, wide, high, opaque, omode)
 
 
 /***********************************/
-int LoadPad(pinfo, fname)
-     PICINFO *pinfo;
-     char    *fname;
+int LoadPad(PICINFO *pinfo, char *fname)
 {
   /* loads up into XV structures results of last 'pad' command.
      returns 0 on failure, 1 on success */
@@ -2929,9 +2889,7 @@ int LoadPad(pinfo, fname)
 
 
 /*******************************/
-static int doPadSolid(str, wide, high, opaque,omode)
-     char *str;
-     int   wide, high, opaque,omode;
+static int doPadSolid(char *str, int wide, int high, int opaque, int omode)
 {
   /* returns 0 on error, 1 if successful */
 
@@ -2952,7 +2910,7 @@ static int doPadSolid(str, wide, high, opaque,omode)
 	   (r>=0 && r<=255 && g>=0 && g<=255 && b>=0 && b<=255)) {
     solidRGB = ((r&0xff)<<16) | ((g&0xff)<<8) | (b&0xff);
   }
-  else if (sscanf(str, "0x%x", &rgb) && rgb>=0 && rgb<=0xffffff) {
+  else if (sscanf(str, "0x%x", (unsigned int *) &rgb) && rgb>=0 && rgb<=0xffffff) {
     solidRGB = rgb;
   }
   else {   /* assume a colorname */
@@ -2995,16 +2953,14 @@ static int doPadSolid(str, wide, high, opaque,omode)
 
 
 /*******************************/
-static int doPadBggen(str, wide, high, opaque,omode)
-     char *str;
-     int   wide, high, opaque,omode;
+static int doPadBggen(char *str, int wide, int high, int opaque, int omode)
 {
 #ifndef USE_MKSTEMP
   int tmpfd;
 #endif
   int i;
   byte *bgpic24;
-  char syscmd[512], fname[128], errstr[512];
+  char syscmd[512], fname[128], errstr[512 + 128];
   PICINFO pinfo;
 
   /* returns 0 on error, 1 if successful */
@@ -3082,9 +3038,7 @@ static int doPadBggen(str, wide, high, opaque,omode)
 
 
 /*******************************/
-static int doPadLoad(str, wide, high, opaque,omode)
-     char *str;
-     int   wide, high, opaque,omode;
+static int doPadLoad(char *str, int wide, int high, int opaque, int omode)
 {
   int i;
   byte *bgpic24;
@@ -3092,6 +3046,8 @@ static int doPadLoad(str, wide, high, opaque,omode)
   PICINFO pinfo;
 
   /* returns 0 on error, 1 if successful */
+
+  XV_UNUSED(wide); XV_UNUSED(high);
 
   /* use first word as filename to load. */
   if (sscanf(str, "%s", loadName) != 1) {
@@ -3123,9 +3079,7 @@ static int doPadLoad(str, wide, high, opaque,omode)
 
 
 /*******************************/
-static int doPadPaste(pic24, wide, high, opaque,omode)
-     byte *pic24;
-     int   wide, high, opaque,omode;
+static int doPadPaste(byte *pic24, int wide, int high, int opaque, int omode)
 {
   /* copies 'pic' onto the given 24-bit background image, converts back to
      8-bit (if necessary), and loads up pad* variables.
@@ -3295,19 +3249,17 @@ static int doPadPaste(pic24, wide, high, opaque,omode)
 
 
 /*******************************/
-static int ReadImageFile1(name, pinfo)
-     char    *name;
-     PICINFO *pinfo;
+static int ReadImageFile1(char *name, PICINFO *pinfo)
 {
   int  i, ftype;
-  char uncompname[128], errstr[256], *uncName, *readname;
+  char uncompname[128], errstr[256], *uncName;
 #ifdef VMS
   char basefname[128];
 #endif
 
   ftype = ReadFileType(name);
 
-  if ((ftype == RFT_COMPRESS) || (ftype == RFT_BZIP2)) {  /* handle .Z,gz,bz2 */
+  if ((ftype == RFT_COMPRESS) || (ftype == RFT_BZIP2) || (ftype == RFT_XZ)) {  /* handle .Z,gz,bz2 */
 #ifdef VMS
     basefname[0] = '\0';
     strcpy(basefname, name);     /* remove trailing .Z */
@@ -3319,7 +3271,6 @@ static int ReadImageFile1(name, pinfo)
 
     if (UncompressFile(uncName, uncompname, ftype)) {
       ftype = ReadFileType(uncompname);
-      readname = uncompname;
     }
     else {
       sprintf(errstr, "Error:  Couldn't uncompress file '%s'", name);

@@ -50,14 +50,10 @@ static void   dimDial         PARM((DIAL *));
 
 
 /***************************************************/
-void DCreate(dp, parent, x, y, w, h, minv, maxv, curv, inc, page,
-	          fg, bg, hi, lo, title, units)
-DIAL          *dp;
-Window         parent;
-int            x, y, w, h;
-double         minv, maxv, curv, inc, page;
-unsigned long  fg, bg, hi, lo;
-const char    *title, *units;
+void DCreate(DIAL *dp, Window parent, int x, int y, int w, int h,
+		double minv, double maxv, double curv, double inc, double page,
+		unsigned long fg, unsigned long bg, unsigned long hi, unsigned long lo,
+		const char *title, const char *units)
 {
 
   if (!pixmaps_built) {
@@ -106,9 +102,7 @@ const char    *title, *units;
 
 
 /***************************************************/
-void DSetRange(dp, minv, maxv, curv, inc, page)
-DIAL   *dp;
-double  minv, maxv, curv, inc, page;
+void DSetRange(DIAL *dp, double minv, double maxv, double curv, double inc, double page)
 {
   if (maxv<minv) maxv=minv;
   dp->min = minv; dp->max = maxv; dp->inc = inc; dp->page = page;
@@ -119,9 +113,7 @@ double  minv, maxv, curv, inc, page;
 
 
 /***************************************************/
-void DSetVal(dp, curv)
-DIAL  *dp;
-double curv;
+void DSetVal(DIAL *dp, double curv)
 {
   RANGE(curv, dp->min, dp->max);   /* make sure curv is in-range */
 
@@ -145,9 +137,7 @@ double curv;
 
 
 /***************************************************/
-void DSetActive(dp, i)
-DIAL *dp;
-int   i;
+void DSetActive(DIAL *dp, int i)
 {
   if (i == dp->active) return;
 
@@ -159,8 +149,7 @@ int   i;
 
 
 /***************************************************/
-void DRedraw(dp)
-DIAL *dp;
+void DRedraw(DIAL *dp)
 {
   double tsize;
   int    i, rad, cx, cy, x1, y1, x2, y2;
@@ -199,9 +188,7 @@ DIAL *dp;
 
 
 /***************************************************/
-int DTrack(dp, mx, my)
-DIAL *dp;
-int mx,my;
+int DTrack(DIAL *dp, int mx, int my)
 {
   Window       rW,cW;
   int          rx, ry, x, y, ipos, pos, lit;
@@ -301,9 +288,7 @@ int mx,my;
 
 
 /***************************************************/
-static int whereInDial(dp, x, y)
-DIAL *dp;
-int x, y;
+static int whereInDial(DIAL *dp, int x, int y)
 {
   int i;
 
@@ -321,8 +306,7 @@ int x, y;
 
 
 /***************************************************/
-static void drawArrow(dp)
-DIAL *dp;
+static void drawArrow(DIAL *dp)
 {
   int rad, cx, cy;
   double v;
@@ -345,8 +329,7 @@ DIAL *dp;
 
 
 /***************************************************/
-static void drawValStr(dp)
-DIAL *dp;
+static void drawValStr(DIAL *dp)
 {
   int  tot, i, x1, x2;
   char foo[60], foo1[60];
@@ -395,11 +378,9 @@ DIAL *dp;
 
 
 /***************************************************/
-static void drawButt(dp, i, lit)
-     DIAL *dp;
-     int i, lit;
+static void drawButt(DIAL *dp, int i, int lit)
 {
-  Pixmap pix = (Pixmap) NULL;
+  Pixmap pix = (Pixmap) None;
 
   XSetForeground(theDisp, theGC, dp->fg);
   XDrawRectangle(theDisp, dp->win, theGC, dp->bx[i], dp->by[i], 14, 10);
@@ -430,9 +411,7 @@ static void drawButt(dp, i, lit)
 
 
 /***************************************************/
-static double computeDialVal(dp, x, y)
-DIAL *dp;
-int x, y;
+static double computeDialVal(DIAL *dp, int x, int y)
 {
   int dx, dy;
 
@@ -465,8 +444,7 @@ int x, y;
 
 
 /***************************************************/
-static void dimDial(dp)
-     DIAL *dp;
+static void dimDial(DIAL *dp)
 {
   DimRect(dp->win, 0, 0, (u_int) dp->w, (u_int) dp->h, dp->bg);
 }

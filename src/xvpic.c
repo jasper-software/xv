@@ -126,9 +126,7 @@ static char *pic_msgs[] = {
 
 
 /* The main routine to load a PIC file. */
-int LoadPIC(fname, pinfo)
-    char *fname;
-    PICINFO *pinfo;
+int LoadPIC(char *fname, PICINFO *pinfo)
 {
     int e;
     struct pic_info pic;
@@ -202,9 +200,7 @@ int LoadPIC(fname, pinfo)
     return 1;
 }
 
-static void pic_open_file(pi, fname)
-    struct pic_info *pi;
-    char *fname;
+static void pic_open_file(struct pic_info *pi, char *fname)
 {
     if((pi->fp = fopen(fname, "rb")) == NULL)
 	pic_file_error(pi, PIC_OPEN);
@@ -213,8 +209,7 @@ static void pic_open_file(pi, fname)
     fseek(pi->fp, (size_t) 0, SEEK_SET);
 }
 
-static void pic_check_id(pi)
-    struct pic_info *pi;
+static void pic_check_id(struct pic_info *pi)
 {
     char buf[3];
     if(fread(buf, (size_t) 3, (size_t) 1, pi->fp) != 1)
@@ -223,9 +218,7 @@ static void pic_check_id(pi)
 	pic_error(pi, PIC_FORMAT);
 }
 
-static void pic_read_comment(pi, comm)
-    struct pic_info *pi;
-    char **comm;
+static void pic_read_comment(struct pic_info *pi, char **comm)
 {
     /* The comment field is like:
      * comment-string ^Z dummy \0 \0
@@ -260,8 +253,7 @@ static void pic_read_comment(pi, comm)
 	pic_error(pi, PIC_SUPPORT);
 }
 
-static void pic_read_header(pi)
-    struct pic_info *pi;
+static void pic_read_header(struct pic_info *pi)
 {
     pi->mode   = pic_read_bits(pi, 4);
     pi->type   = pic_read_bits(pi, 4);
@@ -457,7 +449,7 @@ static void pic_read_header(pi)
 	pic_cache_init(pi);
 
 
-    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			  "pic_read_header#2");
     {
 	int i;
@@ -470,8 +462,7 @@ static void pic_read_header(pi)
 }
 
 /* The main routine to expand a PIC file. */
-static void pic_expand_data(pi)
-    struct pic_info *pi;
+static void pic_expand_data(struct pic_info *pi)
 {
     int cnt;
     data32 c;
@@ -488,8 +479,7 @@ static void pic_expand_data(pi)
     }
 }
 
-static int pic_expanding_read_len(pi)
-    struct pic_info *pi;
+static int pic_expanding_read_len(struct pic_info *pi)
 {
     int len;
     byte bits;
@@ -498,8 +488,7 @@ static int pic_expanding_read_len(pi)
     return len - 1 + pic_read_bits(pi, bits);
 }
 
-static data32 pic_expanding_read_color(pi)
-    struct pic_info *pi;
+static data32 pic_expanding_read_color(struct pic_info *pi)
 {
     if(pi->cached){
 	byte b = pic_read_bits(pi, 1);
@@ -514,10 +503,7 @@ static data32 pic_expanding_read_color(pi)
     return pic_read_color_code(pi);
 }
 
-static void pic_expanding_read_chain(pi, x, y, c)
-    struct pic_info *pi;
-    int x, y;
-    data32 c;
+static void pic_expanding_read_chain(struct pic_info *pi, int x, int y, data32 c)
 {
     pi->data[y * pi->width + x] = c;
     if(pic_read_bits(pi, 1) == 1){
@@ -550,19 +536,17 @@ static void pic_expanding_read_chain(pi, x, y, c)
 /*
  * Make a picture from the expanded data.
  */
-static void pic_make_xvpic(pi, xp, rp, gp, bp)
-    struct pic_info *pi;
-    byte **xp, *rp, *gp, *bp;
+static void pic_make_xvpic(struct pic_info *pi, byte **xp, byte *rp, byte *gp, byte *bp)
 {
     if(pi->cmapped){
 	if(pi->tiled256)
-	    *xp = pic_malloc((size_t) pi->width * pi->height * 2,   // GRR POSSIBLE OVERFLOW / FIXME
+	    *xp = pic_malloc((size_t) pi->width * pi->height * 2,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			     "pic_make_xvpic#1");
 	else
-	    *xp = pic_malloc((size_t) pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+	    *xp = pic_malloc((size_t) pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			     "pic_make_xvpic#2");
     }else
-	*xp = pic_malloc((size_t) pi->width * pi->height * 3,   // GRR POSSIBLE OVERFLOW / FIXME
+	*xp = pic_malloc((size_t) pi->width * pi->height * 3,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			 "pic_make_xvpic#3");
 
     if(pi->cmapped){
@@ -582,7 +566,7 @@ static void pic_make_xvpic(pi, xp, rp, gp, bp)
 		    col = pi->data[dat_idx];
 		(*xp)[pic_idx++] = col      & 0xff;
 		(*xp)[pic_idx++] = col >> 8 & 0xff;
-		dat_idx++;
+		dat_idx++; /* is this increment a mistake? */
 	    }
 	}else{
 	    int pic_idx = 0, dat_idx;
@@ -612,14 +596,8 @@ static void pic_make_xvpic(pi, xp, rp, gp, bp)
 
 
 /* The main routine to write PIC file. */
-int WritePIC(fp, pic0, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
-	     comment)
-    FILE *fp;
-    byte *pic0;
-    int ptype, w, h;
-    byte *rmap, *gmap, *bmap;
-    int numcols, colorstyle;
-    char *comment;
+int WritePIC(FILE *fp, byte *pic0, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+	     char *comment)
 {
     struct pic_info pic;
     int e;
@@ -673,16 +651,13 @@ int WritePIC(fp, pic0, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
     return 0;
 }
 
-static void pic_write_id(pi)
-    struct pic_info *pi;
+static void pic_write_id(struct pic_info *pi)
 {
     if(fwrite("PIC", (size_t) 3, (size_t) 1, pi->fp) != 1)
 	pic_file_error(pi, PIC_WRITE);
 }
 
-static void pic_write_comment(pi, comm)
-    struct pic_info *pi;
-    char *comm;
+static void pic_write_comment(struct pic_info *pi, char *comm)
 {
     if(comm){
 	while(*comm){
@@ -699,8 +674,7 @@ static void pic_write_comment(pi, comm)
 	pic_file_error(pi, PIC_WRITE);
 }
 
-static void pic_write_header(pi)
-    struct pic_info *pi;
+static void pic_write_header(struct pic_info *pi)
 {
     if(DEBUG) pic_show_pic_info(pi);
     pic_write_bits(pi, (data32) 0, 4);			/* mode:  1:1 */
@@ -713,9 +687,7 @@ static void pic_write_header(pi)
     pic_write_bits(pi, (data32) 0x0101, 16);		/* real aspect */
 }
 
-static void pic_write_palette(pi, r, g, b)
-    struct pic_info *pi;
-    byte *r, *g, *b;
+static void pic_write_palette(struct pic_info *pi, byte *r, byte *g, byte *b)
 {
     int i;
     data32 rgb = 0;
@@ -728,14 +700,12 @@ static void pic_write_palette(pi, r, g, b)
 	pic_write_rgb(pi, rgb);
 }
 
-static void pic_make_sparse_data(pi, dat)
-    struct pic_info *pi;
-    byte *dat;
+static void pic_make_sparse_data(struct pic_info *pi, byte *dat)
 {
     int i;
     data32 c;
 
-    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   // GRR POSSIBLE OVERFLOW / FIXME
+    pi->data = pic_malloc(sizeof(data32) * pi->width * pi->height,   /* GRR POSSIBLE OVERFLOW / FIXME */
 			  "pic_make_sparse_data");
 
     if(pi->cmapped){
@@ -763,8 +733,7 @@ static void pic_make_sparse_data(pi, dat)
     }
 }
 
-static void pic_write_data(pi)
-    struct pic_info *pi;
+static void pic_write_data(struct pic_info *pi)
 {
     int i;
     int max = pi->width * pi->height;
@@ -786,9 +755,7 @@ static void pic_write_data(pi)
     }
 }
 
-static void pic_write_length(pi, len)
-    struct pic_info *pi;
-    data32 len;
+static void pic_write_length(struct pic_info *pi, data32 len)
 {
     int bits = 0;	/* leading 1's */
     int max = 2;
@@ -797,14 +764,14 @@ static void pic_write_length(pi, len)
 	max = (max + 1) * 2;
 	bits++;
     }
-    pic_write_bits(pi, 0xffffffff, bits);
+    if (bits > 0){
+	pic_write_bits(pi, 0xffffffff, bits);
+    }
     pic_write_bits(pi, 0, 1);
     pic_write_bits(pi, len - max / 2, bits + 1);
 }
 
-static void pic_write_color(pi, c)
-    struct pic_info *pi;
-    data32 c;
+static void pic_write_color(struct pic_info *pi, data32 c)
 {
     if(pi->cached){
 	int idx = pic_cache_lookup(pi, c);
@@ -820,10 +787,7 @@ static void pic_write_color(pi, c)
 	pic_write_color_code(pi, c);
 }
 
-static void pic_write_chain(pi, x, y, c)
-    struct pic_info *pi;
-    int x, y;
-    data32 c;
+static void pic_write_chain(struct pic_info *pi, int x, int y, data32 c)
 {
     int ctr = (y + 1) * pi->width + x;
 
@@ -881,8 +845,7 @@ static void pic_write_chain(pi, x, y, c)
  * pic_write_color_code:
  *	writes a color code.
  */
-static data32 pic_read_rgb(pi)
-    struct pic_info *pi;
+static data32 pic_read_rgb(struct pic_info *pi)
 {
     int rb = pi->r_bits, gb = pi->g_bits, bb = pi->b_bits;
     byte r, g, b;
@@ -911,17 +874,14 @@ static data32 pic_read_rgb(pi)
     return (data32) r << 16 | (data32) g << 8 | (data32) b;
 }
 
-static data32 pic_read_color_code(pi)
-    struct pic_info *pi;
+static data32 pic_read_color_code(struct pic_info *pi)
 {
     if(pi->cmapped)
 	return pic_read_bits(pi, pi->cbits);
     return pic_read_rgb(pi);
 }
 
-static void pic_write_rgb(pi, rgb)
-    struct pic_info *pi;
-    data32 rgb;
+static void pic_write_rgb(struct pic_info *pi, data32 rgb)
 {
     byte r = rgb >> 16;
     byte g = rgb >> 8;
@@ -933,9 +893,7 @@ static void pic_write_rgb(pi, rgb)
     pic_write_bits(pi, b, pi->b_bits);
 }
 
-static void pic_write_color_code(pi, code)
-    struct pic_info *pi;
-    data32 code;
+static void pic_write_color_code(struct pic_info *pi, data32 code)
 {
     if(pi->cmapped){
 	pic_write_bits(pi, code, pi->cbits);
@@ -958,8 +916,7 @@ static void pic_write_color_code(pi, code)
  * pic_cache_add_value:
  *	adds a color to the top of the cache list.
  */
-static void pic_cache_init(pi)
-    struct pic_info *pi;
+static void pic_cache_init(struct pic_info *pi)
 {
     int i;
     pi->cache.node = pic_malloc(sizeof(struct cachenode_t) * 128,
@@ -974,9 +931,7 @@ static void pic_cache_init(pi)
     pi->cache.newest = 0;
 }
 
-static data32 pic_cache_get_value(pi, idx)
-    struct pic_info *pi;
-    int idx;
+static data32 pic_cache_get_value(struct pic_info *pi, int idx)
 {
     struct cachenode_t *p = pi->cache.node;
     int n = pi->cache.newest;
@@ -994,17 +949,13 @@ static data32 pic_cache_get_value(pi, idx)
     return pi->cache.node[idx].dat;
 }
 
-static void pic_cache_add_value(pi, dat)
-    struct pic_info *pi;
-    data32 dat;
+static void pic_cache_add_value(struct pic_info *pi, data32 dat)
 {
     pi->cache.newest = pi->cache.node[pi->cache.newest].newer;
     pi->cache.node[pi->cache.newest].dat = dat;
 }
 
-static int pic_cache_lookup(pi, dat)
-    struct pic_info *pi;
-    data32 dat;
+static int pic_cache_lookup(struct pic_info *pi, data32 dat)
 {
     int i;
     for(i = 0; i < 128; i++){
@@ -1025,9 +976,7 @@ static int pic_cache_lookup(pi, dat)
  * pic_write_bits:
  *	writes the specified bits to the file.
  */
-static data32 pic_read_bits(pi, bits)
-    struct pic_info *pi;
-    int bits;
+static data32 pic_read_bits(struct pic_info *pi, int bits)
 {
     data32 r = 0;
 
@@ -1052,10 +1001,7 @@ static data32 pic_read_bits(pi, bits)
     return r;
 }
 
-static void pic_write_bits(pi, dat, bits)
-    struct pic_info *pi;
-    data32 dat;
-    int bits;
+static void pic_write_bits(struct pic_info *pi, data32 dat, int bits)
 {
     data32 dat_mask = 1 << (bits - 1);
     while(bits > 0){
@@ -1080,9 +1026,7 @@ static void pic_write_bits(pi, dat, bits)
 /*
  * This function extends sub-8-bit data to 8-bit data using bit-replication.
  */
-static byte pic_pad_bit(bits, dat)
-    int bits;
-    data32 dat;
+static byte pic_pad_bit(int bits, data32 dat)
 {
     switch(bits){
     case 1:
@@ -1122,8 +1066,7 @@ static byte pic_pad_bit(bits, dat)
  * pic_cleanup_pinfo:
  *	cleans up a PICINFO structure.
  */
-static void pic_init_info(pi)
-    struct pic_info *pi;
+static void pic_init_info(struct pic_info *pi)
 {
     pi->fp = NULL;
     pi->bs.rest = 0;
@@ -1142,9 +1085,7 @@ static void pic_init_info(pi)
     pi->writing_grey = 0;
 }
 
-static void pic_cleanup_pic_info(pi, writing)
-    struct pic_info *pi;
-    int writing;
+static void pic_cleanup_pic_info(struct pic_info *pi, int writing)
 {
     if(!writing && pi->fp)
 	fclose(pi->fp);
@@ -1160,8 +1101,7 @@ static void pic_cleanup_pic_info(pi, writing)
     pi->data = NULL;
 }
 
-static void pic_cleanup_pinfo(pinfo)
-    PICINFO *pinfo;
+static void pic_cleanup_pinfo(PICINFO *pinfo)
 {
     if(pinfo->pic){
 	free(pinfo->pic);
@@ -1184,25 +1124,20 @@ static void pic_cleanup_pinfo(pinfo)
  * pic_file_warning:
  *	shows a file warning message.
  */
-static void pic_memory_error(scm, fn)
-    char *scm, *fn;
+static void pic_memory_error(char *scm, char *fn)
 {
     char buf[128];
     sprintf(buf, "%s: can't allocate memory. (%s)", scm, fn);
     FatalError(buf);
 }
 
-static void pic_error(pi, mn)
-    struct pic_info *pi;
-    int mn;
+static void pic_error(struct pic_info *pi, int mn)
 {
     SetISTR(ISTR_WARNING, "%s", pic_msgs[mn]);
     longjmp(pi->jmp, 1);
 }
 
-static void pic_file_error(pi, mn)
-    struct pic_info *pi;
-    int mn;
+static void pic_file_error(struct pic_info *pi, int mn)
 {
     if(feof(pi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", pic_msgs[mn]);
@@ -1211,9 +1146,7 @@ static void pic_file_error(pi, mn)
     longjmp(pi->jmp, 1);
 }
 
-static void pic_file_warning(pi, mn)
-    struct pic_info *pi;
-    int mn;
+static void pic_file_warning(struct pic_info *pi, int mn)
 {
     if(feof(pi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", pic_msgs[mn]);
@@ -1221,8 +1154,7 @@ static void pic_file_warning(pi, mn)
 	SetISTR(ISTR_WARNING, "%s (%s)", pic_msgs[mn], ERRSTR(errno));
 }
 
-static void pic_show_pic_info(pi)
-    struct pic_info *pi;
+static void pic_show_pic_info(struct pic_info *pi)
 {
     fprintf(stderr, "  file size: %ld.\n", pi->fsize);
 
@@ -1262,9 +1194,7 @@ static void pic_show_pic_info(pi)
 }
 
 /* Memory related routines. */
-static void *pic_malloc(n, fn)
-    size_t n;
-    char *fn;
+static void *pic_malloc(size_t n, char *fn)
 {
     void *r = (void *) malloc(n);
     if(r == NULL)
@@ -1272,10 +1202,7 @@ static void *pic_malloc(n, fn)
     return r;
 }
 
-static void *pic_realloc(p, n, fn)
-    void *p;
-    size_t n;
-    char *fn;
+static void *pic_realloc(void *p, size_t n, char *fn)
 {
     void *r = (p == NULL) ? (void *) malloc(n) : (void *) realloc(p, n);
     if(r == NULL)

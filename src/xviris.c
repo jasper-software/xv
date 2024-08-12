@@ -101,9 +101,7 @@ static const char *loaderr;
 static const char *bname;
 
 /*****************************************************/
-int LoadIRIS(fname, pinfo)
-     char    *fname;
-     PICINFO *pinfo;
+int LoadIRIS(char *fname, PICINFO *pinfo)
 /*****************************************************/
 {
   /* returns '1' on success, '0' on failure */
@@ -233,8 +231,7 @@ int LoadIRIS(fname, pinfo)
 
 
 /*******************************************/
-static int irisError(name, st)
-  const char *name, *st;
+static int irisError(const char *name, const char *st)
 {
   SetISTR(ISTR_WARNING,"%s: %s", name, st);
   return 0;
@@ -242,9 +239,7 @@ static int irisError(name, st)
 
 
 /****************************************************/
-static byte *getimagedata(fp, img)
-     FILE  *fp;
-     IMAGE *img;
+static byte *getimagedata(FILE *fp, IMAGE *img)
 {
   /* read in a B/W RGB or RGBA iris image file and return a
      pointer to an array of 4-byte pixels, arranged ABGR, NULL on error */
@@ -405,9 +400,7 @@ static byte *getimagedata(fp, img)
 
 
 /******************************************/
-static void interleaverow(lptr,cptr,z,n)
-     byte *lptr, *cptr;
-     int z, n;
+static void interleaverow(byte *lptr, byte *cptr, int z, int n)
 {
   lptr += z;
   while(n--) {
@@ -418,9 +411,7 @@ static void interleaverow(lptr,cptr,z,n)
 
 
 /******************************************/
-static void expandrow(optr,iptr,z)
-     byte *optr, *iptr;
-     int z;
+static void expandrow(byte *optr, byte *iptr, int z)
 {
   byte pixel, count;
 
@@ -472,10 +463,7 @@ static void expandrow(optr,iptr,z)
 
 
 /****************************************************/
-static void readtab(fp, tab, n)
-     FILE   *fp;
-     u_long *tab;
-     int     n;
+static void readtab(FILE *fp, u_long *tab, int n)
 {
   while (n) {
     *tab++ = getlong(fp);
@@ -485,9 +473,7 @@ static void readtab(fp, tab, n)
 
 
 /*****************************************************/
-static void addimgtag(dptr,xsize,ysize)
-     byte *dptr;
-     int   xsize, ysize;
+static void addimgtag(byte *dptr, int xsize, int ysize)
 {
   /* this is used to extract image data from core dumps.
      I doubt this is necessary...  --jhb */
@@ -525,10 +511,7 @@ static void addimgtag(dptr,xsize,ysize)
 
 
 /*************************************************/
-int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
-     FILE *fp;
-     byte *pic, *rmap, *gmap, *bmap;
-     int   ptype, w, h, numcols, colorstyle;
+int WriteIRIS(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle)
 {
   /* writes a greyscale or 24-bit RGB IRIS file to the already open
      stream, RLE-compressed; returns 0 on success, -1 on minor error */
@@ -538,6 +521,8 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
   u_long *starttab, *lengthtab;
   byte   *rlebuf, *pptr;
   byte   *lumbuf, *lptr, *longpic;
+
+  XV_UNUSED(numcols);
 
   xvbzero((char *) &img, sizeof(IMAGE));
 
@@ -670,9 +655,7 @@ int WriteIRIS(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle)
 
 
 /*************************************/
-static void lumrow(rgbptr, lumptr, n)
-     byte *rgbptr, *lumptr;
-     int n;
+static void lumrow(byte *rgbptr, byte *lumptr, int n)
 {
   lumptr += CHANOFFSET(0);
   while (n--) {
@@ -684,9 +667,7 @@ static void lumrow(rgbptr, lumptr, n)
 
 
 /*************************************/
-static int compressrow(lbuf, rlebuf, z, cnt)
-     byte *lbuf, *rlebuf;
-     int   z, cnt;
+static int compressrow(byte *lbuf, byte *rlebuf, int z, int cnt)
 {
   byte *iptr, *ibufend, *sptr, *optr;
   short todo, cc;
@@ -750,10 +731,7 @@ static int compressrow(lbuf, rlebuf, z, cnt)
 
 
 /****************************************************/
-static void writetab(outf,tab,n)
-     FILE *outf;
-     u_long *tab;
-     int n;
+static void writetab(FILE *outf, u_long *tab, int n)
 {
   while (n) {
     putlong(outf,*tab++);
@@ -766,8 +744,7 @@ static void writetab(outf,tab,n)
 
 /* byte order independent read/write of shorts and longs. */
 
-static u_short getshort(inf)
-     FILE *inf;
+static u_short getshort(FILE *inf)
 {
   byte buf[2];
   fread(buf, (size_t) 2, (size_t) 1,inf);
@@ -775,8 +752,7 @@ static u_short getshort(inf)
 }
 
 
-static u_long getlong(inf)
-     FILE *inf;
+static u_long getlong(FILE *inf)
 {
   byte buf[4];
   fread(buf, (size_t) 4, (size_t) 1,inf);
@@ -785,9 +761,7 @@ static u_long getlong(inf)
 }
 
 
-static void putshort(outf,val)
-     FILE *outf;
-     int val;
+static void putshort(FILE *outf, int val)
 {
   byte buf[2];
   buf[0] = (val>>8);
@@ -796,9 +770,7 @@ static void putshort(outf,val)
 }
 
 
-static void putlong(outf,val)
-     FILE *outf;
-     u_long val;
+static void putlong(FILE *outf, u_long val)
 {
   byte buf[4];
   buf[0] = (val>>24);

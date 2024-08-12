@@ -22,9 +22,12 @@ static int   vd_recursive_rmdir		PARM((char *));
 static void  vd_optimize_path		PARM((char *));
 static int   vd_ftype			PARM((char *));
 static int   vd_compp			PARM((char *, char *));
-static int   vd_UncompressFile		PARM((char *, char *));
+static int   vd_UncompressFile		PARM((char *, char *, int));
 static int   vd_tarc			PARM((char *));
 static u_int vd_tar_sumchk		PARM((char *));
+
+static int   block_signal		PARM((int));
+static void  unblock_signal		PARM((int, int));
 
 static XtSignalId IdHup = 0;
 static XtSignalId IdInt = 0;
@@ -35,6 +38,10 @@ extern XtAppContext context;
 
 #define VD_ERR -2
 #define VD_UKN -1
+
+/* archive extraction commands */
+/* The %s should not be quoted because QuoteFileName() handles quoting */
+/* The maximum VD type must be less than RFT_COMPRESS to avoid conflicts */
 
 static char *ext_command[] = {
 /* KEEP 0 */
@@ -65,7 +72,7 @@ static char *vdtable[VD_VDTABLESIZE];
  * Vdsettle:
  *	sweeps virtual directories.
  */
-void Vdinit()
+void Vdinit(void)
 {
 #ifndef VMS
     char tmp[MAXPATHLEN+1];
@@ -83,8 +90,9 @@ void Vdinit()
 #else
     sprintf(vdroot, "Sys$Scratch:xvvdXXXXXX");
 #endif /* VMS */
+
 #ifdef USE_MKSTEMP
-    close(mkstemp(vdroot));
+    mkdtemp(vdroot);
 #else
     mktemp(vdroot);
 #endif
@@ -93,7 +101,7 @@ void Vdinit()
 	tmpdir = vdroot;
 }
 
-void Vdsettle()
+void Vdsettle(void)
 {
     int i;
 
@@ -107,10 +115,9 @@ void Vdsettle()
 
 /*
  * This function chdir to virtual directory, if specified path is in
- * virtual directlry.
+ * virtual directory.
  */
-int Chvdir(dir)
-char *dir;
+int Chvdir(char *dir)
 {
     char buf[MAXPATHLEN+1];
 
@@ -136,16 +143,14 @@ char *dir;
  * Dirtosubst:
  *	converts directory to substance of archive.
  */
-void Dirtovd(dir)
-char *dir;
+void Dirtovd(char *dir)
 {
     vd_optimize_path(dir);
 
     vd_Dirtovd(dir);
 }
 
-static void vd_Dirtovd(dir)
-char *dir;
+static void vd_Dirtovd(char *dir)
 {
     int i;
 
@@ -159,16 +164,14 @@ char *dir;
 	}
 }
 
-void Vdtodir(dir)
-char *dir;
+void Vdtodir(char *dir)
 {
     vd_optimize_path(dir);
 
     vd_Vdtodir(dir);
 }
 
-static void vd_Vdtodir(vd)
-char *vd;
+static void vd_Vdtodir(char *vd)
 {
     int i;
     char tmp[MAXPATHLEN+1];
@@ -183,8 +186,7 @@ char *vd;
     }
 }
 
-void Dirtosubst(dir)
-char *dir;
+void Dirtosubst(char *dir)
 {
     char tmp[MAXPATHLEN+1];
 
@@ -194,6 +196,80 @@ char *dir;
 
     if (Isarchive(tmp))
 	strcpy(dir, tmp);
+}
+
+static int block_signal(int sig)
+{
+  int mask = 0;
+
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 199309L)
+
+  struct sigaction sa;
+  sigset_t new_mask;
+
+  memset(&sa, 0, sizeof(sa));
+  sa.sa_handler = SIG_IGN;
+
+  sigemptyset(&new_mask);
+  sigaddset(&new_mask, sig);
+
+  if (sigaction(sig, &sa, NULL) == -1) {
+    perror("block_signal: sigaction");
+  }
+
+  if (sigprocmask(SIG_BLOCK, &new_mask, NULL) == -1) {
+    perror("block_signal: sigprocmask");
+  }
+
+#elif defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
+
+  sighold(sig);
+
+#else
+
+  mask = sigblock(sigmask(sig));
+
+#endif
+
+  return mask;
+}
+
+static void unblock_signal(int sig, int old_mask)
+{
+#if defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 199309L)
+
+  struct sigaction sa;
+  sigset_t new_mask;
+
+  XV_UNUSED(old_mask);
+
+  memset(&sa, 0, sizeof(sa));
+  sa.sa_handler = SIG_DFL;
+
+  sigemptyset(&new_mask);
+  sigaddset(&new_mask, sig);
+
+  if (sigaction(sig, &sa, NULL) == -1) {
+    perror("unblock_signal: sigaction");
+  }
+
+  if (sigprocmask(SIG_UNBLOCK, &new_mask, NULL) == -1) {
+    perror("unblock_signal: sigprocmask");
+  }
+
+#elif defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
+
+  XV_UNUSED(old_mask);
+
+  sigrelse(sig);
+
+#else
+
+  XV_UNUSED(sig);
+
+  sigsetmask(old_mask);
+
+#endif
 }
 
 /*
@@ -206,20 +282,15 @@ char *dir;
  * Mkvdir_force: (used by makeThumbDir(in xvbrowse.c) only)
  *	make virtual directory by force.
  */
-int Mkvdir(dir)
-char *dir;
+int Mkvdir(char *dir)
 {
     char dir1[MAXPATHLEN+1], dir2[MAXPATHLEN+1];
     char *d1, *d2;
     int rv;
-
-#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sighold(SIGHUP);
-    sighold(SIGCHLD);
-#else
     int mask;
-    mask = sigblock(sigmask(SIGHUP)|sigmask(SIGCHLD));
-#endif
+
+    mask = block_signal(SIGHUP);
+    /* block_signal(SIGCHLD); */ /* breaks calls to system() */
 
     strcpy(dir1, dir);
     vd_optimize_path(dir1);
@@ -246,18 +317,14 @@ char *dir;
     }
 
 MKVDIR_END:
-#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sigrelse(SIGHUP);
-    sigrelse(SIGCHLD);
-#else
-    sigsetmask(mask);
-#endif
+
+    unblock_signal(SIGHUP, mask);
+    /* unblock_signal(SIGCHLD, mask); */
 
     return rv;
 }
 
-static int vd_Mkvdir(dir)
-char *dir;
+static int vd_Mkvdir(char *dir)
 {
     char dir1[MAXPATHLEN+1], dir2[MAXPATHLEN+1], tmp[MAXPATHLEN+1];
     int ftype, i;
@@ -274,7 +341,7 @@ char *dir;
 	SetCursors(-1);
 	return ftype;
     }
-    if (ftype == RFT_COMPRESS) {
+    if (ftype == RFT_COMPRESS || ftype == RFT_BZIP2 || ftype == RFT_XZ) {
 	if (!(ftype = vd_compp(dir1, tmp))) {
 	    SetCursors(-1);
 	    return ftype;
@@ -290,7 +357,8 @@ char *dir;
 	    }
 
 	if (!S_ISDIR(st.st_mode)) {
-	    char origdir[MAXPATHLEN+1], buf[MAXPATHLEN+10], buf1[100];
+	    char origdir[ MAXPATHLEN + 1 ], buf[ XV_MAXQUOTEDPATHLEN + 20 ], buf1[ 100 ];
+	    char quoted_dir[ XV_MAXQUOTEDPATHLEN ];
 
 	    if (vdcount >= VD_VDTABLESIZE) {
 		ErrPopUp("Sorry, you can't make virtual directory any more.",
@@ -302,13 +370,13 @@ char *dir;
 
 	    xv_getwd(origdir, MAXPATHLEN+1);
 
-	    sprintf(tmp, "%s%s", vdroot, dir2);
+	    snprintf(tmp, sizeof(tmp), "%s%s", vdroot, dir2);
 	    if (vd_recursive_mkdir(tmp) || chdir(tmp)) {
 		SetISTR(ISTR_INFO, "fail to make virtual directory.");
 		Warning();
 		goto VD_MKVDIR_ERR;
 	    }
-	    sprintf(buf, ext_command[ftype], dir1);
+	    sprintf(buf, ext_command[ftype], QuoteFileName(quoted_dir, dir1, XV_MAXQUOTEDPATHLEN));
 
 	    WaitCursor();
 
@@ -381,8 +449,7 @@ char *dir;
  * vd_Rmvdir:
  *	remove virtual directory function.
  */
-int Rmvdir(dir)
-char *dir;
+int Rmvdir(char *dir)
 {
     int rv;
     char buf[MAXPATHLEN+1];
@@ -395,8 +462,7 @@ char *dir;
     return rv;
 }
 
-static int vd_Rmvdir(dir)
-char *dir;
+static int vd_Rmvdir(char *dir)
 {
     int i;
     char tmp[MAXPATHLEN+1];
@@ -420,8 +486,7 @@ char *dir;
  * vd_Movevdir:
  *	does real work.
  */
-int Movevdir(src, dst)
-char *src, *dst;
+int Movevdir(char *src, char *dst)
 {
 /*
     char sbuf[MAXPATHLEN+1], dbuf[MAXPATHLEN+1];
@@ -437,8 +502,7 @@ char *src, *dst;
     return (vd_Movevdir(src, dst));
 }
 
-static int vd_Movevdir(src, dst)
-char *src, *dst;
+static int vd_Movevdir(char *src, char *dst)
 {
     int i;
     char *p, *pp;
@@ -446,9 +510,9 @@ char *src, *dst;
 
     for (i = 0; i < vdcount; i++)
 	if (!strncmp(src, vdtable[i], strlen(src))) {
-	    sprintf(tmps, "%s%s", vdroot, vdtable[i]);
-	    sprintf(tmp, "%s%s", dst, vdtable[i]+strlen(src));
-	    sprintf(tmpd, "%s%s", vdroot, tmp);
+	    snprintf(tmps, sizeof(tmps), "%s%s", vdroot, vdtable[i]);
+	    snprintf(tmp,  sizeof(tmp),  "%s%s", dst, vdtable[i]+strlen(src));
+	    snprintf(tmpd, sizeof(tmpd), "%s%s", vdroot, tmp);
 
 	    if (vd_Movevdir(tmps, tmpd))
 		return 1;
@@ -486,8 +550,7 @@ VD_MOVEVDIR_ERR:
  * vd_packvdtable:
  *	removes disused virtual directories from table.
  */
-static void vd_addvdtable(vd)
-char *vd;
+static void vd_addvdtable(char *vd)
 {
     char *p;
     p = (char *) malloc(strlen(vd)+1);
@@ -496,7 +559,7 @@ char *vd;
     vdcount++;
 }
 
-static void vd_packvdtable()
+static void vd_packvdtable(void)
 {
     int i, j;
 
@@ -516,16 +579,22 @@ static void vd_packvdtable()
  * vd_recursive_rmdir
  *	removes directories recursively.
  */
-static int vd_recursive_mkdir(dir)
-char *dir;
+static int vd_recursive_mkdir(char *dir)
 {
     char buf[MAXPATHLEN+1], *p;
+    int len;
     struct stat st;
 
     strcpy(buf, dir);
 
-    if (buf[strlen(buf) - 1] == '/')
-	buf[strlen(buf) - 1] = '\0';
+    len = strlen(buf);
+    if (len > 0 && buf[len - 1] == '/') {
+	buf[len - 1] = '\0';
+	len--;
+    }
+    if (len == 0) {
+	return 0;
+    }
 
     p = rindex(buf, '/');
     *p = '\0';
@@ -541,8 +610,7 @@ char *dir;
     return (0);
 }
 
-static int vd_recursive_rmdir(dir)
-char *dir;
+static int vd_recursive_rmdir(char *dir)
 {
     char buf[MAXPATHLEN+1], buf2[MAXPATHLEN+1];
     DIR *dp;
@@ -589,23 +657,24 @@ VD_RECURSIVE_RMDIR_ERR:
  * Isvdir:
  *	tests whether it's in the virtual directory?
  */
-int Isarchive(path)
-char *path;
+int Isarchive(char *path)
 {
     int ftype;
 
-    if ((ftype = vd_ftype(path)) < 0)
+    if ((ftype = vd_ftype(path)) < 0) {
 	return 0;
+    }
 
-    if (ftype == RFT_COMPRESS)
-	if (!(ftype = vd_compp(path, NULL)))
+    if (ftype == RFT_COMPRESS || ftype == RFT_BZIP2 || ftype == RFT_XZ) {
+	if (!(ftype = vd_compp(path, NULL))) {
 	    return 0;
+	}
+    }
 
     return ftype;
 }
 
-int Isvdir(path)
-char *path;
+int Isvdir(char *path)
 {
     int rv = 0;
     char tmp1[MAXPATHLEN+1], tmp2[MAXPATHLEN+1];
@@ -621,13 +690,11 @@ char *path;
     archive2 = Isarchive(tmp2);
 
     if (strcmp(tmp1, tmp2)) {
-	char tmp3[MAXPATHLEN+1], tmp4[MAXPATHLEN+1];
-	int archive3, archive4;
+	char tmp4[MAXPATHLEN+1];
+	int archive4;
 
-	sprintf(tmp3, "%s%s", vdroot, tmp1);
 	strcpy(tmp4, tmp2+strlen(vdroot));
 
-	archive3 = Isarchive(tmp3);
 	archive4 = Isarchive(tmp4);
 
 	if (archive4 && !strcmp(tmp1, tmp4)) {
@@ -651,8 +718,7 @@ char *path;
  * This function optimizes given path.
  * Expand '~' to home directory and removes '.', and treat '..'.
  */
-static void vd_optimize_path(path)
-char *path;
+static void vd_optimize_path(char *path)
 {
     char *tmp, *reserve;
 
@@ -722,8 +788,7 @@ char *path;
 /*
  * These functions detect file type.
  */
-static int vd_ftype(fname)
-char *fname;
+static int vd_ftype(char *fname)
 {
     /* check archive type */
 
@@ -771,11 +836,20 @@ char *fname;
     else if (magicno[0]==0x1f && magicno[1]==0x1e) rv = RFT_COMPRESS;/* pack */
 #endif
 
+#ifdef BUNZIP2
+    else if (magicno[0]==0x42 && magicno[1]==0x5a) rv = RFT_BZIP2;
+#endif
+
+#ifdef XZ
+  else if (magicno[0]==0xfd &&
+           magicno[1]=='7' && magicno[2]=='z' &&
+           magicno[3]=='X' && magicno[4]=='Z') rv = RFT_XZ;
+#endif
+
     return rv;
 }
 
-static int vd_compp(path, newpath)
-char *path, *newpath;
+static int vd_compp(char *path, char *newpath)
 {
     /*
      * uncompress and check archive type.
@@ -793,6 +867,7 @@ char *path, *newpath;
 
     if (newpath) *newpath = '\0';
     strncpy(basename, path, 127);
+    uncompname[0] = '\0';
     comptype = ReadFileType(path);
 #if (defined(VMS) && !defined(GUNZIP))
     /* VMS decompress doesn't like the file to have a trailing .Z in fname
@@ -803,7 +878,7 @@ char *path, *newpath;
     if (UncompressFile(basename, uncompname)) {
 #else
     if (newpath == NULL)
-	r = vd_UncompressFile(basename, uncompname);
+	r = vd_UncompressFile(basename, uncompname, comptype);
     else
 	r = UncompressFile(basename, uncompname, comptype);
     if (r) {
@@ -827,16 +902,16 @@ static int   stderr_on			PARM((void));
 static int   stderr_off			PARM((void));
 static FILE  *popen_nul			PARM((char *, char *));
 
-static int vd_UncompressFile(name, uncompname)
-char *name, *uncompname;
+static int vd_UncompressFile(char *name, char *uncompname, int filetype)
 {
-    /* Yap, I`m nearly same as original `UncompnameFile' function, but,
+    /* Yap, I`m nearly same as original `UncompressFile' function, but,
        1) I extract `name' file ONLY first 512 byte.
        2) I'm called only from UNIX and UNIX like OS, *NOT* VMS */
     /* returns '1' on success, with name of uncompressed file in uncompname
        returns '0' on failure */
 
-    char namez[128], *fname, buf[512], tmp[HEADERSIZE];
+    char namez[128], *fname, buf[ XV_MAXQUOTEDPATHLEN + 20 ], tmp[HEADERSIZE];
+    char quoted_name[ XV_MAXQUOTEDPATHLEN ];
     int n, tmpfd;
     FILE *pfp, *tfp;
 
@@ -874,7 +949,25 @@ char *name, *uncompname;
     mktemp(uncompname);
 #endif
 
-    sprintf(buf,"%s -c %s", UNCOMPRESS, fname);
+  /* FIXME: need to escape any special characters (spaces, dollar signs,
+   * backticks, quotes, etc., or use ticks) in the filename before calling system().
+   * Maybe one of the exec() variants would be better...
+   * (and why can't this be merged with the similar code in xv.c?)
+   */
+    buf[0] = '\0';
+    QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN);
+    if (filetype == RFT_COMPRESS)
+      sprintf(buf,"%s -c %s", UNCOMPRESS, quoted_name);
+#ifdef BUNZIP2
+    else if (filetype == RFT_BZIP2)
+      sprintf(buf,"%s -c %s", BUNZIP2, quoted_name);
+#endif
+#ifdef XZ
+    else if (filetype == RFT_XZ)
+      sprintf(buf,"%s -c %s", XZ, quoted_name);
+#endif
+    else
+      return 0;
     SetISTR(ISTR_INFO, "Uncompressing Header '%s'...", BaseName(fname));
     if ((pfp = popen_nul(buf, "r")) == NULL) {
 	SetISTR(ISTR_INFO, "Cannot extract for archive '%s'.",
@@ -942,8 +1035,7 @@ char *name, *uncompname;
 /*
  * Tar file: 1, other: 0
  */
-static int vd_tarc(fname)
-char *fname;
+static int vd_tarc(char *fname)
 {
     FILE *fp;
     unsigned int sum;
@@ -971,8 +1063,7 @@ char *fname;
     return 1;
 }
 
-static unsigned int vd_tar_sumchk(buf)
-char *buf;
+static unsigned int vd_tar_sumchk(char *buf)
 {
     int i;
     unsigned int sum = 0;
@@ -994,7 +1085,7 @@ static int nul = -1;         /*  fd of /dev/null */
 /*
  * switch off the output to stderr(bypass to /dev/null).
  */
-static int stderr_off()
+static int stderr_off(void)
 {
     if (nul < 0)
       nul = open("/dev/null", O_RDONLY);
@@ -1016,7 +1107,7 @@ static int stderr_off()
 /*
  * turn on stderr output.
  */
-static int stderr_on()
+static int stderr_on(void)
 {
     if ((stde < 0) || (nul < 0)) {
 	fprintf(stderr, "stderr_on should call after stderr_off\n");
@@ -1030,8 +1121,7 @@ static int stderr_on()
 /*
  * popen with no output to stderr.
  */
-static FILE *popen_nul(prog, mode)
-char *prog, *mode;
+static FILE *popen_nul(char *prog, char *mode)
 {
     FILE *fp;
 
@@ -1048,6 +1138,7 @@ char *prog, *mode;
  */
 static void vd_HUPhandler(int sig)
 {
+    XV_UNUSED(sig);
     XtNoticeSignal(IdHup);
 #if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
     signal(SIGHUP, (void (*)PARM((int))) vd_HUPhandler);
@@ -1056,20 +1147,16 @@ static void vd_HUPhandler(int sig)
 
 static void HUPhandler(XtPointer dummy, XtSignalId* Id)
 {
-#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sighold(SIGHUP);
-#else
     int mask;
-    mask = sigblock(sigmask(SIGHUP));
-#endif
 
-  Vdsettle();
+    mask = block_signal(SIGHUP);
 
-#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sigrelse(SIGHUP);
-#else
-    sigsetmask(mask);
-#endif
+    XV_UNUSED(dummy);
+    XV_UNUSED(Id);
+
+    Vdsettle();
+
+    unblock_signal(SIGHUP, mask);
 }
 
 static void vd_handler(int sig)
@@ -1080,33 +1167,32 @@ static void vd_handler(int sig)
 
 static void INThandler(XtPointer dummy, XtSignalId* Id)
 {
-#if defined(SYSV) || defined(SVR4) || defined(__USE_XOPEN_EXTENDED)
-    sighold(UsedSignal);
-#else
-    sigblock(sigmask(UsedSignal));
-#endif
+    XV_UNUSED(dummy);
+    XV_UNUSED(Id);
+
+    block_signal(UsedSignal);
 
     Quit(1); /*exit(1);*/
 }
 
-int vd_Xhandler(disp,event)
-Display *disp;
-XErrorEvent *event;
+static int vd_Xhandler(Display *disp, XErrorEvent *event)
 {
+    XV_UNUSED(disp);
+    XV_UNUSED(event);
     Quit(1); /*exit(1);*/
     return (1); /* Not reached */
 }
 
-int vd_XIOhandler(disp)
-Display *disp;
+static int vd_XIOhandler(Display *disp)
 {
+    XV_UNUSED(disp);
     fprintf(stderr, "XIO  fatal IO error ? (?) on X server\n");
     fprintf(stderr, "You must exit normally in xv usage.\n");
     Quit(1); /*exit(1);*/
     return (1); /* Not reached */
 }
 
-void vd_handler_setup()
+void vd_handler_setup(void)
 {
     IdHup = XtAppAddSignal(context, HUPhandler, NULL);
     IdInt = XtAppAddSignal(context, INThandler, NULL);

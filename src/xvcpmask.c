@@ -87,10 +87,8 @@ static void GetCPTbl(int nTbl, char *CPcode, int *tbl, CPS *cps)
 CPS *calcCPmask(char *code, int ntbl)
 {
     int *tbl;
-    int len;
     CPS *cps;
 
-    len = strlen(code);
     tbl = (int *)malloc(sizeof(int) * ntbl);
     cps = (CPS *)malloc(sizeof(CPS) * ntbl);
     if(!tbl || !cps) {

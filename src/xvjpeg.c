@@ -27,20 +27,20 @@
 
 
 /*** Stuff for JPEG Dialog box ***/
-#define JWIDE 400
-#define JHIGH 200
+#define JWIDE (400*dpiMult)
+#define JHIGH (200*dpiMult)
 #define J_NBUTTS 2
 #define J_BOK    0
 #define J_BCANC  1
-#define BUTTH    24
+#define BUTTH    (24*dpiMult)
 
 /* Minimum size compression when doing a 'quick' image load.  (Of course, if
    the image *is* smaller than this, you'll get whatever size it actually is.)
    This is currently hardcoded to be twice the size of a schnauzer icon, as
    the schnauzer's the only thing that does a quick load... */
 
-#define QUICKWIDE 160
-#define QUICKHIGH 120
+#define QUICKWIDE (160*dpiMult)
+#define QUICKHIGH (120*dpiMult)
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub;
@@ -98,23 +98,23 @@ char errbuffer[JMSG_LENGTH_MAX];
 
 
 /***************************************************/
-void CreateJPEGW()
+void CreateJPEGW(void)
 {
-  jpegW = CreateWindow("xv jpeg","XVjpeg",NULL,JWIDE,JHIGH,infofg,infobg,0);
+  jpegW = CreateWindow("xv jpeg","XVjpeg",NULL,JWIDE,JHIGH,infofg,infobg,FALSE);
   if (!jpegW) FatalError("can't create jpeg window!");
 
   XSelectInput(theDisp, jpegW, ExposureMask | ButtonPressMask | KeyPressMask);
 
-  DCreate(&qDial, jpegW, 10, 10, 80, 100, 1.0, 100.0, 75.0, 1.0, 5.0,
+  DCreate(&qDial, jpegW, 10*dpiMult, 10*dpiMult, 80*dpiMult, 100*dpiMult, 1.0, 100.0, 75.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Quality", "%");
 
-  DCreate(&smDial, jpegW, 120, 10, 80, 100, 0.0, 100.0, 0.0, 1.0, 5.0,
+  DCreate(&smDial, jpegW, 120*dpiMult, 10*dpiMult, 80*dpiMult, 100*dpiMult, 0.0, 100.0, 0.0, 1.0, 5.0,
 	  infofg, infobg, hicol, locol, "Smoothing", "%");
 
-  BTCreate(&jbut[J_BOK], jpegW, JWIDE-180-1, JHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&jbut[J_BOK], jpegW, JWIDE - 180*dpiMult - 1*dpiMult, JHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
 
-  BTCreate(&jbut[J_BCANC], jpegW, JWIDE-90-1, JHIGH-10-BUTTH-1, 80, BUTTH,
+  BTCreate(&jbut[J_BCANC], jpegW, JWIDE - 90*dpiMult - 1*dpiMult, JHIGH - 10*dpiMult - BUTTH - 1*dpiMult, 80*dpiMult, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
   XMapSubwindows(theDisp, jpegW);
@@ -122,8 +122,7 @@ void CreateJPEGW()
 
 
 /***************************************************/
-void JPEGDialog(vis)
-     int vis;
+void JPEGDialog(int vis)
 {
   if (vis) {
     CenterMapWindow(jpegW, jbut[J_BOK].x + (int) jbut[J_BOK].w/2,
@@ -135,8 +134,7 @@ void JPEGDialog(vis)
 
 
 /***************************************************/
-int JPEGCheckEvent(xev)
-     XEvent *xev;
+int JPEGCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -210,9 +208,7 @@ int JPEGCheckEvent(xev)
 
 
 /***************************************************/
-void JPEGSaveParams(fname, col)
-     char *fname;
-     int col;
+void JPEGSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -220,8 +216,7 @@ void JPEGSaveParams(fname, col)
 
 
 /***************************************************/
-static void drawJD(x,y,w,h)
-     int x,y,w,h;
+static void drawJD(int x, int y, int w, int h)
 {
   const char *title  = "Save JPEG file...";
   const char *title1 = "Quality value determines";
@@ -239,6 +234,7 @@ static void drawJD(x,y,w,h)
   const char *smtitle3 = "for typical GIFs.";
 
   int  i;
+  int dx, dy;
   XRectangle xr;
 
   xr.x = x;  xr.y = y;  xr.width = w;  xr.height = h;
@@ -249,28 +245,38 @@ static void drawJD(x,y,w,h)
 
   for (i=0; i<J_NBUTTS; i++) BTRedraw(&jbut[i]);
 
-  DrawString(jpegW, 220, 10+ASCENT,                   title);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*1,        title1);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*2,        title2);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*3,        title3);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*4,        title4);
-  DrawString(jpegW, 230, 10+ASCENT+LINEHIGH*5,        title5);
+  dx = 220*dpiMult;
+  dy = 10*dpiMult + ASCENT;
 
-  DrawString(jpegW,  15, 10+100+10+ASCENT,            qtitle1);
-  DrawString(jpegW,  15, 10+100+10+ASCENT+LINEHIGH,   qtitle2);
-  DrawString(jpegW,  15, 10+100+10+ASCENT+LINEHIGH*2, qtitle3);
+  DrawString(jpegW, dx, dy,              title);
 
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*0, smtitle1);
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*1, smtitle2);
-  DrawString(jpegW, 115, 10+100+10+ASCENT+LINEHIGH*2, smtitle3);
+  dx = 230*dpiMult;
+
+  DrawString(jpegW, dx, dy + LINEHIGH*1, title1);
+  DrawString(jpegW, dx, dy + LINEHIGH*2, title2);
+  DrawString(jpegW, dx, dy + LINEHIGH*3, title3);
+  DrawString(jpegW, dx, dy + LINEHIGH*4, title4);
+  DrawString(jpegW, dx, dy + LINEHIGH*5, title5);
+
+  dx = 15*dpiMult;
+  dy = (10 + 100 + 10)*dpiMult + ASCENT;
+
+  DrawString(jpegW,  dx, dy,              qtitle1);
+  DrawString(jpegW,  dx, dy + LINEHIGH,   qtitle2);
+  DrawString(jpegW,  dx, dy + LINEHIGH*2, qtitle3);
+
+  dx = 115*dpiMult;
+
+  DrawString(jpegW, dx, dy + LINEHIGH*0, smtitle1);
+  DrawString(jpegW, dx, dy + LINEHIGH*1, smtitle2);
+  DrawString(jpegW, dx, dy + LINEHIGH*2, smtitle3);
 
   XSetClipMask(theDisp, theGC, None);
 }
 
 
 /***************************************************/
-static void clickJD(x,y)
-     int x,y;
+static void clickJD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -290,8 +296,7 @@ static void clickJD(x,y)
 
 
 /***************************************************/
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
 
   switch (cmd) {
@@ -320,7 +325,7 @@ static void doCmd(cmd)
 
 
 /*******************************************/
-static void writeJPEG()
+static void writeJPEG(void)
 {
   FILE          *fp;
   int            i, nc, rv, w, h, npixels, ptype, pfree;
@@ -437,11 +442,10 @@ static void writeJPEG()
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_error_exit(cinfo)
+METHODDEF(void) xv_error_exit(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_error_exit(cinfo)
+METHODDEF void  xv_error_exit(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
   my_error_ptr myerr;
 
@@ -453,16 +457,13 @@ METHODDEF void  xv_error_exit(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_error_output(cinfo)
+METHODDEF(void) xv_error_output(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_error_output(cinfo)
+METHODDEF void  xv_error_output(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
-  my_error_ptr myerr;
   char         buffer[JMSG_LENGTH_MAX];
 
-  myerr = (my_error_ptr) cinfo->err;
   (*cinfo->err->format_message)(cinfo, buffer);
 
   SetISTR(ISTR_WARNING, "%s: %s", fbasename, buffer);   /* send it to XV */
@@ -471,11 +472,10 @@ METHODDEF void  xv_error_output(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(void) xv_prog_meter(cinfo)
+METHODDEF(void) xv_prog_meter(j_common_ptr cinfo)
 #else
-METHODDEF void  xv_prog_meter(cinfo)
+METHODDEF void  xv_prog_meter(j_common_ptr cinfo)
 #endif
-     j_common_ptr cinfo;
 {
   struct jpeg_progress_mgr *prog;
 
@@ -498,10 +498,7 @@ METHODDEF void  xv_prog_meter(cinfo)
 
 
 /*******************************************/
-int LoadJFIF(fname, pinfo, quick)
-     char    *fname;
-     PICINFO *pinfo;
-     int      quick;
+int LoadJFIF(char *fname, PICINFO *pinfo, int quick)
 {
   /* returns '1' on success, '0' on failure */
 
@@ -667,11 +664,14 @@ L2:
   jpeg_start_decompress(&cinfo);
 
   while (cinfo.output_scanline < cinfo.output_height) {
+#if 0
+    /* can never happen because output_scanline is unsigned */
     if (cinfo.output_scanline < 0) {   /* should never happen, but... */
       SetISTR(ISTR_WARNING, "%s:  invalid negative scanline (%d)",
               fbasename, cinfo.output_scanline);
       goto L1;
     }
+#endif
     rowptr[0] = (JSAMPROW) &pic[cinfo.output_scanline * w * bperpix];
     (void) jpeg_read_scanlines(&cinfo, rowptr, (JDIMENSION) 1);
   }
@@ -696,9 +696,9 @@ L2:
       do {
         register int cmy, k = 255 - q[3];
 
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* R */
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* G */
-        if ((cmy = *q++ - k) < 0) cmy = 0; *p++ = cmy; /* B */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* R */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* G */
+        if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* B */
       } while (++q <= pic_end);
     }
     else { /* assume normal data */
@@ -707,9 +707,9 @@ L2:
       do {
         register int cmy, k = 255 - q[3];
 
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* R */
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* G */
-        if ((cmy = k - *q++) < 0) cmy = 0; *p++ = cmy; /* B */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* R */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* G */
+        if ((cmy = k - *q++) < 0) { cmy = 0; } *p++ = cmy; /* B */
       } while (++q <= pic_end);
     }
     pic = realloc(pic,p-pic); /* Release extra storage */
@@ -781,8 +781,7 @@ L2:
 
 
 /**************************************************/
-static unsigned int j_getc(cinfo)
-     j_decompress_ptr cinfo;
+static unsigned int j_getc(j_decompress_ptr cinfo)
 {
   struct jpeg_source_mgr *datasrc = cinfo->src;
 
@@ -797,11 +796,10 @@ static unsigned int j_getc(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(boolean) xv_process_comment(cinfo)
+METHODDEF(boolean) xv_process_comment(j_decompress_ptr cinfo)
 #else
-METHODDEF boolean  xv_process_comment(cinfo)
+METHODDEF boolean  xv_process_comment(j_decompress_ptr cinfo)
 #endif
-     j_decompress_ptr cinfo;
 {
   int          length, hasnull;
   unsigned int ch;
@@ -836,11 +834,10 @@ METHODDEF boolean  xv_process_comment(cinfo)
 
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
-METHODDEF(boolean) xv_process_app1(cinfo)   /* Geoff H. Kuenning 20030331 */
+METHODDEF(boolean) xv_process_app1(j_decompress_ptr cinfo)   /* Geoff H. Kuenning 20030331 */
 #else
-METHODDEF boolean  xv_process_app1(cinfo)
+METHODDEF boolean  xv_process_app1(j_decompress_ptr cinfo)
 #endif
-     j_decompress_ptr cinfo;
 {
   int          length;
   unsigned int ch;
@@ -879,10 +876,7 @@ METHODDEF boolean  xv_process_app1(cinfo)
 /* WRITE ROUTINES **********************************************************/
 /***************************************************************************/
 
-static int writeJFIF(fp, pic, w,h, coltype)
-     FILE *fp;
-     byte *pic;
-     int   w,h,coltype;
+static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
 {
   struct     jpeg_compress_struct cinfo;
   struct     jpeg_progress_mgr    prog;
@@ -1005,7 +999,7 @@ static int writeJFIF(fp, pic, w,h, coltype)
 
 /*******************************************/
 void
-VersionInfoJPEG()	/* GRR 19980605, 19980607 */
+VersionInfoJPEG(void)	/* GRR 19980605, 19980607 */
 {
   int major = JPEG_LIB_VERSION / 10;
   int minor = JPEG_LIB_VERSION % 10;

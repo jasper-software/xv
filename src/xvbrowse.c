@@ -69,6 +69,7 @@ typedef unsigned int mode_t;  /* file mode bits */
 #include "bits/br_targa"
 #include "bits/br_tiff"
 #include "bits/br_utah"
+#include "bits/br_webp"
 #include "bits/br_xbm"
 #include "bits/br_xpm"
 #include "bits/br_xwd"
@@ -117,7 +118,8 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define BF_PCD      30
 #define BF_BZIP2    31
 #define BF_JP2      32
-#define BF_JPC      33
+#define BF_WEBP     33
+#define BF_JPC      34
 #define JP_EXT_BF   (BF_JPC)
 #define BF_MAG      (JP_EXT_BF + 1)
 #define BF_MAKI     (JP_EXT_BF + 2)
@@ -138,17 +140,17 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define TEMP_LIT  3        /* temporarily selected, normally off */
 #define TEMP_LIT1 4        /* temporarily selected, normally on */
 
-#define TOPMARGIN 30       /* from top of window to top of iconwindow */
-#define BOTMARGIN 58       /* room for a row of buttons and a line of text */
+#define TOPMARGIN (30 * dpiMult) /* from top of window to top of iconwindow */
+#define BOTMARGIN (58 * dpiMult) /* room for a row of buttons and a line of text */
 #define LRMARGINS 5        /* left and right margins */
 
 /* some people like bigger icons; 4:3 aspect ratio is recommended
  * (NOTE:  standard XV binaries will not be able to read larger icons!) */
 #ifndef ISIZE_WIDE
-#  define ISIZE_WIDE 80    /* maximum size of an icon */
+#  define ISIZE_WIDE (80 * dpiMult)   /* maximum size of an icon */
 #endif
 #ifndef ISIZE_HIGH
-#  define ISIZE_HIGH 60
+#  define ISIZE_HIGH (60 /* * dpiMult */)
 #endif
 
 #ifndef ISIZE_WPAD
@@ -165,9 +167,7 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define ISPACE_WIDE (ISIZE_WIDE+ISIZE_WPAD)   /* icon spacing */
 #define ISPACE_TOP  4                 /* dist btwn top of ISPACE and ISIZE */
 #define ISPACE_TTOP 4                 /* dist btwn bot of icon and title */
-#define ISPACE_HIGH (ISIZE_HIGH+ISPACE_TOP+ISPACE_TTOP+16+4)
-
-#define DBLCLICKTIME 300  /* milliseconds */
+#define ISPACE_HIGH (ISIZE_HIGH+ISPACE_TOP+ISPACE_TTOP+(16+4)*dpiMult)
 
 #define COUNT(x) (sizeof (x) / sizeof (x)[0])
 
@@ -197,13 +197,17 @@ typedef unsigned int mode_t;  /* file mode bits */
 #  define BR_NCMDS    17   /* # of menu commands */
 #endif
 
-#define BUTTW 80
-#define BUTTH 24
+#define BUTTW (80 * dpiMult)
+#define BUTTH (24 * dpiMult)
 
 /* original size of window was 615 x 356 (for 80x60 thumbnails in 6x3 array) */
 #define DEF_BROWWIDE  (ISPACE_WIDE * INUM_WIDE + LRMARGINS * 2 + 29)
 #define DEF_BROWHIGH  (ISPACE_HIGH * INUM_HIGH + BUTTH * 2 + 16 + 28)
 /* last number is a fudge--e.g., extra spaces, borders, etc. -----^  */
+
+#define MIN_BROWWIDE  ((325 + 96) * dpiMult)
+#define MIN_BROWHIGH  (180 * dpiMult)
+
 
 static const char *showHstr = "Show hidden files";
 static const char *hideHstr = "Hide 'hidden' files";
@@ -254,7 +258,7 @@ typedef struct {  Window        win, iconW;
 		  int           numWide, numHigh, visHigh;
 
 		  SCRL          scrl;
-		  BUTT          but[BR_NBUTTS];
+		  BUTT          but[BR_NCMDS];
 		  MBUTT         dirMB, cmdMB;
 		  char          dispstr[256];
 		  int           numbutshown;
@@ -384,12 +388,9 @@ static void clipChanges      PARM((BROWINFO *));
 
 
 /***************************************************************/
-void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
-     const char *geom;
-     const char *fgstr, *bgstr, *histr, *lostr;
+void CreateBrowse(const char *geom, int userspec, const char *fgstr, const char *bgstr, const char *histr, const char *lostr)
 {
   int                   i;
-  XSizeHints            hints;
   XSetWindowAttributes  xswa;
   BROWINFO             *br;
   XColor                ecdef, cursfg, cursbg;
@@ -398,7 +399,10 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
   unsigned int          uw, uh;
   char                  wgeom[64];
 
-  if (!geom) geom = "";
+  if (!geom) {
+    geom = "";
+    userspec = FALSE;
+  }
 
   /* map color spec strings into browCmap, if we're in browPerfect mode */
   if (browPerfect && browCmap) {
@@ -439,7 +443,7 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
 
   /* creates *all* schnauzer windows at once */
 
-  for (i=0; i<MAXBRWIN; i++) binfo[i].win = (Window) NULL;
+  for (i=0; i<MAXBRWIN; i++) binfo[i].win = (Window) None;
 
   for (i=0; i<MAXBRWIN; i++) {
     char wname[64];
@@ -468,9 +472,11 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
     if (i) sprintf(wname, "xv visual schnauzer (%d)", i);
       else sprintf(wname, "xv visual schnauzer");
 
-    br->win = CreateWindow(wname, "XVschnauze", wgeom,
-			   DEF_BROWWIDE, DEF_BROWHIGH, browfg, browbg, 1);
+    br->win = CreateFlexWindow(wname, "XVschnauze", wgeom,
+                              DEF_BROWWIDE, DEF_BROWHIGH, browfg, browbg,
+                              TRUE, FALSE, userspec);
     if (!br->win) FatalError("can't create schnauzer window!");
+    SetMinSizeWindow(br->win, MIN_BROWWIDE, MIN_BROWHIGH);
 
     haveWindows = 1;
     br->vis = br->wasvis = 0;
@@ -486,19 +492,11 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
     /* note: everything is sized and positioned in ResizeBrowse() */
 
     br->iconW = XCreateSimpleWindow(theDisp, br->win, 1,1, 100,100,
-				     1,browfg,browbg);
+				   1, browfg, browbg);
     if (!br->iconW) FatalError("can't create schnauzer icon window!");
 
-    SCCreate(&(br->scrl), br->win, 0,0, 1,100, 0,0,0,0,
+    SCCreate(&br->scrl, br->win, 0,0, 1,100, 0,0,0,0,
 	     browfg, browbg, browhi, browlo, drawIconWin);
-
-
-    if (XGetNormalHints(theDisp, br->win, &hints)) {
-      hints.min_width  = 325 + 96;
-       hints.min_height = 180;
-      hints.flags |= PMinSize;
-      XSetNormalHints(theDisp, br->win, &hints);
-    }
 
 #ifdef BACKING_STORE
     xswa.backing_store = WhenMapped;
@@ -540,10 +538,10 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
 
     XMapSubwindows(theDisp, br->win);
 
-    MBCreate(&(br->dirMB), br->win, 0,0,100,19, NULL,NULL,0,
+    MBCreate(&(br->dirMB), br->win, 0,0,100,19*dpiMult, NULL,NULL,0,
 	     browfg,browbg,browhi,browlo);
 
-    MBCreate(&(br->cmdMB), br->win, 0,0,160,19, "Misc. Commands",
+    MBCreate(&(br->cmdMB), br->win, 0,0,160*dpiMult,19*dpiMult, "Misc. Commands",
 	     cmdMList, BR_NCMDS, browfg,browbg,browhi,browlo);
 
     br->showhidden   = 0;
@@ -605,6 +603,7 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
   bfIcons[BF_PS]  =MakePix1(br->win,br_ps_bits,  br_ps_width,  br_ps_height);
   bfIcons[BF_TGA] =MakePix1(br->win,br_tga_bits, br_tga_width, br_tga_height);
   bfIcons[BF_TIFF]=MakePix1(br->win,br_tiff_bits,br_tiff_width,br_tiff_height);
+  bfIcons[BF_WEBP]=MakePix1(br->win,br_webp_bits,br_webp_width,br_webp_height);
   bfIcons[BF_XBM] =MakePix1(br->win,br_xbm_bits, br_xbm_width, br_xbm_height);
   bfIcons[BF_XPM] =MakePix1(br->win,br_xpm_bits, br_xpm_width, br_xpm_height);
   bfIcons[BF_XWD] =MakePix1(br->win,br_xwd_bits, br_xwd_width, br_xwd_height);
@@ -665,7 +664,7 @@ void CreateBrowse(geom, fgstr, bgstr, histr, lostr)
 
 
 /***************************************************************/
-void OpenBrowse()
+void OpenBrowse(void)
 {
   /* opens up a single browser window */
 
@@ -719,8 +718,7 @@ void OpenBrowse()
 
 
 /***************************************************************/
-static void closeBrowse(br)
-     BROWINFO *br;
+static void closeBrowse(BROWINFO *br)
 {
   int i;
 
@@ -751,7 +749,7 @@ static void closeBrowse(br)
 
 
 /***************************************************************/
-void HideBrowseWindows()
+void HideBrowseWindows(void)
 {
   int i;
 
@@ -766,7 +764,7 @@ void HideBrowseWindows()
 
 
 /***************************************************************/
-void UnHideBrowseWindows()
+void UnHideBrowseWindows(void)
 {
   int i;
 
@@ -781,8 +779,7 @@ void UnHideBrowseWindows()
 
 
 /***************************************************************/
-void SetBrowseCursor(c)
-     Cursor c;
+void SetBrowseCursor(Cursor c)
 {
   int i;
 
@@ -796,7 +793,7 @@ static int _IfTempOut=0;
 #endif
 
 /***************************************************************/
-void KillBrowseWindows()
+void KillBrowseWindows(void)
 {
   int i;
 
@@ -809,9 +806,7 @@ void KillBrowseWindows()
 static int *event_retP, *event_doneP;
 
 /***************************************************************/
-int BrowseCheckEvent(xev, retP, doneP)
-     XEvent *xev;
-     int *retP, *doneP;
+int BrowseCheckEvent(XEvent *xev, int *retP, int *doneP)
 {
   int i;
 
@@ -827,9 +822,7 @@ int BrowseCheckEvent(xev, retP, doneP)
 }
 
 /***************************************************************/
-static int brChkEvent(br, xev)
-     BROWINFO *br;
-     XEvent *xev;
+static int brChkEvent(BROWINFO *br, XEvent *xev)
 {
   /* checks event to see if it's a browse-window related thing.  If it
      is, it eats the event and returns '1', otherwise '0'. */
@@ -854,9 +847,9 @@ static int brChkEvent(br, xev)
 #endif
 
   if (xev->type == Expose) {
-    //int x,y,w,h;
+    /* int x,y,w,h; */
     XExposeEvent *e = (XExposeEvent *) xev;
-    //x = e->x;  y = e->y;  w = e->width;  h = e->height;
+    /* x = e->x;  y = e->y;  w = e->width;  h = e->height; */
 
     /* throw away excess redraws for 'dumb' windows */
     if (e->count > 0 && (e->window == br->scrl.win))
@@ -913,11 +906,12 @@ static int brChkEvent(br, xev)
 
   else if (xev->type == ButtonPress) {
     XButtonEvent *e = (XButtonEvent *) xev;
-    int i,x,y;
+    int x,y;
     x = e->x;  y = e->y;
 
 #ifdef VS_RESCMAP
     if (browCmap && browPerfect && (_IfTempOut!=0)) {
+      int i;
       XSetWindowAttributes  xswa;
       _IfTempOut--;
       xswa.colormap = browCmap;
@@ -931,8 +925,8 @@ static int brChkEvent(br, xev)
       if      (e->window == br->win)      clickBrow(br,x,y);
       else if (e->window == br->scrl.win) SCTrack(&(br->scrl),x,y);
       else if (e->window == br->iconW) {
-        i = clickIconWin(br, x,y,(unsigned long) e->time,
-          (e->state&ControlMask) || (e->state&ShiftMask));
+        XV_UNUSED_RETURN(clickIconWin(br, x,y,(unsigned long) e->time,
+          (e->state&ControlMask) || (e->state&ShiftMask)));
       }
       else rv = 0;
     }
@@ -1003,8 +997,7 @@ static int brChkEvent(br, xev)
 
 
 /***************************************************************/
-int BrowseDelWin(win)
-     Window win;
+int BrowseDelWin(Window win)
 {
   /* got a delete window request.  see if the window is a browser window,
      and close accordingly.  Return 1 if event was eaten */
@@ -1023,9 +1016,7 @@ int BrowseDelWin(win)
 
 
 /***************************************************************/
-static void resizeBrowse(br,w,h)
-     BROWINFO *br;
-     int w,h;
+static void resizeBrowse(BROWINFO *br, int w, int h)
 {
   XSizeHints hints;
   int        i, maxv, page, maxh;
@@ -1090,8 +1081,7 @@ static void resizeBrowse(br,w,h)
 
 
 /***************************************************************/
-void SetBrowStr(str)
-     const char *str;
+void SetBrowStr(const char *str)
 {
   /* put string in *all* browse windows */
   int i;
@@ -1102,9 +1092,7 @@ void SetBrowStr(str)
 
 
 /***************************************************************/
-static void setBrowStr(br, str)
-     BROWINFO *br;
-     const char *str;
+static void setBrowStr(BROWINFO *br, const char *str)
 {
   strncpy(br->dispstr, str, (size_t) 256);
   br->dispstr[255] = '\0';
@@ -1114,7 +1102,7 @@ static void setBrowStr(br, str)
 
 
 /***************************************************************/
-void RegenBrowseIcons()
+void RegenBrowseIcons(void)
 {
   /* called whenever colormaps have changed, and icons need to be rebuilt */
 
@@ -1158,8 +1146,7 @@ void RegenBrowseIcons()
 
 
 /***************************************************************/
-void BRDeletedFile(name)
-     char *name;
+void BRDeletedFile(char *name)
 {
   /* called when file 'name' has been deleted.  If any of the browsers
      were showing the directory that the file was in, does a rescan() */
@@ -1178,8 +1165,7 @@ void BRDeletedFile(name)
 
 
 /***************************************************************/
-void BRCreatedFile(name)
-     char *name;
+void BRCreatedFile(char *name)
 {
   BRDeletedFile(name);
 }
@@ -1191,9 +1177,7 @@ void BRCreatedFile(name)
 
 
 /***************************************************************/
-static void doCmd(br, cmd)
-     BROWINFO *br;
-     int cmd;
+static void doCmd(BROWINFO *br, int cmd)
 {
   br->lst = 0;
 
@@ -1266,8 +1250,7 @@ static void doCmd(br, cmd)
 
 
 /***************************************************************/
-static void drawBrow(br)
-     BROWINFO *br;
+static void drawBrow(BROWINFO *br)
 {
   int i;
 
@@ -1285,8 +1268,7 @@ static void drawBrow(br)
 
 
 /***************************************************************/
-static void drawNumfiles(br)
-     BROWINFO *br;
+static void drawNumfiles(BROWINFO *br)
 {
   char foo[40];
   int  x, y;
@@ -1314,9 +1296,7 @@ static void drawNumfiles(br)
 
 
 /***************************************************************/
-static void eraseNumfiles(br,nf)
-     BROWINFO *br;
-     int nf;
+static void eraseNumfiles(BROWINFO *br, int nf)
 {
   char foo[40];
 
@@ -1329,8 +1309,7 @@ static void eraseNumfiles(br,nf)
 
 
 /***************************************************************/
-static void drawTrash(br)
-     BROWINFO *br;
+static void drawTrash(BROWINFO *br)
 {
   int  x, y, w, h;
 
@@ -1357,9 +1336,7 @@ static void drawTrash(br)
 
 
 /***************************************************************/
-static int inTrash(br, mx,my)
-     BROWINFO *br;
-     int       mx,my;
+static int inTrash(BROWINFO *br, int mx, int my)
 {
   int  x, y, w, h;
 
@@ -1373,8 +1350,7 @@ static int inTrash(br, mx,my)
 
 
 /***************************************************************/
-static void drawBrowStr(br)
-     BROWINFO *br;
+static void drawBrowStr(BROWINFO *br)
 {
   int y;
 
@@ -1402,9 +1378,7 @@ static void drawBrowStr(br)
 
 
 /***************************************************************/
-static void changedNumLit(br, sel, nostr)
-     BROWINFO *br;
-     int       sel, nostr;
+static void changedNumLit(BROWINFO *br, int sel, int nostr)
 {
   int i, allowtext;
 
@@ -1448,11 +1422,9 @@ static void changedNumLit(br, sel, nostr)
 
 
 /***************************************************************/
-static void setSelInfoStr(br, sel)
-     BROWINFO *br;
-     int       sel;
+static void setSelInfoStr(BROWINFO *br, int sel)
 {
-  /* sets the '# files selected' string in the brow window appropriately */
+  /* sets the '# files selected' string in the browser window appropriately */
 
   /* criteria:
    *    if no files are lit, display ''
@@ -1513,9 +1485,7 @@ static void setSelInfoStr(br, sel)
 
 
 /***************************************************************/
-static void exposeIconWin(br, x,y,w,h)
-     BROWINFO *br;
-     int x,y,w,h;
+static void exposeIconWin(BROWINFO *br, int x, int y, int w, int h)
 {
   int        i, j, cnt;
 
@@ -1548,9 +1518,7 @@ static void exposeIconWin(br, x,y,w,h)
 
 
 /***************************************************************/
-static void drawIconWin(delta, sptr)
-     int delta;
-     SCRL *sptr;
+static void drawIconWin(int delta, SCRL *sptr)
 {
   XV_UNUSED(delta);
   int   i,indx, num;
@@ -1605,9 +1573,7 @@ static void drawIconWin(delta, sptr)
 
 
 /***************************************/
-static void drawIcon(br, num)
-     BROWINFO *br;
-     int       num;
+static void drawIcon(BROWINFO *br, int num)
 {
   int i,x,y,ix,iy,sw,sh,sx,sy;
   BFIL *bf;
@@ -1713,9 +1679,7 @@ static void drawIcon(br, num)
 
 
 /***************************************/
-static void eraseIcon(br, num)
-     BROWINFO *br;
-     int       num;
+static void eraseIcon(BROWINFO *br, int num)
 {
   /* note: doesn't erase the icon's title, just the icon itself */
 
@@ -1749,9 +1713,7 @@ static void eraseIcon(br, num)
 
 
 /***************************************/
-static void eraseIconTitle(br, num)
-     BROWINFO *br;
-     int       num;
+static void eraseIconTitle(BROWINFO *br, int num)
 {
   /* note: doesn't erase the icon, just the icon's title */
 
@@ -1776,15 +1738,13 @@ static void eraseIconTitle(br, num)
 
 
 /***************************************/
-static void makeIconVisible(br, num)
-     BROWINFO *br;
-     int       num;
+static void makeIconVisible(BROWINFO *br, int num)
 {
   int sval, first, numvis;
 
   /* if we know what path we have, remember last visible icon for this path */
-  if (br->path)
-    recIconVisible(br->path, num);
+  /* br->path is an array so it can never be NULL */
+  recIconVisible(br->path, num);
 
   /* if icon #i isn't visible, adjust scrollbar so it *is* */
 
@@ -1805,9 +1765,7 @@ static void makeIconVisible(br, num)
 
 
 /***************************************************************/
-static void clickBrow(br, x,y)
-     BROWINFO *br;
-     int x,y;
+static void clickBrow(BROWINFO *br, int x, int y)
 {
   int   i;
   BUTT *bp;
@@ -1918,10 +1876,7 @@ static int updateSel(BROWINFO *br, int sel, int multi, unsigned long mtime)
 
 
 /***************************************************************/
-static int clickIconWin(br, mx, my, mtime, multi)
-     BROWINFO *br;
-     int mx,my,multi;
-     unsigned long mtime;
+static int clickIconWin(BROWINFO *br, int mx, int my, long unsigned int mtime, int multi)
 {
   /* returns '-1' normally, returns an index into bfList[] if the user
      double-clicks an icon */
@@ -1951,7 +1906,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
     int          x, y, rootx, rooty, iwx, iwy, bwx, bwy;
     unsigned int mask;
     Cursor       curs;
-    //int          samepos, oldx, oldy, oldbrnum, destic, origsval, first;
+    /* int          samepos, oldx, oldy, oldbrnum, destic, origsval, first; */
     int          oldx, oldy, oldbrnum, destic, origsval, first;
     int          hasrect, rx, ry, rw, rh;
 
@@ -1975,9 +1930,9 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	/* change cursors */
 	for (i=0; i<MAXBRWIN; i++) {
 	  XDefineCursor(theDisp,binfo[i].iconW, curs);
-    }
+	}
 
-	//samepos = oldx = oldy = oldbrnum = 0;
+	/* samepos = oldx = oldy = oldbrnum = 0; */
 	oldx = oldy = oldbrnum = 0;
 
 	while (1) {  /* wait for button 1 to be released */
@@ -2048,7 +2003,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
 	       a rect drag */
 
 	    if (sel>=0 && (oldx!=x || oldy!=y || oldbrnum!=i)) {  /* moved */
-	      //samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i;
+	      /* samepos = 0;  oldx = x;  oldy = y;  oldbrnum = i; */
 	      oldx = x;  oldy = y;  oldbrnum = i;
 	    }
 	    else {
@@ -2305,9 +2260,7 @@ static int clickIconWin(br, mx, my, mtime, multi)
 }
 
 /*******************************************/
-static void doubleClick(br, sel)
-     BROWINFO *br;
-     int       sel;
+static void doubleClick(BROWINFO *br, int sel)
 {
   int i, j, k;
   char buf[512];
@@ -2446,9 +2399,7 @@ static void doubleClick(br, sel)
 }
 
 /*******************************************/
-static int mouseInWhichIcon(br, mx, my)
-     BROWINFO *br;
-     int       mx, my;
+static int mouseInWhichIcon(BROWINFO *br, int mx, int my)
 {
   /* mx,my are mouse position in iconW coordinates.  Returns '-1' if the
      mouse is not in any icon */
@@ -2480,9 +2431,7 @@ static int mouseInWhichIcon(br, mx, my)
 
 
 /*******************************************/
-static void invertSelRect(br, x, y, w, h)
-     BROWINFO *br;
-     int       x,y,w,h;
+static void invertSelRect(BROWINFO *br, int x, int y, int w, int h)
 {
   if (w>1 && h>1) {
     XSetState(theDisp,theGC, browfg, browbg, GXinvert, browfg^browbg);
@@ -2495,9 +2444,7 @@ static void invertSelRect(br, x, y, w, h)
 
 
 /***************************************************************/
-static void keyIconWin(br, kevt)
-     BROWINFO *br;
-     XKeyEvent *kevt;
+static void keyIconWin(BROWINFO *br, XKeyEvent *kevt)
 {
   char buf[128];
   KeySym ks;
@@ -2600,7 +2547,7 @@ static void keyIconWin(br, kevt)
 	  /* try to open this file */
 	  snprintf(foo, sizeof(buf), "%s%s", br->path, br->bfList[i].name);
 #ifdef AUTO_EXPAND
-	Dirtovd(foo);
+	  Dirtovd(foo);
 #endif
 	  for (j=0; j<numnames && strcmp(namelist[j],foo); j++);
 	  if (j<numnames) {
@@ -2648,9 +2595,7 @@ static void keyIconWin(br, kevt)
 
 
 /***************************************************/
-static void browKey(br, key)
-     BROWINFO *br;
-     int key;
+static void browKey(BROWINFO *br, int key)
 {
   int i,j;
 
@@ -2735,9 +2680,7 @@ static void browKey(br, key)
 
 
 /***************************************************/
-static void browAlpha(br, ch)
-     BROWINFO *br;
-     int ch;
+static void browAlpha(BROWINFO *br, int ch)
 {
   /* find first 'plain' file that is lexically >= than the given ch */
 
@@ -2786,9 +2729,7 @@ static void browAlpha(br, ch)
 
 
 /***************************************************/
-static void changedBrDirMB(br, sel)
-     BROWINFO *br;
-     int sel;
+static void changedBrDirMB(BROWINFO *br, int sel)
 {
 
   if (sel != 0) {   /* changed directories */
@@ -2865,8 +2806,7 @@ static void changedBrDirMB(br, sel)
 
 
 /***************************************************************/
-static int cdBrow(br)
-     BROWINFO *br;
+static int cdBrow(BROWINFO *br)
 {
   /* returns non-zero on failure */
 
@@ -2912,8 +2852,7 @@ static int cdBrow(br)
 
 
 /***************************************************************/
-static void copyDirInfo(srcbr, dstbr)
-     BROWINFO *srcbr, *dstbr;
+static void copyDirInfo(BROWINFO *srcbr, BROWINFO *dstbr)
 {
   /* copies br info from an already existing browser window
      (ie, one that is already showing the same directory) */
@@ -3032,8 +2971,7 @@ static void copyDirInfo(srcbr, dstbr)
 
 
 /***************************************************************/
-static void scanDir(br)
-     BROWINFO *br;
+static void scanDir(BROWINFO *br)
 {
   /* loads contents of current working directory into BFIL structures...
    * and also loads up the MB list
@@ -3088,7 +3026,7 @@ static void scanDir(br)
 #endif
 
     dirnames[i] = dbeg;
-    dbeg = dend+1;
+    dbeg = ((dend==NULL)? NULL: (dend+1));
   }
   br->ndirs = i-1;
 
@@ -3237,9 +3175,7 @@ static void scanDir(br)
 
 
 /***************************************************************/
-static void endScan(br, oldnum)
-     BROWINFO *br;
-     int       oldnum;
+static void endScan(BROWINFO *br, int oldnum)
 {
   /* called at end of scanDir() and rescanDir() */
 
@@ -3272,10 +3208,7 @@ static void endScan(br, oldnum)
 
 
 /***************************************************************/
-static void scanFile(br, bf, name)
-     BROWINFO *br;
-     BFIL *bf;
-     char *name;
+static void scanFile(BROWINFO *br, BFIL *bf, char *name)
 {
   /* given a pointer to an empty BFIL structure, and a filename,
      loads up the BFIL structure appropriately */
@@ -3342,6 +3275,7 @@ static void scanFile(br, bf, name)
     case RFT_PDSVICAR: bf->ftype = BF_PDS;      break;
     case RFT_COMPRESS: bf->ftype = BF_COMPRESS; break;
     case RFT_BZIP2:    bf->ftype = BF_BZIP2;    break;
+    case RFT_XZ:       bf->ftype = BF_COMPRESS; break;
     case RFT_PS:       bf->ftype = BF_PS;       break;
     case RFT_IFF:      bf->ftype = BF_IFF;      break;
     case RFT_TARGA:    bf->ftype = BF_TGA;      break;
@@ -3357,6 +3291,7 @@ static void scanFile(br, bf, name)
     case RFT_PI:       bf->ftype = BF_PI;       break;
     case RFT_PIC2:     bf->ftype = BF_PIC2;     break;
     case RFT_MGCSFX:   bf->ftype = BF_MGCSFX;   break;
+    case RFT_WEBP:     bf->ftype = BF_WEBP;     break;
     }
   }
 }
@@ -3366,16 +3301,14 @@ static void scanFile(br, bf, name)
 /***************************************************************/
 static unsigned long bfcompares;
 
-static void sortBFList(br)
-     BROWINFO *br;
+static void sortBFList(BROWINFO *br)
 {
   bfcompares = 0;
   qsort((char *) br->bfList, (size_t) br->bfLen, sizeof(BFIL), bfnamCmp);
 }
 
 
-static int bfnamCmp(p1, p2)
-     const void *p1, *p2;
+static int bfnamCmp(const void *p1, const void *p2)
 {
   BFIL *b1, *b2;
 
@@ -3398,8 +3331,7 @@ static int bfnamCmp(p1, p2)
 
 
 /***************************************************************/
-static void rescanDir(br)
-     BROWINFO *br;
+static void rescanDir(BROWINFO *br)
 {
   /* chdir to br->path
    * build two name-lists, one holding the names of all files in the bfList,
@@ -3563,8 +3495,7 @@ static void rescanDir(br)
 }
 
 /***************************************************************/
-static void freeBfList(br)
-     BROWINFO *br;
+static void freeBfList(BROWINFO *br)
 {
   int   i;
   BFIL *bf;
@@ -3588,8 +3519,7 @@ static void freeBfList(br)
 }
 
 
-static int namcmp(p1, p2)
-     const void *p1, *p2;
+static int namcmp(const void *p1, const void *p2)
 {
   char **s1, **s2;
   s1 = (char **) p1;
@@ -3599,10 +3529,7 @@ static int namcmp(p1, p2)
 }
 
 /***************************************************************/
-static char **getDirEntries(dir, lenP, dohidden)
-     const char *dir;
-     int  *lenP;
-     int   dohidden;
+static char **getDirEntries(const char *dir, int *lenP, int dohidden)
 {
   /* loads up all directory entries into an array.  This *isn't* a great
      way to do it, but I can't count on 'scandir()' existing on
@@ -3673,9 +3600,7 @@ static char **getDirEntries(dir, lenP, dohidden)
 
 
 /***************************************************************/
-static void computeScrlVals(br, max, page)
-     BROWINFO *br;
-     int *max, *page;
+static void computeScrlVals(BROWINFO *br, int *max, int *page)
 {
   /* called whenever bfList or size of icon window has changed */
 
@@ -3693,8 +3618,7 @@ static void computeScrlVals(br, max, page)
 
 
 /***************************************************************/
-static void genSelectedIcons(br)
-     BROWINFO *br;
+static void genSelectedIcons(BROWINFO *br)
 {
   int i, cnt;
 
@@ -3727,9 +3651,7 @@ static void genSelectedIcons(br)
 
 
 /***************************************************************/
-static void genIcon(br, bf)
-     BROWINFO *br;
-     BFIL *bf;
+static void genIcon(BROWINFO *br, BFIL *bf)
 {
   /* given a BFIL entry, load up the file.
    * if we succeeded in loading up the file,
@@ -3744,13 +3666,13 @@ static void genIcon(br, bf)
   int     iwide, ihigh;
   byte   *icon24, *icon8;
   char    str[256], str1[256], readname[128], uncompname[128];
-  //char    basefname[128], *uncName;
+  /* char    *uncName; */
   char    *uncName;
 
 
   if (!bf || !bf->name || bf->name[0] == '\0') return;   /* shouldn't happen */
   str[0] = '\0';
-  //basefname[0] = '\0';
+  /* basefname[0] = '\0'; */
   pinfo.pic = (byte *) NULL;
   pinfo.comment = (char *) NULL;
   strncpy(readname, bf->name, sizeof(readname) - 1);
@@ -3770,12 +3692,17 @@ static void genIcon(br, bf)
 
   filetype = ReadFileType(bf->name);
 
-  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2) || (filetype == RFT_XZ)) {
 #if (defined(VMS) && !defined(GUNZIP))
     /* VMS decompress doesn't like the file to have a trailing .Z in fname
        however, GUnZip is OK with it, which we are calling UnCompress */
-    strcpy (basefname, bf->name);
-    *rindex (basefname, '.') = '\0';
+    char basefname[128];
+    char *dot;
+    basefname[0] = '\0';
+    strncpy (basefname, bf->name, 128 - 1);
+    basefname[ 128 - 1 ] = '\0';
+    dot = rindex (basefname, '.');
+    if (dot != NULL) *dot = '\0';
     uncName = basefname;
 #else
     uncName = bf->name;
@@ -3985,6 +3912,7 @@ ms_auto_no:
   case RFT_PI:       strcat(str,"PI file");               break;
   case RFT_PIC2:     strcat(str,"PIC2 file");             break;
   case RFT_MGCSFX:   strcat(str,"Magic Suffix file");     break;
+  case RFT_WEBP:     strcat(str,"WEBP file");             break;
   default:           strcat(str,"file of unknown type");  break;
   }
 
@@ -4071,9 +3999,7 @@ ms_auto_no:
 
 
 /***************************************************************/
-static void loadThumbFile(br, bf)
-     BROWINFO *br;
-     BFIL *bf;
+static void loadThumbFile(BROWINFO *br, BFIL *bf)
 {
   /* determine if bf has an associated thumbnail file.  If so, load it up,
      and create the ximage, and such */
@@ -4181,12 +4107,7 @@ static void loadThumbFile(br, bf)
 
 
 /***************************************************************/
-static void writeThumbFile(br, bf, icon8, w, h, info)
-     BROWINFO *br;
-     BFIL *bf;
-     byte *icon8;
-     int   w,h;
-     char *info;
+static void writeThumbFile(BROWINFO *br, BFIL *bf, byte *icon8, int w, int h, char *info)
 {
   FILE *fp;
   char  thFname[512], buf[256];
@@ -4264,8 +4185,7 @@ static void writeThumbFile(br, bf, icon8, w, h, info)
 
 
 /***************************************************************/
-static void makeThumbDir(br)
-     BROWINFO *br;
+static void makeThumbDir(BROWINFO *br)
 {
   char  thFname[512];
   int i, perm;
@@ -4305,8 +4225,7 @@ static void makeThumbDir(br)
 
 
 /***************************************************************/
-static void updateIcons(br)
-     BROWINFO *br;
+static void updateIcons(BROWINFO *br)
 {
   /* for each file in the bfList, see if it has an icon file.
    *    if it doesn't, generate one
@@ -4441,9 +4360,7 @@ static void updateIcons(br)
 
 
 /*******************************************/
-static void drawTemp(br, cnt, maxcnt)
-     BROWINFO *br;
-     int       cnt, maxcnt;
+static void drawTemp(BROWINFO *br, int cnt, int maxcnt)
 {
   if (maxcnt<1) return;   /* none of that naughty ol' divide by zero stuff */
 
@@ -4453,8 +4370,7 @@ static void drawTemp(br, cnt, maxcnt)
 		browfg, browbg, browhi, browlo, "");
 }
 
-static void clearTemp(br)
-  BROWINFO *br;
+static void clearTemp(BROWINFO *br)
 {
   XClearArea(theDisp, br->win, 5, br->dirMB.y,
 	     (u_int) br->dirMB.x-10+1, (u_int) br->dirMB.h + 1, True);
@@ -4464,8 +4380,7 @@ static void clearTemp(br)
 
 
 /*******************************************/
-static void doTextCmd(br)
-     BROWINFO *br;
+static void doTextCmd(BROWINFO *br)
 {
   int i;
 
@@ -4480,8 +4395,7 @@ static void doTextCmd(br)
 
 
 /*******************************************/
-static void doRenameCmd(br)
-     BROWINFO *br;
+static void doRenameCmd(BROWINFO *br)
 {
   /* called when one (and *only* one!) item is lit in the current br.
      pops up a 'what do you want to rename it to' box, and attempts to
@@ -4494,7 +4408,7 @@ static void doRenameCmd(br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't rename file in the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't rename file in the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -4576,8 +4490,7 @@ static void doRenameCmd(br)
 
 
 /*******************************************/
-static void doMkdirCmd(br)
-     BROWINFO *br;
+static void doMkdirCmd(BROWINFO *br)
 {
   /* called at any time (doesn't have anything to do with current selection)
      pops up a 'what do you want to call it' box, and attempts to
@@ -4590,7 +4503,7 @@ static void doMkdirCmd(br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't mkdir in the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't mkdir in the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -4640,8 +4553,7 @@ static void doMkdirCmd(br)
 
 
 /*******************************************/
-static void doChdirCmd(br)
-     BROWINFO *br;
+static void doChdirCmd(BROWINFO *br)
 {
   int                i;
   static char        buf[MAXPATHLEN+100];
@@ -4700,8 +4612,7 @@ static void doChdirCmd(br)
 
 
 /*******************************************/
-static void doDeleteCmd(br)
-     BROWINFO *br;
+static void doDeleteCmd(BROWINFO *br)
 {
   /* if '..' is lit, turn it off and mention that you can't delete it.
    *
@@ -4720,7 +4631,7 @@ static void doDeleteCmd(br)
 
 #ifdef AUTO_EXPAND
   if (Isvdir(br->path)) {
-    sprintf(buf,"Sorry, you can't delete file at the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't delete file at the virtual directory, '%s'",
 	    br->path);
     ErrPopUp(buf, "\nBummer!");
     return;
@@ -4864,8 +4775,7 @@ static void doDeleteCmd(br)
 
 
 /*******************************************/
-static void doSelFilesCmd(br)
-     BROWINFO *br;
+static void doSelFilesCmd(BROWINFO *br)
 {
   int                i;
   static char        buf[MAXPATHLEN+100];
@@ -4905,8 +4815,7 @@ static int   dirStackLen;
 
 
 /*******************************************/
-static void doRecurseCmd(br)
-     BROWINFO *br;
+static void doRecurseCmd(BROWINFO *br)
 {
   int                i;
   static const char *labels[] = { "\nOk", "\033Cancel" };
@@ -4929,9 +4838,7 @@ static void doRecurseCmd(br)
 
 
 /*******************************************/
-static void recurseUpdate(br, subdir)
-     BROWINFO   *br;
-     const char *subdir;
+static void recurseUpdate(BROWINFO *br, const char *subdir)
 {
   /* note:  'br->path + subdir' is the full path to recurse down from */
 
@@ -5035,9 +4942,7 @@ static void recurseUpdate(br, subdir)
 
 
 /*******************************************/
-static void rm_file(br, name)
-     BROWINFO *br;
-     char *name;
+static void rm_file(BROWINFO *br, char *name)
 {
   /* unlinks specified file.  br only needed to display potential err msg */
 
@@ -5074,9 +4979,7 @@ static void rm_file(br, name)
 static char rmdirPath[MAXPATHLEN+1];
 
 /*******************************************/
-static void rm_dir(br, dname)
-     BROWINFO *br;
-     char *dname;
+static void rm_dir(BROWINFO *br, char *dname)
 {
   /* called to remove top-level dir.  All subdirs are handled by rm_dir1() */
 
@@ -5084,8 +4987,7 @@ static void rm_dir(br, dname)
   rm_dir1(br);
 }
 
-static void rm_dir1(br)
-     BROWINFO *br;
+static void rm_dir1(BROWINFO *br)
 {
   /* recursively delete this directory, and all things under it */
 
@@ -5192,12 +5094,8 @@ static int overwrite;
 #define OWRT_CANCEL 3
 
 /*******************************************/
-static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
-		      names, nlen, cpymode)
-     BROWINFO   *srcBr, *dstBr;
-     char       *srcpath, *dstpath, **names;
-     const char *dstdir;
-     int         nlen, cpymode;
+static void dragFiles(BROWINFO *srcBr, BROWINFO *dstBr, char *srcpath, char *dstpath, const char *dstdir,
+		      char **names, int nlen, int cpymode)
 {
   /* move or copy file(s) and their associated thumbnail files.
      srcpath and dstpath will have trailing '/'s.  dstdir is name of
@@ -5231,7 +5129,7 @@ static void dragFiles(srcBr, dstBr, srcpath, dstpath, dstdir,
 
 #ifdef AUTO_EXPAND
   if (Isvdir(dstp)) {
-    sprintf(buf,"Sorry, you can't %s to the virtual directory, '%s'",
+    snprintf(buf,sizeof(buf),"Sorry, you can't %s to the virtual directory, '%s'",
 	    cpymode ? "copy" : "move", dstp);
     ErrPopUp(buf, "\nBummer!");
     SetCursors(-1);
@@ -5426,8 +5324,7 @@ err:
 }
 
 /*************************************************/
-static int moveFile(src,dst)
-     char *src, *dst;
+static int moveFile(char *src, char *dst)
 {
   /* essentially the same as the 'mv' command.  src and dst are full
      pathnames.  It's semi-quiet about errors.  a non-existant src file is
@@ -5524,8 +5421,7 @@ static char cpSrcPath[MAXPATHLEN], cpDstPath[MAXPATHLEN];
 
 
 /*************************************************/
-static int copyFile(src,dst)
-     char *src, *dst;
+static int copyFile(char *src, char *dst)
 {
   /* src and dst are full
      pathnames.  It's semi-quiet about errors.  a non-existant src file is
@@ -5665,7 +5561,7 @@ static int copyFile(src,dst)
 
 
 /************************/
-static void cp()
+static void cp(void)
 /************************/
 {
   /* copies 'thing' at cpSrcPath to cpDstPath.  Since this function is
@@ -5746,7 +5642,7 @@ static void cp()
 
 
 /********************/
-static void cp_dir()
+static void cp_dir(void)
 /********************/
 {
   int    i, dirlen, oldsrclen, olddstlen, longpath;
@@ -5852,9 +5748,7 @@ static void cp_dir()
 
 
 /*****************************/
-static void cp_file(st, exists)
-     struct stat *st;
-     int exists;
+static void cp_file(struct stat *st, int exists)
 /*****************************/
 {
   register int       srcFd, dstFd, rcount, wcount;
@@ -5919,9 +5813,7 @@ static void cp_file(st, exists)
 
 
 /*********************************/
-static void cp_special(st, exists)
-     struct stat *st;
-     int exists;
+static void cp_special(struct stat *st, int exists)
 /*********************************/
 {
   if (DEBUG) fprintf(stderr,"cp_spec:  src='%s',  dst='%s'\n",
@@ -5945,9 +5837,7 @@ static void cp_special(st, exists)
 
 
 /*********************************/
-static void cp_fifo(st, exists)
-     struct stat *st;
-     int exists;
+static void cp_fifo(struct stat *st, int exists)
 /*********************************/
 {
   if (DEBUG) fprintf(stderr,"cp_fifo:  src='%s',  dst='%s'\n",
@@ -5974,12 +5864,9 @@ static void cp_fifo(st, exists)
 
 /*********************************/
 #ifdef AUTO_EXPAND
-static int stat2bf(uistmode, path)
-     u_int uistmode;
-     char *path;
+static int stat2bf(u_int uistmode, char *path)
 #else
-static int stat2bf(uistmode)
-     u_int uistmode;
+static int stat2bf(u_int uistmode)
 #endif
 {
   /* given the 'st.st_mode' field from a successful stat(), returns
@@ -6005,8 +5892,7 @@ static int stat2bf(uistmode)
 
 
 /*********************************/
-static int selmatch(name, line)
-     char *name, *line;
+static int selmatch(char *name, char *line)
 {
   /* returns non-zero if 'name' is found in 'line'.  Line can be sequence of
      words separated by whitespace, in which case 'name' is compared to each
@@ -6032,8 +5918,7 @@ static int selmatch(name, line)
 
 
 /*********************************/
-static int selmatch1(name, arg)
-     char *name, *arg;
+static int selmatch1(char *name, char *arg)
 {
   /* returns non-zero if 'name' matches 'arg'.  Any '*' chars found in arg
      are considered wildcards that match any number of characters,
@@ -6100,9 +5985,7 @@ static int selmatch1(name, arg)
 static IVIS *icon_vis_list = NULL;
 
 /***************************************************************/
-static void recIconVisible(name, icon)
-  char *name;
-  int   icon;
+static void recIconVisible(char *name, int icon)
 {
   IVIS *ptr, *prev = NULL;
 
@@ -6113,7 +5996,7 @@ static void recIconVisible(name, icon)
     }
   }
 
-  ptr = calloc(sizeof(IVIS), 1);
+  ptr = calloc(1, sizeof(IVIS));
   if (!ptr)
     return;
 
@@ -6135,8 +6018,7 @@ static void recIconVisible(name, icon)
 }
 
 /***************************************************************/
-static void restIconVisible(br)
-  BROWINFO *br;
+static void restIconVisible(BROWINFO *br)
 {
   IVIS *ptr;
 
@@ -6153,8 +6035,7 @@ static void restIconVisible(br)
 
 
 /*********************************/
-static void clipChanges(br)
-     BROWINFO *br;
+static void clipChanges(BROWINFO *br)
 {
   /* called whenever schnauzer activity should place file names in
      the X11 clipboard, or change what it put there.

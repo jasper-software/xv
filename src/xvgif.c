@@ -107,9 +107,7 @@ static byte       *dataptr;
 
 
 /*****************************/
-int LoadGIF(fname, pinfo)
-     char *fname;
-     PICINFO *pinfo;
+int LoadGIF(char *fname, PICINFO *pinfo)
 /*****************************/
 {
   /* returns '1' if successful */
@@ -271,7 +269,7 @@ int LoadGIF(fname, pinfo)
 
 
       else if (fn == 0xFE) {  /* Comment Extension */
-	int   ch, j, sbsize, cmtlen;
+	int   j, sbsize, cmtlen;
 	byte *ptr1, *cmt, *cmt1, *sp;
 
 	cmtlen = 0;
@@ -281,7 +279,7 @@ int LoadGIF(fname, pinfo)
 	do {
 	  sbsize = NEXTBYTE;
 	  cmtlen += sbsize;
-	  for (j=0; j<sbsize; j++) ch = NEXTBYTE;
+	  for (j=0; j<sbsize; j++) XV_UNUSED_RETURN(NEXTBYTE);
 	} while (sbsize);
 
 
@@ -427,7 +425,7 @@ int LoadGIF(fname, pinfo)
 
       if (pinfo->numpages > 0) {   /* do multipage stuff */
 	if (pinfo->numpages == 1) {    /* first time only... */
-	  xv_mktemp(pinfo->pagebname, "xvpgXXXXXX"); // a.k.a. close(mkstemp())
+	  xv_mktemp(pinfo->pagebname, "xvpgXXXXXX"); /* a.k.a. close(mkstemp()) */
 	  if (pinfo->pagebname[0] == '\0') {
 	    ErrPopUp("LoadGIF: Unable to create temporary filename???",
 			"\nHow unlikely!");
@@ -535,8 +533,7 @@ int LoadGIF(fname, pinfo)
 
 
 /********************************************/
-static int readImage(pinfo)
-     PICINFO *pinfo;
+static int readImage(PICINFO *pinfo)
 {
   register byte ch, ch1, *ptr1, *picptr;
   int           i, npixels, maxpixels;
@@ -793,7 +790,7 @@ static int readImage(pinfo)
  * bring the desired code to the bottom, then mask it off and return it.
  */
 
-static int readCode()
+static int readCode(void)
 {
   int RawCode, ByteOffset;
 
@@ -811,8 +808,7 @@ static int readCode()
 
 
 /***************************/
-static void doInterlace(Index)
-     int Index;
+static void doInterlace(int Index)
 {
   static byte *ptr = NULL;
   static int   oldYC = -1;
@@ -866,9 +862,7 @@ static void doInterlace(Index)
 
 
 /*****************************/
-static int gifError(pinfo, st)
-     PICINFO    *pinfo;
-     const char *st;
+static int gifError(PICINFO *pinfo, const char *st)
 {
   gifWarning(st);
 
@@ -888,8 +882,7 @@ static int gifError(pinfo, st)
 
 
 /*****************************/
-static void gifWarning(st)
-     const char *st;
+static void gifWarning(const char *st)
 {
   SetISTR(ISTR_WARNING,"%s:  %s", bname, st);
 }

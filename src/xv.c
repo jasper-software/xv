@@ -24,19 +24,6 @@
 #endif
 
 
-/* program needs one of the following fonts.  Trys them in ascending order */
-#define FONT1 "-*-lucida-medium-r-*-*-12-*-*-*-*-*-*-*"
-#define FONT2 "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*"
-#define FONT3 "-*-helvetica-medium-r-*-*-11-*-*-*-*-*-*-*"
-#define FONT4 "6x13"
-#define FONT5 "fixed"
-
-/* a mono-spaced font needed for the 'pixel value tracking' feature */
-#define MFONT1 "-misc-fixed-medium-r-normal-*-13-*"
-#define MFONT2 "6x13"
-#define MFONT3 "-*-courier-medium-r-*-*-12-*"
-#define MFONT4 "fixed"
-
 
 /* default positions for various windows */
 #define DEFINFOGEOM "-10+10"       /* default position of info window */
@@ -55,7 +42,7 @@ static int    randomShow = 0;   /* do a 'random' slideshow */
 static int    startIconic = 0;  /* '-iconic' option */
 static int    defaultVis  = 0;  /* true if using DefaultVisual */
 #ifdef HAVE_G3
-static int    fax = 0;          /* temporary(?) kludge */
+int           lowresfax = 0;    /* temporary(?) kludge */
 int           highresfax = 0;
 #endif
 static double hexpand = 1.0;    /* '-expand' argument */
@@ -63,6 +50,7 @@ static double vexpand = 1.0;    /* '-expand' argument */
 static const char *maingeom = NULL;
 static const char *icongeom = NULL;
 static Atom   __SWM_VROOT = None;
+static int dpiMultSet = 0;
 
 static char   basefname[NAME_MAX+1];   /* just the current fname, no path */
 
@@ -120,7 +108,7 @@ static void parseResources           PARM((int, char **));
 static void parseCmdLine             PARM((int, char **));
 static void verifyArgs               PARM((void));
 static void printoption              PARM((const char *));
-static void cmdSyntax                PARM((void));
+static void cmdSyntax                PARM((int));
 static void rmodeSyntax              PARM((void));
 static int  openPic                  PARM((int));
 static int  readpipe                 PARM((char *, char *));
@@ -139,14 +127,19 @@ static void deleteFromList           PARM((int));
 static int  argcmp                   PARM((const char *, const char *,
                                            int, int, int *));
 static void add_filelist_to_namelist PARM((char *, char **, int *, int));
+static void makeFontName             PARM((char *, int, int, int));
 
+#ifdef HAVE_XRR
+extern int RRevent_number, RRerror_number;
+#endif
 
 /* formerly local vars in main, made local to this module when
    parseResources() and parseCmdLine() were split out of main() */
 
-static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, nopos, limit2x;
+static int   imap, ctrlmap, gmap, browmap, cmtmap, clrroot, limit2x;
 static const char *histr, *lostr, *fgstr, *bgstr, *tmpstr;
 static const char *infogeom, *ctrlgeom, *gamgeom, *browgeom, *textgeom, *cmtgeom;
+static int userspecbrowgeom;
 static char *display, *whitestr, *blackstr;
 static char *rootfgstr, *rootbgstr, *imagebgstr, *visualstr;
 static char *monofontname, *flistName;
@@ -162,18 +155,20 @@ static double gamval, rgamval, ggamval, bgamval;
 XtAppContext context;
 
 /*******************************************/
-int main(argc, argv)
-     int    argc;
-     char **argv;
+int main(int argc, char **argv)
 /*******************************************/
 {
   int    i;
 #ifdef TV_L10N
   int    j;
 #endif
+#ifdef HAVE_XRR
+  int major = -1, minor = -1;
+  int nScreens;
+#endif
   XColor ecdef;
   Window rootReturn, parentReturn, *children;
-  //unsigned int numChildren, rootDEEP;
+  /* unsigned int numChildren, rootDEEP; */
   unsigned int numChildren;
 
 #ifdef AUTO_EXPAND
@@ -282,7 +277,7 @@ int main(argc, argv)
 
   /* init command-line options flags */
   infogeom = DEFINFOGEOM;  ctrlgeom = DEFCTRLGEOM;
-  gamgeom  = DEFGAMGEOM;   browgeom = DEFBROWGEOM;
+  gamgeom  = DEFGAMGEOM;   browgeom = DEFBROWGEOM; userspecbrowgeom = 0;
   textgeom = DEFTEXTGEOM;  cmtgeom  = DEFCMTGEOM;
 
   ncols = -1;  mono = 0;
@@ -301,6 +296,7 @@ int main(argc, argv)
   pscomp = 0;
   preset = 0;
   viewonly = 0;
+  dpiMult = 1;
 
 #ifdef ENABLE_FIXPIX_SMOOTH
   do_fixpix_smooth = 0;
@@ -321,38 +317,43 @@ int main(argc, argv)
   conv24 = CONV24_SLOW;  /* use 'slow' algorithm by default */
 
   defaspect = normaspect = 1.0;
-  mainW = dirW = infoW = ctrlW = gamW = psW = (Window) NULL;
+  mainW = dirW = infoW = ctrlW = gamW = psW = (Window) None;
   anyBrowUp = 0;
   incrementalSearchTimeout = 30;
+  forcegeom = TRUE;
 
 #ifdef HAVE_JPEG
-  jpegW = (Window) NULL;  jpegUp = 0;
+  jpegW = (Window) None;  jpegUp = 0;
 #endif
 
 #ifdef HAVE_JP2K
-  jp2kW = (Window) NULL;  jp2kUp = 0; 
+  jp2kW = (Window) None;  jp2kUp = 0;
 #endif
 
 #ifdef HAVE_TIFF
-  tiffW = (Window) NULL;  tiffUp = 0;
+  tiffW = (Window) None;  tiffUp = 0;
 #endif
 
 #ifdef HAVE_PNG
-  pngW = (Window) NULL;  pngUp = 0;
+  pngW = (Window) None;  pngUp = 0;
 #endif
 
-  pcdW = (Window) NULL;  pcdUp = 0;
+#ifdef HAVE_WEBP
+  webpW = (Window) None; webpUp = 0;
+#endif
+
+  pcdW = (Window) None;  pcdUp = 0;
 
 #ifdef HAVE_PIC2
-  pic2W = (Window) NULL;  pic2Up = 0;
+  pic2W = (Window) None;  pic2Up = 0;
 #endif
 
 #ifdef HAVE_PCD
-  pcdW = (Window) NULL;  pcdUp = 0;
+  pcdW = (Window) None;  pcdUp = 0;
 #endif
 
 #ifdef HAVE_MGCSFX
-  mgcsfxW = (Window) NULL;  mgcsfxUp = 0;
+  mgcsfxW = (Window) None;  mgcsfxUp = 0;
 #endif
 
   imap = ctrlmap = gmap = browmap = cmtmap = 0;
@@ -414,9 +415,9 @@ int main(argc, argv)
   theScreen = DefaultScreen(theDisp);
   theCmap   = DefaultColormap(theDisp, theScreen);
   if (spec_window) {
-	rootW = spec_window;
+    rootW = spec_window;
   } else {
-	rootW = RootWindow(theDisp,theScreen);
+    rootW = RootWindow(theDisp,theScreen);
   }
   theGC     = DefaultGC(theDisp,theScreen);
   theVisual = DefaultVisual(theDisp,theScreen);
@@ -426,7 +427,59 @@ int main(argc, argv)
   maxHIGH   = vrHIGH  = dispHIGH  = DisplayHeight(theDisp,theScreen);
 
 
-  //rootDEEP = dispDEEP;
+#ifdef HAVE_XRR
+  if (!dpiMultSet && XRRQueryExtension(theDisp, &RRevent_number, &RRerror_number)) {
+    XRRScreenResources *screenRes;
+    XRROutputInfo *outputInfo;
+    XRRCrtcInfo *crtcInfo;
+    int outputNum;
+
+    /* Get screen resources */
+    screenRes = XRRGetScreenResources(theDisp, rootW);
+    if (screenRes == NULL) {
+      fprintf(stderr, "Unable to get screen resources to check for hidpi\n");
+    } else {
+      /* Loop through each output to get the DPI */
+      for (outputNum = 0; outputNum < screenRes->noutput; outputNum++) {
+        outputInfo = XRRGetOutputInfo(theDisp, screenRes, screenRes->outputs[ outputNum ]);
+        if (outputInfo->crtc) {
+          crtcInfo = XRRGetCrtcInfo(theDisp, screenRes, outputInfo->crtc);
+
+          /* Physical size in inches */
+          double width_in = outputInfo->mm_width / 25.4;
+          double height_in = outputInfo->mm_height / 25.4;
+
+          /* Screen resolution in pixels */
+          int width_px = crtcInfo->width;
+          int height_px = crtcInfo->height;
+
+          /* Calculate the DPI */
+          double dpi_x = ((width_in < 1)? 0: (width_px / width_in));
+          double dpi_y = ((height_in < 1)? 0: (height_px / height_in));
+
+          XRRFreeCrtcInfo(crtcInfo);
+
+#if 0
+          /* Print the DPI values */
+          fprintf(stderr, "Output: %s\n", outputInfo->name);
+          fprintf(stderr, "Resolution: %dx%d pixels\n", width_px, height_px);
+          fprintf(stderr, "Physical size: %.2fx%.2f inches\n", width_in, height_in);
+          fprintf(stderr, "DPI: %.2f x %.2f\n", dpi_x, dpi_y);
+#endif
+
+          /* Check for a HiDPI display (common threshold: 144 DPI) */
+          if (dpi_x > 144 || dpi_y > 144) {
+	    dpiMult = 2;
+	  }
+        }
+        XRRFreeOutputInfo(outputInfo);
+      }
+    }
+    XRRFreeScreenResources(screenRes);
+  }
+#endif
+
+  /* rootDEEP = dispDEEP; */
 
   /* things dependent on theVisual:
    *    dispDEEP, theScreen, rootW, ncells, theCmap, theGC,
@@ -508,7 +561,7 @@ int main(argc, argv)
     else if (!strcmp(visualstr,"directcolor")) vclass = DirectColor;
     else if (!strcmp(visualstr,"default"))     {}   /* recognize it as valid */
     else if (!strncmp(visualstr,"0x",(size_t) 2)) {  /* specified visual id */
-      if (sscanf(visualstr, "0x%x", &vid) != 1) vid = -1;
+      if (sscanf(visualstr, "0x%x", (unsigned int *) &vid) != 1) vid = -1;
     }
     else {
       fprintf(stderr,"%s: Unrecognized visual type '%s'.  %s\n",
@@ -580,7 +633,7 @@ int main(argc, argv)
     if (XGetWindowProperty (theDisp, children[i], __SWM_VROOT, 0L, 1L,
 	  False, XA_WINDOW, &actual_type, &actual_format, &nitems,
 	  &bytesafter, (unsigned char **) &newRoot) == Success && newRoot) {
-      vrootW = *(Window *)newRoot;
+      vrootW = *(Window *)newRoot; /* FIXME: alignment and type aliasing violation (use memcpy()) */
       XGetWindowAttributes(theDisp, vrootW, &xwa);
       maxWIDE = vrWIDE = xwa.width;  maxHIGH = vrHIGH = xwa.height;
       dispDEEP = xwa.depth;
@@ -748,15 +801,23 @@ int main(argc, argv)
 
 
   /* try to load fonts */
-  if ( (mfinfo = XLoadQueryFont(theDisp,FONT1))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT2))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT3))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT4))==NULL &&
-       (mfinfo = XLoadQueryFont(theDisp,FONT5))==NULL) {
-    sprintf(dummystr,
-	    "couldn't open the following fonts:\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s",
-	    FONT1, FONT2, FONT3, FONT4, FONT5);
-    FatalError(dummystr);
+  {
+    int fontnum;
+    char fontname[80];
+    mfinfo = NULL;
+    strcpy(dummystr, "couldn't open the following fonts:");
+    for (fontnum = 0; fontnum < 5; fontnum++) {
+      makeFontName(fontname, sizeof(fontname), /* mono */ 0, fontnum);
+      mfinfo = XLoadQueryFont(theDisp,fontname);
+      if (mfinfo != NULL) break;
+      if (strlen(dummystr) + strlen(fontname) + 8 < sizeof(dummystr)) {
+        strcat(dummystr,"\n\t");
+        strcat(dummystr,fontname);
+      }
+    }
+    if (mfinfo == NULL) {
+      FatalError(dummystr);
+    }
   }
   mfont=mfinfo->fid;
   XSetFont(theDisp,theGC,mfont);
@@ -770,13 +831,19 @@ int main(argc, argv)
   }
 
   if (!monofinfo) {
-    if ((monofinfo = XLoadQueryFont(theDisp,MFONT1))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT2))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT3))==NULL &&
-	(monofinfo = XLoadQueryFont(theDisp,MFONT4))==NULL) {
-      sprintf(dummystr,"couldn't open %s fonts:\n\t%s\n\t%s\n\t%s\n\t%s",
-	      "any of the following",
-	      MFONT1, MFONT2, MFONT3, MFONT4);
+    int fontnum;
+    char fontname[80];
+    strcpy(dummystr, "couldn't open any of the following monospaced fonts:");
+    for (fontnum = 0; fontnum < 4; fontnum++) {
+      makeFontName(fontname, sizeof(fontname), /* mono */ 1, fontnum);
+      monofinfo = XLoadQueryFont(theDisp,fontname);
+      if (monofinfo != NULL) break;
+      if (strlen(dummystr) + strlen(fontname) + 8 < sizeof(dummystr)) {
+	strcat(dummystr,"\n\t");
+	strcat(dummystr,fontname);
+      }
+    }
+    if (monofinfo == NULL) {
       FatalError(dummystr);
     }
   }
@@ -789,7 +856,7 @@ int main(argc, argv)
     while (mfontsize[i]) {
       xlocale = 1;	/* True */
 
-      sprintf(mfontset, TV_FONTSET, mfontsize[i]);
+      sprintf(mfontset, TV_FONTSET, mfontsize[i] * dpiMult);
 /*fprintf(stderr, "FontSet: %s\n", mfontset);*/
 
       monofset = XCreateFontSet(theDisp, mfontset,
@@ -814,10 +881,12 @@ int main(argc, argv)
 
       if (xlocale) {
 	monofsetinfo = XExtentsOfFontSet(monofset);
-	monofsetinfo->max_logical_extent.width = mfontsize[i];
+	if (monofsetinfo != NULL) {
+	  monofsetinfo->max_logical_extent.width = mfontsize[i] * dpiMult;
 		/* correct size of TextViewer
 		   in case that JIS X 0208 is not found */
-	break;
+	  break;
+	}
       }
 
       i++;
@@ -930,8 +999,8 @@ int main(argc, argv)
 
 
   /* create the directory window */
-  CreateDirW(NULL);
-  XSelectInput(theDisp, dirW, ExposureMask | ButtonPressMask | KeyPressMask);
+  CreateDirW();
+  XSelectInput(theDisp, dirW, ExposureMask | StructureNotifyMask | ButtonPressMask | KeyPressMask);
   browseCB.val = browseMode;
   savenormCB.val = savenorm;
 
@@ -954,7 +1023,7 @@ int main(argc, argv)
   if (!novbrowse) {
     MakeBrowCmap();
     /* create the visual browser window */
-    CreateBrowse(browgeom, fgstr, bgstr, histr, lostr);
+    CreateBrowse(browgeom, userspecbrowgeom, fgstr, bgstr, histr, lostr);
 
     if (browmap) OpenBrowse();
   }
@@ -990,6 +1059,11 @@ int main(argc, argv)
 #ifdef HAVE_PNG
   CreatePNGW();
   XSetTransientForHint(theDisp, pngW, dirW);
+#endif
+
+#ifdef HAVE_WEBP
+  CreateWEBPW();
+  XSetTransientForHint(theDisp, webpW, dirW);
 #endif
 
 #ifdef HAVE_PCD
@@ -1042,8 +1116,26 @@ int main(argc, argv)
   /* make std colormap, maybe */
   ChangeCmapMode(colorMapMode, 0, 0);
 
+  /* Xrandr */
+#ifdef HAVE_XRR
+  if (!XRRQueryExtension(theDisp, &RRevent_number, &RRerror_number)) {
+    major = -1;
+  } else {
+    if (DEBUG) fprintf(stderr, "XRRQueryExtension: %d, %d\n", RRevent_number, RRerror_number);
 
+    if (!XRRQueryVersion(theDisp, &major, &minor)) {
+      if (DEBUG) fprintf(stderr, "XRRQueryVersion failed!\n");
+    } else {
+      if (DEBUG) fprintf(stderr, "XRRQueryVersion: %d, %d\n", major, minor);
+    }
 
+    nScreens = ScreenCount(theDisp);
+
+    for (i = 0; i < nScreens; i++) {
+      XRRSelectInput(theDisp, RootWindow(theDisp, i), RRScreenChangeNotifyMask);
+    }
+  }
+#endif
 
   /* Do The Thing... */
   mainLoop();
@@ -1054,7 +1146,7 @@ int main(argc, argv)
 
 
 /*****************************************************/
-static void makeDirectCmap()
+static void makeDirectCmap(void)
 {
   int    i, cmaplen, numgot;
   byte   origgot[256];
@@ -1128,8 +1220,7 @@ static void makeDirectCmap()
 }
 
 
-static int highbit(ul)
-     unsigned long ul;
+static int highbit(long unsigned int ul)
 {
   /* returns position of highest set bit in 'ul' as an integer (0-31),
    or -1 if none */
@@ -1144,9 +1235,7 @@ static int highbit(ul)
 
 
 /*****************************************************/
-static void useOtherVisual(vinfo, best)
-     XVisualInfo *vinfo;
-     int best;
+static void useOtherVisual(XVisualInfo *vinfo, int best)
 {
   if (!vinfo || best<0) return;
 
@@ -1194,10 +1283,10 @@ static void useOtherVisual(vinfo, best)
     XFlush(theDisp);
     XSync(theDisp, False);
 
-    xswa.background_pixel = 0;
+    xswa.background_pixmap  = None;
     xswa.border_pixel     = 1;
     xswa.colormap         = theCmap;
-    xswamask = CWBackPixel | CWBorderPixel | CWColormap;
+    xswamask = CWBackPixmap | CWBorderPixel | CWColormap;
 
     win = XCreateWindow(theDisp, rootW, 0, 0, 100, 100, 2, (int) dispDEEP,
 			InputOutput, theVisual, xswamask, &xswa);
@@ -1219,9 +1308,7 @@ static void useOtherVisual(vinfo, best)
 
 
 /*****************************************************/
-static void parseResources(argc, argv)
-     int argc;
-     char **argv;
+static void parseResources(int argc, char **argv)
 {
   int i, pm;
 
@@ -1230,8 +1317,7 @@ static void parseResources(argc, argv)
 
   for (i=1; i<argc; ++i) {
     if (!strncmp(argv[i],"-help", (size_t) 5)) {  /* help */
-      cmdSyntax();
-      exit(0);
+      cmdSyntax(0);
     }
 
     else if (!argcmp(argv[i],"-display",4,0,&pm)) {
@@ -1352,6 +1438,7 @@ static void parseResources(argc, argv)
   if (rd_flag("nopicadjust"))    nopicadjust = def_int;
 #endif
   if (rd_flag("nopos"))          nopos       = def_int;
+  if (rd_flag("forcegeom]"))     forcegeom   = def_int;
   if (rd_flag("noqcheck"))       noqcheck    = def_int;
   if (rd_flag("nostat"))         nostat      = def_int;
   if (rd_flag("ownCmap"))        owncmap     = def_int;
@@ -1380,11 +1467,11 @@ static void parseResources(argc, argv)
   if (rd_flag("vsadjust"))       vsadjust    = def_int;
 #endif
   if (rd_flag("vsDisable"))      novbrowse   = def_int;
-  if (rd_str ("vsGeometry"))     browgeom    = def_str;
+  if (rd_str ("vsGeometry"))     { browgeom  = def_str; userspecbrowgeom = 1; }
   if (rd_flag("vsMap"))          browmap     = def_int;
   if (rd_flag("vsPerfect"))      browPerfect = def_int;
   if (rd_str ("white"))          whitestr    = def_str;
-  
+
   /* Check for any command-bindings to the supported function keys */
 #define TMPLEN 80
   for (i=0; i<FSTRMAX; ++i) {
@@ -1395,19 +1482,20 @@ static void parseResources(argc, argv)
       fkeycmds[i] = def_str;
     else
       fkeycmds[i] = NULL;
-  }  
+  }
 #undef TMPLEN
 }
 
 
 
 /*****************************************************/
-static void parseCmdLine(argc, argv)
-     int argc;  char **argv;
+static void parseCmdLine(int argc, char **argv)
 {
   int i, oldi, not_in_first_half, pm;
+  int hidpi;
 
   orignumnames = 0;
+  hidpi = 0;
 
   for (i=1, numnames=0; i<argc; i++) {
     oldi = i;
@@ -1448,7 +1536,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-4x3",    2,1,&auto4x3 ));   /* 4x3 */
     else if (!argcmp(argv[i],"-8",      2,1,&force8  ));   /* force8 */
     else if (!argcmp(argv[i],"-acrop",  3,1,&autocrop));   /* autocrop */
-                                                          
+
     else if (!argcmp(argv[i],"-aspect",3,0,&pm)) {         /* def. aspect */
       int n,d;
       if (++i<argc) {
@@ -1460,7 +1548,7 @@ static void parseCmdLine(argc, argv)
 
     else if (!argcmp(argv[i],"-windowid",3,0,&pm)) {
       if (++i<argc) {
-	if (sscanf(argv[i], "%ld", &spec_window) != 1) {
+	if (sscanf(argv[i], "%ld", (long int *) &spec_window) != 1) {
 		fprintf(stderr,"%s: bad argument to -windowid '%s'\n",cmd,argv[i]);
         }
       }
@@ -1554,10 +1642,6 @@ static void parseCmdLine(argc, argv)
       }
     }
 
-#ifdef HAVE_G3
-    else if (!argcmp(argv[i],"-fax",3,0,&highresfax));     /* fax */
-#endif
-
     else if (!argcmp(argv[i],"-fg",3,0,&pm))               /* fg color */
       { if (++i<argc) fgstr = argv[i]; }
 
@@ -1594,8 +1678,20 @@ static void parseCmdLine(argc, argv)
       { if (++i<argc) histr = argv[i]; }
 
 #ifdef HAVE_G3
+    else if (!argcmp(argv[i],"-fax",3,3,&highresfax)); /* high resolution fax */
+    else if (!argcmp(argv[i],"-lowresfax",4,0,&lowresfax)); /* low resolution fax */
     else if (!argcmp(argv[i],"-highresfax",4,0,&highresfax));/* high res. fax */
 #endif
+
+    else if (!argcmp(argv[i],"-hidpi", 4,1,&hidpi))        /* hi dpi */
+      { dpiMult = (hidpi? 2: 1); dpiMultSet = 1; }
+
+    else if (!argcmp(argv[i],"-dpimult", 4,0,&pm))         /* dpi mult */
+      { if (++i<argc) dpiMult = atoi(argv[i]);
+        if (dpiMult < 1) dpiMult = 1;
+        else if (dpiMult > 5) dpiMult = 5;
+        dpiMultSet = 1;
+      }
 
     else if (!argcmp(argv[i],"-hist", 4,1,&autohisteq));   /* hist eq */
 
@@ -1668,6 +1764,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-nopicadjust", 4,1,&nopicadjust));/*nopicadjust*/
 #endif
     else if (!argcmp(argv[i],"-nopos",     4,1,&nopos));      /* nopos */
+    else if (!argcmp(argv[i],"-forcegeom", 6,1,&forcegeom));  /* forcegeom */
     else if (!argcmp(argv[i],"-noqcheck",  4,1,&noqcheck));   /* noqcheck */
     else if (!argcmp(argv[i],"-noresetroot",5,1,&resetroot)); /* reset root */
     else if (!argcmp(argv[i],"-norm",      5,1,&autonorm));   /* norm */
@@ -1742,7 +1839,7 @@ static void parseCmdLine(argc, argv)
     else if (!argcmp(argv[i],"-vsdisable",4,1,&novbrowse)); /* disable sch? */
 
     else if (!argcmp(argv[i],"-vsgeometry",4,0,&pm))	/* visSchnauzer geom */
-      { if (++i<argc) browgeom = argv[i]; }
+      { if (++i<argc) { browgeom = argv[i]; userspecbrowgeom = 1; } }
 
     else if (!argcmp(argv[i],"-vsmap",4,1,&browmap));	/* visSchnauzer map */
 
@@ -1761,19 +1858,19 @@ static void parseCmdLine(argc, argv)
 
     else if (!argcmp(argv[i],"-wloop",3,1,&waitloop));	/* waitloop */
 
-    else if (not_in_first_half) cmdSyntax();
+    else if (not_in_first_half) cmdSyntax(1);
   }
 
 
   /* build origlist[], a copy of namelist that remains unmodified, for
      use with the 'autoDelete' option */
   orignumnames = numnames;
-  xvbcopy( (char *) namelist, (char *) origlist, sizeof(origlist));
+  xvbcopy((char *) namelist, (char *) origlist, sizeof(origlist));
 }
 
 
 /*****************************************************************/
-static void verifyArgs()
+static void verifyArgs(void)
 {
   /* check options for validity */
 
@@ -1797,7 +1894,7 @@ static void verifyArgs()
   RANGE(curstype,0,254);
   curstype = curstype & 0xfe;   /* clear low bit to make curstype even */
 
-  if (hexpand == 0.0 || vexpand == 0.0) cmdSyntax();
+  if (hexpand == 0.0 || vexpand == 0.0) cmdSyntax(1);
   if (rootMode < 0 || rootMode > RM_MAX) rmodeSyntax();
 
   if (DEBUG) XSynchronize(theDisp, True);
@@ -1841,11 +1938,6 @@ static void verifyArgs()
 
   defaultCmapMode = colorMapMode;  /* default mode for 8-bit images */
 
-  if (nopos) {
-    maingeom = infogeom = ctrlgeom = gamgeom = browgeom = textgeom = cmtgeom =
-      (const char *) NULL;
-  }
-
   /* if -root and -maxp, disallow 'integer' tiling modes */
   if (useroot && fixedaspect && automax && !rmodeset &&
       (rootMode == RM_TILE || rootMode == RM_IMIRROR))
@@ -1857,8 +1949,7 @@ static void verifyArgs()
 static int cpos = 0;
 
 /***********************************/
-static void printoption(st)
-     const char *st;
+static void printoption(const char *st)
 {
   if (strlen(st) + cpos > 78) {
     fprintf(stderr,"\n   ");
@@ -1870,7 +1961,7 @@ static void printoption(st)
 }
 
 
-static void cmdSyntax()
+static void cmdSyntax(int i)
 {
   /* GRR 19980605:  added version info for most common libraries */
   fprintf(stderr, "XV - %s.\n", REVDATE);
@@ -1930,9 +2021,6 @@ static void cmdSyntax()
   printoption("[-/+dither]");
   printoption("[-drift dx dy]");
   printoption("[-expand exp | hexp:vexp]");
-#ifdef HAVE_G3
-  printoption("[-fax]");
-#endif
   printoption("[-fg color]");
   printoption("[-/+fixed]");
 #ifdef ENABLE_FIXPIX_SMOOTH
@@ -1948,9 +2036,6 @@ static void cmdSyntax()
   printoption("[-help]");
   printoption("[-/+hflip]");
   printoption("[-hi color]");
-#ifdef HAVE_G3
-  printoption("[-highresfax]");
-#endif
   printoption("[-/+hist]");
   printoption("[-/+hsv]");
   printoption("[-ibg color]");  /* GRR 19980314 */
@@ -1984,6 +2069,7 @@ static void cmdSyntax()
   printoption("[-/+nopicadjust]");
 #endif
   printoption("[-/+nopos]");
+  printoption("[-/+forcegeom]");
   printoption("[-/+noqcheck]");
   printoption("[-/+noresetroot]");
   printoption("[-/+norm]");
@@ -2031,14 +2117,19 @@ static void cmdSyntax()
   printoption("[-white color]");
   printoption("[-windowid windowid]");
   printoption("[-/+wloop]");
+#ifdef HAVE_G3
+  printoption("[-fax]");
+  printoption("[-lowresfax]");
+  printoption("[-highresfax]");
+#endif
   printoption("[filename ...]");
   fprintf(stderr,"\n\n");
-  Quit(1);
+  Quit(i);
 }
 
 
 /***********************************/
-static void rmodeSyntax()
+static void rmodeSyntax(void)
 {
   fprintf(stderr,"%s: unknown root mode '%d'.  Valid modes are:\n",
 	  cmd, rootMode);
@@ -2059,10 +2150,7 @@ static void rmodeSyntax()
 
 
 /***********************************/
-static int argcmp(a1, a2, minlen, plusallowed, plusminus)
-     const char *a1, *a2;
-     int  minlen, plusallowed;
-     int *plusminus;
+static int argcmp(const char *a1, const char *a2, int minlen, int plusallowed, int *plusminus)
 {
   /* does a string compare between a1 and a2.  To return '0', a1 and a2
      must match to the length of a1, and that length has to
@@ -2086,8 +2174,7 @@ static int argcmp(a1, a2, minlen, plusallowed, plusminus)
 
 
 /***********************************/
-static int openPic(filenum)
-     int filenum;
+static int openPic(int filenum)
 {
   /* tries to load file #filenum (from 'namelist' list)
    * returns 0 on failure (cleans up after itself)
@@ -2104,9 +2191,9 @@ static int openPic(filenum)
   int   oldCXOFF, oldCYOFF, oldCWIDE, oldCHIGH, wascropped;
   char *tmp;
   char *fullname,       /* full name of the original file */
-        filename[512];  /* full name of file to load (could be /tmp/xxx)*/
+        filename[MAXPATHLEN];	/* full name of file to load (could be /tmp/xxx)*/
 #ifdef MACBINARY
-  char origname[512];	/* file name of original file (NO processing) */
+  char origname[MAXPATHLEN];	/* file name of original file (NO processing) */
   origname[0] = '\0';
 #endif
 
@@ -2245,12 +2332,12 @@ static int openPic(filenum)
 #ifdef AUTO_EXPAND
   else {
     fullname = (char *) malloc(MAXPATHLEN+2);
-    strcpy(fullname, namelist[filenum]);   // 1 of 2 places fullname != const
+    strcpy(fullname, namelist[filenum]);   /* 1 of 2 places fullname != const */
     freename = 1;
   }
   tmp = (char *) rindex(fullname, '/');
   if (tmp) {
-    *tmp = '\0';			   // 2 of 2 places fullname != const
+    *tmp = '\0';			   /* 2 of 2 places fullname != const */
     Mkvdir(fullname);
     *tmp = '/';
   }
@@ -2278,6 +2365,10 @@ static int openPic(filenum)
 #ifdef BUNZIP2
     if (strlen(basefname)>4 && strcmp(basefname+strlen(basefname)-4,".bz2")==0)
       basefname[strlen(basefname)-4]='\0';
+#endif
+#ifdef XZ
+    if (strlen(basefname)>3 && strcmp(basefname+strlen(basefname)-3,".xz")==0)
+      basefname[strlen(basefname)-3]='\0';
 #endif
   }
 
@@ -2412,7 +2503,7 @@ static int openPic(filenum)
 #endif
 
   /* if it's a compressed file, uncompress it: */
-  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2)) {
+  if ((filetype == RFT_COMPRESS) || (filetype == RFT_BZIP2) || (filetype == RFT_XZ)) {
     char tmpname[128];
 
     if (
@@ -2488,8 +2579,8 @@ ms_auto_no:
 #endif /* HAVE_MGCSFX_AUTO */
 
   if (filetype == RFT_ERROR) {
-    char  foostr[512];
-    sprintf(foostr,"Can't open file '%s'\n\n  %s.",filename, ERRSTR(errno));
+    char  foostr[MAXPATHLEN + 512];
+    snprintf(foostr, sizeof(foostr), "Can't open file '%s'\n\n  %s.", filename, ERRSTR(errno));
 
     if (!polling) ErrPopUp(foostr, "\nBummer!");
 
@@ -2725,9 +2816,8 @@ ms_auto_no:
     SetCropString();
   }
   else {
-    int w,h,aspWIDE,aspHIGH,oldemode;
+    int w,h,aspWIDE,aspHIGH;
 
-    oldemode = epicMode;
     epicMode = EM_RAW;   /* be in raw mode for all intermediate conversions */
     cpic = pic;  cWIDE = pWIDE;  cHIGH = pHIGH;  cXOFF = cYOFF = 0;
     epic = cpic; eWIDE = cWIDE;  eHIGH = cHIGH;
@@ -3029,8 +3119,7 @@ extern byte ZXheader[128];	/* [JCE] Spectrum screen magic number is
 
 
 /********************************/
-int ReadFileType(fname)
-     char *fname;
+int ReadFileType(char *fname)
 {
   /* opens fname (which *better* be an actual file by this point!) and
      reads the first couple o' bytes.  Figures out what the file's likely
@@ -3112,6 +3201,12 @@ int ReadFileType(fname)
   else if (magicno[0]==0x42 && magicno[1]==0x5a)              rv = RFT_BZIP2;
 #endif
 
+#ifdef XZ
+  else if (magicno[0]==0xfd &&
+           magicno[1]=='7' && magicno[2]=='z' &&
+           magicno[3]=='X' && magicno[4]=='Z')                rv = RFT_XZ;
+#endif
+
   else if (magicno[0]==0x0a && magicno[1] <= 5)               rv = RFT_PCX;
 
   else if (strncmp((char *) magicno,   "FORM", (size_t) 4)==0 &&
@@ -3137,7 +3232,7 @@ int ReadFileType(fname)
 #endif
 
 #ifdef HAVE_JP2K
-  else if (magicno[0]==0xff && magicno[1]==0x4f && 
+  else if (magicno[0]==0xff && magicno[1]==0x4f &&
            magicno[2]==0xff && magicno[3]==0x51)              rv = RFT_JPC;
 
   else if (memcmp(magicno, jp2k_magic, sizeof(jp2k_magic))==0) rv = RFT_JP2;
@@ -3175,14 +3270,6 @@ int ReadFileType(fname)
            strncmp((char *) magicno, "%PDF",   (size_t) 4)==0) rv = RFT_PS;
 #endif
 
-#ifdef HAVE_G3
-  else if ((magicno[0]==  1 && magicno[1]==  1 &&
-            magicno[2]== 77 && magicno[3]==154 &&
-            magicno[4]==128 && magicno[5]==  0 &&
-            magicno[6]==  1 && magicno[7]== 77)
-           || highresfax || fax) /* kludge! */                rv = RFT_G3;
-#endif
-
 #ifdef HAVE_MAG
   else if (strncmp((char *) magicno,"MAKI02  ", (size_t) 8)==0) rv = RFT_MAG;
 #endif
@@ -3207,6 +3294,17 @@ int ReadFileType(fname)
 #ifdef HAVE_PCD
   else if (magicno[0]==0xff && magicno[1]==0xff &&
            magicno[2]==0xff && magicno[3]==0xff)              rv = RFT_PCD;
+#endif
+
+#ifdef HAVE_G3
+  else if ((magicno[0]==  1 && magicno[1]==  1 &&
+            magicno[2]== 77 && magicno[3]==154 &&
+            magicno[4]==128 && magicno[5]==  0 &&
+            magicno[6]==  1 && magicno[7]== 77) ||
+            (rv == RFT_UNKNOWN &&
+             (highresfax || lowresfax || (strlen(fname)>3 && !strcmp(fname+strlen(fname)-3,".g3"))))) {
+               rv = RFT_G3;
+  }
 #endif
 
 #ifdef MACBINARY
@@ -3236,10 +3334,7 @@ int ReadFileType(fname)
 
 
 /********************************/
-int ReadPicFile(fname, ftype, pinfo, quick)
-     char    *fname;
-     int      ftype, quick;
-     PICINFO *pinfo;
+int ReadPicFile(char *fname, int ftype, PICINFO *pinfo, int quick)
 {
   /* if quick is set, we're being called to generate icons, or something
      like that.  We should load the image as quickly as possible.  Previously,
@@ -3345,16 +3440,54 @@ int ReadPicFile(fname, ftype, pinfo, quick)
   return rv;
 }
 
+/********************************/
+char *QuoteFileName(char *safe_name, const char *orig_name, int max_len)
+{
+  /* Returns a quoted version of orig_name safe for use in command lines. */
+  /* The return value is safe_name to simplify use in sprintf calls. */
+  /* safe_name should be at least 3 * length(orig_name) + 4 */
+  /* Use XV_MAXQUOTEDPATHLEN */
+
+  int i, len;
+
+  if (max_len < 10) {
+    fprintf(stderr, "Error quoting file name\n");
+    Quit(1);
+    return NULL;
+  }
+
+  len = 0;
+  safe_name[ len++ ] = XV_SINGLE_QUOTE;
+  i = 0;
+  while (orig_name[i] != '\0' && len + 4 < max_len) {
+    if (orig_name[i] == XV_SINGLE_QUOTE) {
+      if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+      while (orig_name[i] == XV_SINGLE_QUOTE && len + 4 < max_len) {
+        if (len < max_len) safe_name[ len++ ] = '\\';
+        if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+        i++;
+      }
+      if (len < max_len) safe_name[ len++ ] = XV_SINGLE_QUOTE;
+    } else {
+      if (len < max_len) safe_name[ len++ ] = orig_name[ i ];
+      i++;
+    }
+  }
+
+  safe_name[ len++ ] = XV_SINGLE_QUOTE;
+  safe_name[ len ] = '\0';
+
+  return safe_name;
+}
 
 /********************************/
-int UncompressFile(name, uncompname, filetype)
-     char *name, *uncompname;
-     int filetype;
+int UncompressFile(char *name, char *uncompname, int filetype)
 {
   /* returns '1' on success, with name of uncompressed file in uncompname
      returns '0' on failure */
 
-  char namez[128], *fname, buf[512];
+  char namez[128], *fname, buf[ 512 + 2 * XV_MAXQUOTEDPATHLEN ];
+  char quoted_name[ XV_MAXQUOTEDPATHLEN ], quoted_uncompname[ XV_MAXQUOTEDPATHLEN ];
 #ifndef USE_MKSTEMP
   int tmpfd;
 #endif
@@ -3402,14 +3535,31 @@ int UncompressFile(name, uncompname, filetype)
   close(tmpfd);
 #endif
 
+  /* FIXME: need to replace any ticks in filename (with the
+   * ugly sequence '\"'\"' because backslash won't work inside
+   * single quotes) before calling system().  Maybe one of the
+   * exec() variants would be better...
+   */
+  /* QuoteFileName handles single quotes.
+   * It also adds the outer quotes for flexibility for more efficient quoting or other operating systems.
+   */
+  buf[0] = '\0';
 #ifndef VMS
   if (filetype == RFT_COMPRESS)
-    sprintf(buf,"%s -c '%s' > '%s'", UNCOMPRESS, fname, uncompname);
+    sprintf(buf,"%s -c %s > %s", UNCOMPRESS, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
 # ifdef BUNZIP2
   else if (filetype == RFT_BZIP2)
-    sprintf(buf,"%s -c '%s' > '%s'", BUNZIP2, fname, uncompname);
+    sprintf(buf,"%s -c %s > %s", BUNZIP2, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
+# endif
+# ifdef XZ
+  else if (filetype == RFT_XZ)
+    sprintf(buf,"%s -c %s > %s", XZ, QuoteFileName(quoted_name, fname, XV_MAXQUOTEDPATHLEN), QuoteFileName(quoted_uncompname, uncompname, XV_MAXQUOTEDPATHLEN));
 # endif
 #else /* it IS VMS */
+  /* QuoteFileName currently doesn't know the quote rules for VMS */
+  /* VMS uses double quotes around the file name. */
+  /* Use two double quotes for an embedded double quote. */
+  /* It might depend if the CLI is DCL or a shell. */
 # ifdef GUNZIP
   sprintf(buf,"%s '%s' '%s'", UNCOMPRESS, fname, uncompname);
 # else
@@ -3513,9 +3663,7 @@ int RemoveMacbinary(src, dst)
 
 
 /********************************/
-void KillPageFiles(bname, numpages)
-  char *bname;
-  int   numpages;
+void KillPageFiles(char *bname, int numpages)
 {
   /* deletes any page files (numbered 1 through numpages) that might exist */
   char tmp[128];
@@ -3535,8 +3683,7 @@ void KillPageFiles(bname, numpages)
 
 
 /********************************/
-void NewPicGetColors(donorm, dohist)
-     int donorm, dohist;
+void NewPicGetColors(int donorm, int dohist)
 {
   int i;
 
@@ -3625,8 +3772,7 @@ void NewPicGetColors(donorm, dohist)
 
 
 /***********************************/
-static int readpipe(cmd, fname)
-     char *cmd, *fname;
+static int readpipe(char *cmd, char *fname)
 {
   /* cmd is something like: "! bggen 100 0 0"
    *
@@ -3635,7 +3781,7 @@ static int readpipe(cmd, fname)
    * returns '0' if everything's cool, '1' on error
    */
 
-  char fullcmd[512], tmpname[64], str[512];
+  char fullcmd[512], tmpname[64], str[512 + 128];
   int i;
 #ifndef USE_MKSTEMP
   int tmpfd;
@@ -3687,7 +3833,7 @@ static int readpipe(cmd, fname)
 
 
 /****************/
-static void openFirstPic()
+static void openFirstPic(void)
 {
   int i;
 
@@ -3712,7 +3858,7 @@ static void openFirstPic()
 
 
 /****************/
-static void openNextPic()
+static void openNextPic(void)
 {
   int i;
 
@@ -3730,7 +3876,7 @@ static void openNextPic()
 
 
 /****************/
-static void openNextQuit()
+static void openNextQuit(void)
 {
   int i;
 
@@ -3749,7 +3895,7 @@ static void openNextQuit()
 
 
 /****************/
-static void openNextLoop()
+static void openNextLoop(void)
 {
   int i,j,loop;
 
@@ -3778,7 +3924,7 @@ static void openNextLoop()
 
 
 /****************/
-static void openPrevPic()
+static void openPrevPic(void)
 {
   int i;
 
@@ -3796,14 +3942,14 @@ static void openPrevPic()
 
 
 /****************/
-static void openNamedPic()
+static void openNamedPic(void)
 {
   /* if (!openPic(LOADPIC)) openPic(DFLTPIC); */
   openPic(LOADPIC);
 }
 
 /****************/
-static void mainLoop()
+static void mainLoop(void)
 {
   /* search forward until we manage to display a picture,
      then call EventLoop.  EventLoop will eventually return
@@ -3867,8 +4013,7 @@ static void mainLoop()
 
 
 /***********************************/
-static void createMainWindow(geom, name)
-     const char *geom, *name;
+static void createMainWindow(const char *geom, const char *name)
 {
   XSetWindowAttributes xswa;
   unsigned long        xswamask;
@@ -3933,7 +4078,7 @@ static void createMainWindow(geom, name)
   hints.flags |= PSize | PMaxSize;
 
   xswa.bit_gravity      = StaticGravity;
-  xswa.background_pixel = bg;
+  xswa.background_pixmap  = None;
   xswa.border_pixel     = fg;
   xswa.colormap         = theCmap;
 
@@ -3948,7 +4093,8 @@ static void createMainWindow(geom, name)
      that windows, by default, have backing-store turned on, then the
      image window will, too */
 
-  xswamask = CWBackPixel | CWBorderPixel | CWColormap /* | CWBackingStore */;
+  /* CWBackPixel */
+  xswamask = CWBackPixmap | CWBorderPixel | CWColormap /* | CWBackingStore */;
   if (!clearonload) xswamask |= CWBitGravity;
 
   if (mainW) {
@@ -4040,8 +4186,7 @@ static void createMainWindow(geom, name)
 
 
 /***********************************/
-static void setWinIconNames(name)
-     const char *name;
+static void setWinIconNames(const char *name)
 {
   char winname[NAME_MAX+sizeof("xv : ")+sizeof(VERSTR)+sizeof(" <unregistered>")+1], iconname[NAME_MAX+1];
 
@@ -4054,8 +4199,8 @@ static void setWinIconNames(name)
     sprintf(iconname,"xv");
   }
   else {
-    sprintf(winname,"xv %s: %s", VERSTR, name);
-    sprintf(iconname,"%s",name);
+    sprintf(winname, "xv %s: %.*s", VERSTR, NAME_MAX, name);
+    sprintf(iconname, "%.*s", NAME_MAX, name);
   }
 
 #ifndef REGSTR
@@ -4070,9 +4215,7 @@ static void setWinIconNames(name)
 
 
 /***********************************/
-void FixAspect(grow,w,h)
-     int   grow;
-     int   *w, *h;
+void FixAspect(int grow, int *w, int *h)
 {
   /* computes new values of eWIDE and eHIGH which will have aspect ratio
      'normaspect'.  If 'grow' it will preserve aspect by enlarging,
@@ -4124,7 +4267,7 @@ void FixAspect(grow,w,h)
 
 
 /***********************************/
-static void makeDispNames()
+static void makeDispNames(void)
 {
   int   prelen, n, i, done;
   char *suffix;
@@ -4153,7 +4296,7 @@ static void makeDispNames()
 
 
 /***********************************/
-static void fixDispNames()
+static void fixDispNames(void)
 {
   /* fix dispnames array so that names don't go off right edge */
 
@@ -4182,8 +4325,7 @@ static void fixDispNames()
 
 
 /***********************************/
-void StickInCtrlList(select)
-     int select;
+void StickInCtrlList(int select)
 {
   /* stick current name (from 'load/save' box) and current working directory
      into 'namelist'.  Does redraw list.  */
@@ -4206,8 +4348,7 @@ void StickInCtrlList(select)
 
 
 /***********************************/
-void AddFNameToCtrlList(fpath,fname)
-     const char *fpath, *fname;
+void AddFNameToCtrlList(const char *fpath, const char *fname)
 {
   /* stick given path/name into 'namelist'.  Doesn't redraw list */
 
@@ -4260,7 +4401,7 @@ void AddFNameToCtrlList(fpath,fname)
 
 
 /***********************************/
-void ChangedCtrlList()
+void ChangedCtrlList(void)
 {
   /* called when the namelist/dispnames arrays have changed, and list needs
      to be re-displayed */
@@ -4282,7 +4423,7 @@ void ChangedCtrlList()
 
 
 /***********************************/
-void ActivePrevNext()
+void ActivePrevNext(void)
 {
   /* called to enable/disable the Prev/Next buttons whenever curname and/or
      numnames and/or nList.selected change */
@@ -4303,7 +4444,7 @@ void ActivePrevNext()
 
 
 /***********************************/
-int DeleteCmd()
+int DeleteCmd(void)
 {
   /* 'delete' button was pressed.  Pop up a dialog box to determine
      what should be deleted, then do it.
@@ -4363,8 +4504,7 @@ int DeleteCmd()
 
 
 /********************************************/
-static void deleteFromList(delnum)
-     int delnum;
+static void deleteFromList(int delnum)
 {
   int i;
 
@@ -4405,7 +4545,7 @@ static void deleteFromList(delnum)
 
 
 /***********************************/
-void HandleDispMode()
+void HandleDispMode(void)
 {
   /* handles a change in the display mode (windowed/root).
      Also, called to do the 'right' thing when opening a picture
@@ -4414,7 +4554,6 @@ void HandleDispMode()
 
   static int haveoldinfo = 0;
   static Window            oldMainW;
-  static int               oldCmapMode;
   static XSizeHints        oldHints;
   static XWindowAttributes oldXwa;
   int i;
@@ -4428,7 +4567,7 @@ void HandleDispMode()
 
 
   if (dispMode == RMB_WINDOW) {        /* windowed */
-    char fnam[256];
+    char fnam[MAXPATHLEN];
 
     BTSetActive(&but[BANNOT], 1);
 
@@ -4461,7 +4600,7 @@ void HandleDispMode()
 
     if (useroot && resetroot) ClearRoot();
 
-    if (mainW == (Window) NULL || useroot) {  /* window not visible */
+    if (mainW == (Window) None || useroot) {  /* window not visible */
       useroot = 0;
 
       if (haveoldinfo) {             /* just remap mainW and resize it */
@@ -4494,7 +4633,7 @@ void HandleDispMode()
       }
 
       else {                         /* first time.  need to create mainW */
-	mainW = (Window) NULL;
+	mainW = (Window) None;
 	createMainWindow(maingeom, fnam);
 	XSelectInput(theDisp, mainW, ExposureMask | KeyPressMask
 		     | StructureNotifyMask | ButtonPressMask
@@ -4545,7 +4684,6 @@ void HandleDispMode()
       /* save current window stuff */
       haveoldinfo = 1;
       oldMainW = mainW;
-      oldCmapMode = colorMapMode;
 
       GetWindowPos(&oldXwa);
       if (!XGetNormalHints(theDisp, mainW, &oldHints)) oldHints.flags = 0;
@@ -4603,10 +4741,7 @@ void HandleDispMode()
 
 
 /*******************************************************/
-static void add_filelist_to_namelist(flist, nlist, numn, maxn)
-     char  *flist;
-     char **nlist;
-     int   *numn, maxn;
+static void add_filelist_to_namelist(char *flist, char **nlist, int *numn, int maxn)
 {
   /* written by Brian Gregory  (bgregory@megatest.com) */
 
@@ -4621,13 +4756,13 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
   while (*numn < maxn) {
     char *s, *nlp, fbuf[MAXPATHLEN];
     if (!fgets(fbuf, MAXPATHLEN, fp) ||
-	!(s = (char *) malloc(strlen(fbuf)))) break;
+	!(s = (char *) malloc(strlen(fbuf)+1))) break;
 
     nlp = (char *) rindex(fbuf, '\n');
     if (nlp) *nlp = '\0';
     strcpy(s, fbuf);
 
-    namelist[*numn] = s;  (*numn)++;
+    nlist[*numn] = s;  (*numn)++;
   }
 
 
@@ -4645,8 +4780,7 @@ static void add_filelist_to_namelist(flist, nlist, numn, maxn)
 /************************************************************************/
 
 /***********************************/
-char *lower_str(str)
-     char *str;
+char *lower_str(char *str)
 {
   char *p;
   for (p=str; *p; p++) if (isupper(*p)) *p = tolower(*p);
@@ -4655,8 +4789,7 @@ char *lower_str(str)
 
 
 /***********************************/
-int rd_int(name)
-     const char *name;
+int rd_int(const char *name)
 {
   /* returns '1' if successful.  result in def_int */
 
@@ -4673,16 +4806,14 @@ int rd_int(name)
 
 
 /***********************************/
-int rd_str(name)
-     const char *name;
+int rd_str(const char *name)
 {
   return rd_str_cl(name, "", 0);
 }
 
 
 /***********************************/
-int rd_flag(name)
-     const char *name;
+int rd_flag(const char *name)
 {
   /* returns '1' if successful.  result in def_int */
 
@@ -4708,10 +4839,7 @@ int rd_flag(name)
 static int xrm_initted = 0;
 
 /***********************************/
-int rd_str_cl (name_str, class_str, reinit)
-     const char *name_str;
-     const char *class_str;
-     int  reinit;
+int rd_str_cl (const char *name_str, const char *class_str, int reinit)
 {
   /* note: *all* X resource reading goes through this routine... */
 
@@ -4854,5 +4982,53 @@ int rd_str_cl (name_str, class_str, reinit)
   def_str = result.addr;
   if (def_str) return 1;
   else return 0;
+}
+
+/* Generate a variable or fixed font name */
+
+static void makeFontName(char *buf, int buf_size, int is_mono, int font_num)
+{
+  const char *pattern;
+  int size, bigsize;
+
+  pattern = "fixed";
+  size = 0;
+  bigsize = 0;
+
+  if (is_mono) {
+    /* a mono-spaced font needed for the 'pixel value tracking' feature, was MFONT# defines */
+    if (dpiMult <= 1) {
+      switch (font_num) {
+      case 0: pattern = "-misc-fixed-medium-r-normal-*-%d-*"; size = 13; break;
+      case 1: pattern = "6x13"; break;
+      case 2: pattern = "-*-courier-medium-r-*-*-%d-*"; size = 12; break;
+      }
+    } else {
+      switch (font_num) {
+      case 0: pattern = "-misc-fixed-medium-r-normal-*-%d-*"; size = 13; bigsize = 20; break;
+      case 1: pattern = "-*-courier-medium-r-*-*-%d-*"; size = 12; bigsize = 25; break;
+      case 2: pattern = "12x24"; break;
+      }
+    }
+  } else {
+    /* program needs one of the following fonts.  Tries them in ascending order, was FONT# defines */
+    switch (font_num) {
+    case 0: pattern = "-*-lucida-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 12; bigsize = 25; break;
+    case 1: pattern = "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 12; bigsize = 25; break;
+    case 2: pattern = "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*-*"; size = 11; bigsize = 20; break;
+    case 3: pattern = ((dpiMult <= 1)? "6x13": "12x24"); break;
+    }
+  }
+
+  if (size > 0) {
+    if (dpiMult > 1) size = ((bigsize > 0)? bigsize: (size * dpiMult));
+    snprintf(buf, buf_size, pattern, size);
+  } else {
+    strncpy(buf, pattern, buf_size);
+  }
+
+  buf[ buf_size-1 ] = '\0';
+
+  /* fprintf(stderr, "makeFontName, mono %d num %d -> %s\n", is_mono, font_num, buf); */
 }
 

@@ -16,9 +16,9 @@
 #define NEEDSDIR
 #include "xv.h"
 
-#define PSWIDE 431
-#define PSHIGH 350
-#define PMAX   200    /* size of square that a 'page' has to fit into */
+#define PSWIDE (431*dpiMult)
+#define PSHIGH (350*dpiMult)
+#define PMAX   (200*dpiMult)    /* size of square that a 'page' has to fit into */
 
 #define PS_BOK    0
 #define PS_BCANC  1
@@ -44,7 +44,7 @@
 #define ORNT_PORT 0
 #define ORNT_LAND 1
 
-#define BUTTH 24
+#define BUTTH (24*dpiMult)
 
 #define IN2CM 2.54
 
@@ -123,14 +123,13 @@ static int   firsttime=1;       /* first time PSDialog being opened ? */
 
 
 /***************************************************/
-void CreatePSD(geom)
-char *geom;
+void CreatePSD(char *geom)
 {
   psW = CreateWindow("xv postscript", "XVps", geom,
-		     PSWIDE, PSHIGH, infofg, infobg, 0);
+		     PSWIDE, PSHIGH, infofg, infobg, FALSE);
   if (!psW) FatalError("can't create postscript window!");
 
-  pageF = XCreateSimpleWindow(theDisp, psW, 20,30, PMAX+1,PMAX+1,
+  pageF = XCreateSimpleWindow(theDisp, psW, 20*dpiMult, 30*dpiMult, PMAX + 1*dpiMult, PMAX + 1*dpiMult,
 			      1,infofg,infobg);
   if (!pageF) FatalError("couldn't create frame windows");
 
@@ -139,56 +138,56 @@ char *geom;
   XSelectInput(theDisp, pageF, ExposureMask | ButtonPressMask);
   XSelectInput(theDisp, psW,   ExposureMask | ButtonPressMask | KeyPressMask);
 
-  CBCreate(&encapsCB, psW, 240, 7, "preview", infofg, infobg, hicol, locol);
-  CBCreate(&pscompCB, psW, 331, 7, "compress", infofg, infobg, hicol, locol);
+  CBCreate(&encapsCB, psW, 240*dpiMult, 7*dpiMult, "preview", infofg, infobg, hicol, locol);
+  CBCreate(&pscompCB, psW, 331*dpiMult, 7*dpiMult, "compress", infofg, infobg, hicol, locol);
 
-  DCreate(&xsDial, psW, 240, 30, 80, 100, 10.0, 800.0, 100.0, 0.5, 5.0,
+  DCreate(&xsDial, psW, 240*dpiMult, 30*dpiMult, 80*dpiMult, 100*dpiMult, 10.0, 800.0, 100.0, 0.5, 5.0,
 	  infofg, infobg, hicol, locol, "Width", "%");
-  DCreate(&ysDial, psW, 331, 30, 80, 100, 10.0, 800.0, 100.0, 0.5, 5.0,
+  DCreate(&ysDial, psW, 331*dpiMult, 30*dpiMult, 80*dpiMult, 100*dpiMult, 10.0, 800.0, 100.0, 0.5, 5.0,
 	  infofg, infobg, hicol, locol, "Height", "%");
   xsDial.drawobj = changedScale;
   ysDial.drawobj = changedScale;
 
-  CBCreate(&lockCB, psW, 318, 134, "", infofg, infobg, hicol, locol);
+  CBCreate(&lockCB, psW, 318*dpiMult + 8*(dpiMult-1) /* fix this is CB is scaled */, 134*dpiMult, "", infofg, infobg, hicol, locol);
   lockCB.val = 1;
 
-  orientRB = RBCreate(NULL, psW, 36, 240+18, "Portrait", infofg, infobg,
+  orientRB = RBCreate(NULL, psW, 36*dpiMult, (240+18)*dpiMult, "Portrait", infofg, infobg,
 		      hicol, locol);
-  RBCreate(orientRB, psW, 36+80, 240+18, "Landscape", infofg, infobg,
+  RBCreate(orientRB, psW, (36+80)*dpiMult, (240+18)*dpiMult, "Landscape", infofg, infobg,
 	   hicol, locol);
 
-  paperRB = RBCreate(NULL, psW,36, 240+18+36, "8.5\"x11\"",
+  paperRB = RBCreate(NULL, psW, 36*dpiMult, (240+18+36)*dpiMult, "8.5\"x11\"",
 		     infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+80,    240+18+36, "A4",
+  RBCreate(paperRB, psW, (36+80)*dpiMult,    (240+18+36)*dpiMult, "A4",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+122,   240+18+36, "B5",
+  RBCreate(paperRB, psW, (36+122)*dpiMult,   (240+18+36)*dpiMult, "B5",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+164,   240+18+36, "A3",
+  RBCreate(paperRB, psW, (36+164)*dpiMult,   (240+18+36)*dpiMult, "A3",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36,       240+36+36, "8.5\"x14\"",
+  RBCreate(paperRB, psW, (36)*dpiMult,       (240+36+36)*dpiMult, "8.5\"x14\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+80,    240+36+36, "11\"x17\"",
+  RBCreate(paperRB, psW, (36+80)*dpiMult,    (240+36+36)*dpiMult, "11\"x17\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36,       240+54+36, "4\"x5\"",
+  RBCreate(paperRB, psW, (36)*dpiMult,       (240+54+36)*dpiMult, "4\"x5\"",
 	   infofg, infobg, hicol, locol);
-  RBCreate(paperRB, psW, 36+80,    240+54+36, "35mm slide",
+  RBCreate(paperRB, psW, (36+80)*dpiMult,    (240+54+36)*dpiMult, "35mm slide",
 	   infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BOK], psW, PSWIDE-180, PSHIGH-10-BUTTH, 80, BUTTH,
+  BTCreate(&psbut[PS_BOK], psW, PSWIDE - 180*dpiMult, PSHIGH - 10*dpiMult - BUTTH, 80*dpiMult, BUTTH,
 	   "Ok", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BCANC], psW, PSWIDE-90, PSHIGH-10-BUTTH, 80, BUTTH,
+  BTCreate(&psbut[PS_BCANC], psW, PSWIDE - 90*dpiMult, PSHIGH - 10*dpiMult - BUTTH, 80*dpiMult, BUTTH,
 	   "Cancel", infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BCENT], psW, 240, 154, 55, BUTTH-2,
+  BTCreate(&psbut[PS_BCENT], psW, 240*dpiMult, 154*dpiMult, 55*dpiMult, BUTTH - 2*dpiMult,
 	   "Center", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BORG], psW,  298, 154, 55, BUTTH-2,
+  BTCreate(&psbut[PS_BORG], psW,  298*dpiMult, 154*dpiMult, 55*dpiMult, BUTTH - 2*dpiMult,
 	   "Origin", infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BMAX], psW,  356, 154, 55, BUTTH-2,
+  BTCreate(&psbut[PS_BMAX], psW,  356*dpiMult, 154*dpiMult, 55*dpiMult, BUTTH - 2*dpiMult,
 	   "Max",    infofg, infobg, hicol, locol);
 
-  BTCreate(&psbut[PS_BPOSX], psW, 256-14, 190+13-8, 8,8, "",
+  BTCreate(&psbut[PS_BPOSX], psW, (256-14)*dpiMult, (190+13-8)*dpiMult, 8*dpiMult, 8*dpiMult, "",
 	   infofg, infobg, hicol, locol);
-  BTCreate(&psbut[PS_BPOSY], psW, 256-14, 190+26-8, 8,8, "",
+  BTCreate(&psbut[PS_BPOSY], psW, (256-14)*dpiMult, (190+26-8)*dpiMult, 8*dpiMult, 8*dpiMult, "",
 	   infofg, infobg, hicol, locol);
 
   posxType = posyType = 0;
@@ -252,8 +251,7 @@ char *geom;
 
 
 /***************************************************/
-void PSDialog(vis)
-int vis;
+void PSDialog(int vis)
 {
   if (vis) {
     if (picType == PIC24) {  /* no comp in 24-bit mode */
@@ -275,8 +273,7 @@ int vis;
 
 
 /***************************************************/
-int PSCheckEvent(xev)
-XEvent *xev;
+int PSCheckEvent(XEvent *xev)
 {
   /* check event to see if it's for one of our subwindows.  If it is,
      deal accordingly, and return '1'.  Otherwise, return '0' */
@@ -382,9 +379,7 @@ XEvent *xev;
 
 
 /***************************************************/
-void PSSaveParams(fname, col)
-     char *fname;
-     int col;
+void PSSaveParams(char *fname, int col)
 {
   filename = fname;
   colorType = col;
@@ -392,7 +387,7 @@ void PSSaveParams(fname, col)
 
 
 /***************************************************/
-void PSResize()
+void PSResize(void)
 {
   changedScale();
 }
@@ -403,8 +398,7 @@ void PSResize()
 
 
 /***************************************************/
-static void drawPSD(x,y,w,h)
-int x,y,w,h;
+static void drawPSD(int x, int y, int w, int h)
 {
   const char *title = "Save PostScript File...";
   int  i,cx;
@@ -425,37 +419,37 @@ int x,y,w,h;
   if (colorType != F_BWDITHER && picType!=PIC24) CBRedraw(&pscompCB);
   CBRedraw(&lockCB);
 
-  ULineString(psW, orientRB->x-16, orientRB->y-3-DESCENT, "Orientation:");
-  ULineString(psW, paperRB->x-16,   paperRB->y-3-DESCENT, "Paper Size:");
+  ULineString(psW, orientRB->x - 16*dpiMult, orientRB->y - 3*dpiMult - DESCENT, "Orientation:");
+  ULineString(psW, paperRB->x - 16*dpiMult,   paperRB->y - 3*dpiMult - DESCENT, "Paper Size:");
 
   /* draw 'lock' arrows */
-  cx = 240 + 40;  /* center of xsDial */
-  XDrawLine(theDisp, psW, theGC, lockCB.x, lockCB.y+6,  cx+2, lockCB.y+6);
-  XDrawLine(theDisp, psW, theGC, cx+2, lockCB.y+6, cx+2, lockCB.y-2);
+  cx = (240 + 40)*dpiMult;  /* center of xsDial */
+  XDrawLine(theDisp, psW, theGC, lockCB.x, lockCB.y + 6*dpiMult,  cx + 2*dpiMult, lockCB.y + 6*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx + 2*dpiMult, lockCB.y + 6*dpiMult, cx + 2*dpiMult, lockCB.y - 2*dpiMult);
 
-  XDrawLine(theDisp, psW, theGC, lockCB.x, lockCB.y+10,  cx-2, lockCB.y+10);
-  XDrawLine(theDisp, psW, theGC, cx-2, lockCB.y+10, cx-2, lockCB.y-2);
+  XDrawLine(theDisp, psW, theGC, lockCB.x, lockCB.y + 10*dpiMult,  cx - 2*dpiMult, lockCB.y + 10*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx - 2*dpiMult, lockCB.y + 10*dpiMult, cx - 2*dpiMult, lockCB.y - 2*dpiMult);
 
-  XDrawLine(theDisp, psW, theGC, cx-2-3, lockCB.y-2+3, cx, lockCB.y-2-2);
-  XDrawLine(theDisp, psW, theGC, cx+2+3, lockCB.y-2+3, cx, lockCB.y-2-2);
+  XDrawLine(theDisp, psW, theGC, cx - 2*dpiMult - 3*dpiMult, lockCB.y - 2*dpiMult + 3*dpiMult, cx, lockCB.y - 2*dpiMult - 2*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx + 2*dpiMult + 3*dpiMult, lockCB.y - 2*dpiMult + 3*dpiMult, cx, lockCB.y - 2*dpiMult - 2*dpiMult);
 
-  cx = 330 + 40;  /* center of ysDial */
-  XDrawLine(theDisp, psW, theGC, lockCB.x+17, lockCB.y+6,  cx-2, lockCB.y+6);
-  XDrawLine(theDisp, psW, theGC, cx-2, lockCB.y+6, cx-2, lockCB.y-2);
+  cx = (330 + 40)*dpiMult;  /* center of ysDial */
+  XDrawLine(theDisp, psW, theGC, lockCB.x + 17*dpiMult - 16*(dpiMult-1), lockCB.y + 6*dpiMult,  cx - 2*dpiMult, lockCB.y + 6*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx - 2*dpiMult, lockCB.y + 6*dpiMult, cx - 2*dpiMult, lockCB.y - 2*dpiMult);
 
-  XDrawLine(theDisp, psW, theGC, lockCB.x+17, lockCB.y+10,  cx+2, lockCB.y+10);
-  XDrawLine(theDisp, psW, theGC, cx+2, lockCB.y+10, cx+2, lockCB.y-2);
+  XDrawLine(theDisp, psW, theGC, lockCB.x + 17*dpiMult - 16*(dpiMult-1), lockCB.y + 10*dpiMult,  cx + 2*dpiMult, lockCB.y + 10*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx + 2*dpiMult, lockCB.y + 10*dpiMult, cx + 2*dpiMult, lockCB.y - 2*dpiMult);
 
-  XDrawLine(theDisp, psW, theGC, cx-2-3, lockCB.y-2+3, cx, lockCB.y-2-2);
-  XDrawLine(theDisp, psW, theGC, cx+2+3, lockCB.y-2+3, cx, lockCB.y-2-2);
+  XDrawLine(theDisp, psW, theGC, cx - 2*dpiMult - 3*dpiMult, lockCB.y - 2*dpiMult + 3*dpiMult, cx, lockCB.y - 2*dpiMult - 2*dpiMult);
+  XDrawLine(theDisp, psW, theGC, cx + 2*dpiMult + 3*dpiMult, lockCB.y - 2*dpiMult + 3*dpiMult, cx, lockCB.y - 2*dpiMult - 2*dpiMult);
 
-  DrawString(psW, 10, 19, title);
+  DrawString(psW, 10*dpiMult, 19*dpiMult, title);
 
-  ULineString(psW, 240, 190,    "Position:");
+  ULineString(psW, 240*dpiMult, 190*dpiMult,    "Position:");
   drawPosStr();
-  ULineString(psW, 240, 190+45, "Size:");
+  ULineString(psW, 240*dpiMult, (190+45)*dpiMult, "Size:");
   drawSizeStr();
-  ULineString(psW, 240, 190+90, "Resolution:");
+  ULineString(psW, 240*dpiMult, (190+90)*dpiMult, "Resolution:");
   drawResStr();
 
 
@@ -464,14 +458,14 @@ int x,y,w,h;
 
 
 /***************************************************/
-static void drawPosStr()
+static void drawPosStr(void)
 {
   int         x,y;
   double      cmx, cmy, inx, iny;
   char        str[64], str1[64];
   const char *xst, *yst;
 
-  x = 256;  y = 190 + 13;
+  x = 256*dpiMult;  y = (190 + 13)*dpiMult;
   inx = iny = 0;
   xst = yst = (const char *) NULL;
 
@@ -497,20 +491,20 @@ static void drawPosStr()
   XSetBackground(theDisp, theGC, infobg);
 
   XSetFont(theDisp, theGC, monofont);
-  XDrawImageString(theDisp, psW, theGC, x, y,    str,  (int) strlen(str));
-  XDrawImageString(theDisp, psW, theGC, x, y+13, str1, (int) strlen(str1));
+  XDrawImageString(theDisp, psW, theGC, x, y,              str,  (int) strlen(str));
+  XDrawImageString(theDisp, psW, theGC, x, y + 13*dpiMult, str1, (int) strlen(str1));
   XSetFont(theDisp, theGC, mfont);
 }
 
 
 /***************************************************/
-static void drawSizeStr()
+static void drawSizeStr(void)
 {
   int x,y;
   double cmx, cmy;
   char   str[64], str1[64];
 
-  x = 256;  y = 190+13+45;
+  x = 256*dpiMult;  y = (190+13+45)*dpiMult;
 
   cmx = sz_inx * IN2CM;
   cmy = sz_iny * IN2CM;
@@ -522,19 +516,19 @@ static void drawSizeStr()
   XSetBackground(theDisp, theGC, infobg);
   XSetFont(theDisp, theGC, monofont);
 
-  XDrawImageString(theDisp, psW, theGC, x, y,    str,  (int) strlen(str));
-  XDrawImageString(theDisp, psW, theGC, x, y+13, str1, (int) strlen(str1));
+  XDrawImageString(theDisp, psW, theGC, x, y,              str,  (int) strlen(str));
+  XDrawImageString(theDisp, psW, theGC, x, y + 13*dpiMult, str1, (int) strlen(str1));
   XSetFont(theDisp, theGC, mfont);
 }
 
 
 /***************************************************/
-static void drawResStr()
+static void drawResStr(void)
 {
   int x,y;
   char   str[64];
 
-  x = 256;  y = 190 + 13 + 90;
+  x = 256*dpiMult;  y = (190 + 13 + 90)*dpiMult;
 
   sprintf(str,  "%ddpi x %ddpi        ", dpix, dpiy);
 
@@ -549,12 +543,12 @@ static void drawResStr()
 
 
 /***************************************************/
-static void drawPage()
+static void drawPage(void)
 {
   /* draw page */
   XSetForeground(theDisp, theGC, infobg);
-  XFillRectangle(theDisp, pageF, theGC, pageRect.x+1, pageRect.y+1,
-		 (u_int) pageRect.width-1, (u_int) pageRect.height-1);
+  XFillRectangle(theDisp, pageF, theGC, pageRect.x + 1*dpiMult, pageRect.y + 1*dpiMult,
+		 (u_int) pageRect.width - 1*dpiMult, (u_int) pageRect.height - 1*dpiMult);
 
   XSetForeground(theDisp, theGC, infofg);
   XDrawRectangle(theDisp, pageF, theGC, pageRect.x, pageRect.y,
@@ -565,8 +559,7 @@ static void drawPage()
 
 
 /***************************************************/
-static void clickPSD(x,y)
-int x,y;
+static void clickPSD(int x, int y)
 {
   int i;
   BUTT *bp;
@@ -608,8 +601,7 @@ int x,y;
 
 
 /***************************************************/
-static void clickPage(mx,my)
-int mx,my;
+static void clickPage(int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry,x,y;
@@ -641,8 +633,7 @@ int mx,my;
 
 
 /***************************************************/
-static void doCmd(cmd)
-     int cmd;
+static void doCmd(int cmd)
 {
   char *fullname;
 
@@ -693,7 +684,7 @@ static void doCmd(cmd)
 
 
 /***************************************************/
-static void changedScale()
+static void changedScale(void)
 {
   double oldx,oldy;
 
@@ -718,7 +709,7 @@ static void changedScale()
 
 
 /***************************************************/
-static void setScale()
+static void setScale(void)
 {
   double hsx, hsy;
 
@@ -749,7 +740,7 @@ static void setScale()
 
 
 /***************************************************/
-static void changedPaper()
+static void changedPaper(void)
 {
   setPaper();
   XClearWindow(theDisp, pageF);
@@ -760,7 +751,7 @@ static void changedPaper()
 
 
 /***************************************************/
-static void setPaper()
+static void setPaper(void)
 {
   int    i;
   double tmp;
@@ -783,8 +774,7 @@ static void setPaper()
 
 
 /***************************************************/
-static void drawIRect(draw)
-     int draw;
+static void drawIRect(int draw)
 {
   int x,y,w,h;
   XRectangle xr;
@@ -812,7 +802,7 @@ static void drawIRect(draw)
 
 
 /***************************************************/
-static void centerImage()
+static void centerImage(void)
 {
   pos_inx = psizex/2 - sz_inx/2;
   pos_iny = psizey/2 - sz_iny/2;
@@ -824,7 +814,7 @@ static void centerImage()
 
 
 /***************************************************/
-static void maxImage()
+static void maxImage(void)
 {
   double scx, scy;
   int w,h;
@@ -864,8 +854,7 @@ static void maxImage()
 
 
 /***************************************************/
-static void moveImage(newx,newy)
-double newx, newy;
+static void moveImage(double newx, double newy)
 {
   double hsx, hsy;
 
@@ -890,7 +879,7 @@ double newx, newy;
 
 
 /***************************************************/
-static void writePS()
+static void writePS(void)
 {
   FILE *fp;
   int   i, j, err, rpix, gpix, bpix, nc, ptype;
@@ -1145,9 +1134,7 @@ static void writePS()
 
 
 /**********************************************/
-static int rle_encode(scanline, rleline, wide)
-     byte *scanline, *rleline;
-     int wide;
+static int rle_encode(byte *scanline, byte *rleline, int wide)
 {
   /* generates a rle-compressed version of the scan line.
    * rle is encoded as such:
@@ -1252,8 +1239,7 @@ static int rle_encode(scanline, rleline, wide)
 
 
 /**********************************************/
-static void psColorImage(fp)
-FILE *fp;
+static void psColorImage(FILE *fp)
 {
   /* spits out code that checks if the PostScript device in question
      knows about the 'colorimage' operator.  If it doesn't, it defines
@@ -1318,10 +1304,7 @@ FILE *fp;
 
 
 /**********************************************/
-static void psColorMap(fp, color, nc, rmap, gmap, bmap)
-     FILE *fp;
-     int color, nc;
-     byte *rmap, *gmap, *bmap;
+static void psColorMap(FILE *fp, int color, int nc, byte *rmap, byte *gmap, byte *bmap)
 {
   /* spits out code for the colormap of the following image
      if !color, it spits out a mono-ized graymap */
@@ -1347,9 +1330,7 @@ static void psColorMap(fp, color, nc, rmap, gmap, bmap)
 
 
 /**********************************************/
-static void psRleCmapImage(fp, color)
-FILE *fp;
-int   color;
+static void psRleCmapImage(FILE *fp, int color)
 {
   /* spits out code that defines the 'rlecmapimage' operator */
 
@@ -1418,13 +1399,8 @@ int   color;
 
 
 /**********************************************/
-static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
-		       landscape)
-     FILE *fp;
-     byte *pic;
-     int   ptype, colorType;
-     int   w, h, landscape;
-     byte *rmap, *gmap, *bmap;
+static void epsPreview(FILE *fp, byte *pic, int ptype, int colorType, int w, int h, byte *rmap, byte *gmap, byte *bmap,
+		       int landscape)
 {
   byte *prev;
   int flipbw;
@@ -1492,11 +1468,7 @@ static void epsPreview(fp, pic, ptype, colorType, w, h, rmap,gmap,bmap,
 
 
 /***********************************/
-static int writeBWStip(fp, pic, prompt, w, h, flipbw)
-     FILE *fp;
-     byte *pic;
-     const char *prompt;
-     int  w, h, flipbw;
+static int writeBWStip(FILE *fp, byte *pic, const char *prompt, int w, int h, int flipbw)
 {
   /* write the given 'pic' (B/W stippled, 1 byte per pixel, 0=blk,1=wht)
      out as hexadecimal, max of 72 hex chars per line.
@@ -1552,10 +1524,7 @@ static int writeBWStip(fp, pic, prompt, w, h, flipbw)
 
 
 /***********************************/
-int LoadPS(fname, pinfo, quick)
-     char    *fname;
-     PICINFO *pinfo;
-     int      quick;
+int LoadPS(char *fname, PICINFO *pinfo, int quick)
 {
   /* returns '1' if successful.  If the document is a single page, the
      a temporary PNM file is created, loaded, and deleted.  If the
@@ -1564,9 +1533,11 @@ int LoadPS(fname, pinfo, quick)
 
 #ifdef GS_PATH
   #define CMDSIZE	1024
-  char tmp[512], gscmd[512], cmdstr[CMDSIZE], tmpname[64];
+  char tmp[CMDSIZE + 128], gscmd[512], cmdstr[CMDSIZE], tmpname[64];
   int  gsresult, nump, i, filetype, doalert, epsf;
 #endif
+
+  int res = gsRes * ((gsGeomStr == NULL)? dpiMult: 1);
 
   pinfo->pic     = (byte *) NULL;
   pinfo->comment = (char *) NULL;
@@ -1599,11 +1570,11 @@ int LoadPS(fname, pinfo, quick)
 
 #ifndef VMS  /* VMS needs quotes around mixed case command lines */
   sprintf(gscmd, "%s -sDEVICE=%s -r%d -q -dSAFER -dNOPAUSE -sOutputFile=%s%%d ",
-	  GS_PATH, gsDev, gsRes, tmpname);
+	  GS_PATH, gsDev, res, tmpname);
 #else
   sprintf(gscmd,
 	  "%s \"-sDEVICE=%s\" -r%d -q \"-dNOPAUSE\" \"-sOutputFile=%s%%d\" ",
-	  GS_PATH, gsDev, gsRes, tmpname);
+	  GS_PATH, gsDev, res, tmpname);
 #endif
 
 
@@ -1736,9 +1707,7 @@ int LoadPS(fname, pinfo, quick)
 
 /******************************************************************/
 #ifdef GS_PATH
-void buildCmdStr(str, gscmd, xname, quick, epsf)
-     char *str, *gscmd, *xname;
-     int   quick, epsf;
+void buildCmdStr(char *str, char *gscmd, char *xname, int quick, int epsf)
 {
   /* note 'epsf' set only on files that don't have a showpage cmd */
   char *x, *y, *fname;

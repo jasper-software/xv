@@ -37,9 +37,18 @@ if(XV_ENABLE_JP2K)
 	set(xv_libs ${xv_libs} Jasper::Jasper)
 endif()
 
+if(XV_ENABLE_G3)
+	add_compile_definitions(DOG3)
+endif()
+
 if(XV_ENABLE_PDS)
 	add_compile_definitions(DOPDS)
 	#set(xv_libs ${xv_libs} XXX::XXX)
+endif()
+
+if(XV_ENABLE_XRANDR)
+	add_compile_definitions(DOXRANDR)
+	set(xv_libs ${xv_libs} ${XRANDR_LIBRARIES})
 endif()
 
 set(xv_sources
@@ -59,6 +68,7 @@ set(xv_sources
 	xvdir.c
 	xvevent.c
 	xvfits.c
+	xvg3.c
 	xvgam.c
 	xvgif.c
 	xvgifwr.c
@@ -92,6 +102,7 @@ set(xv_sources
 	xvrle.c
 	xvroot.c
 	xvscrl.c
+	xvselect.c
 	xvsmooth.c
 	xvsunras.c
 	xvtarga.c
@@ -100,7 +111,7 @@ set(xv_sources
 	xvtiffwr.c
 	xvvd.c
 	xvwbmp.c
-    xvwebp.c
+	xvwebp.c
 	xvxbm.c
 	xvxpm.c
 	xvxwd.c
@@ -205,3 +216,11 @@ install(FILES
 # Install directories into DOCDIR/manuals.
 install(DIRECTORY docs/manuals/html
   DESTINATION "${CMAKE_INSTALL_DOCDIR}/manuals")
+
+# Install files into share/pixmaps
+install(FILES contrib/xv.xpm
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pixmaps")
+
+# Install files into share/applications
+install(FILES contrib/xv.desktop
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications")

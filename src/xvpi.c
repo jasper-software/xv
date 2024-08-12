@@ -98,9 +98,7 @@ static char *pi_msgs[] = {
 
 
 /* The main routine of `Pi' loader. */
-int LoadPi(fname, pinfo)
-    char *fname;
-    PICINFO *pinfo;
+int LoadPi(char *fname, PICINFO *pinfo)
 {
     struct pi_info pi;
     int e;
@@ -143,9 +141,7 @@ int LoadPi(fname, pinfo)
     return 1;
 }
 
-static void pi_open_file(pi, fname)
-    struct pi_info *pi;
-    char *fname;
+static void pi_open_file(struct pi_info *pi, char *fname)
 {
     if((pi->fp = fopen(fname, "rb")) == NULL)
 	pi_file_error(pi, PI_OPEN);
@@ -154,9 +150,7 @@ static void pi_open_file(pi, fname)
     fseek(pi->fp, (size_t) 0, SEEK_SET);
 }
 
-static void pi_read_header(pi, comm)
-    struct pi_info *pi;
-    char **comm;
+static void pi_read_header(struct pi_info *pi, char **comm)
 {
     byte buf[10];
     int mda;
@@ -194,8 +188,7 @@ static void pi_read_header(pi, comm)
     if(DEBUG) pi_show_pi_info(pi);
 }
 
-static void pi_check_id(pi)
-    struct pi_info *pi;
+static void pi_check_id(struct pi_info *pi)
 {
     char buf[2];
 
@@ -205,9 +198,7 @@ static void pi_check_id(pi)
 	pi_error(pi, PI_FORMAT);
 }
 
-static void pi_read_comment(pi, comm)
-    struct pi_info *pi;
-    char **comm;
+static void pi_read_comment(struct pi_info *pi, char **comm)
 {
 /*
  * The comment format is like:
@@ -239,8 +230,7 @@ static void pi_read_comment(pi, comm)
     }
 }
 
-static void pi_read_palette(pi)
-    struct pi_info *pi;
+static void pi_read_palette(struct pi_info *pi)
 {
     pi->cmap = pi_malloc((size_t) pi->numcols * 3, "pi_read_palette");
     if(pi->mode & 0x80){
@@ -281,15 +271,13 @@ static void pi_read_palette(pi)
 }
 
 /* The main routine to expand `Pi' file. */
-static void pi_expand(pi, pic)
-    struct pi_info *pi;
-    byte **pic;
+static void pi_expand(struct pi_info *pi, byte **pic)
 {
     byte prev_col = 0;
     int prev_pos = -1;
     int cnt = 0, max_cnt = pi->width * pi->height;
 
-    *pic = pi_malloc((size_t) max_cnt, "pi_expand");   // GRR POSSIBLE OVERFLOW / FIXME
+    *pic = pi_malloc((size_t) max_cnt, "pi_expand");   /* GRR POSSIBLE OVERFLOW / FIXME */
 
     pi_table_create(pi);
 
@@ -323,9 +311,7 @@ static void pi_expand(pi, pic)
     }
 }
 
-static byte pi_read_color(pi, prev)
-    struct pi_info *pi;
-    int prev;
+static byte pi_read_color(struct pi_info *pi, int prev)
 {
     byte n;
     if(pi->cbits == 4){
@@ -360,8 +346,7 @@ static byte pi_read_color(pi, prev)
     return pi_table_get_value(pi, prev, (int) n);
 }
 
-static int pi_read_position(pi)
-    struct pi_info *pi;
+static int pi_read_position(struct pi_info *pi)
 {
     byte r;
     if((r = pi_read_bits(pi, 2)) != 3)
@@ -370,8 +355,7 @@ static int pi_read_position(pi)
 	return (int) pi_read_bits(pi, 1) + 3;
 }
 
-static data32 pi_read_length(pi)
-    struct pi_info *pi;
+static data32 pi_read_length(struct pi_info *pi)
 {
     data32 r = 1;
     int bits = 0;
@@ -384,11 +368,7 @@ static data32 pi_read_length(pi)
     return 1;
 }
 
-static int pi_copy_pixels(pi, pic, cnt, pos, len)
-    struct pi_info *pi;
-    byte *pic;
-    int cnt, pos;
-    data32 len;
+static int pi_copy_pixels(struct pi_info *pi, byte *pic, int cnt, int pos, data32 len)
 {
     int s = 0, d = cnt;
     int max = pi->width * pi->height;
@@ -432,14 +412,8 @@ static int pi_copy_pixels(pi, pic, cnt, pos, len)
 }
 
 /* The main routine of `Pi' saver. */
-int WritePi(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
-	    comment)
-    FILE *fp;
-    byte *pic;
-    int ptype, w, h;
-    byte *rmap, *gmap, *bmap;
-    int numcols, colorstyle;
-    char *comment;
+int WritePi(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gmap, byte *bmap, int numcols, int colorstyle,
+	    char *comment)
 {
     byte rtemp[256], gtemp[256], btemp[256];
     struct pi_info pi;
@@ -477,10 +451,7 @@ int WritePi(fp, pic, ptype, w, h, rmap, gmap, bmap, numcols, colorstyle,
     return 0;
 }
 
-static void pi_write_header(pi, comm, r, g, b)
-    struct pi_info *pi;
-    char *comm;
-    byte *r, *g, *b;
+static void pi_write_header(struct pi_info *pi, char *comm, byte *r, byte *g, byte *b)
 {
     byte buf[14];
 
@@ -506,16 +477,13 @@ static void pi_write_header(pi, comm, r, g, b)
     pi_write_palette(pi, r, g, b);
 }
 
-static void pi_write_id(pi)
-    struct pi_info *pi;
+static void pi_write_id(struct pi_info *pi)
 {
     if(fwrite(pi_id, (size_t) 2, (size_t) 1, pi->fp) != 1)
 	pi_file_error(pi, PI_WRITE);
 }
 
-static void pi_write_comment(pi, comm)
-    struct pi_info *pi;
-    char *comm;
+static void pi_write_comment(struct pi_info *pi, char *comm)
 {
     if(comm){
 	int i;
@@ -533,9 +501,7 @@ static void pi_write_comment(pi, comm)
 	pi_file_error(pi, PI_WRITE);
 }
 
-static void pi_write_palette(pi, r, g, b)
-    struct pi_info *pi;
-    byte *r, *g, *b;
+static void pi_write_palette(struct pi_info *pi, byte *r, byte *g, byte *b)
 {
     int i;
     int pinum = 1 << pi->cbits;
@@ -558,9 +524,7 @@ static void pi_write_palette(pi, r, g, b)
 }
 
 /* The main routine to compress `Pi' format. */
-static void pi_compress(pi, pic)
-    struct pi_info *pi;
-    byte *pic;
+static void pi_compress(struct pi_info *pi, byte *pic)
 {
     byte prev_col = 0;
     int prev_pos = -1;
@@ -611,15 +575,12 @@ static void pi_compress(pi, pic)
     }
 }
 
-static void pi_write_gabage(pi)
-    struct pi_info *pi;
+static void pi_write_gabage(struct pi_info *pi)
 {
     pi_write_bits(pi, 0, 32);
 }
 
-static void pi_write_color(pi, prev, col)
-    struct pi_info *pi;
-    int prev, col;
+static void pi_write_color(struct pi_info *pi, int prev, int col)
 {
     int n = pi_table_lookup_value(pi, prev, col);
 
@@ -654,11 +615,7 @@ static void pi_write_color(pi, prev, col)
     }
 }
 
-static int pi_test_matching(pi, pic, prev, cnt, len)
-    struct pi_info *pi;
-    byte *pic;
-    int prev, cnt;
-    data32 *len;
+static int pi_test_matching(struct pi_info *pi, byte *pic, int prev, int cnt, data32 *len)
 {
     data32 lens[5];
     int pos, p;
@@ -719,9 +676,7 @@ static int pi_test_matching(pi, pic, prev, cnt, len)
     return pos;
 }
 
-static void pi_write_position(pi, pos)
-    struct pi_info *pi;
-    int pos;
+static void pi_write_position(struct pi_info *pi, int pos)
 {
     switch(pos){
     case 0:
@@ -742,9 +697,7 @@ static void pi_write_position(pi, pos)
     }
 }
 
-static void pi_write_length(pi, len)
-    struct pi_info *pi;
-    data32 len;
+static void pi_write_length(struct pi_info *pi, data32 len)
 {
     int bits = 0;
     data32 base = 1;
@@ -770,8 +723,7 @@ static void pi_write_length(pi, len)
  * pi_table_lookup_value:
  *	look up the specified value, and move it to the top of the list.
  */
-static void pi_table_create(pi)
-    struct pi_info *pi;
+static void pi_table_create(struct pi_info *pi)
 {
     struct ct_t *t;
     int i;
@@ -799,9 +751,7 @@ static void pi_table_create(pi)
     }
 }
 
-static byte pi_table_get_value(pi, left, num)
-    struct pi_info *pi;
-    int left, num;
+static byte pi_table_get_value(struct pi_info *pi, int left, int num)
 {
     struct ct_t *t = &pi->ct[left];
     struct elt_t *e = t->top;
@@ -825,9 +775,7 @@ static byte pi_table_get_value(pi, left, num)
     return e->val;
 }
 
-static int pi_table_lookup_value(pi, left, v)
-    struct pi_info *pi;
-    int left, v;
+static int pi_table_lookup_value(struct pi_info *pi, int left, int v)
 {
     struct ct_t *t = &pi->ct[left];
     struct elt_t *e = t->top;
@@ -863,9 +811,7 @@ static int pi_table_lookup_value(pi, left, v)
  * pi_write_bits:
  *	writes a specified-bit data to the bit stream.
  */
-static data32 pi_read_bits(pi, numbits)
-    struct pi_info *pi;
-    int numbits;
+static data32 pi_read_bits(struct pi_info *pi, int numbits)
 {
     data32 r = 0;
 
@@ -888,10 +834,7 @@ static data32 pi_read_bits(pi, numbits)
     return r;
 }
 
-static void pi_write_bits(pi, dat, bits)
-    struct pi_info *pi;
-    data32 dat;
-    int bits;
+static void pi_write_bits(struct pi_info *pi, data32 dat, int bits)
 {
     data32 dat_mask = 1 << (bits - 1);
     while(bits > 0){
@@ -921,8 +864,7 @@ static void pi_write_bits(pi, dat, bits)
  * pi_cleanup_pinfo:
  *	cleanup PICINFO structure when an error occurs.
  */
-static void pi_init_pi_info(pi)
-    struct pi_info *pi;
+static void pi_init_pi_info(struct pi_info *pi)
 {
     pi->fp = NULL;
     pi->bs.rest = 0;
@@ -939,9 +881,7 @@ static void pi_init_pi_info(pi)
     pi->writing_grey = 0;
 }
 
-static void pi_cleanup_pi_info(pi, writing)
-    struct pi_info *pi;
-    int writing;
+static void pi_cleanup_pi_info(struct pi_info *pi, int writing)
 {
     if(pi->fp && !writing){
 	fclose(pi->fp);
@@ -960,8 +900,7 @@ static void pi_cleanup_pi_info(pi, writing)
     }
 }
 
-static void pi_cleanup_pinfo(pinfo)
-    PICINFO *pinfo;
+static void pi_cleanup_pinfo(PICINFO *pinfo)
 {
     if(pinfo->pic){
 	free(pinfo->pic);
@@ -982,25 +921,20 @@ static void pi_cleanup_pinfo(pinfo)
  * pi_file_error:
  *	shows a file error message.
  */
-static void pi_memory_error(scm, fn)
-    char *scm, *fn;
+static void pi_memory_error(char *scm, char *fn)
 {
     char buf[128];
     sprintf(buf, "%s: couldn't allocate memory. (%s)", scm ,fn);
     FatalError(buf);
 }
 
-static void pi_error(pi, mn)
-    struct pi_info *pi;
-    int mn;
+static void pi_error(struct pi_info *pi, int mn)
 {
     SetISTR(ISTR_WARNING, "%s", pi_msgs[mn]);
     longjmp(pi->jmp, 1);
 }
 
-static void pi_file_error(pi, mn)
-    struct pi_info *pi;
-    int mn;
+static void pi_file_error(struct pi_info *pi, int mn)
 {
     if(feof(pi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", pi_msgs[mn]);
@@ -1009,9 +943,7 @@ static void pi_file_error(pi, mn)
     longjmp(pi->jmp, 1);
 }
 
-static void pi_file_warning(pi, mn)
-    struct pi_info *pi;
-    int mn;
+static void pi_file_warning(struct pi_info *pi, int mn)
 {
     if(feof(pi->fp))
 	SetISTR(ISTR_WARNING, "%s (end of file)", pi_msgs[mn]);
@@ -1019,8 +951,7 @@ static void pi_file_warning(pi, mn)
 	SetISTR(ISTR_WARNING, "%s (%s)", pi_msgs[mn], ERRSTR(errno));
 }
 
-static void pi_show_pi_info(pi)
-    struct pi_info *pi;
+static void pi_show_pi_info(struct pi_info *pi)
 {
     fprintf(stderr, "  file size: %ld.\n", pi->fsize);
     fprintf(stderr, "  mode: 0x%02x.\n", pi->mode);
@@ -1037,9 +968,7 @@ static void pi_show_pi_info(pi)
 /*
  * Memory related routines.  If failed, they calls pi_memory_error.
  */
-static void *pi_malloc(n, fn)
-    size_t n;
-    char *fn;
+static void *pi_malloc(size_t n, char *fn)
 {
     void *r = (void *) malloc(n);
     if(r == NULL)
@@ -1047,10 +976,7 @@ static void *pi_malloc(n, fn)
     return r;
 }
 
-static void *pi_realloc(p, n, fn)
-    void *p;
-    size_t n;
-    char *fn;
+static void *pi_realloc(void *p, size_t n, char *fn)
 {
     void *r = (p == NULL) ? (void *) malloc(n) : (void *) realloc(p, n);
     if(r == NULL)

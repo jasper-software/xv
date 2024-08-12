@@ -75,13 +75,17 @@ static void   annotatePic      PARM((void));
 static int    debkludge_offx;
 static int    debkludge_offy;
 
+#ifdef HAVE_XRR
+int RRevent_number = -1, RRerror_number = -1;
+#endif
+
 #ifndef NOSIGNAL
 static XtSignalId IdQuit = 0;
 extern XtAppContext context;
 #endif
 
 /****************/
-int EventLoop()
+int EventLoop(void)
 /****************/
 {
   XEvent event;
@@ -209,9 +213,7 @@ int EventLoop()
 
 
 /****************/
-int HandleEvent(event, donep)
-     XEvent *event;
-     int    *donep;
+int HandleEvent(XEvent *event, int *donep)
 {
   static int wasInfoUp=0, wasCtrlUp=0, wasDirUp=0, wasGamUp=0, wasPsUp=0;
 #ifdef HAVE_JPEG
@@ -226,6 +228,9 @@ int HandleEvent(event, donep)
 #ifdef HAVE_PNG
   static int wasPngUp=0;
 #endif
+#ifdef HAVE_WEBP
+  static int wasWebpUp=0;
+#endif
 #ifdef HAVE_PCD
   static int wasPcdUp=0;
 #endif
@@ -234,6 +239,10 @@ int HandleEvent(event, donep)
 #endif
 #ifdef HAVE_MGCSFX
   static int wasMgcSfxUp=0;
+#endif
+#ifdef HAVE_XRR
+  int screen;
+  XRRScreenChangeNotifyEvent *xrr_event;
 #endif
 
   static int mainWKludge=0;  /* force first mainW expose after a mainW config
@@ -319,6 +328,10 @@ int HandleEvent(event, donep)
 
 #ifdef HAVE_PNG
     if (PNGCheckEvent (event)) break;   /* event has been processed */
+#endif
+
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent(event)) break;   /* event has been processed */
 #endif
 
     if (PCDCheckEvent(event)) break;    /* event has been processed */
@@ -476,6 +489,10 @@ int HandleEvent(event, donep)
       else if (client_event->window == pngW)  PNGDialog(0);
 #endif
 
+#ifdef HAVE_WEBP
+      else if (client_event->window == webpW)  WEBPDialog(0);
+#endif
+
       else if (client_event->window == pcdW)  PCDDialog(0);
 
 #ifdef HAVE_PIC2
@@ -556,6 +573,13 @@ int HandleEvent(event, donep)
 #endif
     }
 
+    if (cevt->window == dirW) {
+      ResizeDirW(cevt->width, cevt->height);
+    }
+
+    if (cevt->window == ctrlW) {
+      ResizeCtrl(cevt->width, cevt->height);
+    }
 
     if (cevt->window == mainW) {
 
@@ -678,6 +702,9 @@ int HandleEvent(event, donep)
 #ifdef HAVE_PNG
 	if (wasPngUp)  { PNGDialog(wasPngUp);    wasPngUp=0; }
 #endif
+#ifdef HAVE_WEBP
+       if (wasWebpUp) { WEBPDialog(wasWebpUp);  wasWebpUp=0; }
+#endif
 #ifdef HAVE_PCD
 	if (wasPcdUp)  { PCDDialog(wasPcdUp);    wasPcdUp=0; }
 #endif
@@ -729,6 +756,9 @@ int HandleEvent(event, donep)
 #endif
 #ifdef HAVE_PNG
 	  if (pngUp)  { wasPngUp  = pngUp;   PNGDialog(0); }
+#endif
+#ifdef HAVE_WEBP
+         if (webpUp) { wasWebpUp = webpUp;  WEBPDialog(0); }
 #endif
 #ifdef HAVE_PCD
 	  if (pcdUp)  { wasPcdUp = pcdUp;    PCDDialog(0); }
@@ -838,10 +868,10 @@ int HandleEvent(event, donep)
 	XWindowAttributes xwa;
 
 	GetWindowPos(&xwa);
-	//fprintf(stderr, "RAC: orig window pos %d,%d\n", xwa.x, xwa.y);
+	/* fprintf(stderr, "RAC: orig window pos %d,%d\n", xwa.x, xwa.y); */
 
 	xwa.width = eWIDE;  xwa.height = eHIGH;
-	//fprintf(stderr, "RAC: image size now %d,%d\n", xwa.width, xwa.height);
+	/* fprintf(stderr, "RAC: image size now %d,%d\n", xwa.width, xwa.height); */
 
 	/* try to keep the damned thing on-screen, if possible */
 	if (xwa.x + xwa.width  > vrWIDE) xwa.x = vrWIDE - xwa.width;
@@ -849,7 +879,7 @@ int HandleEvent(event, donep)
 	if (xwa.x < 0) xwa.x = 0;
 	if (xwa.y < 0) xwa.y = 0;
 
-	//fprintf(stderr, "RAC: moving window to %d,%d\n", xwa.x, xwa.y);
+	/* fprintf(stderr, "RAC: moving window to %d,%d\n", xwa.x, xwa.y); */
 	SetWindowPos(&xwa);
       }
 #endif
@@ -879,49 +909,60 @@ int HandleEvent(event, donep)
     break;
 
 
-  case SelectionClear:  break;
+  case SelectionClear: {
+    XSelectionClearEvent const *xsclr = &event->xselectionclear;
+    if (xsclr->window == ctrlW) {
+      if (xsclr->selection == XA_PRIMARY) {
+        InactivateDirW();
+      } else {
+
+      }
+    }
+  }
+    break;
 
   case SelectionRequest:
     {
-      XSelectionRequestEvent *xsrevt = (XSelectionRequestEvent *) event;
-      XSelectionEvent  xse;
+      XSelectionRequestEvent const *xsrevt = &event->xselectionrequest;
+      char const *text;
 
-      if (xsrevt->owner     != ctrlW      ||
-	  xsrevt->selection != XA_PRIMARY ||
-	  xsrevt->target    != XA_STRING) {  /* can't do it. */
-	xse.property = None;
-      }
-      else {
-	if (xsrevt->property == None) xse.property = xsrevt->target;
-	                         else xse.property = xsrevt->property;
+      if (xsrevt->owner == ctrlW) {
+        if (xsrevt->selection != XA_PRIMARY ||
+           xsrevt->target    != XA_STRING) {  /* can't do it. */
+         text = NULL;
+        }
+        text = xevPriSel ? xevPriSel : "";
+      } else if (xsrevt->owner == dirW) {
+        if (xsrevt->target != XA_STRING) {
+         text = NULL; /* we don't handle any other format */
+        }
 
-	if (xse.property != None) {
-          xerrcode = 0;
-	  XChangeProperty(theDisp, xsrevt->requestor, xse.property,
-			  XA_STRING, 8, PropModeReplace,
-			  (byte *) ((xevPriSel) ? xevPriSel           : "\0"),
-			  (int)    ((xevPriSel) ? strlen(xevPriSel)+1 : 1));
-          XSync(theDisp, False);
-          if (!xerrcode) xse.property = None;
-	}
+        text = TextOfSelection(xsrevt->selection);
+      } else {
+        text = NULL; /* other windows don't have selections */
       }
 
-      xse.type       = SelectionNotify;
-      xse.send_event = True;
-      xse.display    = theDisp;
-      xse.requestor  = xsrevt->requestor;
-      xse.selection  = xsrevt->selection;
-      xse.target     = xsrevt->target;
-      xse.time       = xsrevt->time;
-      XSendEvent(theDisp, xse.requestor, False, NoEventMask, (XEvent *) &xse);
-      XSync(theDisp, False);
+      SendSelection(xsrevt->selection, xsrevt->requestor, xsrevt->property, xsrevt->target, xsrevt->time, text);
     }
     break;
 
-
-
   default: break;		/* ignore unexpected events */
   }  /* switch */
+
+#ifdef HAVE_XRR
+  if (event->type == RRevent_number + RRScreenChangeNotify) {
+    XRRUpdateConfiguration(event);
+    XSync (theDisp, False);
+    xrr_event = (XRRScreenChangeNotifyEvent *)event;
+
+    screen = XRRRootToScreen(theDisp, xrr_event->window);
+
+    dispWIDE = DisplayWidth(theDisp, screen);
+    dispHIGH = DisplayHeight(theDisp, screen);
+    maxWIDE = vrWIDE = dispWIDE;  maxHIGH = vrHIGH = dispHIGH;
+    HandleDispMode();
+  }
+#endif
 
   frominterrupt = 0;
   *donep = done;
@@ -930,8 +971,41 @@ int HandleEvent(event, donep)
 
 
 /***********************************/
-static void SelectDispMB(i)
-     int i;
+extern void SendSelection(Atom selection, Window requestor, Atom property, Atom target, Time time, const char *text)
+{
+  XSelectionEvent xse;
+
+  if (property == None)
+    xse.property = target;
+  else
+    xse.property = property;
+
+  if (text) {
+    xerrcode = 0;
+         XChangeProperty(theDisp, requestor, xse.property,
+                         XA_STRING, 8, PropModeReplace,
+                         (byte *)text,
+                         (int)(strlen(text)+1));
+    XSync(theDisp, False);
+    if (xerrcode) xse.property = None;
+  } else {
+    xse.property = None; /* we have anything to return */
+  }
+
+  xse.type       = SelectionNotify;
+  xse.send_event = True;
+  xse.display    = theDisp;
+  xse.requestor  = requestor;
+  xse.selection  = selection;
+  xse.target     = target;
+  xse.time       = time;
+  XSendEvent(theDisp, xse.requestor, False, NoEventMask, (XEvent *)&xse);
+  XSync(theDisp, False);
+}
+
+
+/***********************************/
+static void SelectDispMB(int i)
 {
   /* called to handle selection of a dispMB item */
 
@@ -980,8 +1054,7 @@ static void SelectDispMB(i)
 
 
 /***********************************/
-static void SelectRootMB(i)
-     int i;
+static void SelectRootMB(int i)
 {
   /* called to handle selection of a rootMB item */
 
@@ -1000,8 +1073,7 @@ static void SelectRootMB(i)
 
 
 /***********************************/
-static void Select24to8MB(i)
-     int i;
+static void Select24to8MB(int i)
 {
   if (i<0 || i>=CONV24_MAX) return;
 
@@ -1043,8 +1115,7 @@ static void Select24to8MB(i)
 
 
 /***********************************/
-static void SelectWindowMB(i)
-     int i;
+static void SelectWindowMB(int i)
 {
   if (i<0 || i>=WMB_MAX) return;
   if (windowMB.dim[i]) return;
@@ -1074,8 +1145,7 @@ static void SelectWindowMB(i)
 
 
 /***********************************/
-static void SelectSizeMB(i)
-     int i;
+static void SelectSizeMB(int i)
 {
   int w,h;
 
@@ -1187,7 +1257,7 @@ static void SelectSizeMB(i)
 
 
 /***********************************/
-static void DoPrint()
+static void DoPrint(void)
 {
   /* pops open appropriate dialog boxes, issues print command */
 
@@ -1224,8 +1294,7 @@ static void DoPrint()
 
 
 /***********************************/
-static void debugEvent(e)
-     XEvent *e;
+static void debugEvent(XEvent *e)
 {
   switch (e->type) {
   case ButtonPress:
@@ -1265,6 +1334,10 @@ static void debugEvent(e)
     fprintf(stderr,"DBGEVT: MapNotify %s\n", win2name(e->xany.window));
     break;
 
+  case MappingNotify:
+    fprintf(stderr,"DBGEVT: MappingNotify %s\n", win2name(e->xany.window));
+    break;
+
   case ReparentNotify:
     fprintf(stderr,"DBGEVT: ReparentNotify %s\n", win2name(e->xany.window));
     break;
@@ -1276,6 +1349,18 @@ static void debugEvent(e)
 	    win2name(e->xany.window));
     break;
 
+  case SelectionClear:
+    fprintf(stderr,"DBGEVT: SelectionClear window=%s selection=0x%06lx\n",
+           win2name(e->xselectionclear.window),
+           e->xselectionclear.selection);
+    break;
+
+  case SelectionRequest:
+    fprintf(stderr,"DBGEVT: SelectionRequest owner=%s selection=0x%06lx target=0x%06lx\n",
+           win2name(e->xselectionrequest.owner),
+           e->xselectionrequest.selection, e->xselectionrequest.target);
+    break;
+
   default:
     fprintf(stderr,"DBGEVT: unknown event type (%d), window %s\n",
 	    e->type, win2name(e->xany.window));
@@ -1283,8 +1368,7 @@ static void debugEvent(e)
   }
 }
 
-static const char *win2name(win)
-     Window win;
+static const char *win2name(Window win)
 {
   static char foo[16];
 
@@ -1305,9 +1389,7 @@ static const char *win2name(win)
 
 
 /***********************************/
-static void handleButtonEvent(event, donep, retvalp)
-  XEvent *event;
-  int    *donep, *retvalp;
+static void handleButtonEvent(XEvent *event, int *donep, int *retvalp)
 {
   XButtonEvent *but_event;
   int i,x,y, done, retval, shift;
@@ -1350,6 +1432,10 @@ static void handleButtonEvent(event, donep, retvalp)
 
 #ifdef HAVE_PNG
     if (PNGCheckEvent (event)) break;
+#endif
+
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent(event)) break;
 #endif
 
 #ifdef HAVE_PCD
@@ -1459,10 +1545,23 @@ static void handleButtonEvent(event, donep, retvalp)
       else if (win == nList.scrl.win) SCTrack(&nList.scrl, x, y);
 
       else if (win == dirW) {
-	i=ClickDirW(x,y);
+       static int lastClickX=-1;
+       static int lastClickY=-1;
+       static Time lastClickTime=0;
+
+       if (abs(x - lastClickX) < 5 &&
+           abs(y - lastClickY) < 5 &&
+           (but_event->time - lastClickTime) < DBLCLICKTIME)
+         i = DoubleClickDirW(x, y, 1);
+       else
+         i = ClickDirW(x, y, 1);
+       lastClickX = x;
+       lastClickY = y;
+       lastClickTime = but_event->time;
 
 	switch (i) {
-	case S_BOK:   if (dirUp == BLOAD) {
+       case S_BOK:
+         if (dirUp == BLOAD) {
 	    if (!DirCheckCD()) {
 	      retval = LOADPIC;
 	      done=1;
@@ -1473,7 +1572,9 @@ static void handleButtonEvent(event, donep, retvalp)
 	  }
 	  break;
 
-	case S_BCANC: DirBox(0);  break;
+	case S_BCANC:
+	  DirBox(0);
+	  break;
 
 	case S_BRESCAN:
 	  WaitCursor();  LoadCurrentDirectory();  SetCursors(-1);
@@ -1555,9 +1656,7 @@ static void handleButtonEvent(event, donep, retvalp)
 
 
 /***********************************/
-static void handleKeyEvent(event, donep, retvalp)
-  XEvent *event;
-  int    *donep, *retvalp;
+static void handleKeyEvent(XEvent *event, int *donep, int *retvalp)
 {
   /* handles KeyPress and KeyRelease events, called from HandleEvent */
 
@@ -1603,6 +1702,11 @@ static void handleKeyEvent(event, donep, retvalp)
 
     shift = key_event->state & ShiftMask;
     ctrl  = key_event->state & ControlMask;
+    /* FIXME: This is wrong; mod1 can be any modifier.
+     * XV should search for Meta modifier if defined,
+     * else use Alt modifier if defined, else nothing
+     * (or change docs to say Alt and switch the priority)
+     */
     meta  = key_event->state & Mod1Mask;
     dealt = 0;
 
@@ -1640,6 +1744,10 @@ static void handleKeyEvent(event, donep, retvalp)
 
 #ifdef HAVE_PNG
     if (PNGCheckEvent (event)) break;
+#endif
+
+#ifdef HAVE_WEBP
+    if (WEBPCheckEvent (event)) break;
 #endif
 
     if (PCDCheckEvent (event)) break;
@@ -1732,6 +1840,28 @@ static void handleKeyEvent(event, donep, retvalp)
       else if (ck==CK_UP)    CropKey( 0,-1,shift,ctrl);
       else if (ck==CK_DOWN)  CropKey( 0, 1,shift,ctrl);
       else dealt = 0;
+      if (dealt) break;
+    }
+
+
+    /* check for Dir-specific keys */
+    if (key_event->window == dirW) {
+      dealt = 1;
+      if (meta) {  /* meta is down */
+        if (ks==XK_a)
+          SelectAllDirW();
+        else if (ks==XK_x)
+          CutDirW();
+        else if (ks==XK_c)
+          CopyDirW();
+        else if (ks==XK_v)
+          PasteDirW();
+        else if (ks==XK_d)
+          ClearDirW();
+        else
+          dealt = 0;
+      } else
+        dealt = 0;
       if (dealt) break;
     }
 
@@ -1948,6 +2078,9 @@ static void handleKeyEvent(event, donep, retvalp)
       case 'H':    FakeButtonPress(&gbut[G_BHISTEQ]);  break;
       case 'N':    FakeButtonPress(&gbut[G_BMAXCONT]); break;
 
+        /* wait pause/resume */
+      case 'w':    waitsec = -waitsec;                 break;
+
       default:     break;
       }
     }
@@ -1958,8 +2091,7 @@ static void handleKeyEvent(event, donep, retvalp)
 
 
 /***********************************/
-static void zoomCurs(mask)
-     u_int mask;
+static void zoomCurs(u_int mask)
 {
   int zc;
   zc = ((mask & ControlMask) && !(mask & ShiftMask) && !(mask & Mod1Mask));
@@ -1972,7 +2104,7 @@ static void zoomCurs(mask)
 
 
 /***********************************/
-static void textViewCmd()
+static void textViewCmd(void)
 {
   int   i;
   char *name;
@@ -1994,7 +2126,7 @@ static void textViewCmd()
 
 
 /***********************************/
-static void setSizeCmd()
+static void setSizeCmd(void)
 {
   /* open 'set size' prompt window, get a string, parse it, and try to
      set the window size accordingly */
@@ -2130,8 +2262,7 @@ static void setSizeCmd()
 
 
 /***********************************/
-void NewCutBuffer(str)
-     char *str;
+void NewCutBuffer(const char *str)
 {
   /* called whenever contents of CUT_BUFFER0 and PRIMARY selection should
      be changed.  Only works for strings.  Copies the data, so the string
@@ -2148,8 +2279,7 @@ void NewCutBuffer(str)
 }
 
 /***********************************/
-void DrawWindow(x,y,w,h)
-     int x,y,w,h;
+void DrawWindow(int x, int y, int w, int h)
 {
   if (x+w < eWIDE) w++;  /* add one for broken servers (?) */
   if (y+h < eHIGH) h++;
@@ -2162,8 +2292,7 @@ void DrawWindow(x,y,w,h)
 
 
 /***********************************/
-void WResize(w,h)
-     int w,h;
+void WResize(int w, int h)
 {
   XWindowAttributes xwa;
 
@@ -2198,7 +2327,7 @@ void WResize(w,h)
 
 
 /***********************************/
-static void WMaximize()
+static void WMaximize(void)
 {
   if (useroot) WResize((int) dispWIDE, (int) dispHIGH);
   else {
@@ -2215,7 +2344,7 @@ static void WMaximize()
 
 
 /***********************************/
-void WRotate()
+void WRotate(void)
 {
   /* rotate the window and redraw the contents  */
 
@@ -2250,8 +2379,7 @@ void WRotate()
 
 
 /***********************************/
-void WCrop(w,h,dx,dy)
-     int w,h,dx,dy;
+void WCrop(int w, int h, int dx, int dy)
 {
   int ex, ey;
   XWindowAttributes xwa;
@@ -2282,7 +2410,7 @@ void WCrop(w,h,dx,dy)
 
 
 /***********************************/
-void WUnCrop()
+void WUnCrop(void)
 {
   int w,h;
   XWindowAttributes xwa;
@@ -2325,8 +2453,7 @@ void WUnCrop()
 
 
 /***********************************/
-void GetWindowPos(xwa)
-XWindowAttributes *xwa;
+void GetWindowPos(XWindowAttributes *xwa)
 {
   Window child;
 
@@ -2342,11 +2469,10 @@ XWindowAttributes *xwa;
 
 
 /***********************************/
-void SetWindowPos(xwa)
-XWindowAttributes *xwa;
+void SetWindowPos(XWindowAttributes *xwa)
 {
   /* sets window x,y,w,h values */
-  XWindowChanges    xwc;
+  XWindowChanges xwc;
 
   /* Adjust from window origin, to border origin */
   xwc.x = xwa->x - xwa->border_width - ch_offx;
@@ -2419,7 +2545,7 @@ XWindowAttributes *xwa;
   /* dxwm seems to *only* pay attention to the hints */
   {
     XSizeHints hints;
-    if (DEBUG) fprintf(stderr,"SWP: doing the DXWM thing\n");
+    if (DEBUG) fprintf(stderr, "SWP: doing the DXWM thing\n");
     /* read hints for this window and adjust any position hints */
     if (XGetNormalHints(theDisp, mainW, &hints)) {
       hints.flags |= USPosition | USSize;
@@ -2428,9 +2554,11 @@ XWindowAttributes *xwa;
       XSetNormalHints(theDisp, mainW, &hints);
     }
 
+#if 0
 #ifndef MWM     /* don't do this if you're running MWM */
     xwc.x -= 5;   xwc.y -= 25;    /* EVIL KLUDGE */
 #endif /* MWM */
+#endif
   }
 #endif
 
@@ -2443,8 +2571,7 @@ XWindowAttributes *xwa;
 
 
 /***********************************/
-static void CropKey(dx,dy,grow,crop)
-     int dx,dy,grow,crop;
+static void CropKey(int dx, int dy, int grow, int crop)
 {
   int ocx, ocy;
 
@@ -2475,8 +2602,7 @@ static void CropKey(dx,dy,grow,crop)
 
 
 /***********************************/
-static void TrackPicValues(mx,my)
-     int mx,my;
+static void TrackPicValues(int mx, int my)
 {
   Window       rW,cW;
   int          rx,ry,ox,oy,x,y, orgx,orgy;
@@ -2486,6 +2612,8 @@ static void TrackPicValues(mx,my)
   char         foo[128];
   const char   *str  =
    "8888,8888 = 123,123,123  #123456  (123,123,123 HSV)  [-2345,-2345]";
+
+  XV_UNUSED(mx);
 
   ecol = 0;  wh = infobg;  bl = infofg;
 
@@ -2608,12 +2736,11 @@ static void TrackPicValues(mx,my)
 
 
 /***********************************/
-static Bool IsConfig(dpy, ev, arg)
-     Display *dpy;
-     XEvent  *ev;
-     char    *arg;
+static Bool IsConfig(Display *dpy, XEvent *ev, char *arg)
 {
   XConfigureEvent *cev;
+
+  XV_UNUSED(dpy);
 
   if (ev->type == ConfigureNotify) {
     cev = (XConfigureEvent *) ev;
@@ -2624,7 +2751,7 @@ static Bool IsConfig(dpy, ev, arg)
 }
 
 /***********************************/
-static int CheckForConfig()
+static int CheckForConfig(void)
 {
   XEvent ev;
   char   foo;
@@ -2640,7 +2767,7 @@ static int CheckForConfig()
 
 
 /************************************************************************/
-void SetEpicMode()
+void SetEpicMode(void)
 {
   if (epicMode == EM_RAW) {
     dispMB.dim[DMB_RAW]    = 1;
@@ -2663,9 +2790,7 @@ void SetEpicMode()
 
 
 /************************************************************************/
-int xvErrorHandler(disp, err)
-     Display *disp;
-     XErrorEvent *err;
+int xvErrorHandler(Display *disp, XErrorEvent *err)
 {
   char buf[128];
 
@@ -2717,6 +2842,9 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
   /* but first, if any input-grabbing popups are active, we have to 'cancel'
      them. */
 
+  XV_UNUSED(dummy);
+  XV_UNUSED(Id);
+
   if (psUp) PSDialog(0);      /* close PS window */
 
 #ifdef HAVE_JPEG
@@ -2733,6 +2861,10 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
 
 #ifdef HAVE_PNG
   if (pngUp) PNGDialog(0);    /* close png window */
+#endif
+
+#ifdef HAVE_WEBP
+  if (webpUp) WEBPDialog(0);  /* close png window */
 #endif
 
   if (pcdUp) PCDDialog(0);    /* close pcd window */
@@ -2759,6 +2891,7 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
 
 static void onInterrupt(int i)
 {
+  XV_UNUSED(i);
   XtNoticeSignal(IdQuit);
 }
 
@@ -2766,7 +2899,7 @@ static void onInterrupt(int i)
 
 
 /***********************************/
-static void Paint()
+static void Paint(void)
 {
   Window  rW,cW;
   int     rx,ry, x,y, px,py, px1,py1, state;
@@ -2921,8 +3054,7 @@ static void Paint()
 
 
 /***********************/
-static void paintPixel(x,y)
-     int x,y;
+static void paintPixel(int x, int y)
 {
   /* paints pixel x,y (pic coords) into pic in editColor (PIC8) or clearR,G,B
      (PIC24) and does appropriate screen feedback. */
@@ -2954,8 +3086,7 @@ static void paintPixel(x,y)
 
 
 /***********************************/
-static void paintLine(x,y,x1,y1)
-  int x,y,x1,y1;
+static void paintLine(int x, int y, int x1, int y1)
 {
   int t,dx,dy,d,dd;
 
@@ -3004,8 +3135,7 @@ static void paintLine(x,y,x1,y1)
 static int pntxlcol = 0;  /* index into xorMasks */
 
 /***********************************/
-static void paintXLine(x,y,x1,y1,newcol)
-  int x,y,x1,y1,newcol;
+static void paintXLine(int x, int y, int x1, int y1, int newcol)
 {
   /* draws a xor'd line on image from x,y to x1,y1 (pic coords) */
   int ex,ey, ex1,ey1,  tx,ty,tx1,ty1;
@@ -3033,7 +3163,7 @@ static void paintXLine(x,y,x1,y1,newcol)
 
 
 /***********************************/
-static void BlurPaint()
+static void BlurPaint(void)
 {
   Window  rW,cW;
   int     rx,ry,ox,oy,x,y, px,py, done1, dragging;
@@ -3122,8 +3252,7 @@ static void BlurPaint()
 
 
 /***********************/
-static int highbit(ul)
-     unsigned long ul;
+static int highbit(long unsigned int ul)
 {
   /* returns position of highest set bit in 'ul' as an integer (0-31),
      or -1 if none */
@@ -3137,8 +3266,7 @@ static int highbit(ul)
 
 
 /***********************/
-static unsigned long RGBToXColor(r,g,b)
-     int r,g,b;
+static unsigned long RGBToXColor(int r, int g, int b)
 {
   /* converts arbitrary rgb values (0-255) into an appropriate X color value,
      suitable for XSetForeground().  Works for ncols==0, all visual types,
@@ -3219,8 +3347,7 @@ static unsigned long RGBToXColor(r,g,b)
 
 
 /***********************/
-static void blurPixel(x,y)
-     int x,y;
+static void blurPixel(int x, int y)
 {
   /* blurs pixel x,y (pic coords) into pic in editColor (PIC8) or clearR,G,B
      (PIC24) and does appropriate screen feedback.  Does a 3x3 average
@@ -3289,7 +3416,7 @@ static void blurPixel(x,y)
 
 
 /***********************/
-static void annotatePic()
+static void annotatePic(void)
 {
   int                i, w,h, len;
   byte              *cimg;

@@ -205,9 +205,7 @@ int               label_checksum = 0L, checksum = 0L;
 
 
 /*************************************************/
-int main(argc,argv)
-  int  argc;
-  char **argv;
+int main(int argc, char **argv)
 {
   unsigned char ibuf[2048],obuf[2048];
   unsigned char blank=32;
@@ -449,8 +447,7 @@ int main(argc,argv)
 /*                                                                   */
 /*********************************************************************/
 
-int get_files(host)
-  int host;
+int get_files(int host)
 {
   typedef long    off_t;
   short   shortint;
@@ -526,8 +523,7 @@ int get_files(host)
 /*                                                                   */
 /*********************************************************************/
 
-void open_files(host)
-  int *host;
+void open_files(int *host)
 {
   if (*host == 1 || *host == 2 || *host == 5)  {
     if (outname[0] == '-') outfile=stdout;
@@ -603,8 +599,7 @@ void open_files(host)
 /*                                                                   */
 /*********************************************************************/
 
-void pds_labels(host)
-  int host;
+void pds_labels(int host)
 {
   char          ibuf[2048];
   unsigned char cr=13,lf=10,blank=32;
@@ -818,8 +813,7 @@ void pds_labels(host)
 /*                                                                   */
 /*********************************************************************/
 
-void fits_labels(host)
-  int host;
+void fits_labels(int host)
 {
   char          ibuf[2048],outstring[80];
   short         length,total_bytes,i;
@@ -910,8 +904,7 @@ void fits_labels(host)
 /*                                                                   */
 /*********************************************************************/
 
-void vicar_labels(host)
-  int host;
+void vicar_labels(int host)
 {
   char          ibuf[2048],outstring[80];
   short         length,total_bytes,i;
@@ -981,8 +974,7 @@ void vicar_labels(host)
 /*                                                                   */
 /*********************************************************************/
 
-void no_labels(host)
-  int host;
+void no_labels(int host)
 {
   char          ibuf[2048];
   short         length,i;
@@ -1023,11 +1015,9 @@ void no_labels(host)
 /*                                                                   */
 /*********************************************************************/
 
-int read_var(ibuf,host)
-  char  *ibuf;
-  int   host;
+int read_var(char *ibuf, int host)
 {
-  int   length,result,nlen;
+  int   length,nlen;
   char  temp;
   union /* this union is used to swap 16 and 32 bit integers          */
     {
@@ -1041,7 +1031,7 @@ int read_var(ibuf,host)
           /* IBM PC host                                         */
           /*******************************************************/
     length = 0;
-    result = read(infile,&length,(size_t) 2);
+    if (read(infile,&length,(size_t) 2) <= 0) return 0;
     nlen =   read(infile,ibuf,(size_t) (length+(length%2)));
     return (length);
 
@@ -1050,7 +1040,7 @@ int read_var(ibuf,host)
           /*******************************************************/
 
     length = 0;
-    result = read(infile,onion.ichar,(size_t) 2);
+    if (read(infile,onion.ichar,(size_t) 2) <= 0) return 0;
     /*     byte swap the length field                            */
     temp   = onion.ichar[0];
     onion.ichar[0]=onion.ichar[1];
@@ -1063,13 +1053,14 @@ int read_var(ibuf,host)
           /* VAX host with variable-length support               */
           /*******************************************************/
     length = read(infile,ibuf,(size_t) 2048/* upper bound */);
+    if (length <= 0) return 0;
     return (length);
 
   case 4: /*******************************************************/
           /* VAX host, but not a variable-length file            */
           /*******************************************************/
     length = 0;
-    result = read(infile,&length,(size_t) 2);
+    if (read(infile,&length,(size_t) 2) <= 0) return 0;
     nlen =   read(infile,ibuf,(size_t) length+(length%2));
 
     /* check to see if we crossed a VAX record boundary          */
@@ -1081,7 +1072,7 @@ int read_var(ibuf,host)
           /* Unix workstation host (non-byte-swapped 32 bit host)*/
           /*******************************************************/
     length = 0;
-    result = read(infile,onion.ichar,(size_t) 2);
+    if (read(infile,onion.ichar,(size_t) 2) <= 0) return 0;
     /*     byte swap the length field                            */
     temp   = onion.ichar[0];
     onion.ichar[0]=onion.ichar[1];
@@ -1101,7 +1092,7 @@ int read_var(ibuf,host)
 /*                                                                   */
 /*********************************************************************/
 
-int check_host()
+int check_host(void)
 {
   /*  This subroutine checks the attributes of the host computer and
       returns a host code number.
@@ -1154,8 +1145,7 @@ int check_host()
 }
 
 
-int swap_int(inval)  /* swap 4 byte integer */
-  int inval;
+int swap_int(int inval)  /* swap 4 byte integer */
 {
   union /* this union is used to swap 16 and 32 bit integers */
     {
@@ -1176,14 +1166,14 @@ int swap_int(inval)  /* swap 4 byte integer */
   return (onion.llen);
 }
 
-void decompress(ibuf,obuf,nin,nout)
+void decompress(char *ibuf, char *obuf, int *nin, int *nout)
 /****************************************************************************
 *_TITLE decompress - decompresses image lines stored in compressed format   *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                         */
-        char       *ibuf;  /* I         Compressed data buffer              */
-        char       *obuf;  /* O         Decompressed image line             */
-        int        *nin;   /* I         Number of bytes on input buffer     */
-        int        *nout;  /* I         Number of bytes in output buffer    */
+                           /* I         Compressed data buffer              */
+                           /* O         Decompressed image line             */
+                           /* I         Number of bytes on input buffer     */
+                           /* I         Number of bytes in output buffer    */
 {
   dcmprs(ibuf,obuf,nin,nout,tree);
 
@@ -1191,22 +1181,22 @@ void decompress(ibuf,obuf,nin,nout)
 }
 
 
-void decmpinit(hist)
+void decmpinit(int *hist)
 /***************************************************************************
 *_TITLE decmpinit - initializes the Huffman tree                           *
 *_ARGS  TYPE       NAME      I/O        DESCRIPTION                        */
-        int        *hist;  /* I         First-difference histogram.        */
+                           /* I         First-difference histogram.        */
 {
   tree = huff_tree(hist);
   return;
 }
 
 
-NODE *huff_tree(hist)
+NODE *huff_tree(int *hist)
 /****************************************************************************
 *_TITLE huff_tree - constructs the Huffman tree; returns pointer to root    *
 *_ARGS  TYPE          NAME        I/O   DESCRIPTION                         */
-        int          *hist;     /* I    First difference histogram          */
+                                /* I    First difference histogram          */
 {
   /*  Local variables used */
   int freq_list[512];      /* Histogram frequency list */
@@ -1298,11 +1288,11 @@ NODE *huff_tree(hist)
 }
 
 
-NODE *new_node(value)
+NODE *new_node(int value)
 /****************************************************************************
 *_TITLE new_node - allocates a NODE structure and returns a pointer to it   *
 *_ARGS  TYPE        NAME        I/O     DESCRIPTION                         */
-        int         value;    /* I      Value to assign to DN field         */
+                              /* I      Value to assign to DN field         */
 
 {
   NODE *temp;         /* Pointer to the memory block */
@@ -1326,13 +1316,13 @@ NODE *new_node(value)
   return temp;
 }
 
-void sort_freq(freq_list,node_list,num_freq)
+void sort_freq(int *freq_list, NODE **node_list, int num_freq)
 /****************************************************************************
 *_TITLE sort_freq - sorts frequency and node lists in increasing freq. order*
 *_ARGS  TYPE       NAME            I/O  DESCRIPTION                         */
-        int        *freq_list;   /* I   Pointer to frequency list           */
-        NODE       **node_list;  /* I   Pointer to array of node pointers   */
-        int        num_freq;     /* I   Number of values in freq list       */
+                                 /* I   Pointer to frequency list           */
+                                 /* I   Pointer to array of node pointers   */
+                                 /* I   Number of values in freq list       */
 
 {
   /* Local Variables */
@@ -1373,15 +1363,15 @@ void sort_freq(freq_list,node_list,num_freq)
 }
 
 
-void dcmprs(ibuf,obuf,nin,nout,root)
+void dcmprs(char *ibuf, char *obuf, int *nin, int *nout, NODE *root)
 /****************************************************************************
 *_TITLE dcmprs - decompresses Huffman coded compressed image lines          *
 *_ARGS  TYPE       NAME       I/O       DESCRIPTION                         */
-        char       *ibuf;   /* I        Compressed data buffer              */
-        char       *obuf;   /* O        Decompressed image line             */
-        int        *nin;    /* I        Number of bytes on input buffer     */
-        int        *nout;   /* I        Number of bytes in output buffer    */
-        NODE       *root;   /* I        Huffman coded tree                  */
+                            /* I        Compressed data buffer              */
+                            /* O        Decompressed image line             */
+                            /* I        Number of bytes on input buffer     */
+                            /* I        Number of bytes in output buffer    */
+                            /* I        Huffman coded tree                  */
 
 {
   /* Local Variables */
@@ -1428,11 +1418,11 @@ void dcmprs(ibuf,obuf,nin,nout,root)
 }
 
 
-void free_tree(nfreed)
+void free_tree(int *nfreed)
 /****************************************************************************
 *_TITLE free_tree - free memory of all allocated nodes                      *
 *_ARGS  TYPE       NAME       I/O        DESCRIPTION                        */
-        int        *nfreed;  /* O        Return of total count of nodes     *
+                             /* O        Return of total count of nodes     *
 *                                        freed.                             */
 /*                                                                          *
 *_DESCR This routine is supplied to the programmer to free up all the       *
@@ -1455,12 +1445,12 @@ void free_tree(nfreed)
 }
 
 
-int free_node(pnode,total_free)
+int free_node(NODE *pnode, int total_free)
 /***************************************************************************
 *_TITLE free_node - deallocates an allocated NODE pointer                  *
 *_ARGS  TYPE     NAME          I/O   DESCRIPTION                           */
-        NODE     *pnode;       /* I  Pointer to node to free               */
-        int      total_free;   /* I  Total number of freed nodes           */
+                               /* I  Pointer to node to free               */
+                               /* I  Total number of freed nodes           */
 /*                                                                         *
 *_DESCR  free_node will check both right and left pointers of a node       *
 *        and then free the current node using the free() C utility.        *

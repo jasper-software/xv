@@ -2,6 +2,7 @@
  * xvmisc.c - random 'handy' routines used in XV
  *
  *  Contains:
+ *     Window CreateFlexWindow(name, clname, geom, w, h, fg, bg, usesize, keepsize, userspec)
  *     Window CreateWindow(name, clname, geom, w, h, fg, bg, usesize)
  *     void   CenterString(win, str, x, y)
  *     void   ULineString(win, str, x, y)
@@ -58,9 +59,9 @@ static void set_cursors PARM((Cursor, Cursor));
 static Atom atom_DELWIN = 0;
 static Atom atom_PROTOCOLS = 0;
 
+
 /***************************************************/
-void StoreDeleteWindowProp (win)
-     Window win;
+void StoreDeleteWindowProp (Window win)
 {
   if (! atom_DELWIN)
     atom_DELWIN = XInternAtom (theDisp, "WM_DELETE_WINDOW", FALSE);
@@ -78,13 +79,8 @@ void StoreDeleteWindowProp (win)
 
 
 /***************************************************/
-Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
-     const char   *name;
-     const char   *clname;
-     const char   *geom;
-     int           defw,defh;
-     unsigned long fg, bg;
-     int           usesize;
+Window CreateFlexWindow(const char *name, const char *clname, const char *geom, int defw, int defh,
+	long unsigned int fg, long unsigned int bg, int usesize, int keepsize, int userspec)
 {
   Window               win;
   XSetWindowAttributes xswa;
@@ -100,13 +96,27 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   x = y = 1;
   i = XParseGeometry(geom,&x,&y, (unsigned int *) &w, (unsigned int *) &h);
 
-  if ((i&XValue || i&YValue)) hints.flags = USPosition;
-                         else hints.flags = PPosition;
+  if (nopos) hints.flags = 0;
+  else if ((i&XValue || i&YValue)) hints.flags = USPosition;
+  else hints.flags = PPosition;
 
   if (!usesize || !(i&WidthValue))  w = defw;
   if (!usesize || !(i&HeightValue)) h = defh;
 
-  hints.flags |= USSize | PWinGravity;
+  if (forcegeom)
+    userspec = TRUE; /* pretend it is user specified to get direct placement */
+
+  if (userspec && (i&XValue) && (i&YValue))
+    hints.flags = USPosition;
+  else
+    hints.flags = PPosition;
+
+  if (userspec && (i&WidthValue) && (i&HeightValue))
+    hints.flags |= USSize;
+  else
+    hints.flags |= PSize;
+
+  hints.flags |= PWinGravity;
 
   hints.win_gravity = NorthWestGravity;
   if (i&XValue && i&XNegative) {
@@ -134,10 +144,10 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   hints.x = x;                  hints.y = y;
   hints.width = w;              hints.height = h;
 
-  if (!usesize) {
+  if (keepsize) {
     hints.min_width  = w;         hints.min_height = h;
     hints.max_width  = w;         hints.max_height = h;
-    hints.flags |= PMaxSize | PMinSize;
+    hints.flags |= PMinSize | PMaxSize;
   }
 
   xswa.background_pixel = bg;
@@ -145,7 +155,7 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
   xswa.colormap         = theCmap;
   xswa.bit_gravity      = StaticGravity;
   xswamask = CWBackPixel | CWBorderPixel | CWColormap;
-  if (!usesize) xswamask |= CWBitGravity;
+  if (keepsize) xswamask |= CWBitGravity; /* reduce redraw flicker */
 
   win = XCreateWindow(theDisp, rootW, x, y, (u_int) w, (u_int) h,
 		      (u_int) bwidth, (int) dispDEEP, InputOutput,
@@ -170,32 +180,32 @@ Window CreateWindow(name,clname,geom,defw,defh,fg,bg,usesize)
 }
 
 
+/***************************************************/
+Window CreateWindow(const char *name, const char *clname, const char *geom, int defw, int defh, long unsigned int fg, long unsigned int bg, int usesize)
+{
+  /* note: we assume the geom string was provided by the user */
+
+  return CreateFlexWindow(name, clname, geom, defw, defh,
+                         fg, bg, usesize, !usesize, usesize);
+}
+
 
 /**************************************************/
-void DrawString(win,x,y,str)
-     Window      win;
-     int         x,y;
-     const char *str;
+void DrawString(Window win, int x, int y, const char *str)
 {
   XDrawString(theDisp, win, theGC, x, y, str, (int) strlen(str));
 }
 
 
 /**************************************************/
-void CenterString(win,x,y,str)
-     Window      win;
-     int         x,y;
-     const char *str;
+void CenterString(Window win, int x, int y, const char *str)
 {
   DrawString(win, CENTERX(mfinfo, x, str), CENTERY(mfinfo, y), str);
 }
 
 
 /**************************************************/
-void ULineString(win,x,y,str)
-     Window      win;
-     int         x,y;
-     const char *str;
+void ULineString(Window win, int x, int y, const char *str)
 {
   DrawString(win, x, y, str);
   XDrawLine(theDisp, win, theGC, x, y+DESCENT-1,
@@ -204,17 +214,14 @@ void ULineString(win,x,y,str)
 
 
 /**************************************************/
-int StringWidth(str)
-     const char *str;
+int StringWidth(const char *str)
 {
   return(XTextWidth(mfinfo, str, (int) strlen(str)));
 }
 
 
 /**************************************************/
-int CursorKey(ks, shift, dotrans)
-     KeySym ks;
-     int    shift, dotrans;
+int CursorKey(KeySym ks, int shift, int dotrans)
 {
   /* called by the KeyPress/KeyRelease event handler to determine if a
      given keypress is a cursor key.  More complex than you'd think, since
@@ -279,8 +286,7 @@ int CursorKey(ks, shift, dotrans)
 
 
 /***********************************/
-void FakeButtonPress(bp)
-BUTT *bp;
+void FakeButtonPress(BUTT *bp)
 {
   /* called when a button keyboard equivalent has been pressed.
      'fakes' a ButtonPress event in the button, which A) makes the button
@@ -296,7 +302,7 @@ BUTT *bp;
   ev.display = theDisp;
   ev.window = bp->win;
   ev.root = rootW;
-  ev.subwindow = (Window) NULL;
+  ev.subwindow = (Window) None;
   ev.x = bp->x;
   ev.y = bp->y;
   ev.state = 0;
@@ -311,9 +317,7 @@ BUTT *bp;
 
 
 /************************************************************************/
-void FakeKeyPress(win, ksym)
-     Window win;
-     KeySym ksym;
+void FakeKeyPress(Window win, KeySym ksym)
 {
   XKeyEvent ev;
 
@@ -322,7 +326,7 @@ void FakeKeyPress(win, ksym)
   ev.display = theDisp;
   ev.window = win;
   ev.root = rootW;
-  ev.subwindow = (Window) NULL;
+  ev.subwindow = (Window) None;
   ev.time = CurrentTime;
   ev.x = ev.y = ev.x_root = ev.y_root = 0;
   ev.state = 0;
@@ -334,10 +338,7 @@ void FakeKeyPress(win, ksym)
 
 
 /***********************************/
-void GenExpose(win, x, y, w, h)
-     Window       win;
-     int          x, y;
-     unsigned int w, h;
+void GenExpose(Window win, int x, int y, unsigned int w, unsigned int h)
 {
   /* generates an expose event on 'win' of the specified rectangle.  Unlike
      XClearArea(), it doesn't clear the rectangular region */
@@ -356,10 +357,7 @@ void GenExpose(win, x, y, w, h)
 
 
 /***********************************/
-void RemapKeyCheck(ks, buf, stlen)
-     KeySym ks;
-     char   *buf;
-     int    *stlen;
+void RemapKeyCheck(KeySym ks, char *buf, int *stlen)
 {
   /* remap weirdo keysyms into normal key events */
   if (ks == 0x1000ff00) {  /* map 'Remove' key on DEC keyboards -> ^D */
@@ -374,8 +372,7 @@ void RemapKeyCheck(ks, buf, stlen)
 
 
 /***********************************/
-void xvDestroyImage(image)
-     XImage *image;
+void xvDestroyImage(XImage *image)
 {
   /* called in place of XDestroyImage().  Explicitly destroys *BOTH* the
      data and the structure.  XDestroyImage() doesn't seem to do this on all
@@ -391,11 +388,7 @@ void xvDestroyImage(image)
 
 
 /***********************************/
-void DimRect(win, x, y, w, h, bg)
-     Window win;
-     int    x, y;
-     u_int  w, h;
-     u_long bg;
+void DimRect(Window win, int x, int y, u_int w, u_int h, u_long bg)
 {
   /* stipple a rectangular region by drawing 'bg' where there's 1's
      in the stipple pattern */
@@ -410,11 +403,7 @@ void DimRect(win, x, y, w, h, bg)
 
 
 /**************************************************/
-void Draw3dRect(win, x,y,w,h, inout, bwidth, hi, lo, bg)
-     Window        win;
-     int           x,y,inout,bwidth;
-     unsigned int  w,h;
-     unsigned long hi, lo, bg;
+void Draw3dRect(Window win, int x, int y, unsigned int w, unsigned int h, int inout, int bwidth, long unsigned int hi, long unsigned int lo, long unsigned int bg)
 {
   int i, x1, y1;
 
@@ -451,7 +440,7 @@ void Draw3dRect(win, x,y,w,h, inout, bwidth, hi, lo, bg)
 
 
 /**************************************************/
-void SetCropString()
+void SetCropString(void)
 {
   /* sets the crop string in the info box to be correct.  should
      be called whenever 'but[BCROP].active', cXOFF,cYOFF,cWIDE,cHIGH
@@ -465,7 +454,7 @@ void SetCropString()
 
 
 /**************************************************/
-void SetSelectionString()
+void SetSelectionString(void)
 {
   /* sets the Selection string in the info box to be correct.  should
      be called whenever the selection may have changed */
@@ -480,7 +469,7 @@ void SetSelectionString()
 
 
 /***********************************/
-void Warning()
+void Warning(void)
 {
   char *st;
 
@@ -496,8 +485,7 @@ void Warning()
 
 
 /***********************************/
-void FatalError (identifier)
-      const char *identifier;
+void FatalError (const char *identifier)
 {
   fprintf(stderr, "%s: %s\n",cmd, identifier);
   Quit(-1);
@@ -505,8 +493,7 @@ void FatalError (identifier)
 
 
 /***********************************/
-void Quit(i)
-     int i;
+void Quit(int i)
 {
   /* called when the program exits.  frees everything explictly created
      EXCEPT allocated colors.  This is used when 'useroot' is in operation,
@@ -547,6 +534,10 @@ void Quit(i)
 
 #ifdef HAVE_PNG
     if (pngW)  XDestroyWindow(theDisp, pngW);
+#endif
+
+#ifdef HAVE_WEBP
+    if (webpW) XDestroyWindow(theDisp, webpW);
 #endif
 
 #ifdef HAVE_PCD
@@ -605,7 +596,7 @@ void Quit(i)
 static Cursor flcurs, fl1curs, fmcurs, fr1curs, frcurs;
 
 /***********************************/
-void LoadFishCursors()
+void LoadFishCursors(void)
 {
 #define fc_w 16
 #define fc_h 16
@@ -614,7 +605,7 @@ void LoadFishCursors()
   Pixmap fl1pix, fl1mpix, fr1pix, fr1mpix;
   XColor fg, bg;
 
-  flcurs = fl1curs = fmcurs = fr1curs = frcurs = (Pixmap) NULL;
+  flcurs = fl1curs = fmcurs = fr1curs = frcurs = (Pixmap) None;
 
   flpix = XCreatePixmapFromBitmapData(theDisp, ctrlW, (char *) fc_left_bits,
 	     fc_w, fc_h, 1L, 0L, 1);
@@ -655,7 +646,7 @@ void LoadFishCursors()
   frcurs = XCreatePixmapCursor(theDisp, frpix, frmpix, &fg, &bg, 8,8);
 
   if (!flcurs || !fmcurs || !frcurs || !fl1curs || !fr1curs)
-    { flcurs = fmcurs = frcurs = (Cursor) NULL; }
+    { flcurs = fmcurs = frcurs = (Cursor) None; }
 }
 
 
@@ -665,7 +656,7 @@ static time_t lastwaittime;
 
 
 /***********************************/
-void WaitCursor()
+void WaitCursor(void)
 {
   XWMHints xwmh;
   time_t   nowT;
@@ -676,7 +667,7 @@ void WaitCursor()
     xwmh.input       = True;
     xwmh.icon_pixmap = riconPix;
     xwmh.icon_mask   = riconmask;
-    xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
+    xwmh.flags = InputHint | IconPixmapHint | IconMaskHint;
     if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
     if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
   }
@@ -692,8 +683,7 @@ void WaitCursor()
 
 
 /***********************************/
-void SetCursors(n)
-     int n;
+void SetCursors(int n)
 {
   Cursor c;
   XWMHints xwmh;
@@ -708,7 +698,7 @@ void SetCursors(n)
       xwmh.input       = True;
       xwmh.icon_pixmap = iconPix;
       xwmh.icon_mask   = iconmask;
-      xwmh.flags = (InputHint | IconPixmapHint | IconMaskHint) ;
+      xwmh.flags = InputHint | IconPixmapHint | IconMaskHint;
       if (!useroot && mainW) XSetWMHints(theDisp, mainW, &xwmh);
       if ( useroot && ctrlW) XSetWMHints(theDisp, ctrlW, &xwmh);
     }
@@ -737,8 +727,7 @@ void SetCursors(n)
 }
 
 
-static void set_cursors(mainc, otherc)
-     Cursor mainc, otherc;
+static void set_cursors(Cursor mainc, Cursor otherc)
 {
   if (!useroot && mainW) XDefineCursor(theDisp, mainW, mainc);
   if (infoW) XDefineCursor(theDisp, infoW, otherc);
@@ -766,8 +755,8 @@ static void set_cursors(mainc, otherc)
   if (pngW)  XDefineCursor(theDisp, pngW, otherc);
 #endif
 
-#ifdef HAVE_PNG
-  if (pngW)  XDefineCursor(theDisp, pngW, otherc);
+#ifdef HAVE_WEBP
+  if (webpW)  XDefineCursor(theDisp, webpW, otherc);
 #endif
 
 #ifdef HAVE_PCD
@@ -785,8 +774,7 @@ static void set_cursors(mainc, otherc)
 
 
 /***************************************************/
-const char *BaseName(fname)
-     const char *fname;
+const char *BaseName(const char *fname)
 {
   const char *basname;
 
@@ -800,12 +788,7 @@ const char *BaseName(fname)
 
 
 /***************************************************/
-void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
-     Window      win;
-     int         x,y,w,h;
-     double      ratio;
-     u_long      fg,bg,hi,lo;
-     const char *str;
+void DrawTempGauge(Window win, int x, int y, int w, int h, double ratio, u_long fg, u_long bg, u_long hi, u_long lo, const char *str)
 {
   /* draws a 'temprature'-style horizontal progress meter in the specified
      window, at the specified location */
@@ -909,9 +892,7 @@ void DrawTempGauge(win, x,y,w,h, ratio, fg,bg,hi,lo, str)
 
 
 /***************************************************/
-void ProgressMeter(min, max, val, str)
-     int         min, max, val;
-     const char *str;
+void ProgressMeter(int min, int max, int val, const char *str)
 {
   /* called during 'long' operations (algorithms, smoothing, etc.) to
      give some indication that the program will ever finish.  Draws a
@@ -962,8 +943,7 @@ void ProgressMeter(min, max, val, str)
 
 
 /***************************************************/
-void XVDeletedFile(fullname)
-     char *fullname;
+void XVDeletedFile(char *fullname)
 {
   /* called whenever a file has been deleted.  Updates browser & dir windows,
      if necessary */
@@ -974,8 +954,7 @@ void XVDeletedFile(fullname)
 
 
 /***************************************************/
-void XVCreatedFile(fullname)
-     char *fullname;
+void XVCreatedFile(char *fullname)
 {
   /* called whenever a file has been created.  Updates browser & dir windows,
      if necessary */
@@ -986,10 +965,7 @@ void XVCreatedFile(fullname)
 
 
 /***************************************************/
-void xvbcopy(src, dst, len)
-     const char *src;
-     char *dst;
-     size_t  len;
+void xvbcopy(const char *src, char *dst, size_t len)
 {
   /* Modern OS's (Solaris, etc.) frown upon the use of bcopy(),
    * and only want you to use memcpy().  However, memcpy() is broken,
@@ -1015,17 +991,16 @@ void xvbcopy(src, dst, len)
     for ( ; len>0; len--, src--, dst--) *dst = *src;
   }
 
-  else {  /* they either overlap (src>dst) or they don't overlap */
-    /* do a forward copy */
+  else if (src>dst && src<dst+len) {  /* do a forward copy */
     for ( ; len>0; len--, src++, dst++) *dst = *src;
   }
+  else /* no overlap, use the fast method */
+    memcpy(dst, src, len);
 }
 
 
 /***************************************************/
-int xvbcmp (s1, s2, len)
-     const char   *s1, *s2;
-     size_t  len;
+int xvbcmp (const char *s1, const char *s2, size_t len)
 {
   for ( ; len>0; len--, s1++, s2++) {
     if      (*s1 < *s2) return -1;
@@ -1034,19 +1009,16 @@ int xvbcmp (s1, s2, len)
   return 0;
 }
 
+
 /***************************************************/
-void xvbzero(s, len)
-     char   *s;
-     size_t  len;
+void xvbzero(char *s, size_t len)
 {
   for ( ; len>0; len--) *s++ = 0;
 }
 
 
 /***************************************************/
-void xv_getwd(buf, buflen)
-     char   *buf;
-     size_t  buflen;
+void xv_getwd(char *buf, size_t buflen)
 {
   /* Gets the current working directory and puts it in buf.  No trailing '/'. */
 
@@ -1085,9 +1057,8 @@ void xv_getwd(buf, buflen)
  * express or implied warranty.
  */
 
-char *xv_strstr(string, substring)
-     const char *string;        /* String to search. */
-     const char *substring;	/* Substring to try to find in string. */
+char *xv_strstr(const char *string /* String to search. */,
+	const char *substring /* Substring to try to find in string. */)
 {
   const char *a;
   const char *b;
@@ -1118,9 +1089,7 @@ char *xv_strstr(string, substring)
 /***************************************************/
 
 /***************************************************/
-FILE *xv_fopen(fname, mode)
-     const char *fname;
-     const char *mode;
+FILE *xv_fopen(const char *fname, const char *mode)
 {
   FILE *fp;
 
@@ -1136,9 +1105,7 @@ FILE *xv_fopen(fname, mode)
 
 /***************************************************/
 /* GRR 20050320:  added actual mk[s]temp() call... */
-void xv_mktemp(buf, fname)
-     char       *buf;
-     const char *fname;
+void xv_mktemp(char *buf, const char *fname)
 {
 #ifndef VMS
   sprintf(buf, "%s/%s", tmpdir, fname);
@@ -1154,8 +1121,7 @@ void xv_mktemp(buf, fname)
 
 
 /***************************************************/
-void Timer(msec)   /* waits for 'n' milliseconds */
-     int  msec;
+void Timer(int msec)   /* waits for 'n' milliseconds */
 {
   long usec;
 

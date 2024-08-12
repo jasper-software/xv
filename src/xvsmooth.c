@@ -25,10 +25,8 @@ static int smoothXY PARM((byte *, byte *, int, int, int, int, int,
 
 
 /***************************************************/
-byte *SmoothResize(srcpic8, swide, shigh, dwide, dhigh,
-		   rmap, gmap, bmap, rdmap, gdmap, bdmap, maplen)
-     byte *srcpic8, *rmap, *gmap, *bmap, *rdmap, *gdmap, *bdmap;
-     int   swide, shigh, dwide, dhigh, maplen;
+byte *SmoothResize(byte *srcpic8, int swide, int shigh, int dwide, int dhigh,
+		   byte *rmap, byte *gmap, byte *bmap, byte *rdmap, byte *gdmap, byte *bdmap, int maplen)
 {
   /* generic interface to Smooth and ColorDither code.
      given an 8-bit-per, swide * shigh image with colormap rmap,gmap,bmap,
@@ -54,9 +52,7 @@ byte *SmoothResize(srcpic8, swide, shigh, dwide, dhigh,
 
 
 /***************************************************/
-byte *Smooth24(pic824, is24, swide, shigh, dwide, dhigh, rmap, gmap, bmap)
-     byte *pic824, *rmap, *gmap, *bmap;
-     int   is24, swide, shigh, dwide, dhigh;
+byte *Smooth24(byte *pic824, int is24, int swide, int shigh, int dwide, int dhigh, byte *rmap, byte *gmap, byte *bmap)
 {
   /* does a SMOOTH resize from pic824 (which is either a swide*shigh, 8-bit
      pic, with colormap rmap,gmap,bmap OR a swide*shigh, 24-bit image, based
@@ -218,10 +214,8 @@ byte *Smooth24(pic824, is24, swide, shigh, dwide, dhigh, rmap, gmap, bmap)
 
 
 /***************************************************/
-static int smoothX(pic24, pic824, is24, swide, shigh, dwide, dhigh,
-		   rmap, gmap, bmap)
-byte *pic24, *pic824, *rmap, *gmap, *bmap;
-int   is24, swide, shigh, dwide, dhigh;
+static int smoothX(byte *pic24, byte *pic824, int is24, int swide, int shigh, int dwide, int dhigh,
+		   byte *rmap, byte *gmap, byte *bmap)
 {
   byte *cptr, *cptr1;
   int  i, j;
@@ -320,10 +314,8 @@ int   is24, swide, shigh, dwide, dhigh;
 
 
 /***************************************************/
-static int smoothY(pic24, pic824, is24, swide, shigh, dwide, dhigh,
-		   rmap, gmap, bmap)
-byte *pic24, *pic824, *rmap, *gmap, *bmap;
-int   is24, swide, shigh, dwide, dhigh;
+static int smoothY(byte *pic24, byte *pic824, int is24, int swide, int shigh, int dwide, int dhigh,
+		   byte *rmap, byte *gmap, byte *bmap)
 {
   byte *clptr, *cptr, *cptr1;
   int  i, j, bperpix;
@@ -426,15 +418,13 @@ int   is24, swide, shigh, dwide, dhigh;
 
 
 /***************************************************/
-static int smoothXY(pic24, pic824, is24, swide, shigh, dwide, dhigh,
-		    rmap, gmap, bmap)
-byte *pic24, *pic824, *rmap, *gmap, *bmap;
-int   is24, swide, shigh, dwide, dhigh;
+static int smoothXY(byte *pic24, byte *pic824, int is24, int swide, int shigh, int dwide, int dhigh,
+		    byte *rmap, byte *gmap, byte *bmap)
 {
   byte *cptr;
   int  i,j;
   int  *lbufR, *lbufG, *lbufB;
-  int  pixR, pixG, pixB, bperpix;
+  int  pixR, pixG, pixB;
   int  lastline, thisline, lastpix, linecnt, pixcnt;
   int  *pixarr, *paptr;
 
@@ -458,8 +448,6 @@ int   is24, swide, shigh, dwide, dhigh;
     if (pixarr) free(pixarr);
     return 1;
   }
-
-  bperpix = (is24) ? 3 : 1;
 
   for (j=0; j<=swide; j++)
     pixarr[j] = ((2 * j + 1) * dwide) / (2 * swide);
@@ -529,10 +517,8 @@ int   is24, swide, shigh, dwide, dhigh;
 
 
 /********************************************/
-byte *DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
-		    rdisp, gdisp, bdisp, maplen)
-     byte *pic24, *pic8, *rmap, *gmap, *bmap, *rdisp, *gdisp, *bdisp;
-     int   w, h, maplen;
+byte *DoColorDither(byte *pic24, byte *pic8, int w, int h, byte *rmap, byte *gmap, byte *bmap,
+		    byte *rdisp, byte *gdisp, byte *bdisp, int maplen)
 {
   /* takes a 24 bit picture, of size w*h, dithers with the colors in
      rdisp, gdisp, bdisp (which have already been allocated),
@@ -553,7 +539,6 @@ byte *DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
   int  i, j, rerr, gerr, berr, pwide3;
   int  imax, jmax;
   int key;
-  long cnt1, cnt2;
   int fserrmap[512];   /* -255 .. 0 .. +255 */
 
   /* compute somewhat non-linear floyd-steinberg error mapping table */
@@ -565,7 +550,6 @@ byte *DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
     { fserrmap[256+i] = j;  fserrmap[256-i] = -j; }
 
 
-  cnt1 = cnt2 = 0;
   pwide3 = w*3;  imax = h-1;  jmax = w-1;
   ep = (pic24) ? pic24 : pic8;
 
@@ -665,10 +649,9 @@ byte *DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
       key = ((r2&0xf8)<<6) | ((g2&0xf8)<<1) | (b2>>4);
       if (key >= (2<<14)) FatalError("'key' overflow in DoColorDither()");
 
-      if (cache[key]) { *np = (byte) (cache[key] - 1);  cnt1++;	}
+      if (cache[key]) { *np = (byte) (cache[key] - 1);	}
       else {
 	/* not in cache, have to search the colortable */
-	cnt2++;
 
         mind = 10000;
 	for (k=closest=0; k<maplen && mind>7; k++) {
@@ -734,10 +717,8 @@ byte *DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
 
 
 /********************************************/
-byte *Do332ColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
-		    rdisp, gdisp, bdisp, maplen)
-     byte *pic24, *pic8, *rmap, *gmap, *bmap, *rdisp, *gdisp, *bdisp;
-     int   w, h, maplen;
+byte *Do332ColorDither(byte *pic24, byte *pic8, int w, int h, byte *rmap, byte *gmap, byte *bmap,
+		    byte *rdisp, byte *gdisp, byte *bdisp, int maplen)
 {
   /* some sort of color dither optimized for the 332 std cmap */
 
@@ -758,8 +739,9 @@ byte *Do332ColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
   int *thisline, *nextline, *thisptr, *nextptr, *tmpptr;
   int  i, j, rerr, gerr, berr, pwide3;
   int  imax, jmax;
-  long cnt1, cnt2;
   int  fserrmap[512];   /* -255 .. 0 .. +255 */
+
+  XV_UNUSED(maplen);
 
   /* compute somewhat non-linear floyd-steinberg error mapping table */
   for (i=j=0; i<=0x40; i++,j++)
@@ -770,7 +752,6 @@ byte *Do332ColorDither(pic24, pic8, w, h, rmap, gmap, bmap,
     { fserrmap[256+i] = j;  fserrmap[256-i] = -j; }
 
 
-  cnt1 = cnt2 = 0;
   pwide3 = w*3;  imax = h-1;  jmax = w-1;
 
   /* attempt to malloc things */
