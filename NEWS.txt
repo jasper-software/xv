@@ -1,3 +1,12 @@
+6.0.0 (2024-08-12)
+==================
+
+* Add basic HiDPI support.
+* Improve the compatibility of the source code with more modern C standards
+  (e.g., C23).
+* Fix the build with link-time optimization (#25).
+* Fix many other bugs.
+
 5.2.0 (2024-06-25)
 ==================
 
