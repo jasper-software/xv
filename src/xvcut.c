@@ -47,7 +47,6 @@
  */
 
 
-#define  NEEDSDIR               /* for stat() */
 #include "copyright.h"
 #include "xv.h"
 

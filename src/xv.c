@@ -6,7 +6,6 @@
 
 #define MAIN
 #define NEEDSTIME
-#define NEEDSDIR     /* for value of MAXPATHLEN */
 
 #include "xv.h"
 

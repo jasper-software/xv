@@ -13,7 +13,6 @@
 
 #include "copyright.h"
 
-#define NEEDSDIR
 #include "xv.h"
 
 #define PSWIDE 431

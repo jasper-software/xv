@@ -21,7 +21,6 @@
 #include "copyright.h"
 
 #define NEEDSTIME      /* for CheckPoll */
-#define NEEDSDIR
 #include "xv.h"
 
 #include "bits/d_load"

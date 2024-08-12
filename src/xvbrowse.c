@@ -17,7 +17,6 @@
 
 #include "copyright.h"
 
-#define NEEDSDIR
 #include "xv.h"
 #include <unistd.h>   /* access() */
 

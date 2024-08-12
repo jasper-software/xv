@@ -61,7 +61,6 @@
  */
 
 #define PIC2_IGNORE_UNUSED_FUNCTIONS
-#define NEEDSDIR
 
 #include "xv.h"
 #include <setjmp.h>

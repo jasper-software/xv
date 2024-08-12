@@ -293,31 +293,26 @@
 
 
 
-#ifdef NEEDSDIR
-#  ifdef VMS
-#    include <descrip.h>
-#    include <stat.h>
-#    include "dirent.h"
+#ifdef VMS
+#  include <descrip.h>
+#  include <stat.h>
+#  include "dirent.h"
+#else
+#  ifdef NODIRENT
+#    include <sys/dir.h>
 #  else
-#    ifdef NODIRENT
-#      include <sys/dir.h>
-#    else
-#      include <dirent.h>
-#    endif
-
-#    if defined(SVR4) || defined(SYSV)
-#      include <fcntl.h>
-#    endif
-
-#    include <sys/param.h>
-#    include <sys/stat.h>
-
-#    if defined(__convex__) && defined (__STDC__)
-#      define S_IFMT  _S_IFMT
-#      define S_IFDIR _S_IFDIR
-#      define S_IFCHR _S_IFCHR
-#      define S_IFBLK _S_IFBLK
-#    endif
+#    include <dirent.h>
+#  endif
+#  if defined(SVR4) || defined(SYSV)
+#    include <fcntl.h>
+#  endif
+#  include <sys/param.h>
+#  include <sys/stat.h>
+#  if defined(__convex__) && defined (__STDC__)
+#    define S_IFMT  _S_IFMT
+#    define S_IFDIR _S_IFDIR
+#    define S_IFCHR _S_IFCHR
+#    define S_IFBLK _S_IFBLK
 #  endif
 #endif
 

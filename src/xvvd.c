@@ -4,8 +4,6 @@
  *          (virtual) directory.
  */
 
-#define NEEDSDIR
-
 #include "xv.h"
 
 #ifdef AUTO_EXPAND
