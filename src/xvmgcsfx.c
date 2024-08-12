@@ -60,7 +60,6 @@
  *  同様に書き込み時にも問題が生じるかもしれない。
  */
 
-#define  NEEDSDIR               /* for stat() */
 #include "xv.h"
 
 

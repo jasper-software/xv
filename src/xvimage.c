@@ -30,7 +30,6 @@
  */
 /* #define ENABLE_FIXPIX_SMOOTH */   /* GRR 19980607:  moved into xv.h */
 
-#define  NEEDSDIR             /* for S_IRUSR|S_IWUSR */
 #include "copyright.h"
 
 #include "xv.h"

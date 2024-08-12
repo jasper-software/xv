@@ -14,7 +14,6 @@
  * provided "as is" without express or implied warranty.
  */
 
-#define  NEEDSDIR /* for S_IRUSR|S_IWUSR */
 #include "xv.h"
 
 #define NCARDS    (36)

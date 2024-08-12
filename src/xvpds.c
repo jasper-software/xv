@@ -101,7 +101,6 @@
  * This software is provided "as is" without any express or implied warranty.
  */
 
-#define  NEEDSDIR       /* for S_IRUSR|S_IWUSR */
 #include "xv.h"
 
 #ifdef HAVE_PDS
