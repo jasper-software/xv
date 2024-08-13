@@ -378,7 +378,7 @@ int TextView(const char *fname)
 
   int   filetype;
   long  textlen;
-  char *text, buf[512], title[128], rfname[MAXPATHLEN+1];
+  char *text, buf[MAXPATHLEN+128], title[MAXPATHLEN+128], rfname[MAXPATHLEN+1];
   FILE *fp;
   char filename[MAXPATHLEN+1];
 
@@ -412,7 +412,7 @@ int TextView(const char *fname)
 
   fp = fopen(rfname, "r");
   if (!fp) {
-    sprintf(buf,"Couldn't open '%s':  %s", rfname, ERRSTR(errno));
+    snprintf(buf, sizeof(buf), "Couldn't open '%s':  %s", rfname, ERRSTR(errno));
     ErrPopUp(buf,"\nOh well");
     return FALSE;
   }
@@ -423,7 +423,7 @@ int TextView(const char *fname)
   fseek(fp, 0L, 0);
 
   if (!textlen) {
-    sprintf(buf, "File '%s' contains no data.  (Zero length file.)", rfname);
+    snprintf(buf, sizeof(buf), "File '%s' contains no data.  (Zero length file.)", rfname);
     ErrPopUp(buf, "\nOk");
     fclose(fp);
     return FALSE;
@@ -431,7 +431,7 @@ int TextView(const char *fname)
 
   text = (char *) malloc((size_t) textlen + 1);
   if (!text) {
-    sprintf(buf, "Couldn't malloc %ld bytes to read file '%s'",
+    snprintf(buf, sizeof(buf), "Couldn't malloc %ld bytes to read file '%s'",
 	    textlen, rfname);
     ErrPopUp(buf, "\nSo what!");
     fclose(fp);
@@ -439,7 +439,7 @@ int TextView(const char *fname)
   }
 
   if (fread(text, (size_t) 1, (size_t) textlen, fp) != textlen) {
-    sprintf(buf, "Warning:  Couldn't read all of '%s'.  Possibly truncated.",
+    snprintf(buf, sizeof(buf), "Warning:  Couldn't read all of '%s'.  Possibly truncated.",
 	    rfname);
     ErrPopUp(buf, "\nHmm...");
   }
@@ -449,7 +449,7 @@ int TextView(const char *fname)
 
   fclose(fp);
 
-  sprintf(title, "File: '%s'", BaseName(fname));
+  snprintf(title, sizeof(title), "File: '%s'", BaseName(fname));
   OpenTextView(text, (int) textlen, title, 1);
 
   /* note:  text gets freed when window gets closed */
