@@ -1,3 +1,10 @@
+6.0.1 (2024-09-01)
+==================
+
+* xvjpeg.c,xvpng.c: Fix gcc warnings on -Wclobbered.
+* xvjpeg.c: Fix a bad memory access on jpegs with inverted data.
+* Fix xvtext.c overwrite exposed by the link-time optimization fix.
+
 6.0.0 (2024-08-12)
 ==================
 
