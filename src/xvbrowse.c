@@ -3710,6 +3710,7 @@ static void genIcon(BROWINFO *br, BFIL *bf)
     if (UncompressFile(uncName, uncompname, filetype)) {
       filetype = ReadFileType(uncompname);
       strncpy(readname, uncompname, sizeof(readname) - 1);
+      readname[ sizeof(readname) - 1 ] = '\0';
     }
     else {
       sprintf(str, "Couldn't uncompress file '%s'", bf->name);

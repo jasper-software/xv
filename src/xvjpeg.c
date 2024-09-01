@@ -507,16 +507,20 @@ int LoadJFIF(char *fname, PICINFO *pinfo, int quick)
   struct my_error_mgr              jerr;
   JSAMPROW                         rowptr[1];
   FILE                            *fp;
-  const char                      *colorspace_name = "Color";
+  const char                      *colorspace_name;
   byte                            *pic;
   long                             filesize;
   int                              i,w,h,bperpix,bperline,count;
 
 
+  /* Initialize variables below instead of in the declarations above to avoid the warning */
+  /* variable might be clobbered by 'longjmp' or 'vfork' [-Wclobbered] */
+
   fbasename = BaseName(fname);
   pic       = (byte *) NULL;
   comment   = (char *) NULL;
   exifInfo  = (byte *) NULL;
+  colorspace_name = "Color";
 
   pinfo->type  = PIC8;
 
@@ -551,7 +555,6 @@ L1:
 
     return 0;
   }
-
 
   jpeg_create_decompress(&cinfo);
   jpeg_set_marker_processor(&cinfo, JPEG_COM, xv_process_comment);

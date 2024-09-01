@@ -431,7 +431,7 @@ int WritePNG(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gma
   byte        r1[256], g1[256], b1[256];  /* storage for deduped palette */
   byte        pc2nc[256];  /* for duplicated-color remapping (1st level) */
   byte        remap[256];  /* for bw/grayscale remapping (2nd level) */
-  int         i, j, numuniqcols=0, filter, linesize, pass;
+  int         i, j, numuniqcols, filter, linesize, pass;
   byte       *p, *png_line;
   char        software[256];
   char       *savecmnt;
@@ -496,7 +496,7 @@ int WritePNG(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gma
   _interlace_type = interCB.val ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE;
 
   linesize = 0;   /* quiet a compiler warning */
-
+  numuniqcols = 0;
 
   /* GRR 20070331:  remap palette to eliminate duplicated colors (as in
    *   xvgifwr.c) */
