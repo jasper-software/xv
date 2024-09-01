@@ -495,9 +495,8 @@ int WritePNG(FILE *fp, byte *pic, int ptype, int w, int h, byte *rmap, byte *gma
 
   _interlace_type = interCB.val ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE;
 
-  numuniqcols = 0;
-
   linesize = 0;   /* quiet a compiler warning */
+  numuniqcols = 0;
 
   /* GRR 20070331:  remap palette to eliminate duplicated colors (as in
    *   xvgifwr.c) */
