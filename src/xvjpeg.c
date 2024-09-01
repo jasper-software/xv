@@ -693,13 +693,14 @@ L2:
     if (cinfo.saw_Adobe_marker) { /* assume inverted data */
       register byte *q = pic;
 
-      do {
+      while (q < pic_end) {
         register int cmy, k = 255 - q[3];
 
         if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* R */
         if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* G */
         if ((cmy = *q++ - k) < 0) { cmy = 0; } *p++ = cmy; /* B */
-      } while (++q <= pic_end);
+        q++;
+      }
     }
     else { /* assume normal data */
       register byte *q = pic;
