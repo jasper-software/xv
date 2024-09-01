@@ -650,21 +650,28 @@ int LoadPDS(char *fname, PICINFO *pinfo)
   *infobuff='\0';
   if (*spacecraft) {
     strncat(infobuff, spacecraft, sizeof(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
   }
 
   if (*target) {
     strncat(infobuff, ", ", sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
     strncat(infobuff, target, sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
   }
 
   if (*filtname) {
     strncat(infobuff, ", ", sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
     strncat(infobuff, filtname, sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
   }
 
   if (*itime) {
     strncat(infobuff, ", ", sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
     strncat(infobuff, itime, sizeof(infobuff) - strlen(infobuff) - 1);
+    infobuff[ sizeof(infobuff) - 1 ] = '\0';
   }
 
   SetISTR(ISTR_WARNING, "%s", infobuff);

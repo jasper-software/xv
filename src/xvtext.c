@@ -389,6 +389,7 @@ int TextView(const char *fname)
 #endif
 
   strncpy(rfname, filename, sizeof(rfname) - 1);
+  rfname[ sizeof(rfname) - 1 ] = '\0';
 
   /* see if this file is compressed.  if it is, uncompress it, and view
      the uncompressed version */
