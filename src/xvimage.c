@@ -1448,6 +1448,10 @@ void KillOldPics(void)
   if (picComments) free(picComments);
   picComments = (char *) NULL;
   ChangeCommentText();
+
+  if (picExifInfo) free(picExifInfo);
+  picExifInfo = (byte *) NULL;
+  picExifInfoSize = 0;
 }
 
 

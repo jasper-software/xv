@@ -77,11 +77,11 @@ static    int          writeJFIF          PARM((FILE *, byte *, int,int,int));
 
 
 /*** local variables ***/
-static char *filename;
-static const char *fbasename;
-static char *comment;
-static byte *exifInfo;
-static int   exifInfoSize;   /* not a string => must track size explicitly */
+static char *filename = NULL;
+static const char *fbasename = NULL;
+static char *comment = NULL;
+static byte *exifInfo = NULL;
+static int   exifInfoSize = 0;   /* not a string => must track size explicitly */
 static int   colorType;
 
 static DIAL  qDial, smDial;
@@ -515,7 +515,11 @@ int LoadJFIF(char *fname, PICINFO *pinfo, int quick)
 
   fbasename = BaseName(fname);
   pic       = (byte *) NULL;
+
+  if (comment) free(comment);
   comment   = (char *) NULL;
+
+  if (exifInfo) free(exifInfo);
   exifInfo  = (byte *) NULL;
 
   pinfo->type  = PIC8;

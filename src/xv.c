@@ -214,7 +214,6 @@ int main(int argc, char **argv)
 
   picComments = (char *) NULL;
 
-  if (picExifInfo) free(picExifInfo);
   picExifInfo = (byte *) NULL;
   picExifInfoSize = 0;
 
@@ -2201,6 +2200,7 @@ static int openPic(int filenum)
   /* init important fields of pinfo */
   pinfo.pic = (byte *) NULL;
   pinfo.comment = (char *) NULL;
+  pinfo.exifInfo = (byte *) NULL;
   pinfo.numpages = 1;
   pinfo.pagebname[0] = '\0';
 
@@ -2652,6 +2652,10 @@ ms_auto_no:
       free(pinfo.comment);
     }
     pinfo.comment = (char *) NULL;
+    if (pinfo.exifInfo) {
+      free(pinfo.exifInfo);
+    }
+    pinfo.exifInfo = (byte *) NULL;
     goto FAILED;
   }
 
@@ -2703,6 +2707,10 @@ ms_auto_no:
       free(pinfo.comment);
     }
     pinfo.comment = (char *) NULL;
+    if (pinfo.exifInfo) {
+      free(pinfo.exifInfo);
+    }
+    pinfo.exifInfo = (byte *) NULL;
     Warning();
     goto FAILED;
   }
