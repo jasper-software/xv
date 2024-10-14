@@ -104,7 +104,8 @@ static int  highbit                  PARM((unsigned long));
 static void makeDirectCmap           PARM((void));
 static void useOtherVisual           PARM((XVisualInfo *, int));
 static void parseResources           PARM((int, char **));
-static void parseCmdLine             PARM((int, char **));
+static void parseOptions             PARM((const char *));
+static void parseCmdLine             PARM((int, char **, int));
 static void verifyArgs               PARM((void));
 static void printoption              PARM((const char *));
 static void cmdSyntax                PARM((int));
@@ -295,6 +296,7 @@ int main(int argc, char **argv)
   preset = 0;
   viewonly = 0;
   dpiMult = 1;
+  isize_wide = isize_high = 0;
 
 #ifdef ENABLE_FIXPIX_SMOOTH
   do_fixpix_smooth = 0;
@@ -376,7 +378,8 @@ int main(int argc, char **argv)
 
   /* handle user-specified resources and cmd-line arguments */
   parseResources(argc,argv);
-  parseCmdLine(argc, argv);
+  parseOptions( getenv("XV_OPTIONS") );
+  parseCmdLine(argc, argv, 1);
   verifyArgs();
 #ifdef AUTO_EXPAND
   Vdinit();
@@ -1487,7 +1490,7 @@ static void parseResources(int argc, char **argv)
 
 
 /*****************************************************/
-static void parseCmdLine(int argc, char **argv)
+static void parseCmdLine(int argc, char **argv, int allow_file_names)
 {
   int i, oldi, not_in_first_half, pm;
   int hidpi;
@@ -1501,6 +1504,12 @@ static void parseCmdLine(int argc, char **argv)
     not_in_first_half = 0;
 
     if (argv[i][0] != '-' && argv[i][0] != '+') {
+
+      if (!allow_file_names) {
+	fprintf(stderr, "Unexpected option '%s'\n", argv[i]);
+	cmdSyntax(1);
+      }
+
       /* a file name.  put it in list */
 
       if (!nostat) {
@@ -1708,6 +1717,31 @@ static void parseCmdLine(int argc, char **argv)
     else if (!argcmp(argv[i],"-ibg",3,0,&pm))             /* image bkgd color */
       { if (++i<argc) imagebgstr = argv[i]; }
 
+    else if (!argcmp(argv[i],"-isize",4,0,&pm))           /* isize width x high */
+      { if (++i<argc) {
+	  int parse_flags, parse_x, parse_y;
+	  unsigned parse_w, parse_h;
+	  parse_x = parse_y = 0;
+	  parse_w = parse_h = 0;
+	  parse_flags = XParseGeometry(argv[i], &parse_x, &parse_y, &parse_w, &parse_h);
+	  if ((parse_flags & WidthValue) != 0) {
+	    if (parse_w > 1000) {
+	      parse_w = 1000;
+	      fprintf(stderr, "Warning: reduced large -isize width\n");
+	    }
+	    isize_wide = parse_w;
+	    if ((parse_flags & HeightValue) != 0) {
+	      if (parse_h > 1000) {
+		parse_h = 1000;
+		fprintf(stderr, "Warning: reduced large -isize height\n");
+	      }
+	      isize_high = parse_h;
+	    }
+	    if (isize_high == 0) isize_high = (isize_wide * 4) / 3;
+	  }
+        }
+      }
+
     else if (!argcmp(argv[i],"-lbrowse",3,1,&browseMode)); /* browse mode */
 
     else if (!argcmp(argv[i],"-lo",3,0,&pm))	           /* lowlight */
@@ -1862,10 +1896,81 @@ static void parseCmdLine(int argc, char **argv)
 
   /* build origlist[], a copy of namelist that remains unmodified, for
      use with the 'autoDelete' option */
-  orignumnames = numnames;
-  xvbcopy((char *) namelist, (char *) origlist, sizeof(origlist));
+  if (allow_file_names) {
+    orignumnames = numnames;
+    xvbcopy((char *) namelist, (char *) origlist, sizeof(origlist));
+  }
 }
 
+
+/*****************************************************/
+static void parseOptions(const char *options)
+{
+#define MAX_OPTIONS 1000
+  char *option_list[ MAX_OPTIONS ];
+  char *option_ptr, *out_ptr;
+  int option_len;
+  int num_options;
+  char quote;
+  static char *option_buf; /* so asan doesn't warn about lost memory */
+
+  if (options == NULL || *options == '\0') {
+    return;
+  }
+
+  /* fprintf(stderr, "options '%s'\n", options); */
+
+  option_len = strlen(options);
+  option_buf = (char *) malloc(option_len + 1);
+  if (!option_buf) {
+    FatalError("can't malloc option buf\n");
+  }
+  memcpy(option_buf, options, option_len+1);
+  num_options = 0;
+  option_list[ num_options++ ] = NULL;
+  option_ptr = option_buf;
+  while (*option_ptr != '\0' && num_options < MAX_OPTIONS - 1) {
+    while (*option_ptr == ' ' || *option_ptr == '\t') {
+      option_ptr++;
+    }
+    quote = *option_ptr;
+    if (quote == '\'' || quote == '"') {
+      /* quoted option */
+      /* very simple quoting to allow embedded spaces */
+      option_ptr++;
+      option_list[ num_options++ ] = option_ptr;
+      out_ptr = option_ptr;
+      while (*option_ptr != quote && *option_ptr != '\0') {
+        if (*option_ptr == '\\') {
+          option_ptr++;
+          if (*option_ptr == '\0') break;
+        }
+        *out_ptr++ = *option_ptr++;
+      }
+      if (*option_ptr != '\0') {
+        option_ptr++;
+      }
+      *out_ptr = '\0';
+    } else {
+      /* unquoted option */
+      option_list[ num_options++ ] = option_ptr;
+      while (*option_ptr != ' ' && *option_ptr != '\t' && *option_ptr != '\0') {
+        option_ptr++;
+      }
+      if (*option_ptr != '\0') {
+        *option_ptr = '\0';
+        option_ptr++;
+      }
+    }
+    /* fprintf(stderr, "option %d '%s'\n", num_options-1, option_list[ num_options-1 ]); */
+  }
+
+  option_list[ num_options ] = NULL;
+
+  parseCmdLine(num_options, option_list, /* allow_file_names */ 0);
+
+  /* option_buf can't be freed because parseCmdLine copies pointers to some arguments */
+}
 
 /*****************************************************************/
 static void verifyArgs(void)
@@ -2017,6 +2122,7 @@ static void cmdSyntax(int i)
   printoption("[-dir directory]");
   printoption("[-display disp]");
   printoption("[-/+dither]");
+  printoption("[-dpimult val]");
   printoption("[-drift dx dy]");
   printoption("[-expand exp | hexp:vexp]");
   printoption("[-fg color]");
@@ -2034,6 +2140,7 @@ static void cmdSyntax(int i)
   printoption("[-help]");
   printoption("[-/+hflip]");
   printoption("[-hi color]");
+  printoption("[-/+hidpi]");
   printoption("[-/+hist]");
   printoption("[-/+hsv]");
   printoption("[-ibg color]");  /* GRR 19980314 */
@@ -2041,6 +2148,7 @@ static void cmdSyntax(int i)
   printoption("[-/+iconic]");
   printoption("[-igeometry geom]");
   printoption("[-/+imap]");
+  printoption("[-isize geom]");
   printoption("[-/+lbrowse]");
   printoption("[-lo color]");
   printoption("[-/+loadclear]");
