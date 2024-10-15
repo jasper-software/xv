@@ -146,10 +146,10 @@ typedef unsigned int mode_t;  /* file mode bits */
 /* some people like bigger icons; 4:3 aspect ratio is recommended
  * (NOTE:  standard XV binaries will not be able to read larger icons!) */
 #ifndef ISIZE_WIDE
-#  define ISIZE_WIDE (80 * dpiMult)   /* maximum size of an icon */
+#  define ISIZE_WIDE (isize_wide > 0? isize_wide: (80 * dpiMult))   /* maximum size of an icon */
 #endif
 #ifndef ISIZE_HIGH
-#  define ISIZE_HIGH (60 /* * dpiMult */)
+#  define ISIZE_HIGH (isize_high > 0? isize_high: (60 /* * dpiMult */))
 #endif
 
 #ifndef ISIZE_WPAD

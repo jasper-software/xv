@@ -1,3 +1,14 @@
+6.0.2 (2024-10-15)
+==================
+
+* Added -isize option to control the icon size in the browser.
+  The syntax is -isize <width> or -isize <width>x<height>
+  If the height is omitted, it defaults to the width * 3/4.
+
+* xv now checks the XV_OPTIONS environment variable before reading the
+  command line. xv splits it into words and parses it like command line
+  options. Use XV_OPTIONS to set default options.
+
 6.0.1 (2024-09-01)
 ==================
 

@@ -190,7 +190,9 @@ int EventLoop(void)
           sleep(1);
         else {
           /* less than one second remaining:  do delay in msec, then return */
-          Timer((remaining_interval * 1000L) / clock_ticks);  /* can't overflow */
+          if (remaining_interval > 0) {
+            Timer((remaining_interval * 1000L) / clock_ticks);  /* can't overflow */
+          }
           return waitloop? NEXTLOOP : NEXTQUIT;
         }
 #else

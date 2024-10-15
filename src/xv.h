@@ -1206,6 +1206,7 @@ WHERE unsigned int  ncells, dispDEEP; /* root color sizes */
 WHERE unsigned int  dispWIDE, dispHIGH; /* screen sizes */
 WHERE unsigned int  vrWIDE, vrHIGH, maxWIDE, maxHIGH; /* virtual root and max image sizes */
 WHERE int dpiMult;  /* multiplier for hidpi displays */
+WHERE int           isize_wide, isize_high; /* ISIZE icon size for xvbrowse */
 WHERE Colormap      theCmap, LocalCmap;
 WHERE Window        spec_window, rootW, mainW, vrootW;
 WHERE GC            theGC;
