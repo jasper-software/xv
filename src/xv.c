@@ -1737,7 +1737,7 @@ static void parseCmdLine(int argc, char **argv, int allow_file_names)
 	      }
 	      isize_high = parse_h;
 	    }
-	    if (isize_high == 0) isize_high = (isize_wide * 4) / 3;
+	    if (isize_high == 0) isize_high = (isize_wide * 3) / 4;
 	  }
         }
       }
