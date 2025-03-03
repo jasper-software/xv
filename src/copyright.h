@@ -78,7 +78,7 @@
  *   John C. Elliott (http://www.seasip.demon.co.uk/ZX/zxdload.html)
  *   John D. Baker (http://mylinuxisp.com/~jdbaker/)
  *   Jörgen Grahn (jgrahn algonet.se)
- *   John H. Bradley, of course (http://www.trilon.com/xv/)
+ *   John H. Bradley, of course (https://xv.trilon.com)
  *   Jean-Pierre Demailly (http://www-fourier.ujf-grenoble.fr/~demailly/)
  *   John Rochester (http://www.freebsd.org/cgi/query-pr.cgi?pr=2920)
  *   (also http://cvsweb.freebsd.org/ports/graphics/xv/files/patch-af, -ag)

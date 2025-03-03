@@ -11,7 +11,7 @@ themselves can all be found here:
 be notified of new versions automatically; trivial registration required.)
 
 These patches incorporate all of the fix- and enhancement-patches available
-from John's XV site (http://www.trilon.com/xv/downloads.html and
+from John's XV site (https://xv.trilon.com/downloads.html and
 ftp://ftp.trilon.com/pub/xv/patches/), plus a number of my own fixes and
 additions (security-related and otherwise), plus quite a few from other
 people.  They're still not fully complete, and it's probable they never
@@ -77,7 +77,7 @@ below:
   JCE = John C. Elliott (http://www.seasip.demon.co.uk/ZX/zxdload.html)
   JDB = John D. Baker (http://mylinuxisp.com/~jdbaker/)
   JG  = Jörgen Grahn (jgrahn algonet.se)
-  JHB = John H. Bradley, of course (http://www.trilon.com/xv/)
+  JHB = John H. Bradley, of course (https://xv.trilon.com)
   JPD = Jean-Pierre Demailly (http://www-fourier.ujf-grenoble.fr/~demailly/)
   JR  = John Rochester (http://www.freebsd.org/cgi/query-pr.cgi?pr=2920)
         (also http://cvsweb.freebsd.org/ports/graphics/xv/files/patch-af, -ag)
@@ -139,7 +139,7 @@ step.  (A filesystem is a terrible thing to waste.)
    [7] http://www.gnu.org/directory/devel/specific/tar.html
    [8] http://www.gnu.org/directory/devel/specific/patch.html
    [9] http://www.gnu.org/directory/devel/specific/make.html
-  [10] http://www.trilon.com/xv/downloads.html#src-distrib
+  [10] https://xv.trilon.com/downloads.html#src-distrib
 
 +-------------------------------------------------------------------------+
 |                                                                         |

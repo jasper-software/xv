@@ -10,7 +10,7 @@ by GitHub:
 
 Other additional sources of information on the XV software include:
 
-  - <http://www.trilon.com/xv/>
+  - <https://xv.trilon.com>
 
   - <https://en.wikipedia.org/wiki/Xv_(software)>
 
@@ -53,7 +53,7 @@ Acknowledgments
 The XV software was originally written by John Bradley.
 John Bradley's web site for the XV software can be found at:
 
-  - <http://www.trilon.com/xv>
+  - <https://xv.trilon.com>
 
 The creator of this GitHub repository (Michael Adams) would like to thank
 John Bradley for giving his blessing for a public Git repository for the

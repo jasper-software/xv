@@ -30,7 +30,7 @@ If you don't
 .I have
 the PostScript file, it is part of the standard XV distribution, the
 latest version of which can be obtained from
-.IR http://www.trilon.com/xv/
+.IR https://xv.trilon.com
 or via anonymous ftp from
 .IR ftp.cis.upenn.edu
 in the directory pub/xv .
