@@ -14,7 +14,7 @@ jobs:
     steps:
       ############################################################
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       ############################################################
@@ -27,7 +27,7 @@ jobs:
         run: build/github/make_release -r ${{github.ref}} -w ${{github.workspace}} -t ${{runner.temp}}/tmp -o ${{runner.temp}}/out
       ############################################################
       - name: Deploy Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{runner.temp}}/out/xv*.tar.gz
