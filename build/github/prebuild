@@ -47,6 +47,31 @@ echo "OS: $os"
 
 case "$os" in
 linux)
+	sudo apt-get update || \
+	  panic "apt-get update failed"
+	packages=(
+		##########
+		#cmake
+		#make
+		#gcc
+		##########
+		libx11-dev
+		libxext-dev
+		libxrandr-dev
+		libxi-dev
+		libxt-dev
+		libxcursor-dev
+		libxinerama-dev
+		libxft-dev
+		##########
+		libpng-dev
+		libjpeg-dev
+		libgd-dev
+		libnetpbm-dev
+		##########
+	)
+	sudo apt-get install -y "${packages[@]}" || \
+	  panic "cannot install packages"
 	;;
 macos)
 	packages=()
