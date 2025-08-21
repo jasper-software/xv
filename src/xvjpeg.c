@@ -893,6 +893,7 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
   int                             i, bperpix;
   char                            xvcmt[256];
 
+  if (comment) free(comment);
   comment = (char *) NULL;
 
   cinfo.err               = jpeg_std_error(&jerr.pub);
@@ -984,6 +985,7 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
     strcat(comment, xvcmt);
   }
   else {
+    if (comment) free(comment);
     comment = (char *) malloc(strlen(xvcmt) + 1);
     strcpy(comment, xvcmt);
   }
