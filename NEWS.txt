@@ -1,7 +1,12 @@
+6.0.4 (2025-08-21)
+==================
+
+* Fix crash when freeing JPEG comments (PR #37).
+
 6.0.3 (2025-03-03)
 ==================
 
-* Udpated URLs for the xv website.
+* Updated URLs for the xv website.
 
 6.0.2 (2024-10-15)
 ==================
