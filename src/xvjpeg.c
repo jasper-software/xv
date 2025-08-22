@@ -893,6 +893,7 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
   int                             i, bperpix;
   char                            xvcmt[256];
 
+  if (comment) free(comment);
   comment = (char *) NULL;
 
   cinfo.err               = jpeg_std_error(&jerr.pub);
@@ -983,7 +984,11 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
     for ( ; i<2; i++) strcat(comment, "\n");
     strcat(comment, xvcmt);
   }
-  else comment = xvcmt;
+  else {
+    if (comment) free(comment);
+    comment = (char *) malloc(strlen(xvcmt) + 1);
+    strcpy(comment, xvcmt);
+  }
 
 
   jpeg_write_marker(&cinfo, JPEG_COM, (byte *)comment, (u_int)strlen(comment));
