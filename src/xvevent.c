@@ -696,7 +696,7 @@ int HandleEvent(XEvent *event, int *donep)
 	if (wasJpegUp) { JPEGDialog(wasJpegUp);  wasJpegUp=0; }
 #endif
 #ifdef HAVE_JP2K
-	if (wasJp2kUp) { JP2KDialog(wasJpegUp);  wasJp2kUp=0; }
+	if (wasJp2kUp) { JP2KDialog(wasJp2kUp);  wasJp2kUp=0; }
 #endif
 #ifdef HAVE_TIFF
 	if (wasTiffUp) { TIFFDialog(wasTiffUp);  wasTiffUp=0; }
