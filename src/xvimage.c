@@ -2100,7 +2100,6 @@ XImage *Pic8ToXImage(byte *pic8, unsigned int wide, unsigned int high, long unsi
     }
 
     else {  /* LSBFirst */
-      printf("LSBFirst\n");
       for (i=0, ip=imagedata; i<high; i++) {
 	if (((i+1)&0x7f) == 0) WaitCursor();
 	for (j=0, tip=ip; j<wide; j++, pp++) {
