@@ -30,6 +30,11 @@ endif()
 if(XV_ENABLE_JPEG)
 	add_compile_definitions(DOJPEG)
 	set(xv_libs ${xv_libs} JPEG::JPEG)
+
+	if(XV_ENABLE_EXIF)
+		add_compile_definitions(DOEXIF)
+		set(xv_libs ${xv_libs} -lexif)
+	endif()
 endif()
 
 if(XV_ENABLE_JP2K)
