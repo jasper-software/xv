@@ -436,7 +436,6 @@ static void writeJPEG(void)
     }
   }
 
-
   /* in any event, we've got some valid image.  Do the JPEG Thing */
   rv = writeJFIF(fp, (colorType==F_GREYSCALE) ? image8 : image24,
 		 w, h, colorType);
@@ -969,7 +968,6 @@ METHODDEF boolean  xv_process_comment(j_decompress_ptr cinfo)
   return TRUE;
 }
 
-
 /**************************************************/
 #if JPEG_LIB_VERSION > 60
 METHODDEF(boolean) xv_process_app1(j_decompress_ptr cinfo)   /* Geoff H. Kuenning 20030331 */
@@ -995,7 +993,7 @@ METHODDEF boolean  xv_process_app1(j_decompress_ptr cinfo)
       (void)j_getc(cinfo);
   }
   if (!exifInfo) FatalError("out of memory in xv_process_app1 (EXIF info)");
-  
+
   sp = exifInfo + exifInfoSize;
   exifInfoSize += length;
 
@@ -1006,8 +1004,6 @@ METHODDEF boolean  xv_process_app1(j_decompress_ptr cinfo)
 
   return TRUE;
 }
-
-
 
 
 /***************************************************************************/
@@ -1120,7 +1116,6 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
     strcpy(comment, xvcmt);
   }
 
-
   jpeg_write_marker(&cinfo, JPEG_COM, (byte *)comment, (u_int)strlen(comment));
 
   if (picExifInfo) jpeg_write_marker(&cinfo, JPEG_APP1, (byte *)picExifInfo,
@@ -1133,6 +1128,7 @@ static int writeJFIF(FILE *fp, byte *pic, int w, int h, int coltype)
 
   jpeg_finish_compress(&cinfo);
   jpeg_destroy_compress(&cinfo);
+
   return 0;
 }
 
