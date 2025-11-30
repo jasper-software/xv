@@ -1,3 +1,10 @@
+6.1.0 (2025-11-30)
+==================
+
+* Add support for EXIF orientation tags.
+* Add support for depth 30, or 10bit/color, for compatibility with mode.
+* Fix wasJpegUp → wasJp2kUp.
+
 6.0.4 (2025-08-21)
 ==================
 
