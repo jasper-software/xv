@@ -2066,6 +2066,57 @@ XImage *Pic8ToXImage(byte *pic8, unsigned int wide, unsigned int high, long unsi
   }
     break;
 
+    // modern HDR with 10-bit r/g/b
+  case 30: {
+    byte  *imagedata, *ip, *pp, *tip;
+    int    j;
+
+    imagedata = (byte *) malloc((size_t) (4*wide*high));
+    if (!imagedata) FatalError("couldn't malloc imagedata");
+
+    xim = XCreateImage(theDisp,theVisual,dispDEEP,ZPixmap,0,
+		       (char *) imagedata,  wide,  high, 32, 0);
+    if (!xim) FatalError("couldn't create xim!");
+
+    if (xim->bits_per_pixel != 32)
+        FatalError("Unhandled case for 30-bit depth: bits_per_pixel is not 32-bit..");
+
+    pp = (dithpic) ? dithpic : pic8;
+
+    if (xim->byte_order == MSBFirst) {
+      printf("MSBFirst\n");
+      for (i=0, ip=imagedata; i<high; i++) {
+	if (((i+1)&0x7f) == 0) WaitCursor();
+	for (j=0, tip=ip; j<wide; j++, pp++) {
+	  xcol = (dithpic) ? ((*pp) ? white : black) : xcolors[*pp];
+
+	  *tip++ = (xcol>>24) & 0xff;
+	  *tip++ = (xcol>>16) & 0xff;
+	  *tip++ = (xcol>>8) & 0xff;
+	  *tip++ =  xcol & 0xff;
+	}
+	ip += xim->bytes_per_line;
+      }
+    }
+
+    else {  /* LSBFirst */
+      for (i=0, ip=imagedata; i<high; i++) {
+	if (((i+1)&0x7f) == 0) WaitCursor();
+	for (j=0, tip=ip; j<wide; j++, pp++) {
+	  xcol = (dithpic) ? ((*pp) ? white : black) : xcolors[*pp];
+
+	  *tip++ =  xcol & 0x3ff;
+	  *tip++ = (xcol>>8) & 0xff;
+	  *tip++ = (xcol>>16) & 0xff;
+	  *tip++ = (xcol>>24) & 0xff;
+	}
+	ip += xim->bytes_per_line;
+      }
+    }
+  }
+    break;
+
+
 
     /*********************************/
 
