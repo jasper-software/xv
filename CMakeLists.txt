@@ -23,6 +23,7 @@ project(xv VERSION ${XV_VERSION} LANGUAGES C)
 ################################################################################
 
 option(XV_ENABLE_JPEG "Enable JPEG Support" ON)
+option(XV_ENABLE_EXIF "Enable EXIF Support" ON)
 option(XV_ENABLE_JP2K "Enable JP2K Support" ON)
 option(XV_ENABLE_PDS  "Enable PDF Support" ON)
 option(XV_ENABLE_PNG  "Enable PNG Support" ON)
@@ -123,6 +124,18 @@ int main() {
 " XV_TRY_COMPILE_SYSERRLIST)
 set(XV_HAVE_SYSERRLISTDECL ${XV_TRY_COMPILE_SYSERRLIST})
 
+set(XV_OLD_LIBS ${CMAKE_REQUIRED_LIBRARIES})
+set(CMAKE_REQUIRED_LIBRARIES exif)
+check_c_source_compiles("
+#include <libexif/exif-data.h>
+int main() {
+	ExifData *foo = exif_data_new();
+	return 0;
+}
+" XV_TRY_COMPILE_EXIF)
+set(XV_HAVE_EXIF ${XV_TRY_COMPILE_EXIF})
+set(CMAKE_REQUIRED_LIBRARIES ${XV_OLD_LIBS})
+
 check_c_source_compiles("
 #include <limits.h>
 int main() {
@@ -180,6 +193,12 @@ find_package(JPEG)
 if(XV_ENABLE_JPEG AND NOT TARGET JPEG::JPEG)
 	message(WARNING "Disabling JPEG-2000 Support.")
 	set(XV_ENABLE_JPEG OFF)
+
+endif()
+
+if(XV_ENABLE_EXIF AND NOT XV_HAVE_EXIF)
+	message(WARNING "Disabling EXIF Support.")
+	set(XV_ENABLE_EXIF OFF)
 endif()
 
 find_package(PNG)
@@ -226,6 +245,7 @@ endif()
 
 message("JP2K: ${XV_ENABLE_JP2K}")
 message("JPEG: ${XV_ENABLE_JPEG}")
+message("EXIF: ${XV_ENABLE_EXIF}")
 message("TIFF: ${XV_ENABLE_TIFF}")
 message("PNG: ${XV_ENABLE_PNG}")
 message("WEBP: ${XV_ENABLE_WEBP}")

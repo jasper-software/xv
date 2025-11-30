@@ -447,6 +447,9 @@
 
 #ifdef DOJPEG
 #  define HAVE_JPEG
+#  ifdef DOEXIF
+#    define HAVE_EXIF
+#  endif
 #endif
 
 #ifdef DOJP2K
