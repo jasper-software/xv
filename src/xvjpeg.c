@@ -53,18 +53,6 @@ struct my_error_mgr {
 
 typedef struct my_error_mgr *my_error_ptr;
 
-typedef enum orient {
-	ORIENT_NONE = 0,
-	ORIENT_NORMAL = 1,
-	ORIENT_HFLIP = 2,
-	ORIENT_ROT180 = 3,
-	ORIENT_VFLIP = 4,
-	ORIENT_TRANSPOSE = 5,
-	ORIENT_ROT90 = 6,
-	ORIENT_TRANSVERSE = 7,
-	ORIENT_ROT270 = 8,
-} exif_orient_t;
-
 /*** local functions ***/
 static    void         drawJD             PARM((int, int, int, int));
 static    void         clickJD            PARM((int, int));
@@ -97,7 +85,6 @@ static const char *fbasename = NULL;
 static char *comment = NULL;
 static byte *exifInfo = NULL;
 static int   exifInfoSize = 0;   /* not a string => must track size explicitly */
-static exif_orient_t   exifOrientation = ORIENT_NONE;
 
 static int   colorType;
 
@@ -105,12 +92,6 @@ static DIAL  qDial, smDial;
 static BUTT  jbut[J_NBUTTS];
 
 char errbuffer[JMSG_LENGTH_MAX];
-
-#ifdef HAVE_EXIF
-static ExifData *exif_data;
-static ExifByteOrder exif_byte_order;
-static ExifEntry *exif_entry;
-#endif /* HAVE_EXIF */
 
 
 /***************************************************************************/
@@ -530,7 +511,7 @@ int LoadJFIF(char *fname, PICINFO *pinfo, int quick)
   const char                      *colorspace_name;
   byte                            *pic;
   long                             filesize;
-  int                              i,w,h,bperpix,bperline,count,swap_xy=0;
+  int                              i,w,h,bperpix,bperline,count;
 
 
   /* Initialize variables below instead of in the declarations above to avoid the warning */
@@ -690,20 +671,7 @@ L2:
 
   jpeg_start_decompress(&cinfo);
 
-#ifdef HAVE_EXIF
-  exif_data = exif_data_new_from_data(exifInfo, exifInfoSize);
-  exif_entry = exif_data_get_entry(exif_data, EXIF_TAG_ORIENTATION);
-  exif_byte_order = exif_data_get_byte_order(exif_data);
-
-  /* If the EXIF IFD is as expected, get the orientation from it */
-  if (exif_entry != NULL &&
-		exif_entry->components == 1 &&
-		exif_entry->size == 2 &&
-		exif_entry->format == EXIF_FORMAT_SHORT)
-  {
-    exifOrientation = exif_get_short(exif_entry->data, exif_byte_order);
-  }
-#endif
+  pinfo->orientation = get_exif_orientation(exifInfo, exifInfoSize);
 
   while (cinfo.output_scanline < cinfo.output_height) {
 #if 0
@@ -758,107 +726,11 @@ L2:
     pic = realloc(pic,p-pic); /* Release extra storage */
   }
 
-  /* If we need to transform the image, allocate a new image and populate
-  ** it with the correct pixel values. Then swap the two images.
-  */
-  if (exifOrientation != ORIENT_NONE && exifOrientation != ORIENT_NORMAL)
-  {
-    byte *tmppic;
-    byte *orientpic = (byte *) malloc((size_t) count);
-    int dst_row, dst_col, dst_row_width;
-
-    if (!orientpic) {
-      SetISTR(ISTR_WARNING, "%s:  can't transform JPEG file - out of memory",
-             fbasename);
-      goto L1;
-    }
-
-	if (exifOrientation == ORIENT_VFLIP)
-	{
-		/* We can copy entire lines for VFLIP images, which will
-		** be quicker than doing it pixel by pixel, so special
-		** case this one.
-		*/
-		for (int row=0; row < h; row++)
-		{
-			memcpy(&orientpic[(h-row-1) * w * bperpix],
-					&pic[row * w * bperpix],
-					w * bperpix);
-		}
-	} else
-	{
-		int src_offset, dst_offset;
-
-
-		for (int row=0; row < h; row++)
-		{
-			for (int col=0; col < w; col++)
-			{
-				switch(exifOrientation)
-				{
-					case ORIENT_ROT90:
-						dst_col = h-row-1;
-						dst_row = col;
-						swap_xy = 1;
-						break;
-					case ORIENT_ROT180:
-						dst_col = w-col-1;
-						dst_row = h-row-1;
-						break;
-					case ORIENT_ROT270:
-						dst_col = row;
-						dst_row = w-col-1;
-						swap_xy = 1;
-						break;
-					case ORIENT_HFLIP:
-						dst_col = w-col-1;
-						dst_row = row;
-						break;
-					case ORIENT_TRANSPOSE:
-						dst_col = row;
-						dst_row = col;
-						swap_xy = 1;
-						break;
-					case ORIENT_TRANSVERSE:
-						dst_col = h-row-1;
-						dst_row = w-col-1;
-						swap_xy = 1;
-						break;
-					default:
-						dst_offset = src_offset;
-						break;
-				}
-
-				dst_row_width = swap_xy ? h : w;
-
-				src_offset = (row * w) + col;
-				dst_offset = (dst_row * dst_row_width) + dst_col;
-
-				memcpy(&orientpic[dst_offset * bperpix],
-					&pic[src_offset * bperpix],
-					bperpix);
-			}
-		}
-	}
-
-	tmppic = pic;
-	pic = orientpic;
-    free(tmppic);
-  }
-
-
   /* return 'PICINFO' structure to XV */
 
   pinfo->pic = pic;
-  if (swap_xy)
-  {
-	  pinfo->w = h;
-	  pinfo->h = w;
-  } else
-  {
-	  pinfo->w = w;
-	  pinfo->h = h;
-  }
+  pinfo->w = w;
+  pinfo->h = h;
   pinfo->frmType = F_JPEG;
 
   if (cinfo.out_color_space == JCS_GRAYSCALE) {

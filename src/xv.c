@@ -2311,7 +2311,7 @@ static int openPic(int filenum)
   pinfo.exifInfo = (byte *) NULL;
   pinfo.numpages = 1;
   pinfo.pagebname[0] = '\0';
-
+  pinfo.orientation = ORIENT_NONE;
 
   normaspect = defaspect;
   freename = dfltkludge = frompipe = frompoll = fromint = wascropped = 0;
@@ -3552,6 +3552,8 @@ int ReadPicFile(char *fname, int ftype, PICINFO *pinfo, int quick)
 #endif
 
   }
+
+  reorient_image(pinfo);
   return rv;
 }
 
