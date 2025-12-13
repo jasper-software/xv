@@ -447,9 +447,10 @@
 
 #ifdef DOJPEG
 #  define HAVE_JPEG
-#  ifdef DOEXIF
-#    define HAVE_EXIF
-#  endif
+#endif
+
+#ifdef DOEXIF
+#  define HAVE_EXIF
 #endif
 
 #ifdef DOJP2K
@@ -1130,6 +1131,7 @@ typedef struct { byte *pic;                  /* image data */
 		 byte *exifInfo;             /* image info from digicam */
 		 int   exifInfoSize;         /* size of image info */
 
+		 int   orientation;          /* Which way up is the image? */
 		 int   numpages;             /* # of page files, if >1 */
 		 char  pagebname[64];        /* basename of page files */
 	       } PICINFO;
@@ -1178,6 +1180,18 @@ typedef struct {  int    n;
 typedef struct {  int                n;
 		  unsigned short int r;
 		} MKT;
+
+typedef enum orientation {
+	ORIENT_NONE = 0,
+	ORIENT_NORMAL = 1,
+	ORIENT_HFLIP = 2,
+	ORIENT_ROT180 = 3,
+	ORIENT_VFLIP = 4,
+	ORIENT_TRANSPOSE = 5,
+	ORIENT_ROT90 = 6,
+	ORIENT_TRANSVERSE = 7,
+	ORIENT_ROT270 = 8,
+} orientation_t;
 
 
 /* MACROS */
@@ -2161,6 +2175,10 @@ int   MGCSFXSaveParams     PARM((char *, int));
 
 int getInputCom            PARM((void));
 int getOutputCom           PARM((void));
+
+/*************************** XVORIENT.C *************************/
+unsigned int get_exif_orientation PARM((byte *buf, unsigned int bufsize));
+void reorient_image PARM((PICINFO *pinfo));
 
 /**************************** XVPBM.C ***************************/
 #ifdef HAVE_MGCSFX
