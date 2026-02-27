@@ -1,3 +1,11 @@
+6.2.0 (2026-02-27)
+==================
+
+* Add orientation support to WebP images.
+* Add sample WebP image with EXIF orientation flags set.
+* Make EXIF orientation support generic rather than being tied to JPEG.
+* Add orientation support for WebP images.
+
 6.1.0 (2025-11-30)
 ==================
 
