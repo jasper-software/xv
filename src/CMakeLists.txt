@@ -24,7 +24,7 @@ endif()
 
 if(XV_ENABLE_WEBP)
     add_compile_definitions(DOWEBP)
-    set(xv_libs ${xv_libs} WebP::libwebp)
+    set(xv_libs ${xv_libs} WebP::libwebp -lwebpdemux)
 endif()
 
 if(XV_ENABLE_JPEG)
@@ -93,6 +93,7 @@ set(xv_sources
 	xvmgcsfx.c
 	xvmisc.c
 	xvml.c
+	xvorient.c
 	xvpbm.c
 	xvpcd.c
 	xvpcx.c
