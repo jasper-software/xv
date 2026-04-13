@@ -21,6 +21,7 @@ unsigned int get_exif_orientation(byte *buf, unsigned int bufsize)
 	ExifData *exif_data;
 	ExifEntry *exif_entry;
 	ExifByteOrder exif_byte_order;
+	int orient = ORIENT_NONE;
 
 	exif_data = exif_data_new_from_data(buf, bufsize);
 	if (exif_data == NULL)
@@ -29,23 +30,23 @@ unsigned int get_exif_orientation(byte *buf, unsigned int bufsize)
 	}
 
 	exif_entry = exif_data_get_entry(exif_data, EXIF_TAG_ORIENTATION);
-	if (exif_entry == NULL)
+	if (exif_entry != NULL)
 	{
-		return ORIENT_NONE;
+		exif_byte_order = exif_data_get_byte_order(exif_data);
+
+		/* If the EXIF IFD is as expected, get the orientation from it */
+		if (
+				exif_entry->components == 1 &&
+				exif_entry->size == 2 &&
+				exif_entry->format == EXIF_FORMAT_SHORT)
+		{
+			orient = exif_get_short(exif_entry->data, exif_byte_order);
+		}
 	}
 
-	exif_byte_order = exif_data_get_byte_order(exif_data);
+	exif_data_unref(exif_data);
 
-	/* If the EXIF IFD is as expected, get the orientation from it */
-	if (
-			exif_entry->components == 1 &&
-			exif_entry->size == 2 &&
-			exif_entry->format == EXIF_FORMAT_SHORT)
-	{
-		return exif_get_short(exif_entry->data, exif_byte_order);
-	}
-
-	return ORIENT_NONE;
+	return orient;
 #endif
 }
 
@@ -57,7 +58,7 @@ void reorient_image(PICINFO *pinfo)
 	byte *tmppic;
 	byte *orientpic;
 	int dst_row, dst_col, dst_row_width;
-	int bperpix, pixel_bytes, swap_xy, h, w;
+	int bperpix, pixel_bytes, swap_xy = 0, h, w;
 
 	if (pinfo->orientation == ORIENT_NONE || pinfo->orientation == ORIENT_NORMAL)
 	{
@@ -147,7 +148,8 @@ void reorient_image(PICINFO *pinfo)
 						swap_xy = 1;
 						break;
 					default:
-						dst_offset = src_offset;
+						dst_col = col;
+						dst_row = row;
 						break;
 				}
 

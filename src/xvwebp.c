@@ -477,7 +477,6 @@ int LoadWEBP(char *fname, PICINFO *pinfo)
   uint8_t               *raw_data, *rgba, alpha;
   WebPBitstreamFeatures features;
   VP8StatusCode         status;
-  uint32_t				format_flags;
 
   /* open the file */
   fp = xv_fopen(fname,"r");
@@ -653,42 +652,48 @@ int LoadWEBP(char *fname, PICINFO *pinfo)
 
   WebPDemuxer* demux;
   WebPChunkIterator chunk_iter;
+  WebPData webp_data = { raw_data, (size_t)filesize };
   unsigned int exif_length;
   byte *exif_data_src;
+  uint32_t format_flags;
 
-  demux = WebPDemux((WebPData *)&raw_data);
-  format_flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
-
-  if (format_flags & EXIF_FLAG)
+  demux = WebPDemux(&webp_data);
+  if (demux != NULL)
   {
-    WebPDemuxGetChunk(demux, "EXIF", 1, &chunk_iter);
+    format_flags = WebPDemuxGetI(demux, WEBP_FF_FORMAT_FLAGS);
 
-    /* The returned EXIF chunk contains the raw TIFF
-	** image metadata. However, libexif expects it
-	** to be prefixed with a "Exif\0\0" marker and
-	** won't read it unless that's there. So put it
-	** there and pretend that's what we read from
-	** the WebP chunk.
-	*/
+    if (format_flags & EXIF_FLAG)
+    {
+      WebPDemuxGetChunk(demux, "EXIF", 1, &chunk_iter);
 
-    exif_length = chunk_iter.chunk.size + 6;
+      /* The returned EXIF chunk contains the raw TIFF
+      ** image metadata. However, libexif expects it
+      ** to be prefixed with a "Exif\0\0" marker and
+      ** won't read it unless that's there. So put it
+      ** there and pretend that's what we read from
+      ** the WebP chunk.
+      */
 
-	if ((exif_data_src = malloc(exif_length)) == NULL)
-	{
-      FatalError("malloc failure in LoadWEBP");
-	}
+      exif_length = chunk_iter.chunk.size + 6;
+
+      if ((exif_data_src = malloc(exif_length)) == NULL)
+      {
+        FatalError("malloc failure in LoadWEBP");
+      }
 	
-	memcpy(exif_data_src, "Exif", 4);
-	memset(exif_data_src + 4, 0, 2);
-	memcpy(exif_data_src + 6, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
+      memcpy(exif_data_src, "Exif", 4);
+      memset(exif_data_src + 4, 0, 2);
+      memcpy(exif_data_src + 6, chunk_iter.chunk.bytes, chunk_iter.chunk.size);
 
-	pinfo->orientation = get_exif_orientation(exif_data_src, chunk_iter.chunk.size + 6);
+      pinfo->orientation = get_exif_orientation(exif_data_src, chunk_iter.chunk.size + 6);
 
-	free(exif_data_src);
+      free(exif_data_src);
+
+      WebPDemuxReleaseChunkIterator(&chunk_iter);
+    }
+
+    WebPDemuxDelete(demux);
   }
-
-  WebPDemuxReleaseChunkIterator(&chunk_iter);
-  WebPDemuxDelete(demux);
 
 #endif /* HAVE_EXIF */
 
