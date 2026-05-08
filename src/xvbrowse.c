@@ -49,6 +49,7 @@ typedef unsigned int mode_t;  /* file mode bits */
 #include "bits/br_iff"
 #include "bits/br_iris"
 #include "bits/br_jfif"
+#include "bits/br_jxl"
 #include "bits/br_jp2"
 #include "bits/br_jpc"
 #include "bits/br_mag"
@@ -119,7 +120,8 @@ typedef unsigned int mode_t;  /* file mode bits */
 #define BF_JP2      32
 #define BF_WEBP     33
 #define BF_JPC      34
-#define JP_EXT_BF   (BF_JPC)
+#define BF_JXL      35
+#define JP_EXT_BF   (BF_JXL)
 #define BF_MAG      (JP_EXT_BF + 1)
 #define BF_MAKI     (JP_EXT_BF + 2)
 #define BF_PIC      (JP_EXT_BF + 3)
@@ -587,6 +589,7 @@ void CreateBrowse(const char *geom, int userspec, const char *fgstr, const char 
   bfIcons[BF_IRIS]=MakePix1(br->win,br_iris_bits,br_iris_width,br_iris_height);
   bfIcons[BF_JFIF]=MakePix1(br->win,br_jfif_bits,br_jfif_width,br_jfif_height);
   bfIcons[BF_JP2] =MakePix1(br->win,br_jp2_bits, br_jp2_width, br_jp2_height);
+  bfIcons[BF_JXL] =MakePix1(br->win,br_jxl_bits, br_jxl_width, br_jxl_height);
   bfIcons[BF_JPC] =MakePix1(br->win,br_jpc_bits, br_jpc_width, br_jpc_height);
   bfIcons[BF_MAG] =MakePix1(br->win,br_mag_bits, br_mag_width, br_mag_height);
   bfIcons[BF_MAKI]=MakePix1(br->win,br_maki_bits,br_maki_width,br_maki_height);
@@ -2694,11 +2697,11 @@ static void browAlpha(BROWINFO *br, int ch)
 
   if (!br->lst || (br->lst + incrementalSearchTimeout < now)) br->len = 0;
   br->lst = now;
-  
+
   if (br->len + 2 > br->siz)
     if ((br->str = (char *)realloc(br->str, (br->siz = br->len + 32))) == NULL)
        br->siz = br->len = 0;
-  
+
   if (br->len + 2 <= br->siz) {
     br->str[br->len++] = ch;
     br->str[br->len] = '\0';
@@ -3270,6 +3273,7 @@ static void scanFile(BROWINFO *br, BFIL *bf, char *name)
     case RFT_IRIS:     bf->ftype = BF_IRIS;     break;
     case RFT_PCX:      bf->ftype = BF_PCX;      break;
     case RFT_JFIF:     bf->ftype = BF_JFIF;     break;
+    case RFT_JXL:      bf->ftype = BF_JXL;      break;
     case RFT_TIFF:     bf->ftype = BF_TIFF;     break;
     case RFT_PDSVICAR: bf->ftype = BF_PDS;      break;
     case RFT_COMPRESS: bf->ftype = BF_COMPRESS; break;

@@ -224,6 +224,9 @@ int HandleEvent(XEvent *event, int *donep)
 #ifdef HAVE_JP2K
   static int wasJp2kUp=0;
 #endif
+#ifdef HAVE_JXL
+  static int wasJxlUp=0;
+#endif
 #ifdef HAVE_TIFF
   static int wasTiffUp=0;
 #endif
@@ -322,6 +325,10 @@ int HandleEvent(XEvent *event, int *donep)
 
 #ifdef HAVE_JP2K
     if (JP2KCheckEvent(event)) break;   /* event has been processed */
+#endif
+
+#ifdef HAVE_JXL
+    if (JXLCheckEvent(event)) break;   /* event has been processed */
 #endif
 
 #ifdef HAVE_TIFF
@@ -481,6 +488,10 @@ int HandleEvent(XEvent *event, int *donep)
 
 #ifdef HAVE_JP2K
       else if (client_event->window == jp2kW) JP2KDialog(0);
+#endif
+
+#ifdef HAVE_JXL
+      else if (client_event->window == jxlW) JXLDialog(0);
 #endif
 
 #ifdef HAVE_TIFF
@@ -698,6 +709,9 @@ int HandleEvent(XEvent *event, int *donep)
 #ifdef HAVE_JP2K
 	if (wasJp2kUp) { JP2KDialog(wasJp2kUp);  wasJp2kUp=0; }
 #endif
+#ifdef HAVE_JXL
+	if (wasJxlUp) { JXLDialog(wasJxlUp);  wasJxlUp=0; }
+#endif
 #ifdef HAVE_TIFF
 	if (wasTiffUp) { TIFFDialog(wasTiffUp);  wasTiffUp=0; }
 #endif
@@ -752,6 +766,9 @@ int HandleEvent(XEvent *event, int *donep)
 #endif
 #ifdef HAVE_JP2K
 	  if (jp2kUp) { wasJp2kUp = jp2kUp;  JP2KDialog(0); }
+#endif
+#ifdef HAVE_JXL
+	  if (jxlUp) { wasJxlUp = jxlUp;  JXLDialog(0); }
 #endif
 #ifdef HAVE_TIFF
 	  if (tiffUp) { wasTiffUp = tiffUp;  TIFFDialog(0); }
@@ -1428,6 +1445,10 @@ static void handleButtonEvent(XEvent *event, int *donep, int *retvalp)
     if (JP2KCheckEvent(event)) break;
 #endif
 
+#ifdef HAVE_JXL
+    if (JXLCheckEvent(event)) break;
+#endif
+
 #ifdef HAVE_TIFF
     if (TIFFCheckEvent(event)) break;
 #endif
@@ -1738,6 +1759,10 @@ static void handleKeyEvent(XEvent *event, int *donep, int *retvalp)
 
 #ifdef HAVE_JP2K
     if (JP2KCheckEvent(event)) break;
+#endif
+
+#ifdef HAVE_JXL
+    if (JXLCheckEvent(event)) break;
 #endif
 
 #ifdef HAVE_TIFF
@@ -2857,6 +2882,10 @@ static void QuitOnInterrupt(XtPointer dummy, XtSignalId* Id)
   if (jp2kUp) JP2KDialog(0);  /* close jpeg 2000 window */
 #endif
 
+#ifdef HAVE_JXL
+  if (jxlUp) JXLDialog(0);  /* close jpeg window */
+#endif
+
 #ifdef HAVE_TIFF
   if (tiffUp) TIFFDialog(0);  /* close tiff window */
 #endif
@@ -3478,6 +3507,3 @@ static void annotatePic(void)
   /* if (HaveSelection()) EnableSelection(0); */
   DoImgPaste();
 }
-
-
-

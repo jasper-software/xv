@@ -323,17 +323,99 @@ static void doCmd(int cmd)
 }
 
 
+#endif  /* HAVE_JPEG */
+
+#ifdef HAVE_JPEG_OR_JXL
+
+int prepareJpgSave(IMAGE_SAVE_DATA* data, int colorType, const char* fbasename) {
+  int            i, nc;
+  register byte *ip, *ep;
+  byte          *rmap, *gmap, *bmap;
+
+  data->inpix = GenSavePic(&data->ptype, &data->w, &data->h, &data->pfree, &nc, &rmap, &gmap, &bmap);
+
+  /* this case may not be possible to trigger, but not totally clear, so... */
+  data->npixels = data->w * data->h;
+  if (data->w <= 0 || data->h <= 0 || data->npixels / data->w < data->h) {
+    SetISTR(ISTR_WARNING, "%s:  image dimensions too large (%dx%d)",
+            fbasename, data->w, data->h);
+    return 1;
+  }
+
+  data->image8 = data->image24 = (byte *) NULL;
 
 
+  /* monocity: see if the image is mono, save it that way to save space */
+  if (colorType != F_GREYSCALE) {
+    if (data->ptype == PIC8) {
+      for (i=0; i<nc && rmap[i]==gmap[i] && rmap[i]==bmap[i]; i++);
+      if (i==nc) colorType = F_GREYSCALE;    /* made it all the way through */
+    }
+    else {  /* PIC24 */
+      for (i=0,ip=data->inpix; i<data->npixels && ip[0]==ip[1] && ip[1]==ip[2]; i++,ip+=3);
+      if (i==data->npixels) colorType = F_GREYSCALE;  /* all the way through */
+    }
+  }
+
+
+  /* first thing to do is build an 8/24-bit Greyscale/TrueColor image
+     (meaning: non-colormapped) */
+
+  if (colorType == F_GREYSCALE) {   /* build an 8-bit Greyscale image */
+    data->image8 = (byte *) malloc((size_t) data->npixels);
+    if (!data->image8) FatalError("writeJPEG: unable to malloc image8\n");
+
+    if (data->ptype == PIC8) {
+      for (i=0,ip=data->image8,ep=data->inpix; i<data->npixels; i++, ip++, ep++)
+	*ip = MONO(rmap[*ep], gmap[*ep], bmap[*ep]);
+    }
+    else {  /* PIC24 */
+      for (i=0,ip=data->image8,ep=data->inpix; i<data->npixels; i++, ip++, ep+=3)
+	*ip = MONO(ep[0],ep[1],ep[2]);
+    }
+  }
+
+  else {    /* *not* F_GREYSCALE */
+    if (data->ptype == PIC8) {
+      int count = 3*data->npixels;
+
+      /* already know npixels > 0 (above) */
+      if (count/3 < data->npixels) {
+        SetISTR(ISTR_WARNING, "%s:  image dimensions too large (%dx%d)",
+                fbasename, data->w, data->h);
+        return 2;
+      }
+
+      data->image24 = (byte *) malloc((size_t) count);
+      if (!data->image24) {  /* this simply isn't going to work */
+	FatalError("writeJPEG: unable to malloc image24\n");
+      }
+
+      for (i=0, ip=data->image24, ep=data->inpix; i<data->npixels; i++, ep++) {
+	*ip++ = rmap[*ep];
+	*ip++ = gmap[*ep];
+	*ip++ = bmap[*ep];
+      }
+    }
+
+    else {  /* PIC24 */
+      data->image24 = data->inpix;
+    }
+  }
+
+  return 0;
+}
+
+#endif  /* HAVE_JPEG || HAVE_JXL */
+
+#ifdef HAVE_JPEG
 
 /*******************************************/
 static void writeJPEG(void)
 {
   FILE          *fp;
-  int            i, nc, rv, w, h, npixels, ptype, pfree;
-  register byte *ip, *ep;
-  byte          *inpix, *rmap, *gmap, *bmap;
-  byte          *image8, *image24;
+  int            rv;
+  IMAGE_SAVE_DATA imageData = { 0 };
 
   /* get the XV image into a format that the JPEG software can grok on.
      Also, open the output file, so we don't waste time doing this format
@@ -346,85 +428,19 @@ static void writeJPEG(void)
   fbasename = BaseName(filename);
 
   WaitCursor();
-  inpix = GenSavePic(&ptype, &w, &h, &pfree, &nc, &rmap, &gmap, &bmap);
 
-  /* this case may not be possible to trigger, but not totally clear, so... */
-  npixels = w*h;
-  if (w <= 0 || h <= 0 || npixels/w < h) {
-    SetISTR(ISTR_WARNING, "%s:  image dimensions too large (%dx%d)",
-            fbasename, w, h);
-    return;
-  }
-
-  image8 = image24 = (byte *) NULL;
-
-
-  /* monocity: see if the image is mono, save it that way to save space */
-  if (colorType != F_GREYSCALE) {
-    if (ptype == PIC8) {
-      for (i=0; i<nc && rmap[i]==gmap[i] && rmap[i]==bmap[i]; i++);
-      if (i==nc) colorType = F_GREYSCALE;    /* made it all the way through */
-    }
-    else {  /* PIC24 */
-      for (i=0,ip=inpix; i<npixels && ip[0]==ip[1] && ip[1]==ip[2]; i++,ip+=3);
-      if (i==npixels) colorType = F_GREYSCALE;  /* all the way through */
-    }
-  }
-
-
-  /* first thing to do is build an 8/24-bit Greyscale/TrueColor image
-     (meaning: non-colormapped) */
-
-  if (colorType == F_GREYSCALE) {   /* build an 8-bit Greyscale image */
-    image8 = (byte *) malloc((size_t) npixels);
-    if (!image8) FatalError("writeJPEG: unable to malloc image8\n");
-
-    if (ptype == PIC8) {
-      for (i=0,ip=image8,ep=inpix; i<npixels; i++, ip++, ep++)
-	*ip = MONO(rmap[*ep], gmap[*ep], bmap[*ep]);
-    }
-    else {  /* PIC24 */
-      for (i=0,ip=image8,ep=inpix; i<npixels; i++, ip++, ep+=3)
-	*ip = MONO(ep[0],ep[1],ep[2]);
-    }
-  }
-
-  else {    /* *not* F_GREYSCALE */
-    if (ptype == PIC8) {
-      int count = 3*npixels;
-
-      /* already know npixels > 0 (above) */
-      if (count/3 < npixels) {
-        SetISTR(ISTR_WARNING, "%s:  image dimensions too large (%dx%d)",
-                fbasename, w, h);
-        return;
-      }
-
-      image24 = (byte *) malloc((size_t) count);
-      if (!image24) {  /* this simply isn't going to work */
-	FatalError("writeJPEG: unable to malloc image24\n");
-      }
-
-      for (i=0, ip=image24, ep=inpix; i<npixels; i++, ep++) {
-	*ip++ = rmap[*ep];
-	*ip++ = gmap[*ep];
-	*ip++ = bmap[*ep];
-      }
-    }
-
-    else {  /* PIC24 */
-      image24 = inpix;
-    }
+  if (prepareJpgSave(&imageData, colorType, fbasename)) {
+      return;
   }
 
   /* in any event, we've got some valid image.  Do the JPEG Thing */
-  rv = writeJFIF(fp, (colorType==F_GREYSCALE) ? image8 : image24,
-		 w, h, colorType);
+  rv = writeJFIF(fp, (colorType==F_GREYSCALE) ? imageData.image8 : imageData.image24,
+		 imageData.w, imageData.h, colorType);
 
-  if      (colorType == F_GREYSCALE) free(image8);
-  else if (ptype == PIC8)            free(image24);
+  if      (colorType == F_GREYSCALE)  free(imageData.image8);
+  else if (imageData.ptype == PIC8)   free(imageData.image24);
 
-  if (pfree) free(inpix);
+  if (imageData.pfree) free(imageData.inpix);
 
   if (CloseOutFileWhy(fp, filename, rv, errbuffer) == 0) DirBox(0);
   SetCursors(-1);

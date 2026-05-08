@@ -447,6 +447,7 @@
 
 #ifdef DOJPEG
 #  define HAVE_JPEG
+#  define HAVE_JPEG_OR_JXL
 #endif
 
 #ifdef DOEXIF
@@ -455,6 +456,11 @@
 
 #ifdef DOJP2K
 #  define HAVE_JP2K
+#endif
+
+#ifdef DOJXL
+#  define HAVE_JXL
+#  define HAVE_JPEG_OR_JXL
 #endif
 
 #ifdef DOTIFF
@@ -611,6 +617,12 @@
 #  define F_JP2INC  0
 #endif
 
+#ifdef HAVE_JXL
+#  define F_JXLINC  1
+#else
+#  define F_JXLINC  0
+#endif
+
 #ifdef HAVE_TIFF
 #  define F_TIFINC  1
 #else
@@ -675,8 +687,9 @@
 #define F_JPEG      ( 0 + F_PNGINC)
 #define F_JPC       ( 0 + F_PNGINC + F_JPGINC)
 #define F_JP2       ( 0 + F_PNGINC + F_JPGINC + F_JP2INC)
-#define F_GIF       ( 0 + F_PNGINC + F_JPGINC + F_JP2INC + F_JP2INC)  /* always avail; index varies */
-#define F_TIFF      ( 0 + F_PNGINC + F_JPGINC + F_JP2INC + F_JP2INC + F_TIFINC)
+#define F_JXL       ( 0 + F_PNGINC + F_JPGINC + F_JP2INC + F_JP2INC)
+#define F_GIF       ( 0 + F_PNGINC + F_JPGINC + F_JP2INC + F_JP2INC + F_JXLINC)  /* always avail; index varies */
+#define F_TIFF      ( 0 + F_PNGINC + F_JPGINC + F_JP2INC + F_JP2INC + F_JXLINC + F_TIFINC)
 #define F_PS        ( 1 + F_TIFF)
 #define F_PBMRAW    ( 2 + F_TIFF)
 #define F_PBMASCII  ( 3 + F_TIFF)
@@ -750,6 +763,7 @@
 #define RFT_PI       (JP_EXT_RFT + 4)
 #define RFT_PIC2     (JP_EXT_RFT + 5)
 #define RFT_MGCSFX   (JP_EXT_RFT + 6)
+#define RFT_JXL      (JP_EXT_RFT + 7)
 
 /* definitions for page up/down, arrow up/down list control */
 #define LS_PAGEUP   0
@@ -1193,6 +1207,17 @@ typedef enum orientation {
 	ORIENT_ROT270 = 8,
 } orientation_t;
 
+typedef struct { int    w;
+                 int    h;
+                 int    npixels;
+                 int    ptype;
+                 int    pfree;
+                 byte*  image8;
+                 byte*  image24;
+                 byte*  inpix;
+               } IMAGE_SAVE_DATA;
+
+int prepareJpgSave(IMAGE_SAVE_DATA* data, int colorType, const char* fbasename);
 
 /* MACROS */
 #define CENTERX(f,x,str) ((x)-XTextWidth(f,str, (int) strlen(str))/2)
@@ -1491,6 +1516,11 @@ WHERE Window        jp2kW;
 WHERE int           jp2kUp;       /* is jp2kW mapped, or what? */
 #endif
 
+#ifdef HAVE_JXL
+/* stuff used for 'jxl' box */
+WHERE Window        jxlW;
+WHERE int           jxlUp;       /* is jxlW mapped, or what? */
+#endif
 
 #ifdef HAVE_TIFF
 /* stuff used for 'tiff' box */
@@ -2149,6 +2179,14 @@ void JPEGDialog            PARM((int));
 int  JPEGCheckEvent        PARM((XEvent *));
 void JPEGSaveParams        PARM((char *, int));
 void VersionInfoJPEG       PARM((void));		/* GRR 19980605 */
+
+/**************************** XVJXL.C ***************************/
+int  LoadJXL               PARM((char *, PICINFO *));
+void CreateJXLW            PARM((void));
+void JXLDialog             PARM((int));
+int  JXLCheckEvent         PARM((XEvent *));
+void JXLSaveParams         PARM((char *, int));
+void VersionInfoJXL        PARM((void));
 
 /**************************** XVMAG.C ***************************/
 int   LoadMAG              PARM((char *, PICINFO *));
