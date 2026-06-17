@@ -23,6 +23,7 @@ project(xv VERSION ${XV_VERSION} LANGUAGES C)
 ################################################################################
 
 option(XV_ENABLE_JPEG "Enable JPEG Support" ON)
+option(XV_ENABLE_JXL "Enable JPEG XL Support" ON)
 option(XV_ENABLE_EXIF "Enable EXIF Support" ON)
 option(XV_ENABLE_JP2K "Enable JP2K Support" ON)
 option(XV_ENABLE_PDS  "Enable PDF Support" ON)
@@ -189,9 +190,15 @@ if(XV_ENABLE_JP2K AND NOT TARGET Jasper::Jasper)
 	set(XV_ENABLE_JP2K OFF)
 endif()
 
+find_package(JXL)
+if(XV_ENABLE_JXL AND NOT TARGET JXL::JXL)
+	message(WARNING "Disabling JPEG XL Support.")
+	set(XV_ENABLE_JXL OFF)
+endif()
+
 find_package(JPEG)
 if(XV_ENABLE_JPEG AND NOT TARGET JPEG::JPEG)
-	message(WARNING "Disabling JPEG-2000 Support.")
+	message(WARNING "Disabling JPEG Support.")
 	set(XV_ENABLE_JPEG OFF)
 
 endif()
@@ -245,6 +252,7 @@ endif()
 
 message("JP2K: ${XV_ENABLE_JP2K}")
 message("JPEG: ${XV_ENABLE_JPEG}")
+message("JPEG XL: ${XV_ENABLE_JXL}")
 message("EXIF: ${XV_ENABLE_EXIF}")
 message("TIFF: ${XV_ENABLE_TIFF}")
 message("PNG: ${XV_ENABLE_PNG}")

@@ -330,6 +330,10 @@ int main(int argc, char **argv)
   jp2kW = (Window) None;  jp2kUp = 0;
 #endif
 
+#ifdef HAVE_JXL
+  jxlW = (Window) None;  jxlUp = 0;
+#endif
+
 #ifdef HAVE_TIFF
   tiffW = (Window) None;  tiffUp = 0;
 #endif
@@ -1050,6 +1054,11 @@ int main(int argc, char **argv)
 #ifdef HAVE_JP2K
   CreateJP2KW();
   XSetTransientForHint(theDisp, jp2kW, dirW);
+#endif
+
+#ifdef HAVE_JXL
+  CreateJXLW();
+  XSetTransientForHint(theDisp, jxlW, dirW);
 #endif
 
 #ifdef HAVE_TIFF
@@ -2073,6 +2082,9 @@ static void cmdSyntax(int i)
 #endif
 #ifdef HAVE_JP2K
   VersionInfoJP2K();
+#endif
+#ifdef HAVE_JXL
+  VersionInfoJXL();
 #endif
 #ifdef HAVE_TIFF
   VersionInfoTIFF();
@@ -3353,6 +3365,14 @@ int ReadFileType(char *fname)
   else if (memcmp(magicno, jp2k_magic, sizeof(jp2k_magic))==0) rv = RFT_JP2;
 #endif
 
+#ifdef HAVE_JXL
+  else if ((magicno[0]==0xff && magicno[1]==0x0a) ||
+      (magicno[0]==0x00 && magicno[1]==0x00 && magicno[2]==0x00 &&
+       magicno[3]==0x0C && magicno[4]==0x4a && magicno[5]==0x58 &&
+       magicno[6]==0x4c && magicno[7]==0x20 && magicno[8]==0x0D &&
+       magicno[9]==0x0A && magicno[10]==0x87 && magicno[11]==0x0A)) rv = RFT_JXL;
+#endif
+
 #ifdef HAVE_TIFF
   else if ((magicno[0]=='M' && magicno[1]=='M') ||
 	   (magicno[0]=='I' && magicno[1]=='I'))              rv = RFT_TIFF;
@@ -3497,6 +3517,10 @@ int ReadPicFile(char *fname, int ftype, PICINFO *pinfo, int quick)
 #ifdef HAVE_JP2K
   case RFT_JPC:     rv = LoadJPC   (fname, pinfo, quick);  break;
   case RFT_JP2:     rv = LoadJP2   (fname, pinfo, quick);  break;
+#endif
+
+#ifdef HAVE_JXL
+  case RFT_JXL:     rv = LoadJXL   (fname, pinfo);         break;
 #endif
 
 #ifdef HAVE_TIFF
