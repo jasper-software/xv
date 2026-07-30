@@ -16,6 +16,7 @@
 unsigned int get_exif_orientation(byte *buf, unsigned int bufsize)
 {
 #ifndef HAVE_EXIF
+	(void) buf;  (void) bufsize;
 	return ORIENT_NONE;
 #else
 	ExifData *exif_data;

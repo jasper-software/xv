@@ -550,7 +550,11 @@ int LoadPDS(char *fname, PICINFO *pinfo)
       } else if (lastwasinote) {
 	tmptmp=scanbuff;
 	while (((*tmptmp) == ' ') || ((*tmptmp)  == '"')) tmptmp++;
-	strncat(inote, tmptmp, INOTESIZE - strlen(inote) - 1);
+	{
+	  size_t inote_len = strlen(inote);
+	  if (inote_len < INOTESIZE)
+	    snprintf(inote+inote_len, INOTESIZE+1-inote_len, "%s", tmptmp);
+	}
 	strcat(inote," ");
 	if (index(tmptmp,'"') != NULL)
 	    lastwasinote=FALSE;
