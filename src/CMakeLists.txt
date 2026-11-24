@@ -44,8 +44,8 @@ endif()
 
 if(XV_ENABLE_JXL)
 	add_compile_definitions(DOJXL)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${JXL_CFLAGS}")
-	set(xv_libs "${xv_libs} ${JXL_LDFLAGS}")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${JXL_CFLAGS})
+	set(xv_libs ${xv_libs} ${JXL_LDFLAGS})
 endif()
 
 if(XV_ENABLE_G3)
