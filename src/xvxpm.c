@@ -101,16 +101,20 @@ int LoadXPM(char *fname, PICINFO *pinfo)
   line_pos = 0;
 
   /* Now, read in the string */
-  while (((c = XpmGetc(fp))!=EOF) && (line_pos < VALUES_LEN) && (c != '"')) {
+  /* VALUES_LEN-1 leaves room for the terminating '\0' */
+  while (((c = XpmGetc(fp))!=EOF) && (line_pos < VALUES_LEN-1) && (c != '"')) {
     values[line_pos++] = c;
   }
   if (c != '"')
     return (XpmLoadError(bname, "error parsing values line"));
 
   values[line_pos] = '\0';
+  w = h = nc = cpp = 0;		/* sscanf may not set them all */
   sscanf(values, "%d%d%d%d", &w, &h, &nc, &cpp);
   if (nc <= 0 || cpp <= 0)
     return (XpmLoadError(bname, "No colours in Xpm?"));
+  if (cpp >= TOKEN_LEN)		/* token and pixel are TOKEN_LEN bytes */
+    return (XpmLoadError(bname, "Too many characters per pixel"));
 
   npixels = w * h;
   if (w <= 0 || h <= 0 || npixels/w != h)
@@ -410,8 +414,9 @@ static int hash(char *token)
 {
   int i, sum;
 
+  /* unsigned, so bytes > 127 and EOF can't make the key negative */
   for (i=sum=0; token[i] != '\0'; i++)
-    sum += token[i];
+    sum += (unsigned char) token[i];
 
   sum = sum % hash_len;
   return (sum);
