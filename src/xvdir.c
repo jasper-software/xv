@@ -72,7 +72,11 @@ static const char *saveFormats[] = {
 #ifdef HAVE_JP2K
 					"JPEG 2000",
 					"JP2",
-#endif 
+#endif
+
+#ifdef HAVE_JXL
+                                        "JPEG XL",
+#endif
 					"GIF",
 #ifdef HAVE_TIFF
 					"TIFF",
@@ -1623,6 +1627,15 @@ int DoSave(void)
   }
 #endif
 
+#ifdef HAVE_JXL
+  else if (fmt == F_JXL) {   /* JXL */
+    JXLSaveParams(fullname, col);
+    JXLDialog(1);                  /* open JXL Dialog box */
+    dbut[S_BOK].lit = 0;  BTRedraw(&dbut[S_BOK]);
+    return 0;                      /* always 'succeeds' */
+  }
+#endif
+
 #ifdef HAVE_TIFF
   else if (fmt == F_TIFF) {   /* TIFF */
     TIFFSaveParams(fullname, col);
@@ -2018,6 +2031,9 @@ static void changeSuffix(void)
       (strcmp(lowsuf,"jpc" )==0) ||
       (strcmp(lowsuf,"jp2" )==0) ||
 #endif
+#ifdef HAVE_JXL
+      (strcmp(lowsuf,"jxl" )==0) ||
+#endif
 #ifdef HAVE_TIFF
       (strcmp(lowsuf,"tif" )==0) ||
       (strcmp(lowsuf,"tiff")==0) ||
@@ -2073,6 +2089,10 @@ static void changeSuffix(void)
 #ifdef HAVE_JP2K
     case F_JPC:      strcpy(lowsuf,"jpc");  break;
     case F_JP2:      strcpy(lowsuf,"jp2");  break;
+#endif
+
+#ifdef HAVE_JXL
+    case F_JXL:      strcpy(lowsuf,"jxl"); break;
 #endif
 
 #ifdef HAVE_TIFF
@@ -2338,7 +2358,7 @@ int CloseOutFileWhy(FILE *fp, const char *filename, int failed, const char *why)
   if (failed) {    /* failure during format-specific output routine */
     char  str[2048];
     if (why)
-	    snprintf(str, 2048, "Couldn't write file '%s' (%s).", outFName, 
+	    snprintf(str, 2048, "Couldn't write file '%s' (%s).", outFName,
 		why);
     else
 	    snprintf(str, 2048, "Couldn't write file '%s'.", outFName);
