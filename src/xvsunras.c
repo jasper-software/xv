@@ -352,7 +352,9 @@ static void sunRas8to1 (byte *dest, byte *src, int len, int flip)
   }
   if (b) {
     if (flip) c = ~c;
-    *dest = (byte) ((c<<(8-b)) & 0xff);
+    /* shift as unsigned: after ~c, c is negative, and shifting a
+       negative int left is undefined */
+    *dest = (byte) (((unsigned int) c << (8-b)) & 0xff);
   }
 }
 
