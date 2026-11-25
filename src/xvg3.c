@@ -150,6 +150,14 @@ LoadG3 (char *fname, PICINFO *pinfo)
     last_allocated_row = rows;
     rows -= 2;
 
+    if ( rows <= 0 || cols <= 0 ) {	/* truncated file, no rows left */
+	for ( row = 0; row <= last_allocated_row; ++row ) {
+	    if (row==0 || (row>0 && bytes[row]!=bytes[row-1])) free(bytes[row]);
+	}
+	SetISTR(ISTR_WARNING, "LoadG3: no image data in %s", fname);
+	return 0;
+    }
+
     if ((pinfo->pic = (byte *) malloc( rows*cols*sizeof(byte) ))==(byte*) NULL)
 	return 0;
 
@@ -327,10 +335,12 @@ rawgetbit(FILE *file)
 	{
 	shdata = getc( file );
 	if ( shdata == EOF ) {
-	    char errmsg[64];
-	    sprintf(errmsg, "LoadG3: EOF / read error at line %d", eols);
-            FatalError(errmsg);
-	    return 0;
+	    /* treat EOF as end of image instead of FatalError().
+	     * rawzeros = 11 plus a 1 bit ends skiptoeol() and getfaxrow(). */
+	    SetISTR(ISTR_WARNING, "LoadG3: EOF / read error at line %d", eols);
+	    endoffile = 1;
+	    rawzeros = 11;
+	    return 1;
 	    }
 	shbit = reversebits ? 0x01 : 0x80;
 	}
