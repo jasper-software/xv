@@ -27,8 +27,10 @@
 
 typedef int boolean;
 
-#define NEXTBYTE (*dataptr++)
-#define SKIPBYTE (dataptr++)	/* quiet some compiler warnings */
+/* never read past the end of the file data; past the end every
+ * byte reads as 0, which ends all sub-block loops */
+#define NEXTBYTE (dataptr < dataend ? *dataptr++ : 0)
+#define SKIPBYTE (dataptr < dataend ? (void) dataptr++ : (void) 0)	/* quiet some compiler warnings */
 #define EXTENSION     0x21
 #define IMAGESEP      0x2c	/* a.k.a. Image Descriptor */
 #define TRAILER       0x3b
@@ -104,6 +106,7 @@ static void  gifWarning  PARM((const char *));
 static long int    filesize;
 static const char *bname;
 static byte       *dataptr;
+static byte       *dataend;	/* one past the last byte read from the file */
 
 
 /*****************************/
@@ -155,6 +158,7 @@ int LoadGIF(char *fname, PICINFO *pinfo)
     return( gifError(pinfo, "GIF data read failed") );
   fclose(fp);
 
+  dataend = RawGIF + filesize;
   origptr = dataptr;
 
   if      (strncmp((char *) dataptr, id87, (size_t) 6)==0) gif89 = 0;
@@ -465,7 +469,9 @@ int LoadGIF(char *fname, PICINFO *pinfo)
         numcols = ColorMapSize = GlobalColorMapSize;
         BitMask = GlobalBitMask;
       }
+      /* on failure readImage() has already freed RawGIF via gifError() */
       if (readImage(pinfo)) ++pinfo->numpages;
+      else return 0;
       if (DEBUG) fprintf(stderr, "  at end:   offset=0x%lx\n",
                          (unsigned long)(dataptr-RawGIF));
     }
@@ -540,6 +546,7 @@ static int readImage(PICINFO *pinfo)
   boolean       HasLocalColormap;
 
   npixels = maxpixels = 0;
+  pic8 = NULL;	/* the previous page's pic8 is owned (and freed) by pinfo */
 
   /* read in values from the image descriptor */
 
@@ -600,6 +607,9 @@ static int readImage(PICINFO *pinfo)
    */
 
   CodeSize = NEXTBYTE;
+  /* codes are at most 12 bits, so the initial code size is at most 11 */
+  if (CodeSize > 11)
+    return( gifError(pinfo, "corrupt GIF file (code size out of range)") );
 
   ClearCode = (1 << CodeSize);
   EOFCode = ClearCode + 1;
@@ -628,7 +638,7 @@ static int readImage(PICINFO *pinfo)
   do {
     ch = ch1 = NEXTBYTE;
     while (ch--) { *ptr1 = NEXTBYTE; ptr1++; }
-    if ((dataptr - RawGIF) > filesize) {
+    if ((dataptr - RawGIF) >= filesize) {	/* dataptr stops at dataend */
       SetISTR(ISTR_WARNING,"%s:  %s", bname,
 	      "This GIF file seems to be truncated.  Winging it.");
       break;
@@ -868,6 +878,7 @@ static int gifError(PICINFO *pinfo, const char *st)
 
   if (RawGIF != NULL) free(RawGIF);
   if (Raster != NULL) free(Raster);
+  RawGIF = Raster = NULL;	/* no double free on a later error */
 
   if (pinfo->pic) free(pinfo->pic);
   if (pinfo->comment) free(pinfo->comment);
