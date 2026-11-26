@@ -1330,10 +1330,10 @@ static void doPixel(byte *pic24, int w, int h, byte *results, int selx, int sely
       nsum = rsum = gsum = bsum = 0;
       for (y1=y; y1<y+pixY; y1++) {
 	pp = pic24 + (y1 * w + x) * 3;
-	for (x1=x; x1<x+pixX; x1++) {
+	for (x1=x; x1<x+pixX; x1++, pp+=3) {
 	  if (PTINRECT(x1,y1, selx,sely,selw,selh)) {
 	    nsum++;
-	    rsum += *pp++;  gsum += *pp++;  bsum += *pp++;
+	    rsum += pp[0];  gsum += pp[1];  bsum += pp[2];
 	  }
 	}
       }
